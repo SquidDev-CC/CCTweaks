@@ -23,7 +23,8 @@ hs_err_pid*
 .LSOverride
 
 # Icon must ends with two \r.
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -50,3 +51,33 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+
+# =========================
+# Forge Files
+# =========================
+
+/bin/
+/lib/ # Include libs manually
+
+# Gradle
+# =========================
+/.gradle
+/build/
+/run/
+
+# Idea
+# =========================
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+# =========================
+/eclipse/
+/.classpath
+/.project
+/.settings/
+/debug/
+*.lock
+/.metadata/
+out
