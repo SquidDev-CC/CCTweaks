@@ -1,0 +1,43 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		maven {
+			name = "forge"
+			url = "http://files.minecraftforge.net/maven"
+		}
+	}
+	dependencies {
+		classpath 'net.minecraftforge.gradle:ForgeGradle:1.0-SNAPSHOT'
+
+	}
+}
+
+apply plugin: 'forge'
+
+// Define properties file
+ext.configFile = file "build.properties"
+
+configFile.withReader {
+	// Load config.  It shall from now be referenced as simply config or project.config
+	def prop = new Properties()
+	prop.load(it)
+	project.ext.config = new ConfigSlurper().parse prop
+}
+
+version = "${config.mc_version}-${config.mod_version}"
+group= "squiddev.cctweaks"
+archivesBaseName = "cctweaks"
+
+
+minecraft {
+	version = "${config.mc_version}-${config.forge_version}"
+	runDir = 'run'
+	replace '${version}', project.version
+}
+
+dependencies {
+    compile files (
+            "libs/CodeChickenCore-${config.mc_version}-${config.codechicken_version}-dev.jar",
+            "libs/ComputerCraft${config.computercraft_version}.jar",
+    )
+}

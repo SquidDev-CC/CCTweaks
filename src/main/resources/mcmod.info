@@ -1,0 +1,20 @@
+[
+	{
+		"modid": "CCTweaks",
+		"name": "CCTweaks",
+		"description": "Random tweaks to Computer Craft",
+		"version": "${version}",
+		"mcversion": "${mcversion}",
+		"url": "",
+		"updateUrl": "",
+		"authors": [
+			"SquidDev"
+		],
+		"credits": "Dan200, Forge team",
+		"logoFile": "",
+		"screenshots": [],
+		"dependencies": [
+			"ComputerCraft"
+		]
+	}
+]
