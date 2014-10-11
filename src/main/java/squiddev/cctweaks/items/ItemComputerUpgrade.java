@@ -82,6 +82,14 @@ public class ItemComputerUpgrade extends ItemBase {
 	}
 
 	private boolean upgradeTurtle(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, TileTurtle computerTile){
+		// If we set the turtle as moved, the destroy method won't drop the items
+		try {
+			ComputerAccessor.turtleTileMoved.setBoolean(computerTile, true);
+		}catch(Exception e) {
+			DebugLogger.warning("Cannot set TurtleTile m_moved in ItemComputerUpgrade");
+			return false;
+		}
+
 		// Set block as AdvancedTurtle
 		world.setBlock(x, y, z, ComputerCraft.Blocks.turtleAdvanced);
 		TileEntity newTile = world.getTileEntity(x, y, z);
