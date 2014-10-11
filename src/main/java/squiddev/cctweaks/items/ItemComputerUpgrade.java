@@ -6,7 +6,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import squiddev.cctweaks.reference.Config;
 import squiddev.cctweaks.reference.Localisation;
 import squiddev.cctweaks.utils.BlockNotifyFlags;
 import squiddev.cctweaks.utils.ComputerAccessor;
@@ -21,7 +20,7 @@ import dan200.computercraft.shared.turtle.blocks.TileTurtle;
 
 public class ItemComputerUpgrade extends ItemBase {
 	public ItemComputerUpgrade() {
-		super(Config.itemIdComputerUpgrade, "computerUpgrade");
+		super("computerUpgrade");
 	}
 
 	@Override
@@ -30,7 +29,7 @@ public class ItemComputerUpgrade extends ItemBase {
 			return false;
 		}
 
-		TileEntity tile = world.getBlockTileEntity(x, y, z);
+		TileEntity tile = world.getTileEntity(x, y, z);
 		if(tile !=null && !(tile instanceof TileComputerBase)){
 			return false;
 		}
@@ -55,9 +54,9 @@ public class ItemComputerUpgrade extends ItemBase {
 
 		// Set metadata
 		int metadata = world.getBlockMetadata(x, y, z);
-		world.setBlock(x, y, z, ComputerCraft.computerBlockID, metadata + 8, BlockNotifyFlags.SEND_TO_CLIENTS);
+		world.setBlock(x, y, z, ComputerCraft.Blocks.computer, metadata + 8, BlockNotifyFlags.SEND_TO_CLIENTS);
 
-		TileEntity newTile = world.getBlockTileEntity(x, y, z);
+		TileEntity newTile = world.getTileEntity(x, y, z);
 
 		if(newTile == null || !(newTile instanceof TileComputerBase)){
 			return false;
@@ -83,9 +82,17 @@ public class ItemComputerUpgrade extends ItemBase {
 	}
 
 	private boolean upgradeTurtle(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, TileTurtle computerTile){
+		// If we set the turtle as moved, the destroy method won't drop the items
+		try {
+			ComputerAccessor.turtleTileMoved.setBoolean(computerTile, true);
+		}catch(Exception e) {
+			DebugLogger.warning("Cannot set TurtleTile m_moved in ItemComputerUpgrade");
+			return false;
+		}
+
 		// Set block as AdvancedTurtle
-		world.setBlock(x, y, z, ComputerCraft.turtleAdvancedBlockID);
-		TileEntity newTile = world.getBlockTileEntity(x, y, z);
+		world.setBlock(x, y, z, ComputerCraft.Blocks.turtleAdvanced);
+		TileEntity newTile = world.getTileEntity(x, y, z);
 
 		// Transfer state
 		if(newTile == null || !(newTile instanceof TileTurtle)){
@@ -95,13 +102,14 @@ public class ItemComputerUpgrade extends ItemBase {
 		newTurtle.transferStateFrom(computerTile);
 
 		newTurtle.createServerComputer().setWorld(world);
+		newTurtle.createServerComputer().setPosition(x, y, z);
 		newTurtle.updateBlock();
 
 		// 'Use' item and return
 		if(!player.capabilities.isCreativeMode){
 			stack.stackSize -= 1;
 		}
-		return !true;
+		return true;
 	}
 	@Override
 	@SideOnly(Side.CLIENT)

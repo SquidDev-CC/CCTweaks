@@ -1,18 +1,14 @@
 package squiddev.cctweaks.utils;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import squiddev.cctweaks.reference.Config;
-import squiddev.cctweaks.reference.ModInfo;
-import cpw.mods.fml.common.FMLLog;
 
 public class DebugLogger {
 	private static Logger logger;
 
-	static{
-		logger = Logger.getLogger(ModInfo.NAME);
-		logger.setParent(FMLLog.getLogger());
+	public static void init(Logger log){
+		logger = log;
 	}
 
 	public static void debug(String message, Object... args){
@@ -26,10 +22,10 @@ public class DebugLogger {
 	}
 
 	public static void warning(String message){
-		logger.log(Level.WARNING, message);
+		logger.log(Level.WARN, message);
 	}
 
 	public static void error(String message){
-		logger.log(Level.SEVERE, message);
+		logger.log(Level.ERROR, message);
 	}
 }

@@ -13,10 +13,9 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkMod;
+import squiddev.cctweaks.utils.DebugLogger;
 
 @Mod(modid = ModInfo.ID, name = ModInfo.NAME, version = ModInfo.VERSION, dependencies = ModInfo.DEPENDENCIES)
-@NetworkMod(clientSideRequired = ModInfo.REQUIRED_CLIENT, serverSideRequired = ModInfo.REQUIRED_SERVER)
 public class CCTweaks {
 
 	// The instance of your mod that Forge uses.
@@ -32,6 +31,7 @@ public class CCTweaks {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		Config.ConfigHandler.init(event.getSuggestedConfigurationFile());
+		DebugLogger.init(event.getModLog());
 	}
 
 	@EventHandler
