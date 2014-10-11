@@ -2,15 +2,16 @@ package squiddev.cctweaks.reference;
 
 import java.io.File;
 
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 
 public final class Config {
-	// Item ID
-	private static int startItemID = 4490;
-	public static int itemIdComputerUpgrade = startItemID++;
-
 	// Feature enabled
-	public static boolean enableItemComputerUpgrades;
+	public static boolean enableItemComputerUpgrades = true;
+	public static boolean enableTurtleToolHost = true;
+
+	// Turtle Upgrade Ids
+	private static int turtleStartId = 360;
+	public static int turtleToolHostId = ++turtleStartId;
 
 	// Debugging variables
 	public static boolean debug;
@@ -18,15 +19,12 @@ public final class Config {
 	public static final class ConfigHandler{
 		private static Configuration config;
 
-		// Sections
-		private static final String ITEMID = "itemId";
-		private static final String BLOCKID = "blockId";
 		private static final String ENABLED = "enabled";
+		private static final String TURTLE_IDS = "turtle_ids";
 
 		// Description
 		private static final String ENABLE_FORMAT = "Enable the %s";
-		private static final String ITEMID_FORMAT = "The ID for the %s Item";
-		private static final String BLOCKID_FORMAT = "The Block ID of the %s Block";
+		private static final String TURTLE_ID_FORMAT = "The turtle upgrade id of %s";
 
 
 		public static void init(File file) {
@@ -35,41 +33,27 @@ public final class Config {
 
 			sync();
 		}
-		public static void sync(){
-			// Item ids
-			itemIdComputerUpgrade = getItemId("Computer Upgrade", itemIdComputerUpgrade);
 
+		public static void sync(){
 			// Enabled
 			enableItemComputerUpgrades = getEnabled("Computer Upgrade");
+			enableTurtleToolHost = getEnabled("Turtle Tool Host");
+
+			// Turtle Ids
+			turtleToolHostId = getTurtleUpgradeId("Turtle Tool Host", turtleToolHostId);
 
 			// Is debugging
-			debug = getBoolean("misc", "debugging", false, "Is debugging");
+			debug = config.getBoolean("debugging", "misc", false, "Is debugging");
 
-			if (config.hasChanged()) {
-				config.save();
-			}
+			config.save();
 		}
-
-		private static boolean getBoolean(String cat, String key, boolean defaultBool, String desc) {
-			return config.get(cat, key, defaultBool, desc).getBoolean(defaultBool);
-		}
-
-		private static int getInt(String cat, String key, int defaultInt, String desc) {
-			return config.get(cat, key, defaultInt, desc).getInt();
-		}
-
 		private static boolean getEnabled(String key) {
-			return getBoolean(ENABLED, key, true, String.format(ENABLE_FORMAT, key));
+			return config.getBoolean(key, ENABLED, true, String.format(ENABLE_FORMAT, key));
 		}
 
-		private static int getBlockId(String key, int defId) {
-			return getInt(BLOCKID, key, defId, String.format(BLOCKID_FORMAT, key));
+		private static int getTurtleUpgradeId(String key, int defaultValue)
+		{
+			return config.getInt(key, TURTLE_IDS, defaultValue, 64, 32767, String.format(TURTLE_ID_FORMAT, key));
 		}
-
-		private static int getItemId(String key, int defId) {
-			return getInt(ITEMID, key, defId, String.format(ITEMID_FORMAT, key));
-		}
-
-
 	}
 }

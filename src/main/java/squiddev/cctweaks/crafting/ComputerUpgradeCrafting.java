@@ -36,7 +36,6 @@ public class ComputerUpgradeCrafting implements IRecipe{
 			if(item instanceof ItemComputerUpgrade){
 				containsUpgrade = true;
 			}else if(item instanceof IComputerItem){
-				IComputerItem computer = (IComputerItem)item;
 				if(((IComputerItem) item).getFamily(itemStack) != ComputerFamily.Normal){
 					return false;
 				}

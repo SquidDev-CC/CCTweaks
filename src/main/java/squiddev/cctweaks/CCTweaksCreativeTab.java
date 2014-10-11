@@ -1,8 +1,10 @@
 package squiddev.cctweaks;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import squiddev.cctweaks.reference.Config;
+import squiddev.cctweaks.registry.ItemRegistry;
 
 public class CCTweaksCreativeTab extends CreativeTabs {
 
@@ -11,11 +13,10 @@ public class CCTweaksCreativeTab extends CreativeTabs {
 	}
 
 	@Override
-	public int getTabIconItemIndex() {
+	public Item getTabIconItem() {
 		if (Config.enableItemComputerUpgrades) {
-			return Config.itemIdComputerUpgrade;
+			return ItemRegistry.itemComputerUpgrade;
 		}
-		return Item.skull.itemID;
+		return Items.skull;
 	}
-
 }

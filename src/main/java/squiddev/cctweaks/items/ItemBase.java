@@ -2,7 +2,7 @@ package squiddev.cctweaks.items;
 
 import java.util.List;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,21 +19,20 @@ public class ItemBase extends Item {
 
 	private final String name;
 
-	public ItemBase(int itemId, String itemName, int stackSize) {
-		super(itemId - 256);
+	public ItemBase(String itemName, int stackSize) {
 		name = itemName;
 
 		setUnlocalizedName(ModInfo.RESOURCE_DOMAIN + "." + name);
 		setCreativeTab(CCTweaks.creativeTab);
 		setMaxStackSize(stackSize);
 	}
-	public ItemBase(int itemId, String itemName) {
-		this(itemId, itemName, 64);
+	public ItemBase(String itemName) {
+		this(itemName, 64);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void registerIcons(IconRegister registry) {
+	public void registerIcons(IIconRegister registry) {
 		itemIcon = registry.registerIcon(ModInfo.RESOURCE_DOMAIN + ":" + name);
 	}
 
