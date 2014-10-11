@@ -94,13 +94,14 @@ public class ItemComputerUpgrade extends ItemBase {
 		newTurtle.transferStateFrom(computerTile);
 
 		newTurtle.createServerComputer().setWorld(world);
+		newTurtle.createServerComputer().setPosition(x, y, z);
 		newTurtle.updateBlock();
 
 		// 'Use' item and return
 		if(!player.capabilities.isCreativeMode){
 			stack.stackSize -= 1;
 		}
-		return !true;
+		return true;
 	}
 	@Override
 	@SideOnly(Side.CLIENT)
