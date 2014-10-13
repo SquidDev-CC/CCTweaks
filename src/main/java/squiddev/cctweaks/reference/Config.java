@@ -1,6 +1,9 @@
 package squiddev.cctweaks.reference;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.minecraftforge.common.config.Configuration;
 
@@ -12,6 +15,8 @@ public final class Config {
 	// Turtle Upgrade Ids
 	private static int turtleStartId = 360;
 	public static int turtleToolHostId = ++turtleStartId;
+
+	public static Set<String> globalWhitelist = new HashSet<String>();
 
 	// Debugging variables
 	public static boolean debug;
@@ -41,6 +46,8 @@ public final class Config {
 
 			// Turtle Ids
 			turtleToolHostId = getTurtleUpgradeId("Turtle Tool Host", turtleToolHostId);
+
+			globalWhitelist = new HashSet<String>(Arrays.asList(config.getStringList("Disabled Globals", "Computer", new String[0], "Globals that will be set to nil")));
 
 			// Is debugging
 			debug = config.getBoolean("debugging", "misc", false, "Is debugging");
