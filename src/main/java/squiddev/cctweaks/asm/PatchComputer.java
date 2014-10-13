@@ -62,6 +62,7 @@ public class PatchComputer implements Opcodes{
 					index++;
 				}
 
+				int offset = 0;
 				for(Integer instructionIndex : toRemove){
 					changed = true;
 					/* Remove:
@@ -73,8 +74,10 @@ public class PatchComputer implements Opcodes{
 					*/
 					for(int i = 0; i < 5; i++)
 					{
-						method.instructions.remove(method.instructions.get(instructionIndex));
+						method.instructions.remove(method.instructions.get(instructionIndex - offset));
 					}
+
+					offset += 5;
 				}
 			}
 		}

@@ -1,5 +1,8 @@
 package squiddev.cctweaks;
 
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.creativetab.CreativeTabs;
 import squiddev.cctweaks.interfaces.IProxy;
 import squiddev.cctweaks.reference.Config;
@@ -15,7 +18,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import squiddev.cctweaks.utils.DebugLogger;
 
-@Mod(modid = ModInfo.ID, name = ModInfo.NAME, version = ModInfo.VERSION, dependencies = ModInfo.DEPENDENCIES)
+@Mod(modid = ModInfo.ID, name = ModInfo.NAME, version = ModInfo.VERSION, dependencies = ModInfo.DEPENDENCIES, guiFactory = "squiddev.cctweaks.gui.GuiConfigFactory")
 public class CCTweaks {
 
 	// The instance of your mod that Forge uses.
@@ -32,6 +35,8 @@ public class CCTweaks {
 	public void preInit(FMLPreInitializationEvent event) {
 		Config.ConfigHandler.init(event.getSuggestedConfigurationFile());
 		DebugLogger.init(event.getModLog());
+
+		FMLCommonHandler.instance().bus().register(this);
 	}
 
 	@EventHandler
@@ -45,5 +50,12 @@ public class CCTweaks {
 	@EventHandler // used in 1.6.2
 	public void postInit(FMLPostInitializationEvent event) {
 		// Stub Method
+	}
+
+	@SubscribeEvent
+	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
+		if(eventArgs.modID.equals(ModInfo.ID)) {
+			Config.ConfigHandler.sync();
+		}
 	}
 }

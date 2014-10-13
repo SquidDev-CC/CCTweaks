@@ -22,15 +22,19 @@ public final class Config {
 	public static boolean debug;
 
 	public static final class ConfigHandler{
-		private static Configuration config;
+		public static Configuration config;
 
 		private static final String ENABLED = "enabled";
 		private static final String TURTLE_IDS = "turtle_ids";
+		private static final String MISC = "misc";
+		private static final String COMPUTER = "computer";
 
 		// Description
 		private static final String ENABLE_FORMAT = "Enable the %s";
 		private static final String TURTLE_ID_FORMAT = "The turtle upgrade id of %s";
 
+		public static final String[] CATEGORIES = { ENABLED, COMPUTER, TURTLE_IDS, MISC };
+		public static final String LANGUAGE_ROOT = "config.cctweaks.";
 
 		public static void init(File file) {
 			config = new Configuration(file);
@@ -47,10 +51,26 @@ public final class Config {
 			// Turtle Ids
 			turtleToolHostId = getTurtleUpgradeId("Turtle Tool Host", turtleToolHostId);
 
-			globalWhitelist = new HashSet<String>(Arrays.asList(config.getStringList("Disabled Globals", "Computer", new String[0], "Globals that will be set to nil")));
+			globalWhitelist = new HashSet<String>(Arrays.asList(config.getStringList("Whitelisted Globals", COMPUTER, new String[0], "Globals to whitelist (are not set to nil)")));
 
 			// Is debugging
-			debug = config.getBoolean("debugging", "misc", false, "Is debugging");
+			debug = config.getBoolean("debugging", MISC, false, "Is debugging");
+
+			// Pretty comments
+			config.setCategoryComment(ENABLED, "Feature Enabled");
+			config.setCategoryRequiresMcRestart(ENABLED, true);
+
+			config.setCategoryComment(TURTLE_IDS, "Turtle Upgrade Ids");
+			config.setCategoryRequiresMcRestart(TURTLE_IDS, true);
+
+			config.setCategoryComment(COMPUTER, "Tweaks to computer classes");
+			config.setCategoryRequiresMcRestart(COMPUTER, true);
+
+			config.setCategoryComment(MISC, "Random things (doesn't do much really)");
+
+			for(String categoryName : CATEGORIES) {
+				config.setCategoryLanguageKey(categoryName, LANGUAGE_ROOT + categoryName);
+			}
 
 			config.save();
 		}
