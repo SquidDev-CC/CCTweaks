@@ -17,6 +17,7 @@ public final class Config {
 	public static int turtleToolHostId = ++turtleStartId;
 
 	public static Set<String> globalWhitelist = new HashSet<String>();
+	public static int computerThreadTimeout = 5000;
 
 	// Debugging variables
 	public static boolean debug;
@@ -50,7 +51,9 @@ public final class Config {
 			// Turtle Ids
 			turtleToolHostId = getTurtleUpgradeId("Tool Host ID", turtleToolHostId);
 
+			// Tweak regions
 			globalWhitelist = new HashSet<String>(Arrays.asList(config.getStringList("Whitelisted Globals", COMPUTER, new String[0], "Globals to whitelist (are not set to nil)")));
+			computerThreadTimeout = config.getInt("Computer timeout", COMPUTER, computerThreadTimeout, 1, Integer.MAX_VALUE, "Time in milliseconds before 'Too long without yielding' error");
 
 			// Is debugging
 			debug = config.getBoolean("debugging", MISC, false, "Is debugging");
