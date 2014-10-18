@@ -124,7 +124,7 @@ public class PatchTurtle implements Opcodes {
 	}
 
 	public static byte[] DisableTurtleCommand(String name, byte[] bytes) {
-		if(!Config.turtleDisabledActions.contains(name)) return bytes;
+		if(!Config.turtleDisabledActions.contains(name.toLowerCase())) return bytes;
 
 		ClassNode classNode = new ClassNode();
 		ClassReader classReader = new ClassReader(bytes);

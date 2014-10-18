@@ -66,8 +66,7 @@ public final class Config {
 			turtleDisabledActions = new HashSet<String>();
 			String[] actions = config.getStringList("Disabled turtle actions", COMPUTER, new String[0], "Disabled turtle actions:\n(compare, compareTo, craft, detect, dig,\ndrop, equip, inspect, move, place,\nrefuel, select, suck, tool, turn)");
 			for(String action : actions) {
-				String upperAction = action.substring(0, 1).toUpperCase() + action.substring(1);
-				turtleDisabledActions.add("dan200.computercraft.shared.turtle.core.Turtle" + upperAction + "Command");
+				turtleDisabledActions.add("dan200.computercraft.shared.turtle.core.turtle" + action.toLowerCase() + "command");
 			}
 
 			// Is debugging
