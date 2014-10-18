@@ -122,4 +122,27 @@ public class PatchTurtle implements Opcodes {
 		classNode.accept(writer);
 		return writer.toByteArray();
 	}
+
+	public static byte[] DisableTurtleCommand(String name, byte[] bytes) {
+		if(!Config.turtleDisabledActions.contains(name)) return bytes;
+
+		ClassNode classNode = new ClassNode();
+		ClassReader classReader = new ClassReader(bytes);
+		classReader.accept(classNode, 0);
+
+		for (MethodNode method : classNode.methods) {
+			if (method.name.equals("execute") && method.desc.equals("(Ldan200/computercraft/api/turtle/ITurtleAccess;)Ldan200/computercraft/api/turtle/TurtleCommandResult;")) {
+				method.instructions.clear();
+				method.localVariables = null;
+
+				method.visitLdcInsn("Action disabled");
+				method.visitMethodInsn(INVOKESTATIC, "dan200/computercraft/api/turtle/TurtleCommandResult", "failure", "(Ljava/lang/String;)Ldan200/computercraft/api/turtle/TurtleCommandResult;", false);
+				method.visitInsn(ARETURN);
+			}
+		}
+
+		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+		classNode.accept(writer);
+		return writer.toByteArray();
+	}
 }

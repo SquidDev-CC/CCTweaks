@@ -21,6 +21,7 @@ public final class Config {
 	public static int computerThreadTimeout = 5000;
 	public static boolean turtleFluxRefuelEnable = true;
 	public static int turtleFluxRefuelAmount = 100;
+	public static Set<String> turtleDisabledActions = new HashSet<String>();
 
 	// Debugging variables
 	public static boolean debug;
@@ -60,6 +61,14 @@ public final class Config {
 
 			turtleFluxRefuelEnable = config.getBoolean("Flux refuel", COMPUTER, true, "Enable refuel from redstone flux items");
 			turtleFluxRefuelAmount = config.getInt("Flux refuel amount", COMPUTER, 100, 1, Integer.MAX_VALUE, "Amount of flux required for one refuel point");
+
+
+			turtleDisabledActions = new HashSet<String>();
+			String[] actions = config.getStringList("Disabled turtle actions", COMPUTER, new String[0], "Disabled turtle actions:\n(compare, compareTo, craft, detect, dig,\ndrop, equip, inspect, move, place,\nrefuel, select, suck, tool, turn)");
+			for(String action : actions) {
+				String upperAction = action.substring(0, 1).toUpperCase() + action.substring(1);
+				turtleDisabledActions.add("dan200.computercraft.shared.turtle.core.Turtle" + upperAction + "Command");
+			}
 
 			// Is debugging
 			debug = config.getBoolean("debugging", MISC, false, "Is debugging");
