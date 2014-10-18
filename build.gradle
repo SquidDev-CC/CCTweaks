@@ -19,11 +19,14 @@ apply plugin: 'forge'
 
 version = "0.1"
 group= "squiddev.cctweaks" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "cctweaks"
+archivesBaseName = "CCTweaks"
 
 minecraft {
     version = "1.7.10-10.13.1.1217"
     runDir = "eclipse"
+
+    replace "@VERSION@", project.version
+    replaceIn "ModInfo.java"
 }
 
 jar {
