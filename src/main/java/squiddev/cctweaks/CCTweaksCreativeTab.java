@@ -17,6 +17,7 @@ public class CCTweaksCreativeTab extends CreativeTabs {
 		if (Config.enableItemComputerUpgrades) {
 			return ItemRegistry.itemComputerUpgrade;
 		}
+
 		return Items.skull;
 	}
 }

@@ -29,7 +29,7 @@ public class CCTweaks {
 	@SidedProxy(clientSide = ModInfo.PROXY_CLIENT, serverSide = ModInfo.PROXY_SERVER)
 	public static IProxy proxy;
 
-	public static CreativeTabs creativeTab = new CCTweaksCreativeTab();
+	protected static CreativeTabs creativeTab = null;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -57,5 +57,12 @@ public class CCTweaks {
 		if(eventArgs.modID.equals(ModInfo.ID)) {
 			Config.ConfigHandler.sync();
 		}
+	}
+
+	public static CreativeTabs getCreativeTab() {
+		if(creativeTab == null) {
+			creativeTab = new CCTweaksCreativeTab();
+		}
+		return creativeTab;
 	}
 }

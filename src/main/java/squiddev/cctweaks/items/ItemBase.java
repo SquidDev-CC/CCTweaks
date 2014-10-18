@@ -23,7 +23,7 @@ public class ItemBase extends Item {
 		name = itemName;
 
 		setUnlocalizedName(ModInfo.RESOURCE_DOMAIN + "." + name);
-		setCreativeTab(CCTweaks.creativeTab);
+		setCreativeTab(CCTweaks.getCreativeTab());
 		setMaxStackSize(stackSize);
 	}
 	public ItemBase(String itemName) {
