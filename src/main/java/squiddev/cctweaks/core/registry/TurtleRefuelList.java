@@ -41,7 +41,7 @@ public class TurtleRefuelList {
 			}
 		});
 
-		if (Config.turtleFluxRefuelEnable) {
+		if (Config.config.turtleFluxRefuelEnable) {
 			// IEnergyContainerItem
 			refuelList.add(new ITurtleRefuelSource() {
 				@Override
@@ -51,7 +51,7 @@ public class TurtleRefuelList {
 
 				@Override
 				public int refuel(ITurtleAccess turtle, ItemStack stack, int limit) {
-					int fluxAmount = Config.turtleFluxRefuelAmount;
+					int fluxAmount = Config.config.turtleFluxRefuelAmount;
 
 					// Avoid over refueling
 					int maxRefuel = turtle.getFuelLimit() - turtle.getFuelLevel();

@@ -8,14 +8,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class Config {
-	public static final ConfigData defaults = new ConfigData();
 	public static final String LANGUAGE_ROOT = "config.cctweaks.";
 	private static final String MISC = "misc";
 	private static final String COMPUTER = "computer";
 	private static final String TURTLE = "turtle";
 	public static final String[] CATEGORIES = {TURTLE, COMPUTER, MISC};
+
 	public static Configuration configuration;
-	public static ConfigData config;
+	public static final ConfigData defaults = new ConfigData();
+	public static ConfigData config = new ConfigData();
+
 	/**
 	 * List of disabled turtle actions
 	 */
@@ -162,7 +164,7 @@ public final class Config {
 		/**
 		 * Use LuaJC compiler
 		 */
-		public boolean luaJC = true;
+		public boolean luaJC = false;
 
 		/**
 		 * Verify classes on generation

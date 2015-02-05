@@ -30,7 +30,7 @@ public class CCTweaks {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		Config.ConfigHandler.init(event.getSuggestedConfigurationFile());
+		Config.init(event.getSuggestedConfigurationFile());
 		DebugLogger.init(event.getModLog());
 
 		FMLCommonHandler.instance().bus().register(this);
@@ -46,7 +46,7 @@ public class CCTweaks {
 	@SubscribeEvent
 	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
 		if (eventArgs.modID.equals(ModInfo.ID)) {
-			Config.ConfigHandler.sync();
+			Config.sync();
 		}
 	}
 }

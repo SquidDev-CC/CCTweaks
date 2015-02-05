@@ -13,12 +13,10 @@ public class ItemRegistry {
 	public static ItemBase itemComputerUpgrade;
 
 	public static void init() {
-		if (Config.enableItemComputerUpgrades) {
+		if (Config.config.enableComputerUpgrades) {
 			itemComputerUpgrade = new ItemComputerUpgrade();
 			itemComputerUpgrade.registerItem();
-		}
 
-		if (Config.enableItemComputerUpgrades) {
 			GameRegistry.addRecipe(new ItemStack(ItemRegistry.itemComputerUpgrade), "GGG", "GSG", "GSG", 'G', Items.gold_ingot, 'S', Blocks.stone);
 			GameRegistry.addRecipe(new ComputerUpgradeCrafting());
 		}

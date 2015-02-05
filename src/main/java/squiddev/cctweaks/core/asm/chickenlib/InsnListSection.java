@@ -12,6 +12,7 @@ public class InsnListSection implements Iterable<AbstractInsnNode> {
 	public InsnList list;
 	public int start;
 	public int end;
+
 	public InsnListSection(InsnList list, int start, int end) {
 		this.list = list;
 		this.start = start;
@@ -67,6 +68,11 @@ public class InsnListSection implements Iterable<AbstractInsnNode> {
 	public void add(AbstractInsnNode insn) {
 		list.add(insn);
 		end++;
+	}
+
+	public void shift(int shift) {
+		start += shift;
+		end += shift;
 	}
 
 	public void insertBefore(InsnList insns) {
