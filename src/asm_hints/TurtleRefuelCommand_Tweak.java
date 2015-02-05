@@ -1,11 +1,11 @@
-package squiddev.cctweaks.asm;
+package squiddev.cctweaks.core.asm;
 
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.api.turtle.TurtleAnimation;
 import dan200.computercraft.api.turtle.TurtleCommandResult;
 import net.minecraft.item.ItemStack;
-import squiddev.cctweaks.registry.TurtleTweakRegistry;
-import squiddev.cctweaks.turtle.ITurtleRefuelSource;
+import squiddev.cctweaks.core.registry.TurtleRefuelList;
+import squiddev.cctweaks.core.turtle.ITurtleRefuelSource;
 
 public class TurtleRefuelCommand_Tweak {
 	private int m_limit = 0;
@@ -16,7 +16,7 @@ public class TurtleRefuelCommand_Tweak {
 	public TurtleCommandResult execute(ITurtleAccess turtle)
 	{
 		ItemStack stack = turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
-		for(ITurtleRefuelSource source : TurtleTweakRegistry.refuelList) {
+		for (ITurtleRefuelSource source : TurtleRefuelList.refuelList) {
 			if(source.canRefuel(turtle, stack, m_limit)) {
 				if(m_limit == 0) {
 					return TurtleCommandResult.success();

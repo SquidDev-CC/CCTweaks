@@ -1,7 +1,14 @@
 # CCTweaks
-[![Build status](https://ci.appveyor.com/api/projects/status/7rkqy1ghsgwt7y9q/branch/master?svg=true)](https://ci.appveyor.com/project/SquidDev/cc-tweaks/branch/master)
 Miscellaneous things for ComputerCraft
 
-## Building
- - Add ComputerCraft and CodeChickenCore jars to `libs/`.
- - Follow instructions on main MinecraftForge/MinecraftForge repo
+## Features
+ - Config items including:
+	 - Whitelist globals (get the `debug` API).
+	 - Blacklist turtle verbs - no more `turtle.inspect` if you don't like it.
+	 - Change computer timeout
+- Refuel using Redstone Flux
+- Computer upgrades
+
+## Setting up
+ - Add ComputerCraft 1.65 `libs/`.
+ - Follow instructions on [the Forge repo](https://github.com/MinecraftForge/MinecraftForge) or just run:      `./gradlew setupDecompWorkspace setupDevWorkspace`

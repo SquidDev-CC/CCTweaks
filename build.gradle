@@ -28,7 +28,7 @@ minecraft {
 
 jar {
 	manifest {
-		attributes 'FMLCorePlugin': 'squiddev.cctweaks.asm.LoadingPlugin'
+		attributes 'FMLCorePlugin': 'squiddev.cctweaks.core.asm.TweaksLoadingPlugin'
 	}
 }
 
