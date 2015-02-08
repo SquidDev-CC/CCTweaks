@@ -1,8 +1,15 @@
 package squiddev.cctweaks.core.asm;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.util.CheckClassAdapter;
+import org.objectweb.asm.util.TraceClassVisitor;
+import squiddev.cctweaks.core.utils.DebugLogger;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -66,6 +73,34 @@ public class AsmUtils {
 		}
 	}
 
+	public static void validateClass(ClassReader reader) {
+		StringWriter writer = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(writer);
+
+		try {
+			CheckClassAdapter.verify(reader, false, printWriter);
+		} catch (Exception e) {
+			e.printStackTrace(printWriter);
+		}
+
+		String contents = writer.toString();
+		// TODO: Override so this works. We need to ignore ClassNotFound as we don't load subclasses
+		if (contents.length() > 0 && !contents.contains("java.lang.ClassNotFoundException: ")) {
+			reader.accept(new TraceClassVisitor(printWriter), 0);
+			DebugLogger.debug("Dump for " + reader.getClassName());
+			DebugLogger.debug(writer.toString());
+			throw new RuntimeException("Generation error");
+		}
+	}
+
+	public static void validateClass(byte[] bytes) {
+		validateClass(new ClassReader(bytes));
+	}
+
+	public static void validateClass(ClassWriter writer) {
+		validateClass(writer.toByteArray());
+	}
+
 	/**
 	 * Stores very basic data about a method so we can inject it
 	 */
@@ -95,7 +130,7 @@ public class AsmUtils {
 			try {
 				return new TinyMethod(classObj.getMethod(methodName, args));
 			} catch (NoSuchMethodException e) {
-				return null;
+				throw new IllegalArgumentException("Cannot find method " + methodName, e);
 			}
 		}
 

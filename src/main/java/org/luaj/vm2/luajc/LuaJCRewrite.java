@@ -20,15 +20,13 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-package squiddev.cctweaks.core.asm.luaj;
+package org.luaj.vm2.luajc;
 
 import org.luaj.vm2.LoadState;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Prototype;
 import org.luaj.vm2.compiler.LuaC;
-import org.luaj.vm2.luajc.JavaLoader;
-import squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,13 +35,13 @@ import java.io.InputStream;
  * Alternative version of LuaJC which fixes class names properly.
  * For instance chunk-name breaks in LuaJC
  */
-public class LuaJCWorking implements LoadState.LuaCompiler {
+public class LuaJCRewrite implements LoadState.LuaCompiler {
 	protected static final String NON_IDENTIFIER = "[^a-zA-Z0-9_]";
 
-	protected static LuaJCWorking instance;
+	protected static LuaJCRewrite instance;
 
-	public static LuaJCWorking getInstance() {
-		if (instance == null) instance = new LuaJCWorking();
+	public static LuaJCRewrite getInstance() {
+		if (instance == null) instance = new LuaJCRewrite();
 		return instance;
 	}
 
@@ -51,39 +49,24 @@ public class LuaJCWorking implements LoadState.LuaCompiler {
 	 * Install the compiler as the main compiler to use.
 	 */
 	public static void install() {
-		DebugLogger.debug("Installing LuaJCWorking");
 		LoadState.compiler = getInstance();
-	}
-
-
-	public LuaJCWorking() {
 	}
 
 	public LuaFunction load(InputStream stream, String name, LuaValue env) throws IOException {
 		Prototype p = LuaC.compile(stream, name);
 		String className = toStandardJavaClassName(name);
-		String luaName = toStandardLuaFileName(name);
 
-		JavaLoader loader = new JavaLoader(env);
-		return loader.load(p, className, luaName);
+		JavaLoaderRewrite loader = new JavaLoaderRewrite(env);
+		return loader.load(p, className, name);
 	}
 
-
 	private static String toStandardJavaClassName(String chunkName) {
-		String stub = toStub(chunkName);
-		String className = stub.replaceAll(NON_IDENTIFIER, "_");
+		String stub = chunkName.endsWith(".lua") ? chunkName.substring(0, chunkName.length() - 4) : chunkName;
+		String className = stub.replace('/', '.').replaceAll(NON_IDENTIFIER, "_");
 
 		int c = className.charAt(0);
 		if (c != '_' && !Character.isJavaIdentifierStart(c)) className = "_" + className;
 
 		return className + "_LuaCompiled";
-	}
-
-	private static String toStandardLuaFileName(String chunkName) {
-		return toStub(chunkName).replace('.', '/') + ".lua";
-	}
-
-	private static String toStub(String s) {
-		return s.endsWith(".lua") ? s.substring(0, s.length() - 4) : s;
 	}
 }

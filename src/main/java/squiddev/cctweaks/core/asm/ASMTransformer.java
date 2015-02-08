@@ -13,8 +13,6 @@ public class ASMTransformer implements IClassTransformer {
 			return PatchTurtle.PatchRefuelCommand(bytes);
 		} else if (className.startsWith("dan200.computercraft.shared.turtle.core.Turtle") && className.endsWith("Command")) {
 			return PatchTurtle.DisableTurtleCommand(className, bytes);
-		} else if (className.equals("org.luaj.vm2.luajc.JavaBuilder")) {
-			return PatchComputer.PatchJavaBuilder(bytes);
 		}
 
 		return bytes;
