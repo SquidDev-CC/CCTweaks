@@ -3,6 +3,7 @@ package org.luaj.vm2.luajc;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Prototype;
+import squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,11 +34,13 @@ import java.util.Map;
 public class JavaLoaderRewrite extends ClassLoader {
 
 	private final LuaValue env;
+	private final ClassLoader parent;
 
 	private Map<String, byte[]> unloaded = new HashMap<String, byte[]>();
 
 	public JavaLoaderRewrite(LuaValue env) {
 		this.env = env;
+		parent = getClass().getClassLoader();
 	}
 
 	public LuaFunction load(Prototype p, String className, String fileName) {
@@ -53,7 +56,32 @@ public class JavaLoaderRewrite extends ClassLoader {
 	public LuaFunction load(String className) {
 		try {
 			Class c = loadClass(className);
-			LuaFunction v = (LuaFunction) c.newInstance();
+
+			Object o = c.newInstance();
+			DebugLogger.debug(o.toString());
+			Class parent = o.getClass();
+			do {
+				DebugLogger.debug("\tExtends " + parent.getName());
+				DebugLogger.debug("\t  Same class: " + (parent.equals(LuaFunction.class) ? "Yes" : "No"));
+				DebugLogger.debug("\t  Assignable: " + (LuaFunction.class.isAssignableFrom(parent) ? "Yes" : "No"));
+				DebugLogger.debug("\t  From Assignable: " + (parent.isAssignableFrom(o.getClass()) ? "Yes" : "No"));
+				try {
+					DebugLogger.debug("\t  Can cast: " + parent.cast(o).toString());
+				} catch(Exception e) {
+					DebugLogger.debug("\t  Cannot cast " + e.toString());
+				}
+			} while((parent = parent.getSuperclass())!= null);
+
+			try {
+				Object t = LuaFunction.class.cast(o);
+				LuaFunction f = (LuaFunction) t;
+				LuaValue v = (LuaValue) o;
+				LuaFunction func = (LuaFunction) v;
+			} catch(Exception e) {
+				DebugLogger.error(e.getMessage());
+			}
+
+			LuaFunction v = (LuaFunction) o;
 			v.setfenv(env);
 			return v;
 		} catch (Exception e) {
@@ -70,8 +98,7 @@ public class JavaLoaderRewrite extends ClassLoader {
 
 	public Class findClass(String classname) throws ClassNotFoundException {
 		byte[] bytes = unloaded.get(classname);
-		if (bytes != null)
-			return defineClass(classname, bytes, 0, bytes.length);
+		if (bytes != null) return defineClass(classname, bytes, 0, bytes.length);
 		return super.findClass(classname);
 	}
 

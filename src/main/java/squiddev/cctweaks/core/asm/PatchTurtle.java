@@ -12,7 +12,7 @@ public class PatchTurtle implements Opcodes {
 	/**
 	 * Replace the Refuel command with one using CC-Tweaks' {@see squiddev.cctweaks.core.turtle.ITurtleRefuelSource}
 	 */
-	public static byte[] PatchRefuelCommand(byte[] bytes) {
+	public static byte[] patchRefuelCommand(byte[] bytes) {
 		// Setup class reader
 		ClassNode classNode = new ClassNode();
 		ClassReader classReader = new ClassReader(bytes);
@@ -130,7 +130,7 @@ public class PatchTurtle implements Opcodes {
 	/**
 	 * Disable a particular turtle command
 	 */
-	public static byte[] DisableTurtleCommand(String name, byte[] bytes) {
+	public static byte[] disableTurtleCommand(String name, byte[] bytes) {
 		if (!Config.turtleDisabledActions.contains(name.toLowerCase())) return bytes;
 
 		ClassNode classNode = new ClassNode();

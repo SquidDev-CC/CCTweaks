@@ -6,13 +6,15 @@ public class ASMTransformer implements IClassTransformer {
 	@Override
 	public byte[] transform(String className, String s2, byte[] bytes) {
 		if (className.equals("dan200.computercraft.core.lua.LuaJLuaMachine")) {
-			return PatchComputer.PatchLuaMachine(bytes);
+			return PatchComputer.patchLuaMachine(bytes);
 		} else if (className.equals("dan200.computercraft.core.computer.ComputerThread$1")) {
-			return PatchComputer.PatchLuaThread(bytes);
+			return PatchComputer.patchLuaThread(bytes);
 		} else if (className.equals("dan200.computercraft.shared.turtle.core.TurtleRefuelCommand")) {
-			return PatchTurtle.PatchRefuelCommand(bytes);
+			return PatchTurtle.patchRefuelCommand(bytes);
 		} else if (className.startsWith("dan200.computercraft.shared.turtle.core.Turtle") && className.endsWith("Command")) {
-			return PatchTurtle.DisableTurtleCommand(className, bytes);
+			return PatchTurtle.disableTurtleCommand(className, bytes);
+		} else if(className.equals("org.luaj.vm2.lib.DebugLib$DebugInfo")) {
+			return PatchLuaJ.patchDebugLib(bytes);
 		}
 
 		return bytes;

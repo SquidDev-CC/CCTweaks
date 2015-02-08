@@ -16,7 +16,7 @@ public class PatchComputer implements Opcodes {
 	/**
 	 * Patch the Lua machine, using LuaJC and removing global clearing
 	 */
-	public static byte[] PatchLuaMachine(byte[] bytes) {
+	public static byte[] patchLuaMachine(byte[] bytes) {
 		Set<String> whitelist = Config.globalWhitelist;
 		boolean luaJC = Config.config.luaJC;
 
@@ -117,7 +117,7 @@ public class PatchComputer implements Opcodes {
 	/*
 		Patch the Lua Thead with a new timeout length
 	 */
-	public static byte[] PatchLuaThread(byte[] bytes) {
+	public static byte[] patchLuaThread(byte[] bytes) {
 		long timeout = Config.defaults.computerThreadTimeout;
 		long targetTimeout = Config.config.computerThreadTimeout;
 
