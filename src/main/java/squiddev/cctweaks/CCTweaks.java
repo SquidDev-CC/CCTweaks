@@ -22,8 +22,6 @@ public class CCTweaks {
 	@SidedProxy(clientSide = ModInfo.PROXY_CLIENT, serverSide = ModInfo.PROXY_SERVER)
 	public static IProxy proxy;
 
-	protected static CreativeTabs creativeTab = null;
-
 	public static CreativeTabs getCreativeTab() {
 		return ComputerCraft.mainCreativeTab;
 	}

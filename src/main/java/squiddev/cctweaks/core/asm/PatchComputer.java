@@ -1,10 +1,11 @@
 package squiddev.cctweaks.core.asm;
 
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 import squiddev.cctweaks.core.asm.chickenlib.ASMMatcher;
 import squiddev.cctweaks.core.asm.chickenlib.InsnListSection;
-import squiddev.cctweaks.core.asm.luaj.JavaBuilder;
 import squiddev.cctweaks.core.reference.Config;
 import squiddev.cctweaks.core.utils.DebugLogger;
 
@@ -15,7 +16,7 @@ public class PatchComputer implements Opcodes {
 	/**
 	 * Patch the Lua machine, using LuaJC and removing global clearing
 	 */
-	public static byte[] PatchLuaMachine(byte[] bytes) {
+	public static byte[] patchLuaMachine(byte[] bytes) {
 		Set<String> whitelist = Config.globalWhitelist;
 		boolean luaJC = Config.config.luaJC;
 
@@ -47,13 +48,13 @@ public class PatchComputer implements Opcodes {
 						InsnListSection found = ASMMatcher.findOnce(method.instructions, new InsnListSection(jsePlatform), true);
 
 						InsnList insert = new InsnList();
-						insert.add(new MethodInsnNode(INVOKESTATIC, "squiddev/cctweaks/core/asm/luaj/LuaJCWorking", "install", "()V", false));
+						insert.add(new MethodInsnNode(INVOKESTATIC, "org/luaj/vm2/luajc/LuaJCRewrite", "install", "()V", false));
 						found.insert(insert);
 
 						changed = true;
-						DebugLogger.debug("Injected LuaJCWorking.install() call into LuaJLuaMachine.<init>");
+						DebugLogger.debug("Injected LuaJCRewrite.install() call into LuaJLuaMachine.<init>");
 					} catch (Exception e) {
-						DebugLogger.error("Cannot inject LuaJCWorking.install() into LuaJLuaMachine.<init>");
+						DebugLogger.error("Cannot inject LuaJCRewrite.install() into LuaJLuaMachine.<init>");
 						e.printStackTrace();
 					}
 				}
@@ -101,9 +102,7 @@ public class PatchComputer implements Opcodes {
 						e.printStackTrace();
 					}
 				}
-
 			}
-
 		}
 
 		if (changed) {
@@ -118,7 +117,7 @@ public class PatchComputer implements Opcodes {
 	/*
 		Patch the Lua Thead with a new timeout length
 	 */
-	public static byte[] PatchLuaThread(byte[] bytes) {
+	public static byte[] patchLuaThread(byte[] bytes) {
 		long timeout = Config.defaults.computerThreadTimeout;
 		long targetTimeout = Config.config.computerThreadTimeout;
 
@@ -151,38 +150,6 @@ public class PatchComputer implements Opcodes {
 
 		ClassWriter writer = new ClassWriter(0);
 		classNode.accept(writer);
-		return writer.toByteArray();
-	}
-
-	/**
-	 * Create a subclass of squiddev.cctweaks.core.asm.luaj.JavaBuilder
-	 */
-	public static byte[] PatchJavaBuilder(byte[] bytes) {
-		if (!Config.config.luaJC) return bytes;
-
-		String superClass = Type.getInternalName(JavaBuilder.class);
-
-		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		writer.visit(V1_6, ACC_PUBLIC + ACC_SUPER, "org/luaj/vm2/luajc/JavaBuilder", null, superClass, null);
-
-		String signature = "(Lorg/luaj/vm2/luajc/ProtoInfo;Ljava/lang/String;Ljava/lang/String;)V";
-
-		MethodVisitor construct = writer.visitMethod(ACC_PUBLIC, "<init>", signature, null, null);
-
-		construct.visitVarInsn(ALOAD, 0);
-
-		construct.visitVarInsn(ALOAD, 1);
-		construct.visitVarInsn(ALOAD, 2);
-		construct.visitVarInsn(ALOAD, 3);
-
-		construct.visitMethodInsn(INVOKESPECIAL, superClass, "<init>", signature, false);
-
-		construct.visitInsn(RETURN);
-		construct.visitMaxs(0, 0);
-		construct.visitEnd();
-
-		writer.visitEnd();
-
 		return writer.toByteArray();
 	}
 }

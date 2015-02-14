@@ -95,7 +95,8 @@ public final class Config {
 			"Verify LuaJC",
 			COMPUTER,
 			defaults.luaJCVerify,
-			"Verify LuaJC sources on generation"
+			"Verify LuaJC sources on generation.\nThis will slow down compilation.\n" +
+			"If you have errors, please turn this and debug and\nsend it with the bug report."
 		);
 
 		// Is debugging
@@ -121,7 +122,7 @@ public final class Config {
 		configuration.setCategoryComment(TURTLE, "Turtle tweaks");
 		configuration.setCategoryRequiresMcRestart(TURTLE, true);
 
-		configuration.setCategoryComment(MISC, "Random things (doesn't do much really)");
+		configuration.setCategoryComment(MISC, "The lonely config category");
 
 		for (String categoryName : CATEGORIES) {
 			configuration.setCategoryLanguageKey(categoryName, LANGUAGE_ROOT + categoryName);
@@ -169,7 +170,7 @@ public final class Config {
 		/**
 		 * Verify classes on generation
 		 */
-		public boolean luaJCVerify = true;
+		public boolean luaJCVerify = false;
 
 		/**
 		 * Print debug information

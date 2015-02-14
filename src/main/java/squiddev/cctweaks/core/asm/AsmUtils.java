@@ -1,8 +1,14 @@
 package squiddev.cctweaks.core.asm;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.util.CheckClassAdapter;
+import org.objectweb.asm.util.TraceClassVisitor;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -66,6 +72,37 @@ public class AsmUtils {
 		}
 	}
 
+	public static void validateClass(ClassReader reader, ClassLoader loader) {
+		StringWriter writer = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(writer);
+
+		try {
+			CheckClassAdapter.verify(reader, loader, false, printWriter);
+		} catch (Exception e) {
+			e.printStackTrace(printWriter);
+		}
+
+		String contents = writer.toString();
+		if (contents.length() > 0) {
+			reader.accept(new TraceClassVisitor(printWriter), 0);
+			System.out.println("Dump for " + reader.getClassName());
+			System.out.println(writer);
+			throw new RuntimeException("Generation error");
+		}
+	}
+
+	public static void validateClass(byte[] bytes, ClassLoader loader) {
+		validateClass(new ClassReader(bytes), loader);
+	}
+
+	public static void validateClass(byte[] bytes) {
+		validateClass(new ClassReader(bytes), null);
+	}
+
+	public static void validateClass(ClassWriter writer, ClassLoader loader) {
+		validateClass(writer.toByteArray(), loader);
+	}
+
 	/**
 	 * Stores very basic data about a method so we can inject it
 	 */
@@ -95,7 +132,7 @@ public class AsmUtils {
 			try {
 				return new TinyMethod(classObj.getMethod(methodName, args));
 			} catch (NoSuchMethodException e) {
-				return null;
+				throw new IllegalArgumentException(e);
 			}
 		}
 
