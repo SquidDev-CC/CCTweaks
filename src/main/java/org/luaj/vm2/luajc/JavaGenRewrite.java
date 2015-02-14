@@ -23,57 +23,76 @@ package org.luaj.vm2.luajc;
 
 import org.luaj.vm2.Lua;
 import org.luaj.vm2.Prototype;
+import squiddev.cctweaks.core.asm.AsmUtils;
 
 public class JavaGenRewrite {
 
-	public final String classname;
+	public final String className;
 	public final byte[] bytecode;
 	public final JavaGenRewrite[] inners;
 
-	public JavaGenRewrite(Prototype p, String classname, String filename) {
-		this(new ProtoInfo(p, classname), classname, filename);
+	protected boolean validated = false;
+
+	public JavaGenRewrite(Prototype p, String className, String filename) {
+		this(new ProtoInfo(p, className), className, filename);
 	}
 
-	private JavaGenRewrite(ProtoInfo pi, String classname, String filename) {
-		this.classname = classname;
+	private JavaGenRewrite(ProtoInfo pi, String className, String filename) {
+		this.className = className;
 
 		// build this class
-		JavaBuilderRewrite builder = new JavaBuilderRewrite(pi, classname, filename);
-		scanInstructions(pi, classname, builder);
-		this.bytecode = builder.completeClass();
+		JavaBuilderRewrite builder = new JavaBuilderRewrite(pi, className, filename);
+		scanInstructions(pi, className, builder);
+		bytecode = builder.completeClass();
 
 		// build sub-prototypes
 		if (pi.subprotos != null) {
 			int n = pi.subprotos.length;
 			inners = new JavaGenRewrite[n];
-			for (int i = 0; i < n; i++)
-				inners[i] = new JavaGenRewrite(pi.subprotos[i], closureName(classname, i), filename);
+			for (int i = 0; i < n; i++) {
+				inners[i] = new JavaGenRewrite(pi.subprotos[i], closureName(className, i), filename);
+			}
 		} else {
 			inners = null;
 		}
 	}
 
-	private String closureName(String classname, int subprotoindex) {
-		return classname + "$" + subprotoindex;
+	public void validate(ClassLoader loader) {
+		// Validating is slow, validate if we have to
+		if (validated) return;
+		validated = true;
+
+		// Validate at the end so other classes are generated
+		AsmUtils.validateClass(this.bytecode, loader);
 	}
 
-	private void scanInstructions(ProtoInfo pi, String classname, JavaBuilderRewrite builder) {
+	private String closureName(String className, int subprotoindex) {
+		return className + "$" + subprotoindex;
+	}
+
+	private void scanInstructions(ProtoInfo pi, String className, JavaBuilderRewrite builder) {
 		Prototype p = pi.prototype;
 		int vresultbase = -1;
 
 		for (int bi = 0; bi < pi.blocklist.length; bi++) {
 			BasicBlock b0 = pi.blocklist[bi];
 
-			// convert upvalues that are phi-variables
-			for (int slot = 0; slot < p.maxstacksize; slot++) {
-				int pc = b0.pc0;
-				boolean c = pi.isUpvalueCreate(pc, slot);
-				if (c && pi.vars[slot][pc].isPhiVar())
-					builder.convertToUpvalue(pc, slot);
-			}
-
+			boolean setUpvalues = false;
 			for (int pc = b0.pc0; pc <= b0.pc1; pc++) {
 				builder.onStartOfLuaInstruction(pc);
+
+				// For each block we should create upvalues for them. We have to do this after the first instruction
+				if (!setUpvalues) {
+					// convert upvalues that are phi-variables
+					for (int slot = 0; slot < p.maxstacksize; slot++) {
+						int up_pc = b0.pc0;
+						boolean c = pi.isUpvalueCreate(up_pc, slot);
+						if (c && pi.vars[slot][up_pc].isPhiVar()) {
+							builder.convertToUpvalue(up_pc, slot);
+						}
+					}
+					setUpvalues = true;
+				}
 
 				int ins = p.code[pc];
 				final int o = Lua.GET_OPCODE(ins);
@@ -405,16 +424,14 @@ public class JavaGenRewrite {
 
 					case Lua.OP_CLOSURE: /*	A Bx	R(A):= closure(KPROTO[Bx], R(A), ... ,R(A+n))	*/ {
 						Prototype newp = p.p[bx];
-						String protoname = closureName(classname, bx);
+						String protoname = closureName(className, bx);
 						int nup = newp.nups;
 						builder.closureCreate(protoname);
-						if (nup > 0)
-							builder.dup();
+						if (nup > 0) builder.dup();
 						builder.storeLocal(pc, a);
 						if (nup > 0) {
 							for (int up = 0; up < nup; ++up) {
-								if (up + 1 < nup)
-									builder.dup();
+								if (up + 1 < nup) builder.dup();
 								ins = p.code[pc + up + 1];
 								b = Lua.GETARG_B(ins);
 								if ((ins & 4) != 0) {

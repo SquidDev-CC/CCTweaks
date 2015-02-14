@@ -2,6 +2,7 @@ package squiddev.cctweaks.core.utils;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
+import org.luaj.vm2.lib.DebugLib;
 import squiddev.cctweaks.core.reference.Config;
 
 public class DebugLogger {
@@ -27,5 +28,13 @@ public class DebugLogger {
 
 	public static void error(String message) {
 		logger.log(Level.ERROR, message);
+	}
+
+	public static void traceback(String cls) {
+		info(cls + ": " + DebugLib.traceback(1).replace('\n', ',').replace('\t', ' '));
+	}
+
+	public static void line(int line) {
+		info("\t " + line);
 	}
 }
