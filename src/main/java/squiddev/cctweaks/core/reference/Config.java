@@ -1,9 +1,9 @@
 package squiddev.cctweaks.core.reference;
 
 import net.minecraftforge.common.config.Configuration;
-import scala.actors.threadpool.Arrays;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -96,7 +96,7 @@ public final class Config {
 			COMPUTER,
 			defaults.luaJCVerify,
 			"Verify LuaJC sources on generation.\nThis will slow down compilation.\n" +
-			"If you have errors, please turn this and debug and\nsend it with the bug report."
+				"If you have errors, please turn this and debug and\nsend it with the bug report."
 		);
 
 		// Is debugging
