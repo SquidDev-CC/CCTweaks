@@ -35,7 +35,7 @@ public class ItemComputerUpgrade extends ItemBase {
 		}
 
 		TileComputerBase computerTile = (TileComputerBase) tile;
-		if (computerTile.getFamily() != ComputerFamily.Normal) return false;
+		if (computerTile == null || computerTile.getFamily() != ComputerFamily.Normal) return false;
 
 		if (computerTile instanceof TileTurtle) {
 			return upgradeTurtle(stack, player, world, x, y, z, (TileTurtle) computerTile);
@@ -113,6 +113,7 @@ public class ItemComputerUpgrade extends ItemBase {
 
 	@Override
 	@SideOnly(Side.CLIENT)
+	@SuppressWarnings("unchecked")
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
 		list.add(Localisation.Upgrades.Normal.getLocalised());
 	}

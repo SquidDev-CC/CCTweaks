@@ -45,7 +45,7 @@ public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
 			md.authorList = Arrays.asList("SquidDev");
 			md.modId = "<CCTweaks ASM>";
 			md.name = md.description = "CCTweaks ASM Transformer";
-			md.version = "0.1";
+			md.version = "0.1.1";
 		}
 
 		@Override
