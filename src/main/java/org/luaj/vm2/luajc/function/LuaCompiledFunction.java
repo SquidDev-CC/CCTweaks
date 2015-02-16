@@ -26,13 +26,13 @@ import org.luaj.vm2.LuaValue;
 
 /**
  * Subclass of {@link org.luaj.vm2.LuaFunction} common to LuaJC compiled functions.
- * <p>
+ * <p/>
  * Since lua functions can be called with too few or too many arguments,
  * and there are overloaded {@link org.luaj.vm2.LuaValue#call()} functions with varying
  * number of arguments, a compiled function exposed needs to handle the
  * argument fixup when a function is called with a number of arguments
  * differs from that expected.
- * <p>
+ * <p/>
  * To simplify the creation of library functions,
  * there are 5 direct subclasses to handle common cases based on number of
  * argument values and number of return return values.

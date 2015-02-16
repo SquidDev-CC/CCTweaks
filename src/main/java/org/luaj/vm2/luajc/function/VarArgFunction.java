@@ -27,17 +27,17 @@ import org.luaj.vm2.Varargs;
 /**
  * Abstract base class for compiled function implementations that takes varaiable arguments and
  * returns multiple return values.
- * <p>
+ * <p/>
  * Subclasses need only implement {@link org.luaj.vm2.LuaValue#invoke(org.luaj.vm2.Varargs)} to complete this class,
  * simplifying development.
  * All other uses of {@link #call(org.luaj.vm2.LuaValue)}, {@link #invoke()},etc,
  * are routed through this method by this class,
  * converting arguments to {@link org.luaj.vm2.Varargs} and
  * dropping or extending return values with {@code nil} values as required.
- * <p>
+ * <p/>
  * If between one and three arguments are required, and only one return value is returned,
  * {@link ZeroArgFunction}, {@link org.luaj.vm2.luajc.function.OneArgFunction}, {@link org.luaj.vm2.luajc.function.TwoArgFunction}, or {@link ThreeArgFunction}.
- * <p>
+ * <p/>
  * See {@link LuaCompiledFunction} for more information on implementation libraries and library functions.
  *
  * @see #invoke(org.luaj.vm2.Varargs)

@@ -28,7 +28,6 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import squiddev.cctweaks.core.asm.LuaClassWriter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -256,7 +255,7 @@ public class JavaBuilderRewrite {
 			We don't need to compute frames as slots do not change their type
 			TODO: Auto compute maxes and locals.
 		 */
-		writer = new LuaClassWriter(ClassWriter.COMPUTE_MAXS);
+		writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
 		// Check the name of the class. We have no interfaces and no generics
 		writer.visit(V1_6, ACC_PUBLIC + ACC_SUPER, className, null, superType.className, null);
