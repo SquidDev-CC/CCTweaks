@@ -59,6 +59,7 @@ public class JavaLoaderRewrite extends ClassLoader {
 			v.setfenv(env);
 			return v;
 		} catch (Exception e) {
+			if(Config.config.debug) e.printStackTrace();
 			throw new IllegalStateException("bad class gen: " + e.getMessage(), e);
 		}
 	}

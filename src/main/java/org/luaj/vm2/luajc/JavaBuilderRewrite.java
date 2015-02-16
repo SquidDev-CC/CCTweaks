@@ -23,7 +23,7 @@
 package org.luaj.vm2.luajc;
 
 import org.luaj.vm2.*;
-import org.luaj.vm2.lib.*;
+import org.luaj.vm2.luajc.function.*;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -41,11 +41,13 @@ import static squiddev.cctweaks.core.asm.AsmUtils.constantOpcode;
 
 public class JavaBuilderRewrite {
 
-	private static final String TYPE_LOCALUPVALUE = Type.getDescriptor(LuaValue[].class);
-	private static final String TYPE_LUAVALUE = Type.getDescriptor(LuaValue.class);
-	private static final String CLASS_LUAVALUE = Type.getInternalName(LuaValue.class);
+	protected static final String TYPE_LOCALUPVALUE = Type.getDescriptor(LuaValue[].class);
+	protected static final String TYPE_LUAVALUE = Type.getDescriptor(LuaValue.class);
+	protected static final String CLASS_LUAVALUE = Type.getInternalName(LuaValue.class);
 
-	private static final String[] INTERFACES = {Type.getInternalName(IGetSource.class)};
+	protected static final String TYPE_CALLSTACK = Type.getDescriptor(LuaThread.CallStack.class);
+	protected static final String TYPE_SOURCE = Type.getDescriptor(LuaCompiledSource.class);
+	protected static final String CLASS_SOURCE = Type.getInternalName(LuaCompiledSource.class);
 
 	protected static class FunctionType {
 		public final String signature;
@@ -68,7 +70,7 @@ public class JavaBuilderRewrite {
 			);
 		}
 
-		private static String getSignature(Class classObj, String invokeName, Class... args) {
+		protected static String getSignature(Class<?> classObj, String invokeName, Class... args) {
 			try {
 				return Type.getMethodDescriptor(classObj.getMethod(invokeName, args));
 			} catch (Exception ignored) {
@@ -78,143 +80,157 @@ public class JavaBuilderRewrite {
 	}
 
 	// Manage super classes
-	private static FunctionType[] SUPER_TYPES = {
+	protected static FunctionType[] SUPER_TYPES = {
 		new FunctionType(ZeroArgFunction.class, "call"),
 		new FunctionType(OneArgFunction.class, "call", LuaValue.class),
 		new FunctionType(TwoArgFunction.class, "call", LuaValue.class, LuaValue.class),
 		new FunctionType(ThreeArgFunction.class, "call", LuaValue.class, LuaValue.class, LuaValue.class),
-		new FunctionType(VarArgFunction.class, "onInvoke", Varargs.class),
+		new FunctionType(VarArgFunction.class, "invoke", Varargs.class),
 	};
 
 	// Table functions
-	private static final TinyMethod METHOD_TABLEOF = TinyMethod.tryConstruct(LuaValue.class, "tableOf", Varargs.class, int.class);
-	private static final TinyMethod METHOD_TABLEOF_DIMS = TinyMethod.tryConstruct(LuaValue.class, "tableOf", int.class, int.class);
-	private static final TinyMethod METHOD_TABLE_GET = TinyMethod.tryConstruct(LuaValue.class, "get", LuaValue.class);
-	private static final TinyMethod METHOD_TABLE_SET = TinyMethod.tryConstruct(LuaValue.class, "set", LuaValue.class, LuaValue.class);
+	protected static final TinyMethod METHOD_TABLEOF = TinyMethod.tryConstruct(LuaValue.class, "tableOf", Varargs.class, int.class);
+	protected static final TinyMethod METHOD_TABLEOF_DIMS = TinyMethod.tryConstruct(LuaValue.class, "tableOf", int.class, int.class);
+	protected static final TinyMethod METHOD_TABLE_GET = TinyMethod.tryConstruct(LuaValue.class, "get", LuaValue.class);
+	protected static final TinyMethod METHOD_TABLE_SET = TinyMethod.tryConstruct(LuaValue.class, "set", LuaValue.class, LuaValue.class);
 
 	// Strings
-	private static final TinyMethod METHOD_STRING_CONCAT = TinyMethod.tryConstruct(LuaValue.class, "concat", LuaValue.class);
-	private static final TinyMethod METHOD_BUFFER_CONCAT = TinyMethod.tryConstruct(LuaValue.class, "concat", Buffer.class);
+	protected static final TinyMethod METHOD_STRING_CONCAT = TinyMethod.tryConstruct(LuaValue.class, "concat", LuaValue.class);
+	protected static final TinyMethod METHOD_BUFFER_CONCAT = TinyMethod.tryConstruct(LuaValue.class, "concat", Buffer.class);
 
 	// Varargs
-	private static final TinyMethod METHOD_VARARGS_ARG1 = TinyMethod.tryConstruct(Varargs.class, "arg1");
-	private static final TinyMethod METHOD_VARARGS_ARG = TinyMethod.tryConstruct(Varargs.class, "arg", int.class);
-	private static final TinyMethod METHOD_VARARGS_SUBARGS = TinyMethod.tryConstruct(Varargs.class, "subargs", int.class);
+	protected static final TinyMethod METHOD_VARARGS_ARG1 = TinyMethod.tryConstruct(Varargs.class, "arg1");
+	protected static final TinyMethod METHOD_VARARGS_ARG = TinyMethod.tryConstruct(Varargs.class, "arg", int.class);
+	protected static final TinyMethod METHOD_VARARGS_SUBARGS = TinyMethod.tryConstruct(Varargs.class, "subargs", int.class);
 
 	// Varargs factory
-	private static final TinyMethod METHOD_VARARGS_ONE = TinyMethod.tryConstruct(LuaValue.class, "varargsOf", LuaValue.class, Varargs.class);
-	private static final TinyMethod METHOD_VARARGS_TWO = TinyMethod.tryConstruct(LuaValue.class, "varargsOf", LuaValue.class, LuaValue.class, Varargs.class);
-	private static final TinyMethod METHOD_VARARGS_MANY = TinyMethod.tryConstruct(LuaValue.class, "varargsOf", LuaValue[].class);
-	private static final TinyMethod METHOD_VARARGS_MANY_VAR = TinyMethod.tryConstruct(LuaValue.class, "varargsOf", LuaValue[].class, Varargs.class);
+	protected static final TinyMethod METHOD_VARARGS_ONE = TinyMethod.tryConstruct(LuaValue.class, "varargsOf", LuaValue.class, Varargs.class);
+	protected static final TinyMethod METHOD_VARARGS_TWO = TinyMethod.tryConstruct(LuaValue.class, "varargsOf", LuaValue.class, LuaValue.class, Varargs.class);
+	protected static final TinyMethod METHOD_VARARGS_MANY = TinyMethod.tryConstruct(LuaValue.class, "varargsOf", LuaValue[].class);
+	protected static final TinyMethod METHOD_VARARGS_MANY_VAR = TinyMethod.tryConstruct(LuaValue.class, "varargsOf", LuaValue[].class, Varargs.class);
 
 	// Type conversion
-	private static final TinyMethod METHOD_VALUE_TO_BOOL = TinyMethod.tryConstruct(LuaValue.class, "toboolean");
-	private static final TinyMethod METHOD_BUFFER_TO_STR = TinyMethod.tryConstruct(Buffer.class, "tostring");
-	private static final TinyMethod METHOD_VALUE_TO_BUFFER = TinyMethod.tryConstruct(LuaValue.class, "buffer");
-	private static final TinyMethod METHOD_BUFFER_TO_VALUE = TinyMethod.tryConstruct(Buffer.class, "value");
+	protected static final TinyMethod METHOD_VALUE_TO_BOOL = TinyMethod.tryConstruct(LuaValue.class, "toboolean");
+	protected static final TinyMethod METHOD_BUFFER_TO_STR = TinyMethod.tryConstruct(Buffer.class, "tostring");
+	protected static final TinyMethod METHOD_VALUE_TO_BUFFER = TinyMethod.tryConstruct(LuaValue.class, "buffer");
+	protected static final TinyMethod METHOD_BUFFER_TO_VALUE = TinyMethod.tryConstruct(Buffer.class, "value");
 
 	// Booleans
-	private static final TinyMethod METHOD_TESTFOR_B = TinyMethod.tryConstruct(LuaValue.class, "testfor_b", LuaValue.class, LuaValue.class);
-	private static final TinyMethod METHOD_IS_NIL = TinyMethod.tryConstruct(LuaValue.class, "isnil");
+	protected static final TinyMethod METHOD_TESTFOR_B = TinyMethod.tryConstruct(LuaValue.class, "testfor_b", LuaValue.class, LuaValue.class);
+	protected static final TinyMethod METHOD_IS_NIL = TinyMethod.tryConstruct(LuaValue.class, "isnil");
 
 	// Calling
 	// Normal
-	private static final TinyMethod METHOD_CALL_NONE = TinyMethod.tryConstruct(LuaValue.class, "call");
-	private static final TinyMethod METHOD_CALL_ONE = TinyMethod.tryConstruct(LuaValue.class, "call", LuaValue.class);
-	private static final TinyMethod METHOD_CALL_TWO = TinyMethod.tryConstruct(LuaValue.class, "call", LuaValue.class, LuaValue.class);
-	private static final TinyMethod METHOD_CALL_THREE = TinyMethod.tryConstruct(LuaValue.class, "call", LuaValue.class, LuaValue.class, LuaValue.class);
+	protected static final TinyMethod METHOD_CALL_NONE = TinyMethod.tryConstruct(LuaValue.class, "call");
+	protected static final TinyMethod METHOD_CALL_ONE = TinyMethod.tryConstruct(LuaValue.class, "call", LuaValue.class);
+	protected static final TinyMethod METHOD_CALL_TWO = TinyMethod.tryConstruct(LuaValue.class, "call", LuaValue.class, LuaValue.class);
+	protected static final TinyMethod METHOD_CALL_THREE = TinyMethod.tryConstruct(LuaValue.class, "call", LuaValue.class, LuaValue.class, LuaValue.class);
 
 	// Tail call
-	private static final TinyMethod METHOD_TAILCALL = TinyMethod.tryConstruct(LuaValue.class, "tailcallOf", LuaValue.class, Varargs.class);
+	protected static final TinyMethod METHOD_TAILCALL = TinyMethod.tryConstruct(LuaValue.class, "tailcallOf", LuaValue.class, Varargs.class);
+	protected static final TinyMethod METHOD_TAILCALL_EVAL = TinyMethod.tryConstruct(Varargs.class, "eval");
 
 	// Invoke (because that is different to call?) Well, it is but really silly
-	private static final TinyMethod METHOD_INVOKE_VAR = TinyMethod.tryConstruct(LuaValue.class, "invoke", Varargs.class);
-	private static final TinyMethod METHOD_INVOKE_NONE = TinyMethod.tryConstruct(LuaValue.class, "invoke");
-	private static final TinyMethod METHOD_INVOKE_TWO = TinyMethod.tryConstruct(LuaValue.class, "invoke", LuaValue.class, Varargs.class);
-	private static final TinyMethod METHOD_INVOKE_THREE = TinyMethod.tryConstruct(LuaValue.class, "invoke", LuaValue.class, LuaValue.class, Varargs.class);
+	protected static final TinyMethod METHOD_INVOKE_VAR = TinyMethod.tryConstruct(LuaValue.class, "invoke", Varargs.class);
+	protected static final TinyMethod METHOD_INVOKE_NONE = TinyMethod.tryConstruct(LuaValue.class, "invoke");
+	protected static final TinyMethod METHOD_INVOKE_TWO = TinyMethod.tryConstruct(LuaValue.class, "invoke", LuaValue.class, Varargs.class);
+	protected static final TinyMethod METHOD_INVOKE_THREE = TinyMethod.tryConstruct(LuaValue.class, "invoke", LuaValue.class, LuaValue.class, Varargs.class);
 
 	// ValueOf
-	private static final TinyMethod METHOD_VALUEOF_INT = TinyMethod.tryConstruct(LuaValue.class, "valueOf", int.class);
-	private static final TinyMethod METHOD_VALUEOF_DOUBLE = TinyMethod.tryConstruct(LuaValue.class, "valueOf", double.class);
-	private static final TinyMethod METHOD_VALUEOF_STRING = TinyMethod.tryConstruct(LuaString.class, "valueOf", String.class);
-	private static final TinyMethod METHOD_VALUEOF_CHARARRAY = TinyMethod.tryConstruct(LuaString.class, "valueOf", char[].class);
+	protected static final TinyMethod METHOD_VALUEOF_INT = TinyMethod.tryConstruct(LuaValue.class, "valueOf", int.class);
+	protected static final TinyMethod METHOD_VALUEOF_DOUBLE = TinyMethod.tryConstruct(LuaValue.class, "valueOf", double.class);
+	protected static final TinyMethod METHOD_VALUEOF_STRING = TinyMethod.tryConstruct(LuaString.class, "valueOf", String.class);
+	protected static final TinyMethod METHOD_VALUEOF_CHARARRAY = TinyMethod.tryConstruct(LuaString.class, "valueOf", char[].class);
 
 	// Misc
-	private static final TinyMethod METHOD_SETENV = TinyMethod.tryConstruct(LuaValue.class, "setfenv", LuaValue.class);
-	private static final TinyMethod METHOD_TO_CHARARRAY = TinyMethod.tryConstruct(String.class, "toCharArray");
-	private static final TinyMethod METHOD_RAWSET = TinyMethod.tryConstruct(LuaValue.class, "rawset", int.class, LuaValue.class);
-	private static final TinyMethod METHOD_RAWSET_LIST = TinyMethod.tryConstruct(LuaValue.class, "rawsetlist", int.class, Varargs.class);
+	protected static final TinyMethod METHOD_SETENV = TinyMethod.tryConstruct(LuaValue.class, "setfenv", LuaValue.class);
+	protected static final TinyMethod METHOD_TO_CHARARRAY = TinyMethod.tryConstruct(String.class, "toCharArray");
+	protected static final TinyMethod METHOD_RAWSET = TinyMethod.tryConstruct(LuaValue.class, "rawset", int.class, LuaValue.class);
+	protected static final TinyMethod METHOD_RAWSET_LIST = TinyMethod.tryConstruct(LuaValue.class, "rawsetlist", int.class, Varargs.class);
 
-	// TODO: Can this be LibFunction? Is there a performance change?
-	private final TinyMethod methodCurrentNewUpvalueEmpty;
-	private final TinyMethod methodCurrentNewUpvalueNil;
-	private final TinyMethod methodCurrentNewUpvalueValue;
+	// Upvalue creation
+	protected static final TinyMethod METHOD_NEW_UPVALUE_EMPTY = TinyMethod.tryConstruct(LuaCompiledFunction.class, "newupe");
+	protected static final TinyMethod METHOD_NEW_UPVALUE_NIL = TinyMethod.tryConstruct(LuaCompiledFunction.class, "newupn");
+	protected static final TinyMethod METHOD_NEW_UPVALUE_VALUE = TinyMethod.tryConstruct(LuaCompiledFunction.class, "newupl", LuaValue.class);
 
-	// Varable naming
-	private static final String PREFIX_CONSTANT = "k";
-	private static final String PREFIX_UPVALUE = "u";
-	private static final String PREFIX_UPVALUE_SLOT = "a";
-	private static final String PREFIX_LOCAL_SLOT = "s";
+	// Stack tracing
+	protected static final TinyMethod METHOD_ONCALL = TinyMethod.tryConstruct(LuaThread.class, "onCall", LuaFunction.class);
+	protected static final TinyMethod METHOD_ONRETURN = TinyMethod.tryConstruct(LuaThread.CallStack.class, "onReturn");
+
+	// Variable naming
+	protected static final String PREFIX_CONSTANT = "k";
+	protected static final String PREFIX_UPVALUE = "u";
+	protected static final String PREFIX_UPVALUE_SLOT = "a";
+	protected static final String PREFIX_LOCAL_SLOT = "s";
 
 	// Basic info
-	private final ProtoInfo pi;
-	private final Prototype p;
-	private final String className;
+	protected final ProtoInfo pi;
+	protected final Prototype p;
+	protected final String className;
 
 	/**
 	 * Main class writer
 	 */
-	private final ClassWriter writer;
+	protected final ClassWriter writer;
 
 	/**
 	 * The static constructor method
 	 */
-	private final MethodVisitor init;
+	protected final MethodVisitor init;
 
 	/**
 	 * The function invoke
 	 */
-	private final MethodVisitor main;
+	protected final MethodVisitor main;
 
 	/**
 	 * Max number of locals
 	 */
-	private int maxLocals;
+	protected int maxLocals;
 
 	/**
 	 * The local index of the varargs result
 	 */
-	private int varargsLocal = -1;
+	protected int varargsLocal = -1;
 
 	Label start;
 	Label end;
 
 	// the superclass arg count, 0-3 args, 4=varargs
-	private FunctionType superclass;
-	private static int SUPERTYPE_VARARGS_ID = 4;
-	private static FunctionType SUPERTYPE_VARARGS = SUPER_TYPES[SUPERTYPE_VARARGS_ID];
+	protected FunctionType superclass;
+	protected static int SUPERTYPE_VARARGS_ID = 4;
+	protected static FunctionType SUPERTYPE_VARARGS = SUPER_TYPES[SUPERTYPE_VARARGS_ID];
 
-	// Storage for goto locations
-	private final Label[] branchDestinations;
+	/**
+	 * Go to destinations
+	 */
+	protected final Label[] branchDestinations;
 
-	// Storage for line numbers
-	private int previousLine = -1;
+	/**
+	 * Store the previous line number
+	 */
+	protected int previousLine = -1;
+
+	/**
+	 * The slot for the LuaSource
+	 */
+	protected int sourceSlot = -1;
+
+	/**
+	 * The slot for the LuaThread.CallStack
+	 */
+	protected int callStackSlot = -1;
 
 	/**
 	 * The current program counter
 	 */
-	private int pc = 0;
+	protected int pc = 0;
 
 	public JavaBuilderRewrite(ProtoInfo pi, String className, String filename) {
 		this.pi = pi;
 		this.p = pi.prototype;
 
 		this.className = className;
-
-		// Create some more functions
-		methodCurrentNewUpvalueEmpty = new TinyMethod(className, "newupe", "()" + TYPE_LOCALUPVALUE, true);
-		methodCurrentNewUpvalueNil = new TinyMethod(className, "newupn", "()" + TYPE_LOCALUPVALUE, true);
-		methodCurrentNewUpvalueValue = new TinyMethod(className, "newupl", "(" + TYPE_LUAVALUE + ")" + TYPE_LOCALUPVALUE, true);
 
 		// what class to inherit from
 		int superclassType = p.numparams;
@@ -243,7 +259,7 @@ public class JavaBuilderRewrite {
 		writer = new LuaClassWriter(ClassWriter.COMPUTE_MAXS);
 
 		// Check the name of the class. We have no interfaces and no generics
-		writer.visit(V1_6, ACC_PUBLIC + ACC_SUPER, className, null, superType.className, INTERFACES);
+		writer.visit(V1_6, ACC_PUBLIC + ACC_SUPER, className, null, superType.className, null);
 
 		// Write the filename
 		writer.visitSource(filename, null);
@@ -255,16 +271,42 @@ public class JavaBuilderRewrite {
 			writer.visitField(0, upvalueName(i), type, null, null);
 		}
 
+		// Create the class constructor
+		init = writer.visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
+		init.visitCode();
+
 		// Create the invoke method
 		main = writer.visitMethod(ACC_PUBLIC + ACC_FINAL, superType.methodName, superType.signature, null, null);
 		main.visitCode();
 
-		start = new Label();
-		end = new Label();
-		main.visitLabel(start);
+		{
+			// Create some information
+			start = new Label();
+			end = new Label();
+			main.visitLabel(start);
 
-		init = writer.visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
-		init.visitCode();
+			// Create the slots for current line and stack
+			slots.add(new Slot(sourceSlot = ++maxLocals, "source", TYPE_SOURCE));
+			slots.add(new Slot(callStackSlot = ++maxLocals, "callStack", TYPE_CALLSTACK));
+
+			// Create source object
+			main.visitTypeInsn(NEW, CLASS_SOURCE);
+			main.visitInsn(DUP);
+
+			// Constructor
+			main.visitLdcInsn(filename);
+			constantOpcode(main, p.linedefined);
+			main.visitVarInsn(ALOAD, 0);
+			main.visitMethodInsn(INVOKESPECIAL, CLASS_SOURCE, "<init>", "(Ljava/lang/String;ILorg/luaj/vm2/LuaFunction;)V", false);
+
+			// Store it in sourceSlot
+			main.visitInsn(DUP);
+			main.visitVarInsn(ASTORE, sourceSlot);
+
+			// On method call, store callstack in slot
+			METHOD_ONCALL.inject(main);
+			main.visitVarInsn(ASTORE, callStackSlot);
+		}
 
 		// Initialize the values in the slots
 		initializeSlots();
@@ -287,28 +329,11 @@ public class JavaBuilderRewrite {
 			construct.visitMaxs(1, 1);
 			construct.visitEnd();
 		}
-
-		{
-			// Add get source
-			MethodVisitor source = writer.visitMethod(ACC_PUBLIC, "getSource", "()Ljava/lang/String;", null, null);
-			source.visitLdcInsn(filename);
-			source.visitInsn(ARETURN);
-			source.visitMaxs(0, 0);
-			source.visitEnd();
-
-			// Add current line field
-			writer.visitField(0, "line", "I", null, p.linedefined).visitEnd();
-
-			// Add get line
-			source = writer.visitMethod(ACC_PUBLIC, "getLine", "()I", null, null);
-			source.visitVarInsn(ALOAD, 0);
-			source.visitFieldInsn(GETFIELD, className, "line", "I");
-			source.visitInsn(IRETURN);
-			source.visitMaxs(0, 0);
-			source.visitEnd();
-		}
 	}
 
+	/**
+	 * Setup slots for arguments
+	 */
 	public void initializeSlots() {
 		int slot;
 		createUpvalues(-1, 0, p.maxstacksize);
@@ -393,9 +418,9 @@ public class JavaBuilderRewrite {
 		main.visitFieldInsn(GETSTATIC, "org/luaj/vm2/LuaValue", field, "Lorg/luaj/vm2/LuaBoolean;");
 	}
 
-	private Map<Integer, Integer> plainSlotVars = new HashMap<Integer, Integer>();
-	private Map<Integer, Integer> upvalueSlotVars = new HashMap<Integer, Integer>();
-	private List<Slot> slots = new ArrayList<Slot>();
+	protected Map<Integer, Integer> plainSlotVars = new HashMap<Integer, Integer>();
+	protected Map<Integer, Integer> upvalueSlotVars = new HashMap<Integer, Integer>();
+	protected List<Slot> slots = new ArrayList<Slot>();
 
 	protected class Slot {
 		public final int javaSlot;
@@ -413,7 +438,7 @@ public class JavaBuilderRewrite {
 		}
 	}
 
-	private int findSlot(int luaSlot, Map<Integer, Integer> map, String name, String type) {
+	protected int findSlot(int luaSlot, Map<Integer, Integer> map, String name, String type) {
 		if (map.containsKey(luaSlot)) return map.get(luaSlot);
 
 		// This will always be an Upvalue/LuaValue so the slot size is 1 as it is a reference
@@ -425,7 +450,7 @@ public class JavaBuilderRewrite {
 		return javaSlot;
 	}
 
-	private int findSlotIndex(int slot, boolean isUpvalue) {
+	protected int findSlotIndex(int slot, boolean isUpvalue) {
 		LuaString varName = p.getlocalname(slot, pc);
 		String name = varName == null ? Integer.toString(slot) : ("_" + varName.toString());
 
@@ -454,7 +479,7 @@ public class JavaBuilderRewrite {
 				// If we are creating the upvalue for the first time then we call LibFunction.newupe (but actually call
 				// <className>.newupe but I need to check that). The we duplicate the object, so it remains on the stack
 				// and store it
-				methodCurrentNewUpvalueEmpty.inject(main);
+				METHOD_NEW_UPVALUE_EMPTY.inject(main);
 				main.visitInsn(DUP);
 				main.visitVarInsn(ASTORE, index);
 			} else {
@@ -479,7 +504,7 @@ public class JavaBuilderRewrite {
 			boolean isupcreate = pi.isUpvalueCreate(pc, slot);
 			if (isupcreate) {
 				int index = findSlotIndex(slot, true);
-				methodCurrentNewUpvalueNil.inject(main);
+				METHOD_NEW_UPVALUE_NIL.inject(main);
 				main.visitVarInsn(ASTORE, index);
 			}
 		}
@@ -492,13 +517,13 @@ public class JavaBuilderRewrite {
 
 			// Load it from the slot, convert to an array and store it to the upvalue slot
 			main.visitVarInsn(ALOAD, index);
-			methodCurrentNewUpvalueValue.inject(main);
+			METHOD_NEW_UPVALUE_VALUE.inject(main);
 			int upvalueIndex = findSlotIndex(slot, true);
 			main.visitVarInsn(ASTORE, upvalueIndex);
 		}
 	}
 
-	private static String upvalueName(int upvalueIndex) {
+	protected static String upvalueName(int upvalueIndex) {
 		return PREFIX_UPVALUE + upvalueIndex;
 	}
 
@@ -561,7 +586,7 @@ public class JavaBuilderRewrite {
 		}
 	}
 
-	private int getVarresultIndex() {
+	protected int getVarresultIndex() {
 		if (varargsLocal < 0) varargsLocal = ++maxLocals;
 		return varargsLocal;
 	}
@@ -602,7 +627,6 @@ public class JavaBuilderRewrite {
 				break;
 		}
 
-		// TODO: More constants, less magic variables
 		main.visitMethodInsn(INVOKEVIRTUAL, CLASS_LUAVALUE, op, "()" + TYPE_LUAVALUE, false);
 	}
 
@@ -650,6 +674,10 @@ public class JavaBuilderRewrite {
 	}
 
 	public void areturn() {
+		// Pop call stack
+		main.visitVarInsn(ALOAD, callStackSlot);
+		METHOD_ONRETURN.inject(main);
+
 		main.visitInsn(ARETURN);
 	}
 
@@ -733,6 +761,7 @@ public class JavaBuilderRewrite {
 
 	public void newTailcallVarargs() {
 		METHOD_TAILCALL.inject(main);
+		METHOD_TAILCALL_EVAL.inject(main);
 	}
 
 	public void invoke(int nargs) {
@@ -792,7 +821,7 @@ public class JavaBuilderRewrite {
 		main.visitFieldInsn(PUTFIELD, protoName, destName, type);
 	}
 
-	private Map<LuaValue, String> constants = new HashMap<LuaValue, String>();
+	protected Map<LuaValue, String> constants = new HashMap<LuaValue, String>();
 
 	public void loadConstant(LuaValue value) {
 		switch (value.type()) {
@@ -820,7 +849,7 @@ public class JavaBuilderRewrite {
 		}
 	}
 
-	private String createLuaIntegerField(int value) {
+	protected String createLuaIntegerField(int value) {
 		String name = PREFIX_CONSTANT + constants.size();
 		writer.visitField(ACC_STATIC | ACC_FINAL, name, TYPE_LUAVALUE, null, null);
 
@@ -830,7 +859,7 @@ public class JavaBuilderRewrite {
 		return name;
 	}
 
-	private String createLuaDoubleField(double value) {
+	protected String createLuaDoubleField(double value) {
 		String name = PREFIX_CONSTANT + constants.size();
 		writer.visitField(ACC_STATIC | ACC_FINAL, name, TYPE_LUAVALUE, null, null);
 		constantOpcode(init, value);
@@ -839,7 +868,7 @@ public class JavaBuilderRewrite {
 		return name;
 	}
 
-	private String createLuaStringField(LuaString value) {
+	protected String createLuaStringField(LuaString value) {
 		String name = PREFIX_CONSTANT + constants.size();
 		writer.visitField(ACC_STATIC | ACC_FINAL, name, TYPE_LUAVALUE, null, null);
 
@@ -894,14 +923,13 @@ public class JavaBuilderRewrite {
 
 		main.visitLabel(currentLabel);
 
-		// TODO: Fix this so it is less broken
 		int currentLine = p.lineinfo[pc];
 
 		if (currentLine != previousLine) {
 			main.visitLineNumber(currentLine, currentLabel);
-			main.visitVarInsn(ALOAD, 0);
+			main.visitVarInsn(ALOAD, sourceSlot);
 			constantOpcode(main, currentLine);
-			main.visitFieldInsn(PUTFIELD, className, "line", "I");
+			main.visitFieldInsn(PUTFIELD, CLASS_SOURCE, "line", "I");
 			previousLine = currentLine;
 		}
 	}

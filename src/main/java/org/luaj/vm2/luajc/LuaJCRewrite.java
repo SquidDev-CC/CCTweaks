@@ -56,13 +56,8 @@ public class LuaJCRewrite implements LoadState.LuaCompiler {
 		Prototype p = LuaC.compile(stream, name);
 		String className = toStandardJavaClassName(name);
 
-		try {
-			JavaLoaderRewrite loader = new JavaLoaderRewrite(env);
-			return loader.load(p, className, name);
-		} catch (RuntimeException e) {
-			e.printStackTrace();
-			throw e;
-		}
+		JavaLoaderRewrite loader = new JavaLoaderRewrite(env);
+		return loader.load(p, className, name);
 	}
 
 	private static String toStandardJavaClassName(String chunkName) {
