@@ -1,6 +1,7 @@
 package squiddev.cctweaks.core.utils;
 
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
+import dan200.computercraft.shared.turtle.blocks.TileTurtle;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -17,11 +18,11 @@ public final class ComputerAccessor {
 
 	static {
 		try {
-			tileComputerClass = Class.forName("dan200.computercraft.shared.computer.blocks.TileComputerBase");
+			tileComputerClass = TileComputerBase.class;
 			tileCopy = tileComputerClass.getDeclaredMethod("transferStateFrom", TileComputerBase.class);
 			tileCopy.setAccessible(true);
 
-			turtleTileClass = Class.forName("dan200.computercraft.shared.turtle.blocks.TileTurtle");
+			turtleTileClass = TileTurtle.class;
 			turtleTileMoved = turtleTileClass.getDeclaredField("m_moved");
 			turtleTileMoved.setAccessible(true);
 		} catch (Exception e) {

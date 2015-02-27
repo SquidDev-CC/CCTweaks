@@ -46,7 +46,7 @@ public class TurtleRefuelList {
 			refuelList.add(new ITurtleRefuelSource() {
 				@Override
 				public boolean canRefuel(ITurtleAccess turtle, ItemStack stack, int limit) {
-					return stack.getItem() instanceof IEnergyContainerItem;
+					return stack != null && stack.getItem() instanceof IEnergyContainerItem;
 				}
 
 				@Override

@@ -42,7 +42,7 @@ public class PatchTurtle implements Opcodes {
 				method.visitVarInsn(ASTORE, 2);
 
 				// Get iterator
-				method.visitFieldInsn(GETSTATIC, "squiddev/cctweaks/core/registry/TurtleTweakRegistry", "refuelList", "Ljava/util/List;");
+				method.visitFieldInsn(GETSTATIC, "squiddev/cctweaks/core/registry/TurtleRefuelList", "refuelList", "Ljava/util/List;");
 				method.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "iterator", "()Ljava/util/Iterator;", true);
 				method.visitVarInsn(ASTORE, 3);
 
