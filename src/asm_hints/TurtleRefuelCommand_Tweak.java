@@ -9,16 +9,16 @@ import squiddev.cctweaks.core.turtle.ITurtleRefuelSource;
 
 public class TurtleRefuelCommand_Tweak {
 	private int m_limit = 0;
+
 	public TurtleRefuelCommand_Tweak() {
 		m_limit = 3;
 	}
 
-	public TurtleCommandResult execute(ITurtleAccess turtle)
-	{
+	public TurtleCommandResult execute(ITurtleAccess turtle) {
 		ItemStack stack = turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
 		for (ITurtleRefuelSource source : TurtleRefuelList.refuelList) {
-			if(source.canRefuel(turtle, stack, m_limit)) {
-				if(m_limit == 0) {
+			if (source.canRefuel(turtle, stack, m_limit)) {
+				if (m_limit == 0) {
 					return TurtleCommandResult.success();
 				} else {
 					turtle.addFuel(source.refuel(turtle, stack, m_limit));

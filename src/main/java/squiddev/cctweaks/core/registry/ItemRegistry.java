@@ -23,7 +23,7 @@ public class ItemRegistry {
 			GameRegistry.addRecipe(new ComputerUpgradeCrafting());
 		}
 
-		if(Config.config.enableDebugWand) {
+		if (Config.config.enableDebugWand) {
 			itemDebugger = new ItemDebugger();
 			itemDebugger.registerItem();
 		}
