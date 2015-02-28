@@ -3,16 +3,13 @@
 		"modid": "CCTweaks",
 		"name": "CCTweaks",
 		"description": "Random tweaks to Computer Craft",
-		"version": "${version}",
-		"mcversion": "${mcversion}",
-		"url": "",
-		"updateUrl": "",
-		"authors": [
+		"version": "${mod_version}",
+		"mcversion": "${mc_version}",
+		"url": "https://github.com/SquidDev-CC/CC-Tweaks",
+		"credits": "Dan200, Forge team",
+		"authorList": [
 			"SquidDev"
 		],
-		"credits": "Dan200, Forge team",
-		"logoFile": "",
-		"screenshots": [],
 		"dependencies": [
 			"ComputerCraft"
 		]

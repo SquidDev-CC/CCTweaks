@@ -17,13 +17,26 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "0.1.2"
+// Load the config file
+ext.configFile = file "build.properties"
+configFile.withReader {
+	// Load config.  It shall from now be referenced as simply config or project.config
+	def prop = new Properties()
+	prop.load(it)
+	project.ext.config = new ConfigSlurper().parse prop
+}
+
 group = "squiddev.cctweaks"
 archivesBaseName = "CCTweaks"
+version = config.mc_version + "-" + config.mod_version
+
 
 minecraft {
-	version = "1.7.10-10.13.2.1291"
+	version = config.mc_version + "-" + config.forge_version
 	runDir = "eclipse"
+
+	replace '${mod_version}', config.mod_version
+	replace '${mc_version}', config.mc_version
 }
 
 jar {
@@ -34,21 +47,21 @@ jar {
 }
 
 dependencies {
-	compile files('libs/ComputerCraft-1.73.jar')
+	compile files('libs/ComputerCraft-${config.cc_version}.jar')
 }
 
 processResources
 {
 	// this will ensure that this task is redone when the versions change.
-	inputs.property "version", project.version
-	inputs.property "mcversion", project.minecraft.version
+	inputs.property "mod_version", config.mod_version
+	inputs.property "mc_version", config.mc_version
 
 	// replace stuff in mcmod.info, nothing else
 	from(sourceSets.main.resources.srcDirs) {
 		include 'mcmod.info'
 
-		// replace version and mcversion
-		expand 'version': project.version, 'mcversion': project.minecraft.version
+		// Replace mod_version and mc_version
+		expand 'mod_version': config.mod_version, 'mc_version': config.mc_version
 	}
 
 	// copy everything else, thats not the mcmod.info
