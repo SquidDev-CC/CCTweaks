@@ -23,59 +23,17 @@ public class ComputerUpgradeCrafting implements IRecipe {
 
 	@Override
 	public boolean matches(InventoryCrafting inventorycrafting, World world) {
-		int size = inventorycrafting.getSizeInventory();
-		boolean containsUpgrade = false;
-		boolean containsComputer = false;
-
-		// Find
-		for (int i = 0; i < size; i++) {
-			ItemStack itemStack = inventorycrafting.getStackInSlot(i);
-			if (itemStack == null) {
-				continue;
-			}
-
-			Item item = itemStack.getItem();
-
-			if (item instanceof ItemComputerUpgrade) {
-				containsUpgrade = true;
-			} else if (item instanceof IComputerItem) {
-				if (((IComputerItem) item).getFamily(itemStack) != ComputerFamily.Normal) {
-					return false;
-				}
-				containsComputer = true;
-			}
-
-			if (containsUpgrade && containsComputer) {
-				return true;
-			}
-		}
-		return false;
+		return getComputerStack(inventorycrafting) != null;
 	}
 
 	@Override
 	public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
-		int size = inventorycrafting.getSizeInventory();
-
-		ItemStack computerStack = null;
-
-		for (int i = 0; i < size; i++) {
-			ItemStack itemStack = inventorycrafting.getStackInSlot(i);
-			if (itemStack == null) {
-				continue;
-			}
-
-			// If its a 'computer'
-			if (itemStack.getItem() instanceof IComputerItem) {
-				computerStack = itemStack;
-				break;
-			}
-		}
-
-		if (computerStack == null) {
-			return null;
-		}
+		ItemStack computerStack = getComputerStack(inventorycrafting);
+		if (computerStack == null) return null;
 
 		IComputerItem computerItem = (IComputerItem) computerStack.getItem();
+
+		// Get the current data
 		int id = computerItem.getComputerID(computerStack);
 		String label = computerItem.getLabel(computerStack);
 		ComputerFamily family = ComputerFamily.Advanced;
@@ -100,6 +58,46 @@ public class ComputerUpgradeCrafting implements IRecipe {
 		return null;
 	}
 
+	/**
+	 * Find the ItemStack for the computer
+	 *
+	 * @param crafting The crafting inventory space
+	 * @return The ItemStack with a computer type in, or null if the recipe doesn't match
+	 */
+	protected ItemStack getComputerStack(InventoryCrafting crafting) {
+		int size = crafting.getSizeInventory();
+
+		ItemStack computerStack = null;
+		boolean hasUpgrade = false;
+
+		for (int i = 0; i < size; i++) {
+			ItemStack itemStack = crafting.getStackInSlot(i);
+			if (itemStack == null) {
+				continue;
+			}
+
+			Item item = itemStack.getItem();
+
+			// If its a 'computer'
+			if (item instanceof IComputerItem) {
+				// Don't allow more than one computer and it must be a normal computer
+				if (computerStack != null || ((IComputerItem) item).getFamily(itemStack) != ComputerFamily.Normal) {
+					return null;
+				}
+
+				computerStack = itemStack;
+			} else if (item instanceof ItemComputerUpgrade) {
+				// Don't allow more than one upgrade
+				if (hasUpgrade) return null;
+
+				hasUpgrade = true;
+			}
+		}
+
+		// Don't return computer stack
+		return hasUpgrade ? computerStack : null;
+	}
+
 	@Override
 	public int getRecipeSize() {
 		return 2;
@@ -109,5 +107,4 @@ public class ComputerUpgradeCrafting implements IRecipe {
 	public ItemStack getRecipeOutput() {
 		return null;
 	}
-
 }
