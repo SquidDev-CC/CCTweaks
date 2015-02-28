@@ -59,7 +59,7 @@ public class DebugLib_Rewrite extends VarArgFunction {
 	// remove it in production builds
 	public static boolean DEBUG_ENABLED;
 
-	public static final String[] NAMES = {
+	static final String[] NAMES = {
 		"debug",
 		"getfenv",
 		"gethook",
