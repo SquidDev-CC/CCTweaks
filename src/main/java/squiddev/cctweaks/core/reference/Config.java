@@ -69,6 +69,13 @@ public final class Config {
 			"Enable upgrading computers"
 		);
 
+		data.enableDebugWand = configuration.getBoolean(
+			"Debug wand",
+			COMPUTER,
+			defaults.enableDebugWand,
+			"Enable the debug wand"
+		);
+
 		data.globalWhitelist = configuration.getStringList(
 			"Whitelisted Globals",
 			COMPUTER,
@@ -151,6 +158,11 @@ public final class Config {
 		 * Enable computer upgrade
 		 */
 		public boolean enableComputerUpgrades = true;
+
+		/**
+		 * Enable debug want
+		 */
+		public boolean enableDebugWand = false;
 
 		/**
 		 * Global whitelist

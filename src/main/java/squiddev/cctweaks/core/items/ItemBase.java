@@ -8,7 +8,7 @@ import net.minecraft.item.Item;
 import squiddev.cctweaks.CCTweaks;
 import squiddev.cctweaks.core.reference.ModInfo;
 
-public class ItemBase extends Item {
+public abstract class ItemBase extends Item {
 
 	private final String name;
 

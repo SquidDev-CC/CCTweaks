@@ -18,35 +18,14 @@ import squiddev.cctweaks.core.utils.DebugLogger;
 import java.util.List;
 
 
-public class ItemComputerUpgrade extends ItemBase {
+public class ItemComputerUpgrade extends ItemComputerAction {
 	public ItemComputerUpgrade() {
 		super("computerUpgrade");
 	}
 
-	@Override
-	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
-		if (!player.isSneaking() || world.isRemote) {
-			return false;
-		}
-
-		TileEntity tile = world.getTileEntity(x, y, z);
-		if (tile != null && !(tile instanceof TileComputerBase)) {
-			return false;
-		}
-
-		TileComputerBase computerTile = (TileComputerBase) tile;
-		if (computerTile == null || computerTile.getFamily() != ComputerFamily.Normal) return false;
-
-		if (computerTile instanceof TileTurtle) {
-			return upgradeTurtle(stack, player, world, x, y, z, (TileTurtle) computerTile);
-		}
-
-		return upgradeComputer(stack, player, world, x, y, z, computerTile);
-	}
-
-	private boolean upgradeComputer(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, TileComputerBase computerTile) {
-		// Check if null now.
-		if (ComputerAccessor.tileCopy == null) {
+	protected boolean upgradeComputer(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, TileComputerBase computerTile) {
+		// Check we can copy the tile and it is a normal computer
+		if (computerTile.getFamily() != ComputerFamily.Normal || ComputerAccessor.tileCopy == null) {
 			return false;
 		}
 
@@ -71,15 +50,16 @@ public class ItemComputerUpgrade extends ItemBase {
 
 		// Setup computer
 		newComputer.createServerComputer().setWorld(world);
-		computerTile.updateBlock();
+		newComputer.updateBlock();
 
-		if (!player.capabilities.isCreativeMode) {
-			stack.stackSize -= 1;
-		}
 		return true;
 	}
 
-	private boolean upgradeTurtle(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, TileTurtle computerTile) {
+	protected boolean upgradeTurtle(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, TileTurtle computerTile) {
+		// Ensure it is a normal computer
+		if (computerTile.getFamily() != ComputerFamily.Normal) {
+			return false;
+		}
 		// If we set the turtle as moved, the destroy method won't drop the items
 		try {
 			ComputerAccessor.turtleTileMoved.setBoolean(computerTile, true);
@@ -104,10 +84,6 @@ public class ItemComputerUpgrade extends ItemBase {
 		newTurtle.createServerComputer().setPosition(x, y, z);
 		newTurtle.updateBlock();
 
-		// 'Use' item and return
-		if (!player.capabilities.isCreativeMode) {
-			stack.stackSize -= 1;
-		}
 		return true;
 	}
 
