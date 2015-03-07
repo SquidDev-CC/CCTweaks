@@ -33,6 +33,23 @@ public class PatchTurtle implements Opcodes {
 				method.instructions.clear();
 				method.localVariables = null;
 
+				/*
+					ItemStack stack = this.turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
+					for (ITurtleRefuelSource source : TurtleRefuelList.refuelList) {
+						if (source.canRefuel(turtle, stack, m_limit)) {
+							if (m_limit == 0) {
+								return TurtleCommandResult.success();
+							} else {
+								turtle.addFuel(source.refuel(turtle, stack, m_limit));
+								turtle.playAnimation(TurtleAnimation.Wait);
+								return TurtleCommandResult.success();
+							}
+						}
+					}
+
+					return TurtleCommandResult.failure("Cannot refuel from this");
+				 */
+
 				// Get current stack
 				method.visitVarInsn(ALOAD, 1);
 				method.visitMethodInsn(INVOKEINTERFACE, "dan200/computercraft/api/turtle/ITurtleAccess", "getInventory", "()Lnet/minecraft/inventory/IInventory;", true);
