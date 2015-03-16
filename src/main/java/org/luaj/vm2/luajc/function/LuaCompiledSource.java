@@ -2,30 +2,34 @@ package org.luaj.vm2.luajc.function;
 
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Prototype;
 import org.luaj.vm2.luajc.IGetSource;
 
 /**
  * A wrapper for functions to handle call stacks
  */
 public class LuaCompiledSource extends LuaFunction implements IGetSource {
-	protected final String source;
 	public int line;
-	protected final LuaFunction parent;
+	protected final LuaCompiledFunction parent;
 
-	public LuaCompiledSource(String source, int startLine, LuaFunction parent) {
-		this.source = source;
-		line = startLine;
+	public LuaCompiledSource(LuaCompiledFunction parent) {
+		line = parent.getLine();
 		this.parent = parent;
 	}
 
 	@Override
 	public String getSource() {
-		return source;
+		return parent.getSource();
 	}
 
 	@Override
 	public int getLine() {
 		return line;
+	}
+
+	@Override
+	public Prototype getPrototype() {
+		return parent.getPrototype();
 	}
 
 	public LuaValue getfenv() {

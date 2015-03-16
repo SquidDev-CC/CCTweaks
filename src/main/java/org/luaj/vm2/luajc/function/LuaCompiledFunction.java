@@ -21,14 +21,18 @@
  ******************************************************************************/
 package org.luaj.vm2.luajc.function;
 
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Prototype;
+import org.luaj.vm2.luajc.IGetSource;
+import org.luaj.vm2.luajc.JavaBuilderRewrite;
 
 /**
- * Subclass of {@link org.luaj.vm2.LuaFunction} common to LuaJC compiled functions.
+ * Subclass of {@link LuaFunction} common to LuaJC compiled functions.
  * <p/>
  * Since lua functions can be called with too few or too many arguments,
- * and there are overloaded {@link org.luaj.vm2.LuaValue#call()} functions with varying
+ * and there are overloaded {@link LuaValue#call()} functions with varying
  * number of arguments, a compiled function exposed needs to handle the
  * argument fixup when a function is called with a number of arguments
  * differs from that expected.
@@ -37,14 +41,17 @@ import org.luaj.vm2.LuaValue;
  * there are 5 direct subclasses to handle common cases based on number of
  * argument values and number of return return values.
  * <ul>
- * <li>{@link org.luaj.vm2.luajc.function.ZeroArgFunction}</li>
- * <li>{@link org.luaj.vm2.luajc.function.OneArgFunction}</li>
- * <li>{@link org.luaj.vm2.luajc.function.TwoArgFunction}</li>
- * <li>{@link org.luaj.vm2.luajc.function.ThreeArgFunction}</li>
- * <li>{@link org.luaj.vm2.luajc.function.VarArgFunction}</li>
+ * <li>{@link ZeroArgFunction}</li>
+ * <li>{@link OneArgFunction}</li>
+ * <li>{@link TwoArgFunction}</li>
+ * <li>{@link ThreeArgFunction}</li>
+ * <li>{@link VarArgFunction}</li>
  * </ul>
  */
-abstract public class LuaCompiledFunction extends LuaFunction {
+public abstract class LuaCompiledFunction extends LuaFunction implements IGetSource {
+	protected String source;
+	protected int startLine;
+
 	/**
 	 * Java code generation utility to allocate storage for upvalue, leave it empty
 	 */
@@ -64,5 +71,24 @@ abstract public class LuaCompiledFunction extends LuaFunction {
 	 */
 	public static LuaValue[] newupl(LuaValue v) {
 		return new LuaValue[]{v};
+	}
+
+	@Override
+	public String getSource() {
+		return source;
+	}
+
+	@Override
+	public int getLine() {
+		return -startLine;
+	}
+
+	@Override
+	public Prototype getPrototype() {
+		try {
+			return (Prototype) getClass().getField(JavaBuilderRewrite.PROTOTYPE_NAME).get(null);
+		} catch (Exception e) {
+			throw new LuaError(e.getMessage());
+		}
 	}
 }

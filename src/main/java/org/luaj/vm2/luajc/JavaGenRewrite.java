@@ -30,6 +30,7 @@ public class JavaGenRewrite {
 	public final String className;
 	public final byte[] bytecode;
 	public final JavaGenRewrite[] inners;
+	public final Prototype prototype;
 
 	protected boolean validated = false;
 
@@ -39,6 +40,7 @@ public class JavaGenRewrite {
 
 	private JavaGenRewrite(ProtoInfo pi, String className, String filename) {
 		this.className = className;
+		prototype = pi.prototype;
 
 		// build this class
 		JavaBuilderRewrite builder = new JavaBuilderRewrite(pi, className, filename);

@@ -3,6 +3,11 @@ package squiddev.cctweaks.core.asm;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 public class ASMTransformer implements IClassTransformer {
+	protected ClassReplacer[] patches = {
+		new ClassReplacer("org.luaj.vm2.lib.DebugLib"),
+		new ClassReplacer("org.luaj.vm2.lib.StringLib"),
+	};
+
 	@Override
 	public byte[] transform(String className, String s2, byte[] bytes) {
 		if (className.equals("dan200.computercraft.core.lua.LuaJLuaMachine")) {
@@ -13,8 +18,12 @@ public class ASMTransformer implements IClassTransformer {
 			return PatchTurtle.patchRefuelCommand(bytes);
 		} else if (className.startsWith("dan200.computercraft.shared.turtle.core.Turtle") && className.endsWith("Command")) {
 			return PatchTurtle.disableTurtleCommand(className, bytes);
-		} else if (className.startsWith("org.luaj.vm2.lib.DebugLib")) {
-			return PatchLuaJ.patchDebugLib(className, bytes);
+		}
+
+		for (ClassReplacer replacer : patches) {
+			if (replacer.matches(className)) {
+				return replacer.patchClass(className, bytes);
+			}
 		}
 
 		return bytes;

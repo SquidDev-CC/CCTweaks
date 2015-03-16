@@ -1,13 +1,3 @@
-package org.luaj.vm2.luajc;
-
-import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Prototype;
-import squiddev.cctweaks.core.reference.Config;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * ****************************************************************************
  * Copyright (c) 2010 Luaj.org. All rights reserved.
@@ -31,11 +21,22 @@ import java.util.Map;
  * THE SOFTWARE.
  * ****************************************************************************
  */
+package org.luaj.vm2.luajc;
+
+import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Prototype;
+import squiddev.cctweaks.core.reference.Config;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class JavaLoaderRewrite extends ClassLoader {
 
 	private final LuaValue env;
 
 	private Map<String, byte[]> unloaded = new HashMap<String, byte[]>();
+	private Map<String, Prototype> prototypes = new HashMap<String, Prototype>();
 
 	public JavaLoaderRewrite(LuaValue env) {
 		super(JavaLoaderRewrite.class.getClassLoader());
@@ -59,13 +60,14 @@ public class JavaLoaderRewrite extends ClassLoader {
 			v.setfenv(env);
 			return v;
 		} catch (Exception e) {
-			if (Config.config.debug) e.printStackTrace();
 			throw new IllegalStateException("bad class gen: " + e.getMessage(), e);
 		}
 	}
 
 	public void include(JavaGenRewrite jg) {
 		unloaded.put(jg.className, jg.bytecode);
+		prototypes.put(jg.className, jg.prototype);
+
 		for (int i = 0, n = jg.inners != null ? jg.inners.length : 0; i < n; i++) {
 			include(jg.inners[i]);
 		}
@@ -78,7 +80,16 @@ public class JavaLoaderRewrite extends ClassLoader {
 	public Class findClass(String className) throws ClassNotFoundException {
 		byte[] bytes = unloaded.get(className);
 		if (bytes != null) {
-			return defineClass(className, bytes, 0, bytes.length);
+			Class generatedClass = defineClass(className, bytes, 0, bytes.length);
+
+			// Attempt to set the prototype object to this class
+			try {
+				generatedClass.getField(JavaBuilderRewrite.PROTOTYPE_NAME).set(null, prototypes.get(className));
+			} catch (ReflectiveOperationException e) {
+				e.printStackTrace();
+			}
+
+			return generatedClass;
 		}
 		return super.findClass(className);
 	}

@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-
 package org.luaj.vm2.luajc;
 
 import org.luaj.vm2.*;
@@ -39,14 +38,18 @@ import static squiddev.cctweaks.core.asm.AsmUtils.TinyMethod;
 import static squiddev.cctweaks.core.asm.AsmUtils.constantOpcode;
 
 public class JavaBuilderRewrite {
+	public static final String PROTOTYPE_NAME = "PROTOTYPE";
 
 	protected static final String TYPE_LOCALUPVALUE = Type.getDescriptor(LuaValue[].class);
 	protected static final String TYPE_LUAVALUE = Type.getDescriptor(LuaValue.class);
 	protected static final String CLASS_LUAVALUE = Type.getInternalName(LuaValue.class);
 
 	protected static final String TYPE_CALLSTACK = Type.getDescriptor(LuaThread.CallStack.class);
+	protected static final String TYPE_PROTOTYPE = Type.getDescriptor(Prototype.class);
 	protected static final String TYPE_SOURCE = Type.getDescriptor(LuaCompiledSource.class);
+	protected static final String TYPE_COMPILED = Type.getDescriptor(LuaCompiledFunction.class);
 	protected static final String CLASS_SOURCE = Type.getInternalName(LuaCompiledSource.class);
+	protected static final String CLASS_COMPILED = Type.getInternalName(LuaCompiledFunction.class);
 
 	protected static class FunctionType {
 		public final String signature;
@@ -61,7 +64,7 @@ public class JavaBuilderRewrite {
 			argsLength = args;
 		}
 
-		public FunctionType(Class classObj, String invokeName, Class... args) {
+		public FunctionType(Class<?> classObj, String invokeName, Class<?>... args) {
 			this(
 				Type.getInternalName(classObj),
 				invokeName, getSignature(classObj, invokeName, args),
@@ -270,6 +273,9 @@ public class JavaBuilderRewrite {
 			writer.visitField(0, upvalueName(i), type, null, null);
 		}
 
+		// Stores the prototype object
+		writer.visitField(ACC_PUBLIC + ACC_STATIC, PROTOTYPE_NAME, TYPE_PROTOTYPE, null, null).visitEnd();
+
 		// Create the class constructor
 		init = writer.visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
 		init.visitCode();
@@ -293,10 +299,8 @@ public class JavaBuilderRewrite {
 			main.visitInsn(DUP);
 
 			// Constructor
-			main.visitLdcInsn(filename);
-			constantOpcode(main, p.linedefined);
 			main.visitVarInsn(ALOAD, 0);
-			main.visitMethodInsn(INVOKESPECIAL, CLASS_SOURCE, "<init>", "(Ljava/lang/String;ILorg/luaj/vm2/LuaFunction;)V", false);
+			main.visitMethodInsn(INVOKESPECIAL, CLASS_SOURCE, "<init>", "(" + TYPE_COMPILED + ")V", false);
 
 			// Store it in sourceSlot
 			main.visitInsn(DUP);
@@ -324,8 +328,17 @@ public class JavaBuilderRewrite {
 			MethodVisitor construct = writer.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 			construct.visitVarInsn(ALOAD, 0);
 			construct.visitMethodInsn(INVOKESPECIAL, superclass.className, "<init>", "()V", false);
+
+			construct.visitVarInsn(ALOAD, 0);
+			construct.visitLdcInsn(filename);
+			construct.visitFieldInsn(PUTFIELD, CLASS_COMPILED, "source", "Ljava/lang/String;");
+
+			construct.visitVarInsn(ALOAD, 0);
+			constantOpcode(construct, p.linedefined);
+			construct.visitFieldInsn(PUTFIELD, CLASS_COMPILED, "startLine", "I");
+
 			construct.visitInsn(RETURN);
-			construct.visitMaxs(1, 1);
+			construct.visitMaxs(2, 1);
 			construct.visitEnd();
 		}
 	}
@@ -626,6 +639,7 @@ public class JavaBuilderRewrite {
 				break;
 		}
 
+		// TODO: More constants, less magic variables
 		main.visitMethodInsn(INVOKEVIRTUAL, CLASS_LUAVALUE, op, "()" + TYPE_LUAVALUE, false);
 	}
 
