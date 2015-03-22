@@ -65,7 +65,7 @@ public final class ComputerAccessor {
 			luaMachineGlobals.setAccessible(true);
 
 		} catch (Exception e) {
-			System.out.println("CCTweaks: ComputerCraft not found.");
+			DebugLogger.error("CCTweaks: ComputerCraft not found.");
 			e.printStackTrace();
 		}
 	}

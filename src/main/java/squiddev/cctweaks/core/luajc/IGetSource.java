@@ -1,4 +1,4 @@
-package org.luaj.vm2.luajc;
+package squiddev.cctweaks.core.luajc;
 
 import org.luaj.vm2.Prototype;
 

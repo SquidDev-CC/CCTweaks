@@ -1,27 +1,4 @@
-/**
- * ****************************************************************************
- * Copyright (c) 2010 Luaj.org. All rights reserved.
- * <p/>
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * <p/>
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * <p/>
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- * ****************************************************************************
- */
-package org.luaj.vm2.luajc;
+package squiddev.cctweaks.core.luajc;
 
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
@@ -31,24 +8,47 @@ import squiddev.cctweaks.core.reference.Config;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JavaLoaderRewrite extends ClassLoader {
+/**
+ * ****************************************************************************
+ * Copyright (c) 2010 Luaj.org. All rights reserved.
+ * <p>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * <p>
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * <p>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * ****************************************************************************
+ */
+public class JavaLoader extends ClassLoader {
 
 	private final LuaValue env;
 
 	private Map<String, byte[]> unloaded = new HashMap<String, byte[]>();
 	private Map<String, Prototype> prototypes = new HashMap<String, Prototype>();
 
-	public JavaLoaderRewrite(LuaValue env) {
-		super(JavaLoaderRewrite.class.getClassLoader());
+	public JavaLoader(LuaValue env) {
+		super(JavaLoader.class.getClassLoader());
 		this.env = env;
 	}
 
 	public LuaFunction load(Prototype p, String className, String filename) {
-		JavaGenRewrite jg = new JavaGenRewrite(p, className, filename);
+		JavaGen jg = new JavaGen(p, className, filename);
 		return load(jg);
 	}
 
-	public LuaFunction load(JavaGenRewrite jg) {
+	public LuaFunction load(JavaGen jg) {
 		include(jg);
 		return load(jg.className);
 	}
@@ -64,7 +64,7 @@ public class JavaLoaderRewrite extends ClassLoader {
 		}
 	}
 
-	public void include(JavaGenRewrite jg) {
+	public void include(JavaGen jg) {
 		unloaded.put(jg.className, jg.bytecode);
 		prototypes.put(jg.className, jg.prototype);
 
@@ -84,7 +84,7 @@ public class JavaLoaderRewrite extends ClassLoader {
 
 			// Attempt to set the prototype object to this class
 			try {
-				generatedClass.getField(JavaBuilderRewrite.PROTOTYPE_NAME).set(null, prototypes.get(className));
+				generatedClass.getField(JavaBuilder.PROTOTYPE_NAME).set(null, prototypes.get(className));
 			} catch (ReflectiveOperationException e) {
 				e.printStackTrace();
 			}

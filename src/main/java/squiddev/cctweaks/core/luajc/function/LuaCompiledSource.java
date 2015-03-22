@@ -1,9 +1,9 @@
-package org.luaj.vm2.luajc.function;
+package squiddev.cctweaks.core.luajc.function;
 
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Prototype;
-import org.luaj.vm2.luajc.IGetSource;
+import squiddev.cctweaks.core.luajc.IGetSource;
 
 /**
  * A wrapper for functions to handle call stacks

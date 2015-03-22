@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.luaj.vm2.luajc.function;
+package squiddev.cctweaks.core.luajc.function;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
@@ -27,24 +27,24 @@ import org.luaj.vm2.Varargs;
 /**
  * Abstract base class for compiled function implementations that take two arguments and
  * return one value.
- * <p/>
- * Subclasses need only implement {@link org.luaj.vm2.LuaValue#call(org.luaj.vm2.LuaValue, org.luaj.vm2.LuaValue)} to complete this class,
+ * <p>
+ * Subclasses need only implement {@link LuaValue#call(LuaValue, LuaValue)} to complete this class,
  * simplifying development.
- * All other uses of {@link #call()}, {@link #invoke(org.luaj.vm2.Varargs)},etc,
+ * All other uses of {@link #call()}, {@link #invoke(Varargs)},etc,
  * are routed through this method by this class,
  * dropping or extending arguments with {@code nil} values as required.
- * <p/>
+ * <p>
  * If more or less than two arguments are required,
  * or variable argument or variable return values,
  * then use one of the related function
- * {@link ZeroArgFunction}, {@link org.luaj.vm2.luajc.function.OneArgFunction}, {@link ThreeArgFunction}, or {@link VarArgFunction}.
- * <p/>
+ * {@link ZeroArgFunction}, {@link OneArgFunction}, {@link ThreeArgFunction}, or {@link VarArgFunction}.
+ * <p>
  * See {@link LuaCompiledFunction} for more information on implementation libraries and library functions.
  *
- * @see #call(org.luaj.vm2.LuaValue, org.luaj.vm2.LuaValue)
+ * @see #call(LuaValue, LuaValue)
  * @see LuaCompiledFunction
  * @see ZeroArgFunction
- * @see org.luaj.vm2.luajc.function.OneArgFunction
+ * @see OneArgFunction
  * @see ThreeArgFunction
  * @see VarArgFunction
  */

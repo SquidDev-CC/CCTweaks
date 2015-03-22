@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-package org.luaj.vm2.luajc;
+package squiddev.cctweaks.core.luajc;
 
 import org.luaj.vm2.LoadState;
 import org.luaj.vm2.LuaFunction;
@@ -35,13 +35,13 @@ import java.io.InputStream;
  * Alternative version of LuaJC which fixes class names properly.
  * For instance chunk-name breaks in LuaJC
  */
-public class LuaJCRewrite implements LoadState.LuaCompiler {
+public class LuaJC implements LoadState.LuaCompiler {
 	protected static final String NON_IDENTIFIER = "[^a-zA-Z0-9_]";
 
-	protected static LuaJCRewrite instance;
+	protected static LuaJC instance;
 
-	public static LuaJCRewrite getInstance() {
-		if (instance == null) instance = new LuaJCRewrite();
+	public static LuaJC getInstance() {
+		if (instance == null) instance = new LuaJC();
 		return instance;
 	}
 
@@ -56,7 +56,7 @@ public class LuaJCRewrite implements LoadState.LuaCompiler {
 		Prototype p = LuaC.compile(stream, name);
 		String className = toStandardJavaClassName(name);
 
-		JavaLoaderRewrite loader = new JavaLoaderRewrite(env);
+		JavaLoader loader = new JavaLoader(env);
 		return loader.load(p, className, name);
 	}
 

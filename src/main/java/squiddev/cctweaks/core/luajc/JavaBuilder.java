@@ -19,25 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.luaj.vm2.luajc;
+
+package squiddev.cctweaks.core.luajc;
 
 import org.luaj.vm2.*;
-import org.luaj.vm2.luajc.function.*;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+import squiddev.cctweaks.core.luajc.function.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.objectweb.asm.Opcodes.*;
 import static squiddev.cctweaks.core.asm.AsmUtils.TinyMethod;
 import static squiddev.cctweaks.core.asm.AsmUtils.constantOpcode;
 
-public class JavaBuilderRewrite {
+public class JavaBuilder {
 	public static final String PROTOTYPE_NAME = "PROTOTYPE";
 
 	protected static final String TYPE_LOCALUPVALUE = Type.getDescriptor(LuaValue[].class);
@@ -228,7 +227,7 @@ public class JavaBuilderRewrite {
 	 */
 	protected int pc = 0;
 
-	public JavaBuilderRewrite(ProtoInfo pi, String className, String filename) {
+	public JavaBuilder(ProtoInfo pi, String className, String filename) {
 		this.pi = pi;
 		this.p = pi.prototype;
 
@@ -291,8 +290,8 @@ public class JavaBuilderRewrite {
 			main.visitLabel(start);
 
 			// Create the slots for current line and stack
-			slots.add(new Slot(sourceSlot = ++maxLocals, "source", TYPE_SOURCE));
-			slots.add(new Slot(callStackSlot = ++maxLocals, "callStack", TYPE_CALLSTACK));
+			sourceSlot = ++maxLocals;
+			callStackSlot = ++maxLocals;
 
 			// Create source object
 			main.visitTypeInsn(NEW, CLASS_SOURCE);
@@ -400,7 +399,15 @@ public class JavaBuilderRewrite {
 		// Finish main function
 		main.visitLabel(end);
 		main.visitMaxs(0, 0);
-		for (Slot slot : slots) slot.inject();
+
+		// Add upvalue & local value slot names
+		for (Map.Entry<Integer, Integer> slot : plainSlotVars.entrySet()) {
+			main.visitLocalVariable(PREFIX_LOCAL_SLOT + "_" + slot.getKey(), TYPE_LUAVALUE, null, start, end, slot.getValue());
+		}
+
+		for (Map.Entry<Integer, Integer> slot : upvalueSlotVars.entrySet()) {
+			main.visitLocalVariable(PREFIX_UPVALUE_SLOT + "_" + slot.getKey(), TYPE_LOCALUPVALUE, null, start, end, slot.getValue());
+		}
 
 		main.visitEnd();
 
@@ -432,43 +439,20 @@ public class JavaBuilderRewrite {
 
 	protected Map<Integer, Integer> plainSlotVars = new HashMap<Integer, Integer>();
 	protected Map<Integer, Integer> upvalueSlotVars = new HashMap<Integer, Integer>();
-	protected List<Slot> slots = new ArrayList<Slot>();
 
-	protected class Slot {
-		public final int javaSlot;
-		public final String name;
-		public final String type;
-
-		public Slot(int javaSlot, String name, String type) {
-			this.javaSlot = javaSlot;
-			this.name = name;
-			this.type = type;
-		}
-
-		public void inject() {
-			main.visitLocalVariable(name, type, null, start, end, javaSlot);
-		}
-	}
-
-	protected int findSlot(int luaSlot, Map<Integer, Integer> map, String name, String type) {
+	protected int findSlot(int luaSlot, Map<Integer, Integer> map) {
 		if (map.containsKey(luaSlot)) return map.get(luaSlot);
 
 		// This will always be an Upvalue/LuaValue so the slot size is 1 as it is a reference
 		int javaSlot = ++maxLocals;
 		map.put(luaSlot, javaSlot);
-		if (name != null) {
-			slots.add(new Slot(javaSlot, name, type));
-		}
 		return javaSlot;
 	}
 
 	protected int findSlotIndex(int slot, boolean isUpvalue) {
-		LuaString varName = p.getlocalname(slot, pc);
-		String name = varName == null ? Integer.toString(slot) : ("_" + varName.toString());
-
 		return isUpvalue ?
-			findSlot(slot, upvalueSlotVars, PREFIX_UPVALUE_SLOT + name, TYPE_LOCALUPVALUE) :
-			findSlot(slot, plainSlotVars, PREFIX_LOCAL_SLOT + name, TYPE_LUAVALUE);
+			findSlot(slot, upvalueSlotVars) :
+			findSlot(slot, plainSlotVars);
 	}
 
 	public void loadLocal(int pc, int slot) {

@@ -22,7 +22,7 @@
 package org.luaj.vm2.lib;
 
 import org.luaj.vm2.*;
-import org.luaj.vm2.luajc.IGetSource;
+import squiddev.cctweaks.core.luajc.IGetSource;
 
 /**
  * Subclass of {@link org.luaj.vm2.lib.LibFunction} which implements the lua standard {@code debug}

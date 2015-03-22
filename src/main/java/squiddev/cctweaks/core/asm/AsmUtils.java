@@ -6,6 +6,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
+import squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -85,8 +86,8 @@ public class AsmUtils {
 		String contents = writer.toString();
 		if (contents.length() > 0) {
 			reader.accept(new TraceClassVisitor(printWriter), 0);
-			System.out.println("Dump for " + reader.getClassName());
-			System.out.println(writer);
+			DebugLogger.error("Dump for " + reader.getClassName());
+			DebugLogger.error(contents);
 			throw new RuntimeException("Generation error");
 		}
 	}

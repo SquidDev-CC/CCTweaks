@@ -19,24 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.luaj.vm2.luajc.function;
+package squiddev.cctweaks.core.luajc.function;
 
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Prototype;
-import org.luaj.vm2.luajc.IGetSource;
-import org.luaj.vm2.luajc.JavaBuilderRewrite;
+import squiddev.cctweaks.core.luajc.IGetSource;
+import squiddev.cctweaks.core.luajc.JavaBuilder;
 
 /**
  * Subclass of {@link LuaFunction} common to LuaJC compiled functions.
- * <p/>
+ * <p>
  * Since lua functions can be called with too few or too many arguments,
  * and there are overloaded {@link LuaValue#call()} functions with varying
  * number of arguments, a compiled function exposed needs to handle the
  * argument fixup when a function is called with a number of arguments
  * differs from that expected.
- * <p/>
+ * <p>
  * To simplify the creation of library functions,
  * there are 5 direct subclasses to handle common cases based on number of
  * argument values and number of return return values.
@@ -86,7 +86,7 @@ public abstract class LuaCompiledFunction extends LuaFunction implements IGetSou
 	@Override
 	public Prototype getPrototype() {
 		try {
-			return (Prototype) getClass().getField(JavaBuilderRewrite.PROTOTYPE_NAME).get(null);
+			return (Prototype) getClass().getField(JavaBuilder.PROTOTYPE_NAME).get(null);
 		} catch (Exception e) {
 			throw new LuaError(e.getMessage());
 		}

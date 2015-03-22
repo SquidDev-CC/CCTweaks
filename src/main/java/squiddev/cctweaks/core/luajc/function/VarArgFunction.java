@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.luaj.vm2.luajc.function;
+package squiddev.cctweaks.core.luajc.function;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
@@ -27,24 +27,24 @@ import org.luaj.vm2.Varargs;
 /**
  * Abstract base class for compiled function implementations that takes varaiable arguments and
  * returns multiple return values.
- * <p/>
- * Subclasses need only implement {@link org.luaj.vm2.LuaValue#invoke(org.luaj.vm2.Varargs)} to complete this class,
+ * <p>
+ * Subclasses need only implement {@link LuaValue#invoke(Varargs)} to complete this class,
  * simplifying development.
- * All other uses of {@link #call(org.luaj.vm2.LuaValue)}, {@link #invoke()},etc,
+ * All other uses of {@link #call(LuaValue)}, {@link #invoke()},etc,
  * are routed through this method by this class,
- * converting arguments to {@link org.luaj.vm2.Varargs} and
+ * converting arguments to {@link Varargs} and
  * dropping or extending return values with {@code nil} values as required.
- * <p/>
+ * <p>
  * If between one and three arguments are required, and only one return value is returned,
- * {@link ZeroArgFunction}, {@link org.luaj.vm2.luajc.function.OneArgFunction}, {@link org.luaj.vm2.luajc.function.TwoArgFunction}, or {@link ThreeArgFunction}.
- * <p/>
+ * {@link ZeroArgFunction}, {@link OneArgFunction}, {@link TwoArgFunction}, or {@link ThreeArgFunction}.
+ * <p>
  * See {@link LuaCompiledFunction} for more information on implementation libraries and library functions.
  *
- * @see #invoke(org.luaj.vm2.Varargs)
+ * @see #invoke(Varargs)
  * @see LuaCompiledFunction
  * @see ZeroArgFunction
- * @see org.luaj.vm2.luajc.function.OneArgFunction
- * @see org.luaj.vm2.luajc.function.TwoArgFunction
+ * @see OneArgFunction
+ * @see TwoArgFunction
  * @see ThreeArgFunction
  */
 abstract public class VarArgFunction extends LuaCompiledFunction {

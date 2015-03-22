@@ -23,7 +23,7 @@ package org.luaj.vm2.lib;
 
 import org.luaj.vm2.*;
 import org.luaj.vm2.compiler.DumpState;
-import org.luaj.vm2.luajc.IGetSource;
+import squiddev.cctweaks.core.luajc.IGetSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

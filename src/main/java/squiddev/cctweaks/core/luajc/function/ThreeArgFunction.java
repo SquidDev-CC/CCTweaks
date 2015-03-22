@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.luaj.vm2.luajc.function;
+package squiddev.cctweaks.core.luajc.function;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
@@ -27,26 +27,26 @@ import org.luaj.vm2.Varargs;
 /**
  * Abstract base class for compiled function implementations that take two arguments and
  * return one value.
- * <p/>
- * Subclasses need only implement {@link org.luaj.vm2.LuaValue#call(org.luaj.vm2.LuaValue, org.luaj.vm2.LuaValue, org.luaj.vm2.LuaValue)} to complete this class,
+ * <p>
+ * Subclasses need only implement {@link LuaValue#call(LuaValue, LuaValue, LuaValue)} to complete this class,
  * simplifying development.
- * All other uses of {@link #call()}, {@link #invoke(org.luaj.vm2.Varargs)},etc,
+ * All other uses of {@link #call()}, {@link #invoke(Varargs)},etc,
  * are routed through this method by this class,
  * dropping or extending arguments with {@code nil} values as required.
- * <p/>
+ * <p>
  * If more or less than three arguments are required,
  * or variable argument or variable return values,
  * then use one of the related function
- * {@link org.luaj.vm2.luajc.function.ZeroArgFunction}, {@link org.luaj.vm2.luajc.function.OneArgFunction}, {@link org.luaj.vm2.luajc.function.TwoArgFunction}, or {@link org.luaj.vm2.luajc.function.VarArgFunction}.
- * <p/>
+ * {@link ZeroArgFunction}, {@link OneArgFunction}, {@link TwoArgFunction}, or {@link VarArgFunction}.
+ * <p>
  * See {@link LuaCompiledFunction} for more information on implementation libraries and library functions.
  *
- * @see #call(org.luaj.vm2.LuaValue, org.luaj.vm2.LuaValue, org.luaj.vm2.LuaValue)
+ * @see #call(LuaValue, LuaValue, LuaValue)
  * @see LuaCompiledFunction
- * @see org.luaj.vm2.luajc.function.ZeroArgFunction
- * @see org.luaj.vm2.luajc.function.OneArgFunction
- * @see org.luaj.vm2.luajc.function.TwoArgFunction
- * @see org.luaj.vm2.luajc.function.VarArgFunction
+ * @see ZeroArgFunction
+ * @see OneArgFunction
+ * @see TwoArgFunction
+ * @see VarArgFunction
  */
 abstract public class ThreeArgFunction extends LuaCompiledFunction {
 
