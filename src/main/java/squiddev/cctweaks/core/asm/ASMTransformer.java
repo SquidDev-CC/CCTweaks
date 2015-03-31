@@ -6,6 +6,10 @@ public class ASMTransformer implements IClassTransformer {
 	protected ClassReplacer[] patches = {
 		new ClassReplacer("org.luaj.vm2.lib.DebugLib"),
 		new ClassReplacer("org.luaj.vm2.lib.StringLib"),
+		new ClassReplacer(
+			"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
+			"squiddev.cctweaks.core.turtle.TurtleRefuelCommand_Rewrite"
+		),
 	};
 
 	@Override
@@ -14,8 +18,6 @@ public class ASMTransformer implements IClassTransformer {
 			return PatchComputer.patchLuaMachine(bytes);
 		} else if (className.equals("dan200.computercraft.core.computer.ComputerThread$1")) {
 			return PatchComputer.patchLuaThread(bytes);
-		} else if (className.equals("dan200.computercraft.shared.turtle.core.TurtleRefuelCommand")) {
-			return PatchTurtle.patchRefuelCommand(bytes);
 		} else if (className.startsWith("dan200.computercraft.shared.turtle.core.Turtle") && className.endsWith("Command")) {
 			return PatchTurtle.disableTurtleCommand(className, bytes);
 		}

@@ -22,6 +22,11 @@ public class ClassReplacer {
 	protected final String oldName;
 
 	/**
+	 * The name of the class we are replacing with / instead of .
+	 */
+	protected final String oldType;
+
+	/**
 	 * The name of the class to load
 	 */
 	protected final String loadedName;
@@ -31,12 +36,17 @@ public class ClassReplacer {
 	 */
 	protected final String loadedType;
 
-	public ClassReplacer(String className) {
+	public ClassReplacer(String className, String actualName) {
 		oldName = className;
 		oldNameStart = className.length();
+		oldType = className.replace('.', '/');
 
-		loadedName = className + NAME_SUFFIX;
-		loadedType = className.replace('.', '/') + NAME_SUFFIX;
+		loadedName = actualName;
+		loadedType = actualName.replace('.', '/');
+	}
+
+	public ClassReplacer(String className) {
+		this(className, className + NAME_SUFFIX);
 	}
 
 	protected final Remapper mapper = new Remapper() {
@@ -50,7 +60,7 @@ public class ClassReplacer {
 			if (typeName == null) return null;
 
 			if (typeName.contains(loadedType)) {
-				return typeName.replace(NAME_SUFFIX, "");
+				return typeName.replace(loadedType, oldType);
 			}
 
 			return super.map(typeName);
