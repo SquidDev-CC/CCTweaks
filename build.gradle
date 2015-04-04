@@ -17,51 +17,67 @@ buildscript {
 
 apply plugin: 'forge'
 
-// Load the config file
-ext.configFile = file "build.properties"
-configFile.withReader {
-	// Load config.  It shall from now be referenced as simply config or project.config
-	def prop = new Properties()
-	prop.load(it)
-	project.ext.config = new ConfigSlurper().parse prop
-}
+repositories {
+	maven {
+		name = "squiddev"
+		url = "http://maven.bonzodandd.co.uk"
+	}
 
-group = "squiddev.cctweaks"
-archivesBaseName = "CCTweaks"
-version = config.mc_version + "-" + config.mod_version
-
-
-minecraft {
-	version = config.mc_version + "-" + config.forge_version
-	runDir = "eclipse"
-
-	replace '${mod_version}', config.mod_version
-	replace '${mc_version}', config.mc_version
-}
-
-jar {
-	manifest {
-		attributes 'FMLCorePlugin': 'squiddev.cctweaks.core.asm.TweaksLoadingPlugin',
-		           'FMLCorePluginContainsFMLMod': 'true'
+	ivy {
+		name = "ComputerCraft"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2228/723/[module][revision].[ext]"
 	}
 }
 
-dependencies {
-	compile files('libs/ComputerCraft-${config.cc_version}.jar')
+configurations {
+	fatPackage
 }
 
-processResources
-{
+group = "org.squiddev"
+archivesBaseName = "CCTweaks"
+version = mc_version + "-" + mod_version
+
+minecraft {
+	version = project.mc_version + "-" + project.forge_version
+	runDir = "eclipse"
+
+	replace '${mod_version}', project.mod_version
+	replace '${mc_version}', project.mc_version
+}
+
+dependencies {
+	compile group: 'ComputerCraft', name: 'ComputerCraft', version: "${project.cc_version}", ext: 'jar'
+	fatPackage group: 'org.squiddev', name: 'luaj.luajc', version: '1.+'
+}
+// We provide a custom LuaJ source with ComputerCraft
+sourceSets.main.compileClasspath += [configurations.fatPackage]
+configurations.all { exclude group: 'org.luaj' }
+
+jar {
+	manifest {
+		attributes(
+				'FMLCorePlugin': 'squiddev.cctweaks.core.asm.TweaksLoadingPlugin',
+				'FMLCorePluginContainsFMLMod': 'true'
+		)
+	}
+
+	// Package all the org.squiddev dependencies into one file
+	from configurations.fatPackage
+			.findAll { it.getAbsolutePath().contains("org.squiddev") }
+			.collect { it.isDirectory() ? it : zipTree(it) }
+}
+
+processResources {
 	// this will ensure that this task is redone when the versions change.
-	inputs.property "mod_version", config.mod_version
-	inputs.property "mc_version", config.mc_version
+	inputs.property "mod_version", project.mod_version
+	inputs.property "mc_version", project.mc_version
 
 	// replace stuff in mcmod.info, nothing else
 	from(sourceSets.main.resources.srcDirs) {
 		include 'mcmod.info'
 
 		// Replace mod_version and mc_version
-		expand 'mod_version': config.mod_version, 'mc_version': config.mc_version
+		expand 'mod_version': mod_version, 'mc_version': mc_version
 	}
 
 	// copy everything else, thats not the mcmod.info
