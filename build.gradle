@@ -48,11 +48,11 @@ minecraft {
 dependencies {
 	compile group: 'ComputerCraft', name: 'ComputerCraft', version: "${project.cc_version}", ext: 'jar'
 	fatPackage(group: 'org.squiddev', name: 'luaj.luajc', version: '1.+') {
+		// We provide a custom LuaJ source with ComputerCraft
 		exclude group: 'org.ow2.asm'
 		exclude group: 'org.luaj'
 	}
 }
-// We provide a custom LuaJ source with ComputerCraft
 sourceSets.main.compileClasspath += [configurations.fatPackage]
 
 idea.module.scopes.PROVIDED.plus += [configurations.fatPackage]
@@ -72,14 +72,9 @@ jar {
 		.collect { it.isDirectory() ? it : zipTree(it) }
 
 	// Package the patch files into a patch/ folder
-	from(
-		configurations.fatPackage
-			.findAll { it.getAbsolutePath().contains("org.squiddev") }
-			.collect { it.isDirectory() ? it : zipTree(it) }
-	) {
-		into "patch"
-		include "org/luaj/**"
-	}
+	filesMatching("org/luaj/**", {
+		it.path = "patch/" + it.path
+	})
 }
 
 processResources {

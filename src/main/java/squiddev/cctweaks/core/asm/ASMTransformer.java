@@ -1,11 +1,18 @@
 package squiddev.cctweaks.core.asm;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import squiddev.cctweaks.core.reference.Config;
 
 public class ASMTransformer implements IClassTransformer {
 	protected IPatcher[] patches = {
 		new ClassPatcher("org.luaj.vm2.lib.DebugLib"),
 		new ClassPatcher("org.luaj.vm2.lib.StringLib"),
+		new ClassPatcher("org.luaj.vm2.LuaString") {
+			@Override
+			public boolean matches(String className) {
+				return super.matches(className) && Config.config.patchString;
+			}
+		},
 		new ClassReplacer(
 			"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
 			"squiddev.cctweaks.core.turtle.TurtleRefuelCommand_Rewrite"
