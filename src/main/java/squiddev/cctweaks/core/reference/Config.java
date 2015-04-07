@@ -106,6 +106,14 @@ public final class Config {
 				"If you have errors, please turn this and debug and\nsend it with the bug report."
 		);
 
+		data.patchString = configuration.getBoolean(
+			"Patch String",
+			COMPUTER,
+			defaults.patchString,
+			"Patch the LuaString class.\nThis prevents binary data being corrupted\n" +
+				"but is inconsistant with normal ComputerCraft"
+		);
+
 		// Is debugging
 		data.debug = configuration.getBoolean(
 			"debug",
@@ -183,6 +191,11 @@ public final class Config {
 		 * Verify classes on generation
 		 */
 		public boolean luaJCVerify = false;
+
+		/**
+		 * Patch the string class
+		 */
+		public boolean patchString = true;
 
 		/**
 		 * Print debug information

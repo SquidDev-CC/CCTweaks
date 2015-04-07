@@ -83,15 +83,15 @@ public class LuaString extends LuaValue {
 	 */
 	public final int m_length;
 
-	private static final Hashtable index_java = new Hashtable();
+	private static final Hashtable<Object, WeakReference<LuaString>> index_java = new Hashtable<Object, WeakReference<LuaString>>();
 
-	private final static LuaString index_get(Hashtable indextable, Object key) {
-		WeakReference w = (WeakReference) indextable.get(key);
-		return w != null ? (LuaString) w.get() : null;
+	private static LuaString index_get(Hashtable<Object, WeakReference<LuaString>> indextable, Object key) {
+		WeakReference<LuaString> w = indextable.get(key);
+		return w != null ? w.get() : null;
 	}
 
-	private final static void index_set(Hashtable indextable, Object key, LuaString value) {
-		indextable.put(key, new WeakReference(value));
+	private static void index_set(Hashtable<Object, WeakReference<LuaString>> indextable, Object key, LuaString value) {
+		indextable.put(key, new WeakReference<LuaString>(value));
 	}
 
 	/**
@@ -171,7 +171,6 @@ public class LuaString extends LuaValue {
 	 * @param bytes  byte buffer
 	 * @param offset offset into the byte buffer
 	 * @param length length of the byte buffer
-	 * @return {@link LuaString} wrapping the byte buffer
 	 */
 	private LuaString(byte[] bytes, int offset, int length) {
 		this.m_bytes = bytes;
@@ -566,10 +565,7 @@ public class LuaString extends LuaValue {
 
 	// object comparison, used in key comparison
 	public boolean equals(Object o) {
-		if (o instanceof LuaString) {
-			return raweq((LuaString) o);
-		}
-		return false;
+		return o instanceof LuaString && raweq((LuaString) o);
 	}
 
 	// equality w/ metatable processing
@@ -758,21 +754,9 @@ public class LuaString extends LuaValue {
 	 * @see #isValidUtf8()
 	 */
 	public static String decodeAsUtf8(byte[] bytes, int offset, int length) {
-		int i, j, n, b;
-		for (i = offset, j = offset + length, n = 0; i < j; ++n) {
-			switch (0xE0 & bytes[i++]) {
-				case 0xE0:
-					++i;
-				case 0xC0:
-					++i;
-			}
-		}
-		char[] chars = new char[n];
-		for (i = offset, j = offset + length, n = 0; i < j; ) {
-			chars[n++] = (char) (
-				((b = bytes[i++]) >= 0 || i >= j) ? b :
-					(b < -32 || i + 1 >= j) ? (((b & 0x3f) << 6) | (bytes[i++] & 0x3f)) :
-						(((b & 0xf) << 12) | ((bytes[i++] & 0x3f) << 6) | (bytes[i++] & 0x3f)));
+		char[] chars = new char[length];
+		for (int i = 0; i < length; ++i) {
+			chars[i] = (char) bytes[i + offset];
 		}
 		return new String(chars);
 	}
@@ -787,14 +771,7 @@ public class LuaString extends LuaValue {
 	 * @see #isValidUtf8()
 	 */
 	public static int lengthAsUtf8(char[] chars) {
-		int i, b;
-		char c;
-		for (i = b = chars.length; --i >= 0; ) {
-			if ((c = chars[i]) >= 0x80) {
-				b += (c >= 0x800) ? 2 : 1;
-			}
-		}
-		return b;
+		return chars.length;
 	}
 
 	/**
@@ -812,19 +789,9 @@ public class LuaString extends LuaValue {
 	 * @see #isValidUtf8()
 	 */
 	public static void encodeToUtf8(char[] chars, byte[] bytes, int off) {
-		final int n = chars.length;
-		char c;
-		for (int i = 0, j = off; i < n; i++) {
-			if ((c = chars[i]) < 0x80) {
-				bytes[j++] = (byte) c;
-			} else if (c < 0x800) {
-				bytes[j++] = (byte) (0xC0 | ((c >> 6) & 0x1f));
-				bytes[j++] = (byte) (0x80 | (c & 0x3f));
-			} else {
-				bytes[j++] = (byte) (0xE0 | ((c >> 12) & 0x0f));
-				bytes[j++] = (byte) (0x80 | ((c >> 6) & 0x3f));
-				bytes[j++] = (byte) (0x80 | (c & 0x3f));
-			}
+		int length = chars.length;
+		for (int i = 0; i < length; ++i) {
+			bytes[i + off] = (byte) chars[i];
 		}
 	}
 
@@ -837,23 +804,6 @@ public class LuaString extends LuaValue {
 	 * @see #decodeAsUtf8(byte[], int, int)
 	 */
 	public boolean isValidUtf8() {
-		int i, j, n, b, e = 0;
-		for (i = m_offset, j = m_offset + m_length, n = 0; i < j; ++n) {
-			int c = m_bytes[i++];
-			if (c >= 0) continue;
-			if (((c & 0xE0) == 0xC0)
-				&& i < j
-				&& (m_bytes[i++] & 0xC0) == 0x80) {
-				continue;
-			}
-			if (((c & 0xF0) == 0xE0)
-				&& i + 1 < j
-				&& (m_bytes[i++] & 0xC0) == 0x80
-				&& (m_bytes[i++] & 0xC0) == 0x80) {
-				continue;
-			}
-			return false;
-		}
 		return true;
 	}
 
