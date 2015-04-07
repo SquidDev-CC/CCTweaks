@@ -9,9 +9,9 @@ import squiddev.cctweaks.core.utils.DebugLogger;
 import java.io.InputStream;
 
 /**
- * LuaJ related patches
+ * Replaces a class named {@link #oldName} with {@link #loadedName}
  */
-public class ClassReplacer {
+public class ClassReplacer implements IPatcher {
 	protected final static String NAME_SUFFIX = "_Rewrite";
 
 	protected final int oldNameStart;
@@ -68,14 +68,14 @@ public class ClassReplacer {
 	};
 
 	/**
-	 * Patch the Library.
-	 * This works by loading classes beginning with _Rewrite and renaming it.
-	 * It also works on subclasses.
+	 * Patches a class. This loads files (by default called _Rewrite) and
+	 * renames all references
 	 *
-	 * @param bytes The bytes of the original class class
-	 * @return Reformatted bytes
+	 * @param className The name of the class
+	 * @param bytes     The original bytes to patch
+	 * @return The patched bytes
 	 */
-	public byte[] patchClass(String className, byte[] bytes) {
+	public byte[] patch(String className, byte[] bytes) {
 		String source = "/" + loadedType + className.substring(oldNameStart) + ".class";
 
 		InputStream stream = ClassReplacer.class.getResourceAsStream(source);
@@ -99,6 +99,12 @@ public class ClassReplacer {
 		}
 	}
 
+	/**
+	 * Checks if the class matches
+	 *
+	 * @param className The name of the class
+	 * @return If it should be patched
+	 */
 	public boolean matches(String className) {
 		return className.startsWith(oldName);
 	}

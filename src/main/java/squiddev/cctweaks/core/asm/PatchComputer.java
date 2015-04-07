@@ -48,7 +48,7 @@ public class PatchComputer implements Opcodes {
 						InsnListSection found = ASMMatcher.findOnce(method.instructions, new InsnListSection(jsePlatform), true);
 
 						InsnList insert = new InsnList();
-						insert.add(new MethodInsnNode(INVOKESTATIC, "squiddev/cctweaks/core/luajc/LuaJC", "install", "()V", false));
+						insert.add(new MethodInsnNode(INVOKESTATIC, "org/squiddev/luaj/luajc/LuaJC", "install", "()V", false));
 						found.insert(insert);
 
 						changed = true;

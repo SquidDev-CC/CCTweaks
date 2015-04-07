@@ -3,9 +3,9 @@ package squiddev.cctweaks.core.asm;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 public class ASMTransformer implements IClassTransformer {
-	protected ClassReplacer[] patches = {
-		new ClassReplacer("org.luaj.vm2.lib.DebugLib"),
-		new ClassReplacer("org.luaj.vm2.lib.StringLib"),
+	protected IPatcher[] patches = {
+		new ClassPatcher("org.luaj.vm2.lib.DebugLib"),
+		new ClassPatcher("org.luaj.vm2.lib.StringLib"),
 		new ClassReplacer(
 			"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
 			"squiddev.cctweaks.core.turtle.TurtleRefuelCommand_Rewrite"
@@ -22,9 +22,9 @@ public class ASMTransformer implements IClassTransformer {
 			return PatchTurtle.disableTurtleCommand(className, bytes);
 		}
 
-		for (ClassReplacer replacer : patches) {
+		for (IPatcher replacer : patches) {
 			if (replacer.matches(className)) {
-				return replacer.patchClass(className, bytes);
+				return replacer.patch(className, bytes);
 			}
 		}
 
