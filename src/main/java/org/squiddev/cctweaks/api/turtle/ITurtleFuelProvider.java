@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.api;
+package org.squiddev.cctweaks.api.turtle;
 
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import net.minecraft.item.ItemStack;

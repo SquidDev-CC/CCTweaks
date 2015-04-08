@@ -1,12 +1,12 @@
-package org.squiddev.cctweaks.core.turtle;
+package org.squiddev.cctweaks.core.patch;
 
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.api.turtle.ITurtleCommand;
 import dan200.computercraft.api.turtle.TurtleAnimation;
 import dan200.computercraft.api.turtle.TurtleCommandResult;
 import net.minecraft.item.ItemStack;
-import org.squiddev.cctweaks.api.ITurtleFuelProvider;
-import org.squiddev.cctweaks.api.TurtleFuelRegistry;
+import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
+import org.squiddev.cctweaks.api.turtle.TurtleFuelRegistry;
 
 /**
  * Complete rewrite of {@link dan200.computercraft.shared.turtle.core.TurtleRefuelCommand}

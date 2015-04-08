@@ -4,8 +4,8 @@ import cpw.mods.fml.client.config.GuiConfig;
 import cpw.mods.fml.client.config.IConfigElement;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.config.ConfigElement;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.reference.Config;
-import org.squiddev.cctweaks.core.reference.ModInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 public class GuiConfigCCTweaks extends GuiConfig {
 
 	public GuiConfigCCTweaks(GuiScreen screen) {
-		super(screen, getConfigElements(), ModInfo.ID, false, false, ModInfo.NAME);
+		super(screen, getConfigElements(), CCTweaks.ID, false, false, CCTweaks.NAME);
 	}
 
 	private static List<IConfigElement> getConfigElements() {

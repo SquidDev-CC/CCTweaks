@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.api;
+package org.squiddev.cctweaks.api.turtle;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -6,7 +6,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.Item;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.reference.ModInfo;
 
 public abstract class ItemBase extends Item {
 
@@ -15,7 +14,7 @@ public abstract class ItemBase extends Item {
 	public ItemBase(String itemName, int stackSize) {
 		name = itemName;
 
-		setUnlocalizedName(ModInfo.RESOURCE_DOMAIN + "." + name);
+		setUnlocalizedName(CCTweaks.RESOURCE_DOMAIN + "." + name);
 		setCreativeTab(CCTweaks.getCreativeTab());
 		setMaxStackSize(stackSize);
 	}
@@ -27,7 +26,7 @@ public abstract class ItemBase extends Item {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IIconRegister registry) {
-		itemIcon = registry.registerIcon(ModInfo.RESOURCE_DOMAIN + ":" + name);
+		itemIcon = registry.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":" + name);
 	}
 
 	public void registerItem() {

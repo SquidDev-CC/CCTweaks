@@ -8,7 +8,7 @@ public class ASMTransformer implements IClassTransformer {
 		new ClassPatcher("org.luaj.vm2.lib.StringLib"),
 		new ClassReplacer(
 			"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
-			"org.squiddev.cctweaks.core.turtle.TurtleRefuelCommand_Rewrite"
+			"org.squiddev.cctweaks.core.patch.TurtleRefuelCommand_Rewrite"
 		),
 	};
 

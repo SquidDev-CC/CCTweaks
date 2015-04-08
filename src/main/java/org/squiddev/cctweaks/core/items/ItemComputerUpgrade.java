@@ -9,8 +9,8 @@ import dan200.computercraft.shared.turtle.blocks.TileTurtle;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.core.reference.Localisation;
 import org.squiddev.cctweaks.core.utils.BlockNotifyFlags;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -91,6 +91,6 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 	@SideOnly(Side.CLIENT)
 	@SuppressWarnings("unchecked")
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
-		list.add(Localisation.Upgrades.Normal.getLocalised());
+		list.add(StatCollector.translateToLocal("cctweaks.tooltip.items.computerUpgrade.normal"));
 	}
 }

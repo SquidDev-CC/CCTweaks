@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.crafting;
+package org.squiddev.cctweaks.core.registry;
 
 import dan200.computercraft.api.turtle.TurtleSide;
 import dan200.computercraft.shared.computer.core.ComputerFamily;

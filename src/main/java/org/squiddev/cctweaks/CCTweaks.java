@@ -10,13 +10,20 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.creativetab.CreativeTabs;
 import org.squiddev.cctweaks.core.reference.Config;
-import org.squiddev.cctweaks.core.reference.ModInfo;
 import org.squiddev.cctweaks.core.registry.ItemRegistry;
 import org.squiddev.cctweaks.core.registry.RefuelRegistry;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
-@Mod(modid = ModInfo.ID, name = ModInfo.NAME, version = ModInfo.VERSION, dependencies = ModInfo.DEPENDENCIES, guiFactory = ModInfo.GUI_FACTORY)
+@Mod(modid = CCTweaks.ID, name = CCTweaks.NAME, version = CCTweaks.VERSION, dependencies = CCTweaks.DEPENDENCIES, guiFactory = CCTweaks.GUI_FACTORY)
 public class CCTweaks {
+	public static final String ID = "CCTweaks";
+	public static final String NAME = ID;
+	public static final String VERSION = "${mod_version}";
+	public static final String RESOURCE_DOMAIN = ID.toLowerCase();
+	public static final String DEPENDENCIES = "required-after:ComputerCraft;after:CCTurtle;";
+
+	public static final String GUI_FACTORY = "org.squiddev.cctweaks.client.gui.GuiConfigFactory";
+
 	public static CreativeTabs getCreativeTab() {
 		return ComputerCraft.mainCreativeTab;
 	}
@@ -37,7 +44,7 @@ public class CCTweaks {
 
 	@SubscribeEvent
 	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-		if (eventArgs.modID.equals(ModInfo.ID)) {
+		if (eventArgs.modID.equals(CCTweaks.ID)) {
 			Config.sync();
 		}
 	}

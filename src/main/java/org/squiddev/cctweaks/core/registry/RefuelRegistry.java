@@ -5,8 +5,8 @@ import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.shared.util.InventoryUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
-import org.squiddev.cctweaks.api.ITurtleFuelProvider;
-import org.squiddev.cctweaks.api.TurtleFuelRegistry;
+import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
+import org.squiddev.cctweaks.api.turtle.TurtleFuelRegistry;
 import org.squiddev.cctweaks.core.reference.Config;
 
 /**

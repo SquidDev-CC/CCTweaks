@@ -10,12 +10,11 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.RecipeSorter;
-import org.squiddev.cctweaks.core.crafting.ComputerUpgradeCrafting;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.items.ItemBase;
 import org.squiddev.cctweaks.core.items.ItemComputerUpgrade;
 import org.squiddev.cctweaks.core.items.ItemDebugger;
 import org.squiddev.cctweaks.core.reference.Config;
-import org.squiddev.cctweaks.core.reference.ModInfo;
 
 public class ItemRegistry {
 	public static ItemBase itemComputerUpgrade;
@@ -26,7 +25,7 @@ public class ItemRegistry {
 			ItemBase item = itemComputerUpgrade = new ItemComputerUpgrade();
 			item.registerItem();
 
-			RecipeSorter.register(ModInfo.RESOURCE_DOMAIN + ":computer_upgrade_crafting", ComputerUpgradeCrafting.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+			RecipeSorter.register(CCTweaks.RESOURCE_DOMAIN + ":computer_upgrade_crafting", ComputerUpgradeCrafting.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 
 			ItemStack stack = new ItemStack(item);
 			GameRegistry.addRecipe(stack, "GGG", "GSG", "GSG", 'G', Items.gold_ingot, 'S', Blocks.stone);
