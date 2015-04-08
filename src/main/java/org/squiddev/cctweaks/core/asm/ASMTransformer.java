@@ -1,6 +1,9 @@
 package org.squiddev.cctweaks.core.asm;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import org.squiddev.cctweaks.core.asm.patch.ClassPatcher;
+import org.squiddev.cctweaks.core.asm.patch.ClassReplacer;
+import org.squiddev.cctweaks.core.asm.patch.IPatcher;
 
 public class ASMTransformer implements IClassTransformer {
 	protected IPatcher[] patches = {

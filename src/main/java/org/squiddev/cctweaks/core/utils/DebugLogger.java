@@ -18,14 +18,22 @@ public class DebugLogger {
 	}
 
 	public static void info(String message) {
-		logger.log(Level.INFO, message);
+		log(Level.INFO, message);
 	}
 
 	public static void warning(String message) {
-		logger.log(Level.WARN, message);
+		log(Level.WARN, message);
 	}
 
 	public static void error(String message) {
-		logger.log(Level.ERROR, message);
+		log(Level.ERROR, message);
+	}
+
+	private static void log(Level level, String message) {
+		if (logger == null) {
+			System.out.println("[" + level.toString() + "] " + message);
+		} else {
+			logger.log(level, message);
+		}
 	}
 }
