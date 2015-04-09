@@ -2,7 +2,6 @@ package org.squiddev.cctweaks.core.asm.patch;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.commons.RemappingClassAdapter;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 /**
@@ -35,7 +34,7 @@ public class ClassPartialPatcher extends ClassRewriter {
 			if (override == null) return bytes;
 
 			ClassWriter writer = new ClassWriter(0);
-			original.accept(new Visitors.MergeVisitor(new RemappingClassAdapter(writer, mapper), override), ClassReader.EXPAND_FRAMES);
+			original.accept(new Visitors.MergeVisitor(writer, override, mapper), ClassReader.EXPAND_FRAMES);
 
 			DebugLogger.debug("Injected custom " + className);
 			return writer.toByteArray();

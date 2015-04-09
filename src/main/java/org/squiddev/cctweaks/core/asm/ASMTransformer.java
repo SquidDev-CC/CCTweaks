@@ -17,7 +17,11 @@ public class ASMTransformer implements IClassTransformer {
 		new ClassPartialPatcher(
 			"dan200.computercraft.shared.peripheral.common.BlockCable",
 			"org.squiddev.cctweaks.core.patch.BlockCable_Patch"
-		)
+		),
+		new ClassPartialPatcher(
+			"dan200.computercraft.shared.peripheral.modem.TileCable",
+			"org.squiddev.cctweaks.core.patch.TileCable_Patch"
+		),
 	};
 
 	@Override

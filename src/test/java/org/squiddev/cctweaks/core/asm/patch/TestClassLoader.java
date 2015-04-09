@@ -2,6 +2,8 @@ package org.squiddev.cctweaks.core.asm.patch;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Loads classes, rewriting them
@@ -9,13 +11,15 @@ import java.io.InputStream;
 public class TestClassLoader extends ClassLoader {
 	public final IPatcher[] patchers;
 
+	private Set<String> loaded = new HashSet<String>();
+
 	public TestClassLoader(IPatcher[] patchers) {
 		this.patchers = patchers;
 	}
 
 	@Override
 	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-		if (!name.startsWith(ClassReplacerTest.PATCHES)) {
+		if (!name.startsWith(ClassReplacerTest.PATCHES) || !loaded.add(name)) {
 			return super.loadClass(name, resolve);
 		}
 		return findClass(name);
