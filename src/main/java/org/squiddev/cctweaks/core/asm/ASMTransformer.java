@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.asm;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import org.squiddev.cctweaks.core.asm.patch.ClassPartialPatcher;
 import org.squiddev.cctweaks.core.asm.patch.ClassPatcher;
 import org.squiddev.cctweaks.core.asm.patch.ClassReplacer;
 import org.squiddev.cctweaks.core.asm.patch.IPatcher;
@@ -13,6 +14,10 @@ public class ASMTransformer implements IClassTransformer {
 			"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
 			"org.squiddev.cctweaks.core.patch.TurtleRefuelCommand_Rewrite"
 		),
+		new ClassPartialPatcher(
+			"dan200.computercraft.shared.peripheral.common.BlockCable",
+			"org.squiddev.cctweaks.core.patch.BlockCable_Patch"
+		)
 	};
 
 	@Override
