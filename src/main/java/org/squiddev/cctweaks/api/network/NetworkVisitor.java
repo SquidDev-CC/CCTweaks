@@ -25,7 +25,7 @@ public abstract class NetworkVisitor {
 	 */
 	public void visitNetwork(World world, int x, int y, int z) {
 		Queue<SearchLoc> queue = new LinkedList<SearchLoc>();
-		Set<TileEntity> visited = new HashSet<TileEntity>();
+		Set<SearchLoc> visited = new HashSet<SearchLoc>();
 		enqueue(queue, world, x, y, z, 1);
 
 		while (queue.peek() != null) {
@@ -58,15 +58,15 @@ public abstract class NetworkVisitor {
 	 * @param visited  The list of visited nodes
 	 * @param location Location of the current node
 	 */
-	protected void visitBlock(Queue<SearchLoc> queue, Set<TileEntity> visited, SearchLoc location) {
-		if (location.distanceTravelled >= maxDistance) {
+	protected void visitBlock(Queue<SearchLoc> queue, Set<SearchLoc> visited, SearchLoc location) {
+		if (location.distanceTravelled >= maxDistance || !visited.add(location)) {
 			return;
 		}
 
 		TileEntity tile = location.world.getTileEntity(location.x, location.y, location.z);
 		INetworkNode node;
 		if (tile != null && (node = NetworkRegistry.getNode(tile)) != null) {
-			if (node.canVisit() && visited.add(tile)) {
+			if (node.canVisit()) {
 				visitNode(node, location.distanceTravelled + 1);
 
 				enqueue(queue, location.world, location.x, location.y + 1, location.z, location.distanceTravelled + 1);
@@ -75,6 +75,13 @@ public abstract class NetworkVisitor {
 				enqueue(queue, location.world, location.x, location.y, location.z - 1, location.distanceTravelled + 1);
 				enqueue(queue, location.world, location.x + 1, location.y, location.z, location.distanceTravelled + 1);
 				enqueue(queue, location.world, location.x - 1, location.y, location.z, location.distanceTravelled + 1);
+
+				SearchLoc[] searches = node.getExtraNodes();
+				if (searches != null) {
+					for (SearchLoc search : searches) {
+						if (search.isValid()) queue.offer(search);
+					}
+				}
 			}
 		}
 	}
@@ -98,12 +105,14 @@ public abstract class NetworkVisitor {
 	/**
 	 * The location we should search for nodes in
 	 */
-	protected static class SearchLoc {
+	public static final class SearchLoc {
 		public final World world;
 		public final int x;
 		public final int y;
 		public final int z;
 		public final int distanceTravelled;
+
+		protected final int hash;
 
 		public SearchLoc(World world, int x, int y, int z, int distanceTravelled) {
 			this.world = world;
@@ -111,6 +120,36 @@ public abstract class NetworkVisitor {
 			this.y = y;
 			this.z = z;
 			this.distanceTravelled = distanceTravelled;
+
+			// Cache the hash code as we store this in a map
+			int hash = world.hashCode();
+			hash = 31 * hash + x;
+			hash = 31 * hash + y;
+			hash = 31 * hash + z;
+			this.hash = hash;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (!(o instanceof SearchLoc)) return false;
+
+			SearchLoc searchLoc = (SearchLoc) o;
+
+			if (x != searchLoc.x) return false;
+			if (y != searchLoc.y) return false;
+			if (z != searchLoc.z) return false;
+			return world.equals(searchLoc.world);
+
+		}
+
+		@Override
+		public int hashCode() {
+			return hash;
+		}
+
+		public boolean isValid() {
+			return y >= 0 && y < world.getHeight() && BlockCable.isCable(world, x, y, z);
 		}
 	}
 }

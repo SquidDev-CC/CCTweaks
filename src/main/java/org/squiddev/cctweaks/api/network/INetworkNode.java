@@ -3,6 +3,8 @@ package org.squiddev.cctweaks.api.network;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 
+import java.util.Map;
+
 /**
  * Defines a node on the network
  */
@@ -16,18 +18,11 @@ public interface INetworkNode {
 	boolean canVisit();
 
 	/**
-	 * Get the peripheral this node provides if any
+	 * Get connected peripherals this node provides
 	 *
-	 * @return The peripheral or {@code null}
+	 * @return Map of name to peripheral or {@code null} if there are no peripherals
 	 */
-	IPeripheral getConnectedPeripheral();
-
-	/**
-	 * Get the peripheral's name
-	 *
-	 * @return The name or {@code null}
-	 */
-	String getConnectedPeripheralName();
+	Map<String, IPeripheral> getConnectedPeripherals();
 
 	/**
 	 * Receive a packet on the network
@@ -53,6 +48,15 @@ public interface INetworkNode {
 	 * @see TileCable#networkChanged()
 	 */
 	void networkChanged();
+
+	/**
+	 * Get a list of extra node search locations.
+	 *
+	 * This is used by {@link NetworkVisitor} to find nodes in non-adjacent blocks
+	 *
+	 * @return Array of custom search locations, or {@code null} if none provided
+	 */
+	NetworkVisitor.SearchLoc[] getExtraNodes();
 
 	/**
 	 * Object to synchronise on whilst calling {@link #invalidateNetwork}

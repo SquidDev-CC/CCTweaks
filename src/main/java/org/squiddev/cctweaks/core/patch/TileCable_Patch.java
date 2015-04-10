@@ -110,6 +110,11 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 		}
 	}
 
+	@Override
+	public NetworkVisitor.SearchLoc[] getExtraNodes() {
+		return null;
+	}
+
 	private void dispatchPacket(final Packet packet) {
 		new NetworkVisitor() {
 			@Visitors.Rewrite
@@ -124,6 +129,16 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	@Override
 	public boolean canVisit() {
 		return !m_destroyed;
+	}
+
+	@Override
+	public Map<String, IPeripheral> getConnectedPeripherals() {
+		String name = getConnectedPeripheralName();
+		IPeripheral peripheral = getConnectedPeripheral();
+		if (name != null && peripheral != null) {
+			return Collections.singletonMap(name, peripheral);
+		}
+		return null;
 	}
 
 	@Visitors.Stub
@@ -164,11 +179,8 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 
 					public void visitNode(INetworkNode node, int distance) {
 						if (node != origin) {
-							IPeripheral peripheral = node.getConnectedPeripheral();
-							String periphName = node.getConnectedPeripheralName();
-							if (peripheral != null && periphName != null) {
-								newPeripheralsByName.put(periphName, peripheral);
-							}
+							Map<String, IPeripheral> peripherals = node.getConnectedPeripherals();
+							if (peripherals != null) newPeripheralsByName.putAll(peripherals);
 						}
 					}
 				}.visitNetwork(this);
@@ -189,9 +201,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 					IPeripheral peripheral = newPeripheralsByName.get(periphName);
 					if (peripheral != null) {
 						m_peripheralsByName.put(periphName, peripheral);
-						if (isAttached()) {
-							attachPeripheral(periphName, peripheral);
-						}
+						if (isAttached()) attachPeripheral(periphName, peripheral);
 					}
 				}
 			}
@@ -201,7 +211,6 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	@Visitors.Stub
 	private static class RemotePeripheralWrapper {
 		public RemotePeripheralWrapper(IPeripheral peripheral, IComputerAccess computer, String name) {
-
 		}
 
 		public void attach() {
