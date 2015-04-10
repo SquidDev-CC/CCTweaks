@@ -50,38 +50,40 @@ public class Visitors {
 	public static class MergeVisitor extends ClassVisitor {
 		public final static String STUB = Type.getDescriptor(Stub.class);
 		public final static String REWRITE = Type.getDescriptor(Rewrite.class);
+		public final static String RENAME = Type.getDescriptor(Rename.class);
+		public final static String ANNOTATION = "ANNOTATION";
 
-		private final ClassNode override;
+		private final ClassNode node;
 
 		private Set<String> fields = new HashSet<String>();
 		private Set<String> methods = new HashSet<String>();
 
 		private Map<String, Integer> access = new HashMap<String, Integer>();
 
-		private final Remapper mapper;
+		private Remapper mapper;
 
 		/**
 		 * Merge two classes together.
 		 *
-		 * @param cv       The visitor to write to
-		 * @param override The node that holds override methods
-		 * @param mapper   Mapper for override classes to new ones
+		 * @param cv     The visitor to write to
+		 * @param node   The node that holds override methods
+		 * @param mapper Mapper for override classes to new ones
 		 */
-		public MergeVisitor(ClassVisitor cv, ClassNode override, Remapper mapper) {
-			super(Opcodes.ASM5, new RemappingClassAdapter(cv, mapper));
-			this.override = override;
+		public MergeVisitor(ClassVisitor cv, ClassNode node, Remapper mapper) {
+			super(Opcodes.ASM5, new RemappingClassAdapter(cv, mapper = createRemapper(getAnnotation(node.invisibleAnnotations, RENAME), mapper)));
+			this.node = node;
 			this.mapper = mapper;
 		}
 
 		/**
 		 * Merge two classes together.
 		 *
-		 * @param cv       The visitor to write to
-		 * @param override The class reader that holds override properties
-		 * @param mapper   Mapper for override classes to new ones
+		 * @param cv     The visitor to write to
+		 * @param node   The class reader that holds override properties
+		 * @param mapper Mapper for override classes to new ones
 		 */
-		public MergeVisitor(ClassVisitor cv, ClassReader override, Remapper mapper) {
-			this(cv, makeNode(override), mapper);
+		public MergeVisitor(ClassVisitor cv, ClassReader node, Remapper mapper) {
+			this(cv, makeNode(node), mapper);
 		}
 
 		private static ClassNode makeNode(ClassReader reader) {
@@ -92,32 +94,32 @@ public class Visitors {
 
 		@Override
 		public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-			if (hasAnnotation(override.invisibleAnnotations, STUB)) {
+			if (hasAnnotation(node, STUB)) {
 				super.visit(version, access, name, signature, superName, interfaces);
-			} else if (hasAnnotation(override.invisibleAnnotations, REWRITE)) {
-				override.accept(cv);
+			} else if (hasAnnotation(node, REWRITE)) {
+				node.accept(cv);
 				cv = null; // Send no more requests
 			} else {
 				// Merge both interfaces
 				Set<String> overrideInterfaces = new HashSet<String>();
-				for (String inter : override.interfaces) {
+				for (String inter : node.interfaces) {
 					overrideInterfaces.add(mapper.mapType(inter));
 				}
 				Collections.addAll(overrideInterfaces, interfaces);
 
 				interfaces = overrideInterfaces.toArray(new String[overrideInterfaces.size()]);
 
-				super.visit(override.version, override.access, name, override.signature, superName, interfaces);
+				super.visit(node.version, node.access, name, node.signature, superName, interfaces);
 
-				for (FieldNode field : override.fields) {
-					if (!hasAnnotation(field.invisibleAnnotations, STUB)) {
+				for (FieldNode field : node.fields) {
+					if (!hasAnnotation(field.invisibleAnnotations, STUB) && !field.name.equals(ANNOTATION)) {
 						field.accept(this);
 					} else {
 						this.access.put(field.name, field.access);
 					}
 				}
 
-				for (MethodNode method : override.methods) {
+				for (MethodNode method : node.methods) {
 					if (!method.name.equals("<init>") && !method.name.equals("<cinit>") && !hasAnnotation(method.invisibleAnnotations, STUB)) {
 						method.accept(this);
 					} else {
@@ -159,12 +161,69 @@ public class Visitors {
 			return null;
 		}
 
-		protected static boolean hasAnnotation(List<AnnotationNode> nodes, String name) {
-			if (nodes == null) return false;
+		protected static AnnotationNode getAnnotation(List<AnnotationNode> nodes, String name) {
+			if (nodes == null) return null;
 			for (AnnotationNode node : nodes) {
-				if (node.desc.equals(name)) return true;
+				if (node.desc.equals(name)) return node;
 			}
+			return null;
+		}
+
+		protected static boolean hasAnnotation(List<AnnotationNode> nodes, String name) {
+			return getAnnotation(nodes, name) != null;
+		}
+
+		protected static boolean hasAnnotation(ClassNode node, String name) {
+			if (hasAnnotation(node.invisibleAnnotations, name)) return true;
+
+			for (FieldNode field : node.fields) {
+				if (field.name.equals(ANNOTATION)) {
+					return hasAnnotation(field.invisibleAnnotations, name);
+				}
+			}
+
 			return false;
+		}
+
+		/**
+		 * Creates a remapper from a {@link org.squiddev.cctweaks.core.asm.patch.Visitors.Rename} annotation
+		 *
+		 * @param annotation The annotation node
+		 * @param mapper     The existing remapper (or null if none exists)
+		 * @return The resulting remapper
+		 */
+		@SuppressWarnings("unchecked")
+		public static Remapper createRemapper(AnnotationNode annotation, final Remapper mapper) {
+			if (annotation != null && annotation.values.size() == 4) {
+				final Map<String, String> renames = new HashMap<String, String>();
+
+				List<String> from = (List<String>) annotation.values.get(1);
+				List<String> to = (List<String>) annotation.values.get(3);
+
+				if (annotation.values.get(0).equals("to")) {
+					List<String> temp = from;
+					from = to;
+					to = temp;
+				}
+
+				for (int i = 0; i < from.size(); i++) {
+					renames.put(from.get(i), to.get(i));
+				}
+
+				return new Remapper() {
+					@Override
+					public String map(String typeName) {
+						if (mapper != null) typeName = mapper.map(typeName);
+
+						String result = renames.get(typeName);
+						if (result != null) return result;
+
+						return typeName;
+					}
+				};
+			}
+
+			return mapper;
 		}
 	}
 
@@ -178,10 +237,22 @@ public class Visitors {
 
 	/**
 	 * Rewrite the original class instead of merging
+	 * Put on a field called ANNOTATION
+	 */
+	@Target({ElementType.TYPE, ElementType.FIELD})
+	@Retention(RetentionPolicy.CLASS)
+	public @interface Rewrite {
+	}
+
+	/**
+	 * Rename a class inside
 	 */
 	@Target({ElementType.TYPE})
 	@Retention(RetentionPolicy.CLASS)
-	public @interface Rewrite {
+	public @interface Rename {
+		String[] from();
+
+		String[] to();
 	}
 
 }

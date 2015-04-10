@@ -46,7 +46,7 @@ public interface INetworkNode {
 	void invalidateNetwork();
 
 	/**
-	 * Called when the network is changed.
+	 * Called when an adjacent network node is destroyed
 	 *
 	 * @see #invalidateNetwork()
 	 * @see TileCable#networkChanged()

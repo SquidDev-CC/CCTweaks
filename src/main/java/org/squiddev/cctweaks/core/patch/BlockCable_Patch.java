@@ -8,6 +8,7 @@ import org.squiddev.cctweaks.api.network.NetworkRegistry;
 
 /**
  * Patches {@link dan200.computercraft.shared.peripheral.common.BlockCable#isCable(IBlockAccess, int, int, int)}
+ * to use {@link NetworkRegistry#isNode(IBlockAccess, int, int, int)} and implements {@link INetworkNodeBlock}
  */
 @SuppressWarnings("unused")
 public final class BlockCable_Patch implements INetworkNodeBlock {
