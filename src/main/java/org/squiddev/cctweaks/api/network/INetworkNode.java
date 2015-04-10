@@ -31,6 +31,7 @@ public interface INetworkNode {
 
 	/**
 	 * Receive a packet on the network
+	 * This will be a packet sent with rednet or modem.transmit
 	 *
 	 * @param packet            The packet to send
 	 * @param distanceTravelled Distance traveled by the packet

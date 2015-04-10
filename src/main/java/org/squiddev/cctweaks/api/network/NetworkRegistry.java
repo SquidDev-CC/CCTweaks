@@ -20,27 +20,27 @@ public class NetworkRegistry {
 	 * then checks if the block is an instance of {@link INetworkNodeBlock} then
 	 * uses {@link INetworkNodeProvider} to find it.
 	 *
-	 * @param tileEntity The tile entity
+	 * @param tile The tile entity
 	 * @return The network node or {@code null} if not found
 	 */
-	public static INetworkNode getNode(TileEntity tileEntity) {
-		if (tileEntity instanceof INetworkNode) {
-			return (INetworkNode) tileEntity;
+	public static INetworkNode getNode(TileEntity tile) {
+		if (tile instanceof INetworkNode) {
+			return (INetworkNode) tile;
 		}
 
-		Block block = tileEntity.blockType;
+		Block block = tile.blockType;
 		if (block != null && block instanceof INetworkNodeBlock) {
 			return ((INetworkNodeBlock) block).getNode(
-				tileEntity.getWorldObj(),
-				tileEntity.xCoord,
-				tileEntity.yCoord,
-				tileEntity.zCoord,
-				tileEntity.blockMetadata
+				tile.getWorldObj(),
+				tile.xCoord,
+				tile.yCoord,
+				tile.zCoord,
+				tile.blockMetadata
 			);
 		}
 
 		for (INetworkNodeProvider provider : providers) {
-			INetworkNode node = provider.getNode(tileEntity);
+			INetworkNode node = provider.getNode(tile);
 			if (node != null) return node;
 		}
 
@@ -65,11 +65,11 @@ public class NetworkRegistry {
 			return true;
 		}
 
-		TileEntity tileEntity = world.getTileEntity(x, y, z);
+		TileEntity tile = world.getTileEntity(x, y, z);
 
-		if (tileEntity instanceof INetworkNode) return true;
+		if (tile instanceof INetworkNode) return true;
 		for (INetworkNodeProvider provider : providers) {
-			if (provider.isNode(tileEntity)) return true;
+			if (provider.isNode(tile)) return true;
 		}
 
 		return false;

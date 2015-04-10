@@ -34,6 +34,16 @@ public abstract class NetworkVisitor {
 	}
 
 	/**
+	 * Visit a network with this node visitor
+	 *
+	 * @param tile The node to start visiting with.
+	 */
+	public void visitNetwork(TileEntity tile) {
+		if (tile == null) return;
+		visitNetwork(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord);
+	}
+
+	/**
 	 * Visit a node on the network. Override in child classes for functionality
 	 *
 	 * @param node     The node to visit

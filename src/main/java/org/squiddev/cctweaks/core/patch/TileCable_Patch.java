@@ -105,7 +105,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 							node.invalidateNetwork();
 						}
 					}
-				}.visitNetwork(worldObj, xCoord, yCoord, zCoord);
+				}.visitNetwork(this);
 			}
 		}
 	}
@@ -118,7 +118,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 			public void visitNode(INetworkNode node, int distance) {
 				node.receivePacket(packet, distance);
 			}
-		}.visitNetwork(worldObj, xCoord, yCoord, zCoord);
+		}.visitNetwork(this);
 	}
 
 	@Override
@@ -171,7 +171,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 							}
 						}
 					}
-				}.visitNetwork(worldObj, xCoord, yCoord, zCoord);
+				}.visitNetwork(this);
 			}
 
 			Iterator it = m_peripheralsByName.keySet().iterator();
