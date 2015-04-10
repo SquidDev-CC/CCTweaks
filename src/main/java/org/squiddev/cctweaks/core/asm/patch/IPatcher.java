@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.asm;
+package org.squiddev.cctweaks.core.asm.patch;
 
 /**
  * Patches methods on a class
