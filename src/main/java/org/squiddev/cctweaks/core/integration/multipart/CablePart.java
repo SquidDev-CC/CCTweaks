@@ -1,13 +1,8 @@
 package org.squiddev.cctweaks.core.integration.multipart;
 
-import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
-import codechicken.multipart.IconHitEffects;
-import codechicken.multipart.JIconHitEffects;
-import codechicken.multipart.JNormalOcclusion;
-import codechicken.multipart.TMultiPart;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
@@ -18,7 +13,6 @@ import dan200.computercraft.shared.peripheral.common.BlockCable;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.block.Block;
-import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Facing;
@@ -35,13 +29,13 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class CablePart extends TMultiPart implements JNormalOcclusion, JIconHitEffects, INetworkNode {
+public class CablePart extends AbstractPart implements INetworkNode {
 	public static final String NAME = CCTweaks.NAME + ":networkCable";
-	public static final double OFFSET = 0.375D;
+	public static final double MIN = 0.375D;
+	public static final double MAX = 1 - MIN;
 
 	@SideOnly(Side.CLIENT)
 	private static CableRenderer render;
@@ -65,46 +59,46 @@ public class CablePart extends TMultiPart implements JNormalOcclusion, JIconHitE
 	@Override
 	public Iterable<Cuboid6> getOcclusionBoxes() {
 		List<Cuboid6> parts = new ArrayList<Cuboid6>();
-		parts.add(new Cuboid6(OFFSET, OFFSET, OFFSET, 1 - OFFSET, 1 - OFFSET, 1 - OFFSET));
+		parts.add(new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX));
 
 		int x = x(), y = y(), z = z();
 		World world = world();
 
 		if (BlockCable.isCable(world, x - 1, y, z)) {
-			parts.add(new Cuboid6(1 - OFFSET, 1 - OFFSET, 1 - OFFSET, 1 - OFFSET, 1, 1 - OFFSET));
+			parts.add(new Cuboid6(0, MIN, MIN, MIN, MAX, MAX));
 		}
 		if (BlockCable.isCable(world, x + 1, y, z)) {
-			parts.add(new Cuboid6(1 - OFFSET, 0, 1 - OFFSET, 1 - OFFSET, 1 - OFFSET, 1 - OFFSET));
+			parts.add(new Cuboid6(MAX, MIN, MIN, 1, MAX, MAX));
 		}
+
+		if (BlockCable.isCable(world, x, y - 1, z)) {
+			parts.add(new Cuboid6(MIN, 0, MIN, MAX, MIN, MAX));
+		}
+		if (BlockCable.isCable(world, x, y + 1, z)) {
+			parts.add(new Cuboid6(MIN, MAX, MIN, MAX, 1, MAX));
+		}
+		if (BlockCable.isCable(world, x, y, z - 1)) {
+			parts.add(new Cuboid6(MIN, MIN, 0, MAX, MAX, MIN));
+		}
+		if (BlockCable.isCable(world, x, y, z + 1)) {
+			parts.add(new Cuboid6(MIN, MIN, MAX, MAX, MAX, 1));
+		}
+
 
 		return parts;
 	}
 
 	@Override
-	public Iterable<Cuboid6> getCollisionBoxes() {
-		return Collections.singletonList(getCollision());
-	}
-
-	@Override
-	public Iterable<IndexedCuboid6> getSubParts() {
-		// return Collections.singletonList(new IndexedCuboid6(0, getCollision()));
-		List<IndexedCuboid6> boxs = new ArrayList<IndexedCuboid6>();
-		for (Cuboid6 box : getOcclusionBoxes()) {
-			boxs.add(new IndexedCuboid6(0, box));
-		}
-		return boxs;
-	}
-
-	public Cuboid6 getCollision() {
+	public Cuboid6 getBounds() {
 		int x = x(), y = y(), z = z();
 		World world = world();
 
-		double xMin = OFFSET;
-		double yMin = OFFSET;
-		double zMin = OFFSET;
-		double xMax = 1 - OFFSET;
-		double yMax = 1 - OFFSET;
-		double zMax = 1 - OFFSET;
+		double xMin = MIN;
+		double yMin = MIN;
+		double zMin = MIN;
+		double xMax = MAX;
+		double yMax = MAX;
+		double zMax = MAX;
 
 		if (BlockCable.isCable(world, x - 1, y, z)) xMin = 0.0D;
 		if (BlockCable.isCable(world, x + 1, y, z)) xMax = 1.0D;
@@ -128,28 +122,9 @@ public class CablePart extends TMultiPart implements JNormalOcclusion, JIconHitE
 	}
 
 	@Override
-	public Cuboid6 getBounds() {
-		return getCollision();
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getBreakingIcon(Object subPart, int side) {
-		return getBrokenIcon(side);
-	}
-
-	@Override
 	@SideOnly(Side.CLIENT)
 	public IIcon getBrokenIcon(int side) {
 		return ComputerCraft.Blocks.cable.getIcon(0, 0);
-	}
-
-	public void addHitEffects(MovingObjectPosition hit, EffectRenderer effectRenderer) {
-		IconHitEffects.addHitEffects(this, hit, effectRenderer);
-	}
-
-	public void addDestroyEffects(MovingObjectPosition hit, EffectRenderer effectRenderer) {
-		IconHitEffects.addDestroyEffects(this, effectRenderer, false);
 	}
 
 	@Override
