@@ -3,15 +3,11 @@ package org.squiddev.cctweaks.core.patch;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
-import dan200.computercraft.shared.peripheral.common.BlockCable;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Facing;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.NetworkRegistry;
-import org.squiddev.cctweaks.api.network.NetworkVisitor;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.asm.patch.Visitors;
 
 import java.util.*;
@@ -83,18 +79,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	public void networkChanged() {
 		if (!worldObj.isRemote) {
 			if (m_destroyed) {
-				for (int dir = 0; dir < 6; dir++) {
-					int x = xCoord + Facing.offsetsXForSide[dir];
-					int y = yCoord + Facing.offsetsYForSide[dir];
-					int z = zCoord + Facing.offsetsZForSide[dir];
-					if (y >= 0 && y < worldObj.getHeight() && BlockCable.isCable(worldObj, x, y, z)) {
-						TileEntity tile = worldObj.getTileEntity(x, y, z);
-						INetworkNode node;
-						if (tile != null && (node = NetworkRegistry.getNode(tile)) != null) {
-							node.networkChanged();
-						}
-					}
-				}
+				NetworkHelpers.fireNetworkChanged(worldObj, xCoord, yCoord, zCoord);
 			} else {
 				new NetworkVisitor() {
 					@Visitors.Rewrite
@@ -169,6 +154,12 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	}
 
 	private void findPeripherals() {
+		// TEs are not replaced on Multiaprt crashes
+		if(getBlock() == null) {
+			worldObj.removeTileEntity(xCoord, yCoord, zCoord);
+			return;
+		}
+
 		final TileCable_Patch origin = this;
 		synchronized (m_peripheralsByName) {
 			final Map<String, IPeripheral> newPeripheralsByName = new HashMap<String, IPeripheral>();

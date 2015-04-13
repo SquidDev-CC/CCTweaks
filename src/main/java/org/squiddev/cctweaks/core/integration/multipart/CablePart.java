@@ -11,23 +11,38 @@ import codechicken.multipart.TMultiPart;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.client.render.FixedRenderBlocks;
+import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.BlockCable;
+import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.block.Block;
 import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Facing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.NetworkHelpers;
+import org.squiddev.cctweaks.api.network.NetworkVisitor;
+import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-public class CablePart extends TMultiPart implements JNormalOcclusion, JIconHitEffects {
+public class CablePart extends TMultiPart implements JNormalOcclusion, JIconHitEffects, INetworkNode {
+	public static final String NAME = CCTweaks.NAME + ":networkCable";
+	public static final double OFFSET = 0.375D;
+
 	@SideOnly(Side.CLIENT)
 	private static CableRenderer render;
 
@@ -40,8 +55,7 @@ public class CablePart extends TMultiPart implements JNormalOcclusion, JIconHitE
 		return draw;
 	}
 
-	private List<Cuboid6> collisions = Collections.singletonList(getCollision());
-	public static final String NAME = CCTweaks.NAME + ":networkCable";
+	private final Object lock = new Object();
 
 	@Override
 	public String getType() {
@@ -50,21 +64,67 @@ public class CablePart extends TMultiPart implements JNormalOcclusion, JIconHitE
 
 	@Override
 	public Iterable<Cuboid6> getOcclusionBoxes() {
-		return collisions;
+		List<Cuboid6> parts = new ArrayList<Cuboid6>();
+		parts.add(new Cuboid6(OFFSET, OFFSET, OFFSET, 1 - OFFSET, 1 - OFFSET, 1 - OFFSET));
+
+		int x = x(), y = y(), z = z();
+		World world = world();
+
+		if (BlockCable.isCable(world, x - 1, y, z)) {
+			parts.add(new Cuboid6(1 - OFFSET, 1 - OFFSET, 1 - OFFSET, 1 - OFFSET, 1, 1 - OFFSET));
+		}
+		if (BlockCable.isCable(world, x + 1, y, z)) {
+			parts.add(new Cuboid6(1 - OFFSET, 0, 1 - OFFSET, 1 - OFFSET, 1 - OFFSET, 1 - OFFSET));
+		}
+
+		return parts;
 	}
 
 	@Override
 	public Iterable<Cuboid6> getCollisionBoxes() {
-		return getOcclusionBoxes();
+		return Collections.singletonList(getCollision());
 	}
 
 	@Override
 	public Iterable<IndexedCuboid6> getSubParts() {
-		return Collections.singletonList(new IndexedCuboid6(0, getCollision()));
+		// return Collections.singletonList(new IndexedCuboid6(0, getCollision()));
+		List<IndexedCuboid6> boxs = new ArrayList<IndexedCuboid6>();
+		for (Cuboid6 box : getOcclusionBoxes()) {
+			boxs.add(new IndexedCuboid6(0, box));
+		}
+		return boxs;
 	}
 
 	public Cuboid6 getCollision() {
-		return new Cuboid6(0.375D, 0.375D, 0.375D, 0.625D, 0.625D, 0.625D);
+		int x = x(), y = y(), z = z();
+		World world = world();
+
+		double xMin = OFFSET;
+		double yMin = OFFSET;
+		double zMin = OFFSET;
+		double xMax = 1 - OFFSET;
+		double yMax = 1 - OFFSET;
+		double zMax = 1 - OFFSET;
+
+		if (BlockCable.isCable(world, x - 1, y, z)) xMin = 0.0D;
+		if (BlockCable.isCable(world, x + 1, y, z)) xMax = 1.0D;
+		if (BlockCable.isCable(world, x, y - 1, z)) yMin = 0.0D;
+		if (BlockCable.isCable(world, x, y + 1, z)) yMax = 1.0D;
+		if (BlockCable.isCable(world, x, y, z - 1)) zMin = 0.0D;
+		if (BlockCable.isCable(world, x, y, z + 1)) zMax = 1.0D;
+		return new Cuboid6(xMin, yMin, zMin, xMax, yMax, zMax);
+	}
+
+	@Override
+	public void harvest(MovingObjectPosition hit, EntityPlayer player) {
+		World world = world();
+		int x = x(), y = y(), z = z();
+
+		super.harvest(hit, player);
+
+		if (!world.isRemote) {
+			NetworkHelpers.fireNetworkChanged(world, x, y, z);
+		}
 	}
 
 	@Override
@@ -101,6 +161,46 @@ public class CablePart extends TMultiPart implements JNormalOcclusion, JIconHitE
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public ItemStack pickItem(MovingObjectPosition hit) {
+		return PeripheralItemFactory.create(PeripheralType.Cable, null, 1);
+	}
+
+	@Override
+	public boolean canVisit() {
+		return true;
+	}
+
+	@Override
+	public Map<String, IPeripheral> getConnectedPeripherals() {
+		return null;
+	}
+
+	@Override
+	public void receivePacket(Packet packet, int distanceTravelled) {
+	}
+
+	@Override
+	public void invalidateNetwork() {
+	}
+
+	@Override
+	public void networkChanged() {
+		if (!world().isRemote) {
+			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
+		}
+	}
+
+	@Override
+	public NetworkVisitor.SearchLoc[] getExtraNodes() {
+		return null;
+	}
+
+	@Override
+	public Object lock() {
+		return lock;
 	}
 
 	public static class CableRenderer extends FixedRenderBlocks {

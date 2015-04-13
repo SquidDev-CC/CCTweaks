@@ -2,7 +2,7 @@ package org.squiddev.cctweaks.api.network;
 
 import dan200.computercraft.shared.peripheral.common.BlockCable;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.IBlockAccess;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,7 +23,7 @@ public abstract class NetworkVisitor {
 	 * @param y     The starting Y position of the traversal
 	 * @param z     The starting Z position of the traversal
 	 */
-	public void visitNetwork(World world, int x, int y, int z) {
+	public void visitNetwork(IBlockAccess world, int x, int y, int z) {
 		Queue<SearchLoc> queue = new LinkedList<SearchLoc>();
 		Set<SearchLoc> visited = new HashSet<SearchLoc>();
 		enqueue(queue, world, x, y, z, 1);
@@ -96,7 +96,7 @@ public abstract class NetworkVisitor {
 	 * @param z                 Z position of the node
 	 * @param distanceTravelled Distance the node has traversal has travelled
 	 */
-	protected void enqueue(Queue<SearchLoc> queue, World world, int x, int y, int z, int distanceTravelled) {
+	protected void enqueue(Queue<SearchLoc> queue, IBlockAccess world, int x, int y, int z, int distanceTravelled) {
 		if (y >= 0 && y < world.getHeight() && BlockCable.isCable(world, x, y, z)) {
 			queue.offer(new SearchLoc(world, x, y, z, distanceTravelled));
 		}
@@ -106,7 +106,7 @@ public abstract class NetworkVisitor {
 	 * The location we should search for nodes in
 	 */
 	public static final class SearchLoc {
-		public final World world;
+		public final IBlockAccess world;
 		public final int x;
 		public final int y;
 		public final int z;
@@ -114,7 +114,7 @@ public abstract class NetworkVisitor {
 
 		protected final int hash;
 
-		public SearchLoc(World world, int x, int y, int z, int distanceTravelled) {
+		public SearchLoc(IBlockAccess world, int x, int y, int z, int distanceTravelled) {
 			this.world = world;
 			this.x = x;
 			this.y = y;

@@ -1,6 +1,12 @@
 package org.squiddev.cctweaks.core.integration;
 
+import codechicken.multipart.TMultiPart;
+import codechicken.multipart.TileMultipart;
 import cpw.mods.fml.common.Loader;
+import net.minecraft.tileentity.TileEntity;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
+import org.squiddev.cctweaks.api.network.NetworkRegistry;
 import org.squiddev.cctweaks.core.integration.multipart.RegisterBlockPart;
 
 import java.util.HashSet;
@@ -40,6 +46,26 @@ public class IntegrationRegistry {
 			@Override
 			public void load() {
 				new RegisterBlockPart().init();
+
+				NetworkRegistry.addNodeProvider(new INetworkNodeProvider() {
+					@Override
+					public INetworkNode getNode(TileEntity tile) {
+						if (tile instanceof TileMultipart) {
+							for (TMultiPart part : ((TileMultipart) tile).jPartList()) {
+								if (part instanceof INetworkNode) {
+									return (INetworkNode) part;
+								}
+							}
+						}
+
+						return null;
+					}
+
+					@Override
+					public boolean isNode(TileEntity tile) {
+						return getNode(tile) != null;
+					}
+				});
 			}
 		});
 
