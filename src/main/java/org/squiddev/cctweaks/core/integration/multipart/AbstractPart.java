@@ -10,7 +10,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,7 +39,12 @@ public abstract class AbstractPart extends TMultiPart implements JNormalOcclusio
 
 	@Override
 	public Iterable<Cuboid6> getCollisionBoxes() {
-		return Collections.singletonList(getBounds());
-	}
+		List<Cuboid6> boxes = new ArrayList<Cuboid6>();
 
+		for (IndexedCuboid6 icube : getSubParts()) {
+			boxes.add(icube);
+		}
+
+		return boxes;
+	}
 }
