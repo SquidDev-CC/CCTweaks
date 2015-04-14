@@ -71,6 +71,7 @@ $RECYCLE.BIN/
 *.iml
 *.ipr
 *.iws
+.idea
 
 # Eclipse
 # =========================
