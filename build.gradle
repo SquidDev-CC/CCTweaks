@@ -56,6 +56,7 @@ dependencies {
 	compile "codechicken:ForgeMultipart:${project.mc_version}-${project.multipart_version}:dev"
 	compile "codechicken:CodeChickenLib:${project.mc_version}-${project.ccl_version}:dev"
 	compile "codechicken:NotEnoughItems:${project.mc_version}-${project.nei_version}:dev"
+	compile "codechicken:CodeChickenCore:${project.mc_version}-${project.ccc_version}:dev"
 
 	fatPackage(group: 'org.squiddev', name: 'luaj.luajc', version: '1.+') {
 		// We provide a custom LuaJ source with ComputerCraft
