@@ -4,6 +4,7 @@ import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
+import codechicken.multipart.TileMultipart;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
@@ -23,10 +24,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.NetworkHelpers;
-import org.squiddev.cctweaks.api.network.NetworkVisitor;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.lang.reflect.Field;
@@ -99,22 +97,22 @@ public class CablePart extends AbstractPart implements INetworkNode {
 			int x = x(), y = y(), z = z();
 			World world = world();
 
-			if (BlockCable.isCable(world, x - 1, y, z)) {
+			if (BlockCable.isCable(world, x - 1, y, z) && canConnect(tile(), ForgeDirection.WEST)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.WEST, new Cuboid6(0, MIN, MIN, MIN, MAX, MAX)));
 			}
-			if (BlockCable.isCable(world, x + 1, y, z)) {
+			if (BlockCable.isCable(world, x + 1, y, z) && canConnect(tile(), ForgeDirection.EAST)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.EAST, new Cuboid6(MAX, MIN, MIN, 1, MAX, MAX)));
 			}
-			if (BlockCable.isCable(world, x, y - 1, z)) {
+			if (BlockCable.isCable(world, x, y - 1, z) && canConnect(tile(), ForgeDirection.DOWN)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.DOWN, new Cuboid6(MIN, 0, MIN, MAX, MIN, MAX)));
 			}
-			if (BlockCable.isCable(world, x, y + 1, z)) {
+			if (BlockCable.isCable(world, x, y + 1, z) && canConnect(tile(), ForgeDirection.UP)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.UP, new Cuboid6(MIN, MAX, MIN, MAX, 1, MAX)));
 			}
-			if (BlockCable.isCable(world, x, y, z - 1)) {
+			if (BlockCable.isCable(world, x, y, z - 1) && canConnect(tile(), ForgeDirection.NORTH)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.NORTH, new Cuboid6(MIN, MIN, 0, MAX, MAX, MIN)));
 			}
-			if (BlockCable.isCable(world, x, y, z + 1)) {
+			if (BlockCable.isCable(world, x, y, z + 1) && canConnect(tile(), ForgeDirection.SOUTH)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.SOUTH, new Cuboid6(MIN, MIN, MAX, MAX, MAX, 1)));
 			}
 		}
@@ -148,7 +146,7 @@ public class CablePart extends AbstractPart implements INetworkNode {
 	public boolean renderStatic(Vector3 pos, int pass) {
 		if (pass == 0) {
 			TextureUtils.bindAtlas(0);
-			getRender().drawTile(world(), x(), y(), z());
+			getRender().drawTile(tile(), world(), x(), y(), z());
 			return true;
 		}
 		return false;
@@ -160,8 +158,13 @@ public class CablePart extends AbstractPart implements INetworkNode {
 	}
 
 	@Override
-	public boolean canVisit() {
-		return active;
+	public boolean canBeVisited(ForgeDirection from) {
+		return active && canConnect(tile(), from);
+	}
+
+	@Override
+	public boolean canVisitTo(ForgeDirection to) {
+		return active && tile().partMap(to.ordinal()) == null;
 	}
 
 	@Override
@@ -238,39 +241,55 @@ public class CablePart extends AbstractPart implements INetworkNode {
 			return getIcons()[0];
 		}
 
-		public void drawTile(IBlockAccess world, int x, int y, int z) {
+		public void drawTile(TileMultipart tile, IBlockAccess world, int x, int y, int z) {
 			setWorld(world);
 
 			Block block = ComputerCraft.Blocks.cable;
 			setRenderBounds(0.375D, 0.375D, 0.375D, 0.625D, 0.625D, 0.625D);
 			renderStandardBlock(block, x, y, z);
 
-			if (BlockCable.isCable(world, x, y - 1, z)) {
+			if (BlockCable.isCable(world, x, y - 1, z) && canConnect(tile, ForgeDirection.DOWN)) {
 				setRenderBounds(0.375D, 0.0D, 0.375D, 0.625D, 0.375D, 0.625D);
 				renderStandardBlock(block, x, y, z);
 			}
-			if (BlockCable.isCable(world, x, y + 1, z)) {
+			if (BlockCable.isCable(world, x, y + 1, z) && canConnect(tile, ForgeDirection.UP)) {
 				setRenderBounds(0.375D, 0.625D, 0.375D, 0.625D, 1.0D, 0.625D);
 				renderStandardBlock(block, x, y, z);
 			}
-			if (BlockCable.isCable(world, x, y, z - 1)) {
+			if (BlockCable.isCable(world, x, y, z - 1) && canConnect(tile, ForgeDirection.NORTH)) {
 				setRenderBounds(0.375D, 0.375D, 0.0D, 0.625D, 0.625D, 0.375D);
 				renderStandardBlock(block, x, y, z);
 			}
-			if (BlockCable.isCable(world, x, y, z + 1)) {
+			if (BlockCable.isCable(world, x, y, z + 1) && canConnect(tile, ForgeDirection.SOUTH)) {
 				setRenderBounds(0.375D, 0.375D, 0.625D, 0.625D, 0.625D, 1.0D);
 				renderStandardBlock(block, x, y, z);
 			}
-			if (BlockCable.isCable(world, x - 1, y, z)) {
+			if (BlockCable.isCable(world, x - 1, y, z) && canConnect(tile, ForgeDirection.WEST)) {
 				setRenderBounds(0.0D, 0.375D, 0.375D, 0.375D, 0.625D, 0.625D);
 				renderStandardBlock(block, x, y, z);
 			}
-			if (BlockCable.isCable(world, x + 1, y, z)) {
+			if (BlockCable.isCable(world, x + 1, y, z) && canConnect(tile, ForgeDirection.EAST)) {
 				setRenderBounds(0.625D, 0.375D, 0.375D, 1.0D, 0.625D, 0.625D);
 				renderStandardBlock(block, x, y, z);
 			}
 
 			block.setBlockBoundsBasedOnState(world, x, y, z);
 		}
+	}
+
+	public static boolean canConnect(TileMultipart tile, ForgeDirection dir) {
+		if (tile.partMap(dir.ordinal()) != null) {
+			return false;
+		}
+		INetworkNode node = NetworkRegistry.getNode(tile.getWorldObj(),
+				tile.xCoord + dir.offsetX,
+				tile.yCoord + dir.offsetY,
+				tile.zCoord + dir.offsetZ);
+
+		if (node == null) {
+			return false;
+		}
+
+		return node.canVisitTo(dir.getOpposite());
 	}
 }

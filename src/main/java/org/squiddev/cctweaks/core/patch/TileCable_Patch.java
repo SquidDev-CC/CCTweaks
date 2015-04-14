@@ -5,6 +5,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
+import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.NetworkVisitor;
@@ -113,7 +114,12 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	}
 
 	@Override
-	public boolean canVisit() {
+	public boolean canBeVisited(ForgeDirection from) {
+		return !m_destroyed;
+	}
+
+	@Override
+	public boolean canVisitTo(ForgeDirection to) {
 		return !m_destroyed;
 	}
 

@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.api.network;
 import dan200.computercraft.shared.peripheral.common.BlockCable;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,7 +27,7 @@ public abstract class NetworkVisitor {
 	public void visitNetwork(IBlockAccess world, int x, int y, int z) {
 		Queue<SearchLoc> queue = new LinkedList<SearchLoc>();
 		Set<SearchLoc> visited = new HashSet<SearchLoc>();
-		enqueue(queue, world, x, y, z, 1);
+		enqueue(queue, new SearchLoc(world, x, y, z, 1, ForgeDirection.UNKNOWN));
 
 		while (queue.peek() != null) {
 			visitBlock(queue, visited, queue.remove());
@@ -66,21 +67,38 @@ public abstract class NetworkVisitor {
 		TileEntity tile = location.world.getTileEntity(location.x, location.y, location.z);
 		INetworkNode node;
 		if (tile != null && (node = NetworkRegistry.getNode(tile)) != null) {
-			if (node.canVisit()) {
-				visitNode(node, location.distanceTravelled + 1);
+			visitNode(node, location.distanceTravelled + 1);
 
-				enqueue(queue, location.world, location.x, location.y + 1, location.z, location.distanceTravelled + 1);
-				enqueue(queue, location.world, location.x, location.y - 1, location.z, location.distanceTravelled + 1);
-				enqueue(queue, location.world, location.x, location.y, location.z + 1, location.distanceTravelled + 1);
-				enqueue(queue, location.world, location.x, location.y, location.z - 1, location.distanceTravelled + 1);
-				enqueue(queue, location.world, location.x + 1, location.y, location.z, location.distanceTravelled + 1);
-				enqueue(queue, location.world, location.x - 1, location.y, location.z, location.distanceTravelled + 1);
+			SearchLoc downLocation = location.locationInDirection(ForgeDirection.DOWN);
+			SearchLoc upLocation = location.locationInDirection(ForgeDirection.UP);
+			SearchLoc northLocation = location.locationInDirection(ForgeDirection.NORTH);
+			SearchLoc southLocation = location.locationInDirection(ForgeDirection.SOUTH);
+			SearchLoc westLocation = location.locationInDirection(ForgeDirection.WEST);
+			SearchLoc eastLocation = location.locationInDirection(ForgeDirection.EAST);
 
-				SearchLoc[] searches = node.getExtraNodes();
-				if (searches != null) {
-					for (SearchLoc search : searches) {
-						if (search.isValid()) queue.offer(search);
-					}
+			if (node.canVisitTo(ForgeDirection.DOWN)) {
+                enqueue(queue, downLocation);
+            }
+			if (node.canVisitTo(ForgeDirection.UP)) {
+                enqueue(queue, upLocation);
+            }
+			if (node.canVisitTo(ForgeDirection.NORTH)) {
+                enqueue(queue, northLocation);
+            }
+			if (node.canVisitTo(ForgeDirection.SOUTH)) {
+                enqueue(queue, southLocation);
+            }
+			if (node.canVisitTo(ForgeDirection.WEST)) {
+                enqueue(queue, westLocation);
+            }
+			if (node.canVisitTo(ForgeDirection.EAST)) {
+                enqueue(queue, eastLocation);
+            }
+
+			SearchLoc[] searches = node.getExtraNodes();
+			if (searches != null) {
+				for (SearchLoc search : searches) {
+					enqueue(queue, search);
 				}
 			}
 		}
@@ -90,15 +108,11 @@ public abstract class NetworkVisitor {
 	 * Add a node to the queue
 	 *
 	 * @param queue             The queue to add to
-	 * @param world             The world the node is in
-	 * @param x                 X position of the node
-	 * @param y                 Y position of the node
-	 * @param z                 Z position of the node
-	 * @param distanceTravelled Distance the node has traversal has travelled
+	 * @param location			The location of the node to add
 	 */
-	protected void enqueue(Queue<SearchLoc> queue, IBlockAccess world, int x, int y, int z, int distanceTravelled) {
-		if (y >= 0 && y < world.getHeight() && BlockCable.isCable(world, x, y, z)) {
-			queue.offer(new SearchLoc(world, x, y, z, distanceTravelled));
+	protected void enqueue(Queue<SearchLoc> queue, SearchLoc location) {
+		if (location.isValid()) {
+			queue.offer(location);
 		}
 	}
 
@@ -111,15 +125,17 @@ public abstract class NetworkVisitor {
 		public final int y;
 		public final int z;
 		public final int distanceTravelled;
+		public final ForgeDirection side;
 
 		protected final int hash;
 
-		public SearchLoc(IBlockAccess world, int x, int y, int z, int distanceTravelled) {
+		public SearchLoc(IBlockAccess world, int x, int y, int z, int distanceTravelled, ForgeDirection side) {
 			this.world = world;
 			this.x = x;
 			this.y = y;
 			this.z = z;
 			this.distanceTravelled = distanceTravelled;
+			this.side = side;
 
 			// Cache the hash code as we store this in a map
 			int hash = world.hashCode();
@@ -139,6 +155,7 @@ public abstract class NetworkVisitor {
 			if (x != searchLoc.x) return false;
 			if (y != searchLoc.y) return false;
 			if (z != searchLoc.z) return false;
+			if (side != searchLoc.side) return false;
 			return world.equals(searchLoc.world);
 
 		}
@@ -149,7 +166,13 @@ public abstract class NetworkVisitor {
 		}
 
 		public boolean isValid() {
-			return y >= 0 && y < world.getHeight() && BlockCable.isCable(world, x, y, z);
+			return y >= 0 && y < world.getHeight()
+					&& BlockCable.isCable(world, x, y, z)
+					&& NetworkRegistry.getNode(world, x, y, z).canBeVisited(side.getOpposite());
+		}
+
+		public SearchLoc locationInDirection(ForgeDirection direction) {
+			return new SearchLoc(world, x + direction.offsetX, y + direction.offsetY, z + direction.offsetZ, distanceTravelled + 1, direction.getOpposite());
 		}
 	}
 }

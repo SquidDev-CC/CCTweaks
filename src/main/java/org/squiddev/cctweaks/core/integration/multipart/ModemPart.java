@@ -22,6 +22,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
@@ -31,9 +32,7 @@ import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 public class ModemPart extends AbstractPart implements INetworkNode {
@@ -146,7 +145,12 @@ public class ModemPart extends AbstractPart implements INetworkNode {
 	}
 
 	@Override
-	public boolean canVisit() {
+	public boolean canBeVisited(ForgeDirection from) {
+		return modem != null && modem.isActive();
+	}
+
+	@Override
+	public boolean canVisitTo(ForgeDirection to) {
 		return modem != null && modem.isActive();
 	}
 

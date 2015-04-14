@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.api.network;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.Map;
 
@@ -13,9 +14,21 @@ public interface INetworkNode {
 	 * If this node can be visited whilst scanning.
 	 * If you return false, nodes after this one will not be scanned
 	 *
+	 * @param from	The direction the node is being visited from. Might be UNKNOWN
+	 *
 	 * @return If this node can be visited
 	 */
-	boolean canVisit();
+	boolean canBeVisited(ForgeDirection from);
+
+	/**
+	 * If the network can visit nodes that may be found one block away in a particular direction.
+	 * The visitor will determine if the adjacent block can be visited from this direction.
+	 * No need for this method to try to determine if the adjacent block wants to be visited.
+	 *
+	 * @param to	The direction of the block that may be visited
+	 * @return if this node doesn't block connection in the direction.
+	 */
+	boolean canVisitTo(ForgeDirection to);
 
 	/**
 	 * Get connected peripherals this node provides
