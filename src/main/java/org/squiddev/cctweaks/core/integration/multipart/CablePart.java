@@ -61,30 +61,6 @@ public class CablePart extends AbstractPart implements INetworkNode {
 		List<Cuboid6> parts = new ArrayList<Cuboid6>();
 		parts.add(new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX));
 
-		int x = x(), y = y(), z = z();
-		World world = world();
-
-		if (BlockCable.isCable(world, x - 1, y, z)) {
-			parts.add(new Cuboid6(0, MIN, MIN, MIN, MAX, MAX));
-		}
-		if (BlockCable.isCable(world, x + 1, y, z)) {
-			parts.add(new Cuboid6(MAX, MIN, MIN, 1, MAX, MAX));
-		}
-
-		if (BlockCable.isCable(world, x, y - 1, z)) {
-			parts.add(new Cuboid6(MIN, 0, MIN, MAX, MIN, MAX));
-		}
-		if (BlockCable.isCable(world, x, y + 1, z)) {
-			parts.add(new Cuboid6(MIN, MAX, MIN, MAX, 1, MAX));
-		}
-		if (BlockCable.isCable(world, x, y, z - 1)) {
-			parts.add(new Cuboid6(MIN, MIN, 0, MAX, MAX, MIN));
-		}
-		if (BlockCable.isCable(world, x, y, z + 1)) {
-			parts.add(new Cuboid6(MIN, MIN, MAX, MAX, MAX, 1));
-		}
-
-
 		return parts;
 	}
 
