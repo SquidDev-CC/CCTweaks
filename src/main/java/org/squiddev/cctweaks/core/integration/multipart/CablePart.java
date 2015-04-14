@@ -159,12 +159,12 @@ public class CablePart extends AbstractPart implements INetworkNode {
 
 	@Override
 	public boolean canBeVisited(ForgeDirection from) {
-		return active && canConnect(tile(), from);
+		return active && tile().partMap(from.ordinal()) == null;
 	}
 
 	@Override
 	public boolean canVisitTo(ForgeDirection to) {
-		return active && tile().partMap(to.ordinal()) == null;
+		return active && canConnect(tile(), to);
 	}
 
 	@Override
@@ -290,6 +290,6 @@ public class CablePart extends AbstractPart implements INetworkNode {
 			return false;
 		}
 
-		return node.canVisitTo(dir.getOpposite());
+		return node.canBeVisited(dir.getOpposite());
 	}
 }
