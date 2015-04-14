@@ -34,7 +34,7 @@ public class ClassReplacer extends ClassRewriter {
 			if (reader == null) return bytes;
 
 			ClassWriter writer = new ClassWriter(0);
-			reader.accept(new RemappingClassAdapter(writer, mapper), ClassReader.EXPAND_FRAMES);
+			reader.accept(new RemappingClassAdapter(writer, context), ClassReader.EXPAND_FRAMES);
 
 			DebugLogger.debug("Injected custom " + className);
 			return writer.toByteArray();

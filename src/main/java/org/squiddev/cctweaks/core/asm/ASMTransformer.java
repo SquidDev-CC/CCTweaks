@@ -22,6 +22,10 @@ public class ASMTransformer implements IClassTransformer {
 			"dan200.computercraft.shared.peripheral.modem.TileCable",
 			"org.squiddev.cctweaks.core.patch.TileCable_Patch"
 		),
+		new ClassPartialPatcher(
+			"dan200.computercraft.shared.peripheral.common.ItemCable",
+			"org.squiddev.cctweaks.core.patch.ItemCable_Patch"
+		),
 	};
 
 	@Override

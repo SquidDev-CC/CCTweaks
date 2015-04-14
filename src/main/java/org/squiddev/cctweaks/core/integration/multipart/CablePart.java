@@ -61,38 +61,36 @@ public class CablePart extends AbstractPart implements INetworkNode {
 		List<Cuboid6> parts = new ArrayList<Cuboid6>();
 		parts.add(new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX));
 
-		int x = x(), y = y(), z = z();
-		World world = world();
+		if (tile() != null) {
+			int x = x(), y = y(), z = z();
+			World world = world();
 
-		if (BlockCable.isCable(world, x - 1, y, z)) {
-			parts.add(new Cuboid6(0, MIN, MIN, MIN, MAX, MAX));
-		}
-		if (BlockCable.isCable(world, x + 1, y, z)) {
-			parts.add(new Cuboid6(MAX, MIN, MIN, 1, MAX, MAX));
-		}
+			if (BlockCable.isCable(world, x - 1, y, z)) {
+				parts.add(new Cuboid6(0, MIN, MIN, MIN, MAX, MAX));
+			}
+			if (BlockCable.isCable(world, x + 1, y, z)) {
+				parts.add(new Cuboid6(MAX, MIN, MIN, 1, MAX, MAX));
+			}
 
-		if (BlockCable.isCable(world, x, y - 1, z)) {
-			parts.add(new Cuboid6(MIN, 0, MIN, MAX, MIN, MAX));
+			if (BlockCable.isCable(world, x, y - 1, z)) {
+				parts.add(new Cuboid6(MIN, 0, MIN, MAX, MIN, MAX));
+			}
+			if (BlockCable.isCable(world, x, y + 1, z)) {
+				parts.add(new Cuboid6(MIN, MAX, MIN, MAX, 1, MAX));
+			}
+			if (BlockCable.isCable(world, x, y, z - 1)) {
+				parts.add(new Cuboid6(MIN, MIN, 0, MAX, MAX, MIN));
+			}
+			if (BlockCable.isCable(world, x, y, z + 1)) {
+				parts.add(new Cuboid6(MIN, MIN, MAX, MAX, MAX, 1));
+			}
 		}
-		if (BlockCable.isCable(world, x, y + 1, z)) {
-			parts.add(new Cuboid6(MIN, MAX, MIN, MAX, 1, MAX));
-		}
-		if (BlockCable.isCable(world, x, y, z - 1)) {
-			parts.add(new Cuboid6(MIN, MIN, 0, MAX, MAX, MIN));
-		}
-		if (BlockCable.isCable(world, x, y, z + 1)) {
-			parts.add(new Cuboid6(MIN, MIN, MAX, MAX, MAX, 1));
-		}
-
 
 		return parts;
 	}
 
 	@Override
 	public Cuboid6 getBounds() {
-		int x = x(), y = y(), z = z();
-		World world = world();
-
 		double xMin = MIN;
 		double yMin = MIN;
 		double zMin = MIN;
@@ -100,12 +98,18 @@ public class CablePart extends AbstractPart implements INetworkNode {
 		double yMax = MAX;
 		double zMax = MAX;
 
-		if (BlockCable.isCable(world, x - 1, y, z)) xMin = 0.0D;
-		if (BlockCable.isCable(world, x + 1, y, z)) xMax = 1.0D;
-		if (BlockCable.isCable(world, x, y - 1, z)) yMin = 0.0D;
-		if (BlockCable.isCable(world, x, y + 1, z)) yMax = 1.0D;
-		if (BlockCable.isCable(world, x, y, z - 1)) zMin = 0.0D;
-		if (BlockCable.isCable(world, x, y, z + 1)) zMax = 1.0D;
+		if (tile() != null) {
+			int x = x(), y = y(), z = z();
+			World world = world();
+
+			if (BlockCable.isCable(world, x - 1, y, z)) xMin = 0.0D;
+			if (BlockCable.isCable(world, x + 1, y, z)) xMax = 1.0D;
+			if (BlockCable.isCable(world, x, y - 1, z)) yMin = 0.0D;
+			if (BlockCable.isCable(world, x, y + 1, z)) yMax = 1.0D;
+			if (BlockCable.isCable(world, x, y, z - 1)) zMin = 0.0D;
+			if (BlockCable.isCable(world, x, y, z + 1)) zMax = 1.0D;
+		}
+
 		return new Cuboid6(xMin, yMin, zMin, xMax, yMax, zMax);
 	}
 
