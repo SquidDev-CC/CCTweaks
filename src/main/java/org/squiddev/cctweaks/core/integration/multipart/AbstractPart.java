@@ -43,12 +43,4 @@ public abstract class AbstractPart extends TMultiPart implements JNormalOcclusio
 		return Collections.singletonList(getBounds());
 	}
 
-	@Override
-	public Iterable<IndexedCuboid6> getSubParts() {
-		List<IndexedCuboid6> boxes = new ArrayList<IndexedCuboid6>();
-		for (Cuboid6 box : getCollisionBoxes()) {
-			boxes.add(new IndexedCuboid6(0, box));
-		}
-		return boxes;
-	}
 }
