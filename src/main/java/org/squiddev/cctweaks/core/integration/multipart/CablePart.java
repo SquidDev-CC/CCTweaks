@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.integration.multipart;
 
+import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
@@ -20,6 +21,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
@@ -83,6 +85,36 @@ public class CablePart extends AbstractPart implements INetworkNode {
 		if (BlockCable.isCable(world, x, y, z - 1)) zMin = 0.0D;
 		if (BlockCable.isCable(world, x, y, z + 1)) zMax = 1.0D;
 		return new Cuboid6(xMin, yMin, zMin, xMax, yMax, zMax);
+	}
+
+	@Override
+	public Iterable<IndexedCuboid6> getSubParts() {
+		List<IndexedCuboid6> parts = new ArrayList<IndexedCuboid6>();
+		parts.add(new IndexedCuboid6(ForgeDirection.UNKNOWN, new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX)));
+
+		int x = x(), y = y(), z = z();
+		World world = world();
+
+		if (BlockCable.isCable(world, x - 1, y, z)) {
+			parts.add(new IndexedCuboid6(ForgeDirection.WEST, new Cuboid6(0, MIN, MIN, MIN, MAX, MAX)));
+		}
+		if (BlockCable.isCable(world, x + 1, y, z)) {
+			parts.add(new IndexedCuboid6(ForgeDirection.EAST, new Cuboid6(MAX, MIN, MIN, 1, MAX, MAX)));
+		}
+		if (BlockCable.isCable(world, x, y - 1, z)) {
+			parts.add(new IndexedCuboid6(ForgeDirection.DOWN, new Cuboid6(MIN, 0, MIN, MAX, MIN, MAX)));
+		}
+		if (BlockCable.isCable(world, x, y + 1, z)) {
+			parts.add(new IndexedCuboid6(ForgeDirection.UP, new Cuboid6(MIN, MAX, MIN, MAX, 1, MAX)));
+		}
+		if (BlockCable.isCable(world, x, y, z - 1)) {
+			parts.add(new IndexedCuboid6(ForgeDirection.NORTH, new Cuboid6(MIN, MIN, 0, MAX, MAX, MIN)));
+		}
+		if (BlockCable.isCable(world, x, y, z + 1)) {
+			parts.add(new IndexedCuboid6(ForgeDirection.SOUTH, new Cuboid6(MIN, MIN, MAX, MAX, MAX, 1)));
+		}
+
+		return parts;
 	}
 
 	@Override
