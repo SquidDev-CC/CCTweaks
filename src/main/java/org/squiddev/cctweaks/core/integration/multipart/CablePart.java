@@ -31,6 +31,7 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,8 @@ public class CablePart extends AbstractPart implements INetworkNode {
 
 	private final Object lock = new Object();
 
+	private boolean active = true;
+
 	@Override
 	public String getType() {
 		return NAME;
@@ -60,9 +63,7 @@ public class CablePart extends AbstractPart implements INetworkNode {
 
 	@Override
 	public Iterable<Cuboid6> getOcclusionBoxes() {
-		List<Cuboid6> parts = new ArrayList<Cuboid6>();
-		parts.add(new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX));
-		return parts;
+		return Collections.singletonList(new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX));
 	}
 
 	@Override
@@ -128,6 +129,9 @@ public class CablePart extends AbstractPart implements INetworkNode {
 
 		super.harvest(hit, player);
 
+		// Prevent visiting the node
+		active = false;
+
 		if (!world.isRemote) {
 			NetworkHelpers.fireNetworkChanged(world, x, y, z);
 		}
@@ -157,7 +161,7 @@ public class CablePart extends AbstractPart implements INetworkNode {
 
 	@Override
 	public boolean canVisit() {
-		return true;
+		return active;
 	}
 
 	@Override

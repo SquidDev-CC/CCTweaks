@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.core.asm.patch.Visitors;
 import org.squiddev.cctweaks.core.integration.multipart.CablePart;
+import org.squiddev.cctweaks.core.integration.multipart.ModemPart;
 
 /**
  * Patch class for adding cables into multipart blocks
@@ -29,8 +30,15 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 	}
 
 	@Override
-	public TMultiPart newPart(ItemStack itemStack, EntityPlayer entityPlayer, World world, BlockCoord blockCoord, int i, Vector3 vector3) {
-		return MultiPartRegistry.createPart(CablePart.NAME, false);
+	public TMultiPart newPart(ItemStack stack, EntityPlayer entityPlayer, World world, BlockCoord blockCoord, int i, Vector3 vector3) {
+		switch (getPeripheralType(stack)) {
+			case Cable:
+				return MultiPartRegistry.createPart(CablePart.NAME, false);
+			case WiredModem:
+				MultiPartRegistry.createPart(ModemPart.NAME, false);
+		}
+
+		return null;
 	}
 
 	@Override

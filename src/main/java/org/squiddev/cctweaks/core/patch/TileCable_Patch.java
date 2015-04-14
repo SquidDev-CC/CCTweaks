@@ -5,9 +5,10 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Facing;
-import org.squiddev.cctweaks.api.network.*;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.NetworkHelpers;
+import org.squiddev.cctweaks.api.network.NetworkVisitor;
+import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.asm.patch.Visitors;
 
 import java.util.*;
@@ -154,7 +155,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	}
 
 	private void findPeripherals() {
-		// TEs are not replaced on Multiaprt crashes
+		// TEs are not replaced on Multipart crashes
 		if(getBlock() == null) {
 			worldObj.removeTileEntity(xCoord, yCoord, zCoord);
 			return;
