@@ -34,7 +34,7 @@ public class ClassPartialPatcher extends ClassRewriter {
 			if (override == null) return bytes;
 
 			ClassWriter writer = new ClassWriter(0);
-			original.accept(new Visitors.MergeVisitor(writer, override, mapper), ClassReader.EXPAND_FRAMES);
+			original.accept(new Visitors.MergeVisitor(writer, override, context), ClassReader.EXPAND_FRAMES);
 
 			DebugLogger.debug("Injected custom " + className);
 			return writer.toByteArray();
