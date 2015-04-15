@@ -1,13 +1,17 @@
 package org.squiddev.cctweaks.core.integration.multipart;
 
+import codechicken.lib.data.MCDataInput;
+import codechicken.lib.data.MCDataOutput;
 import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
+import codechicken.multipart.TSlottedPart;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.client.proxy.ComputerCraftProxyClient;
 import dan200.computercraft.client.render.FixedRenderBlocks;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
@@ -17,6 +21,7 @@ import dan200.computercraft.shared.peripheral.modem.TileModemBase;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Facing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
@@ -35,7 +40,7 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Map;
 
-public class ModemPart extends AbstractPart implements INetworkNode {
+public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPart {
 	private static IIcon[] icons;
 
 	public static final String NAME = CCTweaks.NAME + ":networkModem";
@@ -79,6 +84,11 @@ public class ModemPart extends AbstractPart implements INetworkNode {
 	@Override
 	public String getType() {
 		return NAME;
+	}
+
+	@Override
+	public int getSlotMask() {
+		return 1 << direction;
 	}
 
 	@Override
@@ -131,12 +141,9 @@ public class ModemPart extends AbstractPart implements INetworkNode {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean renderStatic(Vector3 pos, int pass) {
-		if (pass == 0) {
-			TextureUtils.bindAtlas(0);
-			getRender().drawTile(world(), x(), y(), z());
-			return true;
-		}
-		return false;
+		TextureUtils.bindAtlas(0);
+		getRender().drawTile(world(), x(), y(), z());
+		return true;
 	}
 
 	@Override
@@ -145,13 +152,37 @@ public class ModemPart extends AbstractPart implements INetworkNode {
 	}
 
 	@Override
+	public void writeDesc(MCDataOutput packet) {
+		packet.writeByte(direction);
+		packet.writeBoolean(modem != null && modem.isActive());
+	}
+
+	@Override
+	public void readDesc(MCDataInput packet) {
+		direction = packet.readByte();
+		boolean active = packet.readBoolean();
+	}
+
+	@Override
+	public void save(NBTTagCompound tag) {
+		tag.setByte("direction", (byte) direction);
+		tag.setBoolean("active", modem != null && modem.isActive());
+	}
+
+	@Override
+	public void load(NBTTagCompound tag) {
+		direction = tag.getByte("direction");
+		boolean active = tag.getBoolean("active");
+	}
+
+	@Override
 	public boolean canBeVisited(ForgeDirection from) {
-		return modem != null && modem.isActive();
+		return true;
 	}
 
 	@Override
 	public boolean canVisitTo(ForgeDirection to) {
-		return modem != null && modem.isActive();
+		return true;
 	}
 
 	@Override

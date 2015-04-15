@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.core.asm.patch.Visitors;
 import org.squiddev.cctweaks.core.integration.multipart.CablePart;
@@ -27,17 +28,17 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 	}
 
 	@Override
-	public double getHitDepth(Vector3 vhit, int side) {
-		return vhit.copy().scalarProject(Rotation.axes[side]) + (side % 2 ^ 1);
+	public double getHitDepth(Vector3 hit, int side) {
+		return hit.copy().scalarProject(Rotation.axes[side]) + (side % 2 ^ 1);
 	}
 
 	@Override
-	public TMultiPart newPart(ItemStack stack, EntityPlayer entityPlayer, World world, BlockCoord blockCoord, int i, Vector3 vector3) {
+	public TMultiPart newPart(ItemStack stack, EntityPlayer player, World world, BlockCoord pos, int side, Vector3 hit) {
 		switch (getPeripheralType(stack)) {
 			case Cable:
 				return MultiPartRegistry.createPart(CablePart.NAME, false);
 			case WiredModem:
-				return MultiPartRegistry.createPart(ModemPart.NAME, false);
+				return new ModemPart(Facing.oppositeSide[side], null);
 		}
 
 		return null;
@@ -78,8 +79,8 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 	 *
 	 * @return Success at placing the part
 	 */
-	public boolean place(ItemStack item, EntityPlayer player, World world, BlockCoord pos, int side, Vector3 vhit) {
-		TMultiPart part = newPart(item, player, world, pos, side, vhit);
+	public boolean place(ItemStack item, EntityPlayer player, World world, BlockCoord pos, int side, Vector3 hit) {
+		TMultiPart part = newPart(item, player, world, pos, side, hit);
 
 		if (part == null || !TileMultipart.canPlacePart(world, pos, part)) return false;
 		if (!world.isRemote) TileMultipart.addPart(world, pos, part);

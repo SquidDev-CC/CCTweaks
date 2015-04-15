@@ -4,6 +4,8 @@ import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
+import codechicken.multipart.TMultiPart;
+import codechicken.multipart.TSlottedPart;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
@@ -153,7 +155,10 @@ public class CablePart extends AbstractPart implements INetworkNode {
 
 	@Override
 	public boolean canBeVisited(ForgeDirection from) {
-		return active && tile().partMap(from.ordinal()) == null;
+		if (!active) return false;
+
+		TMultiPart part = tile().partMap(from.ordinal());
+		return part != null && part instanceof INetworkNode;
 	}
 
 	@Override
@@ -162,14 +167,25 @@ public class CablePart extends AbstractPart implements INetworkNode {
 	}
 
 	public boolean canConnect(ForgeDirection dir) {
-		if (tile().partMap(dir.ordinal()) != null) {
-			return false;
+		TMultiPart part = tile().partMap(dir.ordinal());
+
+		INetworkNode node = null;
+		if (part != null) {
+			if (part instanceof INetworkNode) {
+				node = (INetworkNode) part;
+			} else {
+				return false;
+			}
 		}
 
-		INetworkNode node = NetworkRegistry.getNode(world(),
-			x() + dir.offsetX,
-			y() + dir.offsetY,
-			z() + dir.offsetZ);
+		if (node == null) {
+			node = NetworkRegistry.getNode(
+				world(),
+				x() + dir.offsetX,
+				y() + dir.offsetY,
+				z() + dir.offsetZ
+			);
+		}
 
 		if (node == null) return false;
 
