@@ -7,9 +7,11 @@ import codechicken.multipart.MultiPartRegistry;
 import codechicken.multipart.TItemMultiPart;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TileMultipart;
+import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.peripheral.common.ItemCable;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.core.asm.patch.Visitors;
@@ -35,7 +37,7 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 			case Cable:
 				return MultiPartRegistry.createPart(CablePart.NAME, false);
 			case WiredModem:
-				MultiPartRegistry.createPart(ModemPart.NAME, false);
+				return MultiPartRegistry.createPart(ModemPart.NAME, false);
 		}
 
 		return null;
@@ -43,20 +45,27 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 
 	@Override
 	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+		Block block = world.getBlock(x, y, z);
+
+		// We can always place in an air block or a cable block as we can't fit more than one modem/cable in one block
+		if ((block == Blocks.air || block == ComputerCraft.Blocks.cable) && nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
+			return true;
+		}
+
 		BlockCoord pos = new BlockCoord(x, y, z);
-		Vector3 vhit = new Vector3(hitX, hitY, hitZ);
-		double d = getHitDepth(vhit, side);
+		Vector3 hit = new Vector3(hitX, hitY, hitZ);
+		double d = getHitDepth(hit, side);
 
-		if (d < 1 && place(stack, player, world, pos, side, vhit)) return true;
+		if (d < 1 && place(stack, player, world, pos, side, hit)) return true;
 
-		return place(stack, player, world, pos.offset(side), side, vhit) || nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ);
+		return nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ) || place(stack, player, world, pos.offset(side), side, hit);
 	}
 
 	/**
 	 * The original {@link ItemCable#onItemUse(ItemStack, EntityPlayer, World, int, int, int, int, float, float, float)} method
 	 * We keep this to ensure cables can be placed in existing modem blocks
 	 *
-	 * @return Sucess at placing the cable
+	 * @return Success at placing the cable
 	 */
 	@Visitors.Stub
 	@Visitors.Name("onItemUse")
@@ -67,7 +76,7 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 	/**
 	 * Place a multipart into the world
 	 *
-	 * @return Sucess at placing the part
+	 * @return Success at placing the part
 	 */
 	public boolean place(ItemStack item, EntityPlayer player, World world, BlockCoord pos, int side, Vector3 vhit) {
 		TMultiPart part = newPart(item, player, world, pos, side, vhit);
