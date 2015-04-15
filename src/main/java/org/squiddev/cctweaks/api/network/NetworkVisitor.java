@@ -77,23 +77,23 @@ public abstract class NetworkVisitor {
 			SearchLoc eastLocation = location.locationInDirection(ForgeDirection.EAST);
 
 			if (node.canVisitTo(ForgeDirection.DOWN)) {
-                enqueue(queue, downLocation);
-            }
+				enqueue(queue, downLocation);
+			}
 			if (node.canVisitTo(ForgeDirection.UP)) {
-                enqueue(queue, upLocation);
-            }
+				enqueue(queue, upLocation);
+			}
 			if (node.canVisitTo(ForgeDirection.NORTH)) {
-                enqueue(queue, northLocation);
-            }
+				enqueue(queue, northLocation);
+			}
 			if (node.canVisitTo(ForgeDirection.SOUTH)) {
-                enqueue(queue, southLocation);
-            }
+				enqueue(queue, southLocation);
+			}
 			if (node.canVisitTo(ForgeDirection.WEST)) {
-                enqueue(queue, westLocation);
-            }
+				enqueue(queue, westLocation);
+			}
 			if (node.canVisitTo(ForgeDirection.EAST)) {
-                enqueue(queue, eastLocation);
-            }
+				enqueue(queue, eastLocation);
+			}
 
 			SearchLoc[] searches = node.getExtraNodes();
 			if (searches != null) {
@@ -107,8 +107,8 @@ public abstract class NetworkVisitor {
 	/**
 	 * Add a node to the queue
 	 *
-	 * @param queue             The queue to add to
-	 * @param location			The location of the node to add
+	 * @param queue    The queue to add to
+	 * @param location The location of the node to add
 	 */
 	protected void enqueue(Queue<SearchLoc> queue, SearchLoc location) {
 		if (location.isValid()) {
@@ -167,8 +167,8 @@ public abstract class NetworkVisitor {
 
 		public boolean isValid() {
 			return y >= 0 && y < world.getHeight()
-					&& BlockCable.isCable(world, x, y, z)
-					&& NetworkRegistry.getNode(world, x, y, z).canBeVisited(side.getOpposite());
+				&& BlockCable.isCable(world, x, y, z)
+				&& NetworkRegistry.getNode(world, x, y, z).canBeVisited(side.getOpposite());
 		}
 
 		public SearchLoc locationInDirection(ForgeDirection direction) {

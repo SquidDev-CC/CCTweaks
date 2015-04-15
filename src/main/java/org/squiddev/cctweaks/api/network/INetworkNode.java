@@ -14,8 +14,7 @@ public interface INetworkNode {
 	 * If this node can be visited whilst scanning.
 	 * If you return false, nodes after this one will not be scanned
 	 *
-	 * @param from	The direction the node is being visited from. Might be UNKNOWN
-	 *
+	 * @param from The direction the node is being visited from. Might be UNKNOWN
 	 * @return If this node can be visited
 	 */
 	boolean canBeVisited(ForgeDirection from);
@@ -23,8 +22,8 @@ public interface INetworkNode {
 	/**
 	 * If the network can visit nodes that may be found one block away in a particular direction.
 	 *
-	 * @param to	The direction of the block that may be visited
-	 * @return if this node doesn't block connection in the direction.
+	 * @param to The direction of the block that may be visited
+	 * @return If this node doesn't block connection in the direction.
 	 */
 	boolean canVisitTo(ForgeDirection to);
 

@@ -24,7 +24,7 @@ public class NetworkRegistry {
 	 * @return The network node or {@code null} if not found
 	 */
 	public static INetworkNode getNode(TileEntity tile) {
-		if(tile == null) return null;
+		if (tile == null) return null;
 
 		if (tile instanceof INetworkNode) {
 			return (INetworkNode) tile;
@@ -80,7 +80,7 @@ public class NetworkRegistry {
 	 * @return If this block is a network node
 	 */
 	public static boolean isNode(Block block, IBlockAccess world, int x, int y, int z) {
-		if(block == null) return false;
+		if (block == null) return false;
 
 		if (block instanceof INetworkNodeBlock) {
 			return true;
