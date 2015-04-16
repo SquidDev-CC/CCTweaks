@@ -4,8 +4,6 @@ import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
-import codechicken.multipart.TMultiPart;
-import codechicken.multipart.TSlottedPart;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
@@ -40,6 +38,8 @@ public class CablePart extends AbstractPart implements INetworkNode {
 	public static final double MIN = 0.375D;
 	public static final double MAX = 1 - MIN;
 
+	private ForgeDirection connectionTestSide = ForgeDirection.UNKNOWN;
+
 	@SideOnly(Side.CLIENT)
 	private CableRenderer render;
 
@@ -63,7 +63,39 @@ public class CablePart extends AbstractPart implements INetworkNode {
 
 	@Override
 	public Iterable<Cuboid6> getOcclusionBoxes() {
-		return Collections.singletonList(new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX));
+		if (connectionTestSide == ForgeDirection.UNKNOWN) {
+			return Collections.singletonList(new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX));
+		}
+
+		// In order to determine if this cable can pass in a certain direction,
+		// through things like covers and hollow covers,
+		// add an occlusion box in that direction, test if occlusion collisions occur,
+		// and only make the connection if no collision occurs.
+		// Then remove the added occlusison box.
+		List<Cuboid6> parts = new ArrayList<Cuboid6>();
+
+		if (tile() != null) {
+			if (connectionTestSide == ForgeDirection.WEST) {
+				parts.add(new Cuboid6(0, MIN, MIN, MIN, MAX, MAX));
+			}
+			if (connectionTestSide == ForgeDirection.EAST) {
+				parts.add(new Cuboid6(MAX, MIN, MIN, 1, MAX, MAX));
+			}
+			if (connectionTestSide == ForgeDirection.DOWN) {
+				parts.add(new Cuboid6(MIN, 0, MIN, MAX, MIN, MAX));
+			}
+			if (connectionTestSide == ForgeDirection.UP) {
+				parts.add(new Cuboid6(MIN, MAX, MIN, MAX, 1, MAX));
+			}
+			if (connectionTestSide == ForgeDirection.NORTH) {
+				parts.add(new Cuboid6(MIN, MIN, 0, MAX, MAX, MIN));
+			}
+			if (connectionTestSide == ForgeDirection.SOUTH) {
+				parts.add(new Cuboid6(MIN, MIN, MAX, MAX, MAX, 1));
+			}
+		}
+
+		return parts;
 	}
 
 	@Override
@@ -155,10 +187,7 @@ public class CablePart extends AbstractPart implements INetworkNode {
 
 	@Override
 	public boolean canBeVisited(ForgeDirection from) {
-		if (!active) return false;
-
-		TMultiPart part = tile().partMap(from.ordinal());
-		return part != null && part instanceof INetworkNode;
+		return active && canCableExtendInDirection(from);
 	}
 
 	@Override
@@ -167,29 +196,38 @@ public class CablePart extends AbstractPart implements INetworkNode {
 	}
 
 	public boolean canConnect(ForgeDirection dir) {
-		TMultiPart part = tile().partMap(dir.ordinal());
-
-		INetworkNode node = null;
-		if (part != null) {
-			if (part instanceof INetworkNode) {
-				node = (INetworkNode) part;
-			} else {
-				return false;
-			}
+		if (!canCableExtendInDirection(dir)) {
+			return false;
 		}
 
-		if (node == null) {
-			node = NetworkRegistry.getNode(
+		INetworkNode node = NetworkRegistry.getNode(
 				world(),
 				x() + dir.offsetX,
 				y() + dir.offsetY,
 				z() + dir.offsetZ
-			);
-		}
+		);
 
 		if (node == null) return false;
 
 		return node.canBeVisited(dir.getOpposite());
+	}
+
+	/**
+	 * Tests if the cable can pass through a side.
+	 * Uses TileMultipart.canReplacePart to see if a version of this cable with
+	 * with a certain side's occlusion extended to the full length
+	 * can be placed in the multipart.
+	 * If not, there's a cover or something in the way.
+	 * Else, there's no cover, or something like a hollow cover.
+	 *
+	 * @param dir The direction to test in
+	 * @return whether the cable can extend in that direction.
+	 */
+	public boolean canCableExtendInDirection(ForgeDirection dir) {
+		connectionTestSide = dir;
+		boolean occludes = tile().canReplacePart(this, this);
+		connectionTestSide = ForgeDirection.UNKNOWN;
+		return occludes;
 	}
 
 	@Override
