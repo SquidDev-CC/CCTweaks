@@ -11,7 +11,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.client.proxy.ComputerCraftProxyClient;
 import dan200.computercraft.client.render.FixedRenderBlocks;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
@@ -144,6 +143,11 @@ public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPar
 	}
 
 	@Override
+	public Cuboid6 getRenderBounds() {
+		return getBounds();
+	}
+
+	@Override
 	public void harvest(MovingObjectPosition hit, EntityPlayer player) {
 		World world = world();
 		int x = x(), y = y(), z = z();
@@ -229,7 +233,7 @@ public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPar
 	}
 
 	@Override
-	public NetworkVisitor.SearchLoc[] getExtraNodes() {
+	public Iterable<NetworkVisitor.SearchLoc> getExtraNodes() {
 		return null;
 	}
 
