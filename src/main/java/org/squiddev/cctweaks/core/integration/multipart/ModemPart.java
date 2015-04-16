@@ -93,7 +93,30 @@ public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPar
 
 	@Override
 	public Iterable<Cuboid6> getOcclusionBoxes() {
-		return Collections.singletonList(getBounds());
+		Cuboid6 box;
+		switch (direction) {
+			case 0:
+			default:
+				box = new Cuboid6(0.125D, 0.0D, 0.125D, 0.875D, 0.125D, 0.875D);
+				break;
+			case 1:
+				box = new Cuboid6(0.125D, 0.875D, 0.125D, 0.875D, 1.0D, 0.875D);
+				break;
+			case 2:
+				box = new Cuboid6(0.125D, 0.125D, 0.0D, 0.875D, 0.875D, 0.125D);
+				break;
+			case 3:
+				box = new Cuboid6(0.125D, 0.125D, 0.875D, 0.875D, 0.875D, 1.0D);
+				break;
+			case 4:
+				box = new Cuboid6(0.0D, 0.125D, 0.125D, 0.125D, 0.875D, 0.875D);
+				break;
+			case 5:
+				box = new Cuboid6(0.875D, 0.125D, 0.125D, 1.0D, 0.875D, 0.875D);
+				break;
+		}
+
+		return Collections.singletonList(box);
 	}
 
 	@Override
