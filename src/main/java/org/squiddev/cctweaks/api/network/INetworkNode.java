@@ -66,7 +66,7 @@ public interface INetworkNode {
 	 *
 	 * @return Array of custom search locations, or {@code null} if none provided
 	 */
-	NetworkVisitor.SearchLoc[] getExtraNodes();
+	Iterable<NetworkVisitor.SearchLoc> getExtraNodes();
 
 	/**
 	 * Object to synchronise on whilst calling {@link #invalidateNetwork}

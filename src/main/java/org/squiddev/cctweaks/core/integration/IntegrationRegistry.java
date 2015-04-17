@@ -51,10 +51,11 @@ public class IntegrationRegistry {
 					@Override
 					public INetworkNode getNode(TileEntity tile) {
 						if (tile instanceof TileMultipart) {
-							for (TMultiPart part : ((TileMultipart) tile).jPartList()) {
-								if (part instanceof INetworkNode) {
-									return (INetworkNode) part;
-								}
+							// Cables reside in the central slot so we can just fetch that
+							// instead and use the cable to delegate to other nodes in the multipart
+							TMultiPart part = ((TileMultipart) tile).partMap(6);
+							if (part != null && part instanceof INetworkNode) {
+								return (INetworkNode) part;
 							}
 						}
 

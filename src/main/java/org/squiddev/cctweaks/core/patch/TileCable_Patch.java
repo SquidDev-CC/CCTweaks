@@ -98,7 +98,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	}
 
 	@Override
-	public NetworkVisitor.SearchLoc[] getExtraNodes() {
+	public Iterable<NetworkVisitor.SearchLoc> getExtraNodes() {
 		return null;
 	}
 

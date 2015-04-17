@@ -95,7 +95,7 @@ public abstract class NetworkVisitor {
 				enqueue(queue, eastLocation);
 			}
 
-			SearchLoc[] searches = node.getExtraNodes();
+			Iterable<SearchLoc> searches = node.getExtraNodes();
 			if (searches != null) {
 				for (SearchLoc search : searches) {
 					enqueue(queue, search);

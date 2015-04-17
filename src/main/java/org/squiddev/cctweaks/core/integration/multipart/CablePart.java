@@ -4,6 +4,8 @@ import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
+import codechicken.multipart.TMultiPart;
+import codechicken.multipart.TSlottedPart;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
@@ -26,16 +28,13 @@ import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class CablePart extends AbstractPart implements INetworkNode {
+public class CablePart extends AbstractPart implements INetworkNode, TSlottedPart {
 	public static final String NAME = CCTweaks.NAME + ":networkCable";
 	private static IIcon[] icons;
 
-	public static final double MIN = 0.375D;
+	public static final double MIN = 0.375;
 	public static final double MAX = 1 - MIN;
 
 	private ForgeDirection connectionTestSide = ForgeDirection.UNKNOWN;
@@ -62,6 +61,11 @@ public class CablePart extends AbstractPart implements INetworkNode {
 	}
 
 	@Override
+	public int getSlotMask() {
+		return 1 << 6;
+	}
+
+	@Override
 	public Iterable<Cuboid6> getOcclusionBoxes() {
 		if (connectionTestSide == ForgeDirection.UNKNOWN) {
 			return Collections.singletonList(new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX));
@@ -71,7 +75,7 @@ public class CablePart extends AbstractPart implements INetworkNode {
 		// through things like covers and hollow covers,
 		// add an occlusion box in that direction, test if occlusion collisions occur,
 		// and only make the connection if no collision occurs.
-		// Then remove the added occlusison box.
+		// Then remove the added occlusion box.
 		List<Cuboid6> parts = new ArrayList<Cuboid6>();
 
 		if (tile() != null) {
@@ -230,17 +234,47 @@ public class CablePart extends AbstractPart implements INetworkNode {
 		return occludes;
 	}
 
+	/**
+	 * Checks if this connects to a node inside this multipart
+	 *
+	 * @param side The side to check
+	 * @return If there is a multipart on that sides
+	 */
+	public boolean canConnectInternally(ForgeDirection side) {
+		TMultiPart part = tile().partMap(side.ordinal());
+		return part != null && part instanceof INetworkNode;
+	}
+
 	@Override
 	public Map<String, IPeripheral> getConnectedPeripherals() {
-		return null;
+		Map<String, IPeripheral> peripherals = new HashMap<String, IPeripheral>();
+
+		for (TMultiPart part : tile().jPartList()) {
+			if (part instanceof INetworkNode && part != this) {
+				Map<String, IPeripheral> nodePeripherals = ((INetworkNode) part).getConnectedPeripherals();
+				if (nodePeripherals != null) peripherals.putAll(nodePeripherals);
+			}
+		}
+
+		return peripherals;
 	}
 
 	@Override
 	public void receivePacket(Packet packet, int distanceTravelled) {
+		for (TMultiPart part : tile().jPartList()) {
+			if (part instanceof INetworkNode && part != this) {
+				((INetworkNode) part).receivePacket(packet, distanceTravelled);
+			}
+		}
 	}
 
 	@Override
 	public void invalidateNetwork() {
+		for (TMultiPart part : tile().jPartList()) {
+			if (part instanceof INetworkNode && part != this) {
+				((INetworkNode) part).invalidateNetwork();
+			}
+		}
 	}
 
 	@Override
@@ -251,8 +285,21 @@ public class CablePart extends AbstractPart implements INetworkNode {
 	}
 
 	@Override
-	public NetworkVisitor.SearchLoc[] getExtraNodes() {
-		return null;
+	public Iterable<NetworkVisitor.SearchLoc> getExtraNodes() {
+		Set<NetworkVisitor.SearchLoc> nodes = new HashSet<NetworkVisitor.SearchLoc>();
+
+		for (TMultiPart part : tile().jPartList()) {
+			if (part instanceof INetworkNode && part != this) {
+				Iterable<NetworkVisitor.SearchLoc> extras = ((INetworkNode) part).getExtraNodes();
+				if (extras != null) {
+					for (NetworkVisitor.SearchLoc extra : extras) {
+						nodes.add(extra);
+					}
+				}
+			}
+		}
+
+		return nodes;
 	}
 
 	@Override
@@ -261,6 +308,17 @@ public class CablePart extends AbstractPart implements INetworkNode {
 	}
 
 	public class CableRenderer extends FixedRenderBlocks {
+		/**
+		 * When rendering with other nodes on the multipart, rendering overlaps,
+		 * resulting in flickering between the two nodes.
+		 *
+		 * If we detect a node on one side, we add some padding so they don't overlap
+		 * as much.
+		 *
+		 * There are probably better ways of doing this using {@link TMultiPart#getRenderBounds()}
+		 */
+		public static final double RENDER_PADDING = 0.1;
+
 		public IIcon[] getIcons() {
 			IIcon[] icons;
 			if ((icons = CablePart.icons) == null) {
@@ -284,13 +342,13 @@ public class CablePart extends AbstractPart implements INetworkNode {
 		public IIcon getBlockIcon(Block block, IBlockAccess world, int x, int y, int z, int side) {
 			int dir = -1;
 
-			if (canConnect(ForgeDirection.WEST) || canConnect(ForgeDirection.EAST)) {
+			if (canVisuallyConnect(ForgeDirection.WEST) || canVisuallyConnect(ForgeDirection.EAST)) {
 				dir = dir == -1 ? 4 : -2;
 			}
-			if (canConnect(ForgeDirection.UP) || canConnect(ForgeDirection.DOWN)) {
+			if (canVisuallyConnect(ForgeDirection.UP) || canVisuallyConnect(ForgeDirection.DOWN)) {
 				dir = dir == -1 ? 0 : -2;
 			}
-			if (canConnect(ForgeDirection.NORTH) || canConnect(ForgeDirection.SOUTH)) {
+			if (canVisuallyConnect(ForgeDirection.NORTH) || canVisuallyConnect(ForgeDirection.SOUTH)) {
 				dir = dir == -1 ? 2 : -2;
 			}
 			if (dir == -1) dir = 2;
@@ -306,35 +364,71 @@ public class CablePart extends AbstractPart implements INetworkNode {
 			setWorld(world);
 
 			Block block = ComputerCraft.Blocks.cable;
-			setRenderBounds(0.375D, 0.375D, 0.375D, 0.625D, 0.625D, 0.625D);
+			setRenderBounds(MIN, MIN, MIN, MAX, MAX, MAX);
 			renderStandardBlock(block, x, y, z);
 
 			if (canConnect(ForgeDirection.DOWN)) {
-				setRenderBounds(0.375D, 0.0D, 0.375D, 0.625D, 0.375D, 0.625D);
+				setRenderBounds(MIN, 0, MIN, MAX, MIN, MAX);
+				renderStandardBlock(block, x, y, z);
+			} else if (canConnectInternally(ForgeDirection.DOWN)) {
+				setRenderBounds(MIN, 0 + RENDER_PADDING, MIN, MAX, MIN, MAX);
 				renderStandardBlock(block, x, y, z);
 			}
+
 			if (canConnect(ForgeDirection.UP)) {
-				setRenderBounds(0.375D, 0.625D, 0.375D, 0.625D, 1.0D, 0.625D);
+				setRenderBounds(MIN, MAX, MIN, MAX, 1, MAX);
+				renderStandardBlock(block, x, y, z);
+			} else if (canConnectInternally(ForgeDirection.UP)) {
+				setRenderBounds(MIN, MAX, MIN, MAX, 1 - RENDER_PADDING, MAX);
 				renderStandardBlock(block, x, y, z);
 			}
+
 			if (canConnect(ForgeDirection.NORTH)) {
-				setRenderBounds(0.375D, 0.375D, 0.0D, 0.625D, 0.625D, 0.375D);
+				setRenderBounds(MIN, MIN, 0, MAX, MAX, MIN);
+				renderStandardBlock(block, x, y, z);
+			} else if (canConnectInternally(ForgeDirection.NORTH)) {
+				setRenderBounds(MIN, MIN, 0 + RENDER_PADDING, MAX, MAX, MIN);
 				renderStandardBlock(block, x, y, z);
 			}
+
 			if (canConnect(ForgeDirection.SOUTH)) {
-				setRenderBounds(0.375D, 0.375D, 0.625D, 0.625D, 0.625D, 1.0D);
+				setRenderBounds(MIN, MIN, MAX, MAX, MAX, 1);
+				renderStandardBlock(block, x, y, z);
+			} else if (canConnectInternally(ForgeDirection.SOUTH)) {
+				setRenderBounds(MIN, MIN, MAX, MAX, MAX, 1 - RENDER_PADDING);
 				renderStandardBlock(block, x, y, z);
 			}
+
 			if (canConnect(ForgeDirection.WEST)) {
-				setRenderBounds(0.0D, 0.375D, 0.375D, 0.375D, 0.625D, 0.625D);
+				setRenderBounds(0, MIN, MIN, MIN, MAX, MAX);
+				renderStandardBlock(block, x, y, z);
+			} else if (canConnectInternally(ForgeDirection.WEST)) {
+				setRenderBounds(0 + RENDER_PADDING, MIN, MIN, MIN, MAX, MAX);
 				renderStandardBlock(block, x, y, z);
 			}
+
 			if (canConnect(ForgeDirection.EAST)) {
-				setRenderBounds(0.625D, 0.375D, 0.375D, 1.0D, 0.625D, 0.625D);
+				setRenderBounds(MAX, MIN, MIN, 1, MAX, MAX);
+				renderStandardBlock(block, x, y, z);
+			} else if (canConnectInternally(ForgeDirection.EAST)) {
+				setRenderBounds(MAX, MIN, MIN, 1 - RENDER_PADDING, MAX, MAX);
 				renderStandardBlock(block, x, y, z);
 			}
 
 			block.setBlockBoundsBasedOnState(world, x, y, z);
+		}
+
+		/**
+		 * Tests to see if there is something to connect to, either in the
+		 * same block space or using {@link #canConnect(ForgeDirection)}
+		 *
+		 * This is a render exclusive method so lives in
+		 *
+		 * @param side The side to check
+		 * @return If we should appear to connect on that side.
+		 */
+		public boolean canVisuallyConnect(ForgeDirection side) {
+			return canConnect(side) || canConnectInternally(side);
 		}
 	}
 }

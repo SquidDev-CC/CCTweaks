@@ -143,6 +143,11 @@ public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPar
 	}
 
 	@Override
+	public Cuboid6 getRenderBounds() {
+		return getBounds();
+	}
+
+	@Override
 	public void harvest(MovingObjectPosition hit, EntityPlayer player) {
 		World world = world();
 		int x = x(), y = y(), z = z();
@@ -228,7 +233,7 @@ public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPar
 	}
 
 	@Override
-	public NetworkVisitor.SearchLoc[] getExtraNodes() {
+	public Iterable<NetworkVisitor.SearchLoc> getExtraNodes() {
 		return null;
 	}
 
