@@ -8,11 +8,14 @@ import codechicken.multipart.TItemMultiPart;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TileMultipart;
 import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.shared.peripheral.PeripheralType;
+import dan200.computercraft.shared.peripheral.common.BlockCable;
 import dan200.computercraft.shared.peripheral.common.ItemCable;
+import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.core.asm.patch.Visitors;
@@ -48,9 +51,21 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
 		Block block = world.getBlock(x, y, z);
 
-		// We can always place in an air block or a cable block as we can't fit more than one modem/cable in one block
-		if ((block == Blocks.air || block == ComputerCraft.Blocks.cable) && nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
+		// We can always place in an air block or a cable block that doesn't have a modem already.
+		if(block.isAir(world, x, y, z) && nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
 			return true;
+		}
+		if (block == ComputerCraft.Blocks.cable) {
+			TileCable cable = (TileCable) world.getTileEntity(x, y, z);
+			PeripheralType type = cable.getPeripheralType();
+			PeripheralType stackType = getPeripheralType(stack);
+			if ((type == PeripheralType.Cable && stackType == PeripheralType.WiredModem)
+					&& nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
+				return true;
+			} else if ((type == PeripheralType.WiredModem && stackType == PeripheralType.Cable)
+					&& nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
+				return true;
+			}
 		}
 
 		BlockCoord pos = new BlockCoord(x, y, z);
@@ -80,11 +95,26 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 	 * @return Success at placing the part
 	 */
 	public boolean place(ItemStack item, EntityPlayer player, World world, BlockCoord pos, int side, Vector3 hit) {
+		PeripheralType itemType = getPeripheralType(item);
+		Block block = world.getBlock(pos.x, pos.y, pos.z);
+		TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
+		// Will be null when not converting
+		PeripheralType blockType = block instanceof BlockCable ? ((TileCable) te).getPeripheralType() : null;
+
 		TMultiPart part = newPart(item, player, world, pos, side, hit);
 
 		if (part == null || !TileMultipart.canPlacePart(world, pos, part)) return false;
 		if (!world.isRemote) TileMultipart.addPart(world, pos, part);
 		if (!player.capabilities.isCreativeMode) item.stackSize--;
+
+		// When converting a WiredModemWithCable, add the cable in.
+		if (itemType == PeripheralType.WiredModem && blockType == PeripheralType.WiredModemWithCable) {
+			CablePart cable = new CablePart();
+			if (TileMultipart.canPlacePart(world, pos, cable) && !world.isRemote) {
+				TileMultipart.addPart(world, pos, cable);
+			}
+		}
+
 		return true;
 	}
 }

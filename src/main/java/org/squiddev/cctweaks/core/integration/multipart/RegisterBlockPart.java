@@ -34,6 +34,7 @@ public class RegisterBlockPart implements MultiPartRegistry.IPartFactory, MultiP
 				case Cable:
 					return new CablePart();
 				case WiredModem:
+				case WiredModemWithCable:
 					return new ModemPart((TileCable) tile);
 			}
 		}
