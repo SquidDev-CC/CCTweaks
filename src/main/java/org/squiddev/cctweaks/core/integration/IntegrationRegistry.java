@@ -1,13 +1,7 @@
 package org.squiddev.cctweaks.core.integration;
 
-import codechicken.multipart.TMultiPart;
-import codechicken.multipart.TileMultipart;
 import cpw.mods.fml.common.Loader;
-import net.minecraft.tileentity.TileEntity;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
-import org.squiddev.cctweaks.api.network.NetworkRegistry;
-import org.squiddev.cctweaks.core.integration.multipart.RegisterBlockPart;
+import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,33 +36,7 @@ public class IntegrationRegistry {
 	}
 
 	public static void init() {
-		addModule(new ModIntegrationModule("ForgeMultipart") {
-			@Override
-			public void load() {
-				new RegisterBlockPart().init();
-
-				NetworkRegistry.addNodeProvider(new INetworkNodeProvider() {
-					@Override
-					public INetworkNode getNode(TileEntity tile) {
-						if (tile instanceof TileMultipart) {
-							// Cables reside in the central slot so we can just fetch that
-							// instead and use the cable to delegate to other nodes in the multipart
-							TMultiPart part = ((TileMultipart) tile).partMap(6);
-							if (part != null && part instanceof INetworkNode) {
-								return (INetworkNode) part;
-							}
-						}
-
-						return null;
-					}
-
-					@Override
-					public boolean isNode(TileEntity tile) {
-						return getNode(tile) != null;
-					}
-				});
-			}
-		});
+		addModule(new MultipartIntegration());
 
 		for (IIntegrationModule module : modules) {
 			if (module.canLoad()) module.load();
