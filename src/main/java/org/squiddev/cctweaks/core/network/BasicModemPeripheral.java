@@ -25,7 +25,7 @@ public class BasicModemPeripheral extends ModemPeripheral {
 
 	@Override
 	protected Vec3 getPosition() {
-		return null;
+		return modem.getPosition();
 	}
 
 	@Override

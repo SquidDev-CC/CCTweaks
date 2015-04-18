@@ -22,7 +22,7 @@ public abstract class SinglePeripheralModem extends BasicModem {
 	}
 
 	public String getPeripheralName() {
-		if(!peripheralEnabled) return null;
+		if (!peripheralEnabled) return null;
 
 		IPeripheral peripheral = getPeripheral();
 		if (peripheral == null) return null;

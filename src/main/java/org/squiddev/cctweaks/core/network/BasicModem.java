@@ -5,7 +5,9 @@ import com.google.common.collect.SetMultimap;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
+import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
@@ -183,8 +185,8 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 
 	/**
 	 * Set the state of the modem
-	 * @param state The flags to set the state with
 	 *
+	 * @param state The flags to set the state with
 	 * @see #MODEM_ON
 	 * @see #MODEM_PERIPHERAL
 	 */
@@ -193,6 +195,12 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 		peripheralEnabled = (state & MODEM_PERIPHERAL) == MODEM_PERIPHERAL;
 	}
 
+	/**
+	 * Recalculate the state of the modem
+	 *
+	 * @see #MODEM_ON
+	 * @see #MODEM_PERIPHERAL
+	 */
 	public void refreshState() {
 		state = (byte) ((modem.isActive() ? MODEM_ON : 0) | (peripheralEnabled ? MODEM_PERIPHERAL : 0));
 	}
@@ -234,6 +242,14 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	public boolean isActive() {
 		return modem != null && modem.isActive();
 	}
+
+	/**
+	 * Get the position of the tile
+	 *
+	 * @return The position of the tile
+	 * @see ModemPeripheral#getPosition()
+	 */
+	public abstract Vec3 getPosition();
 
 	@Override
 	public boolean isWireless() {

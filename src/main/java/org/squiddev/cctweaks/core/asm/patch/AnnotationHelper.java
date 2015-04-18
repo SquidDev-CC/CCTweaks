@@ -39,7 +39,7 @@ public class AnnotationHelper {
 				Map<String, Object> result = new HashMap<String, Object>();
 				if (node.values != null && node.values.size() > 0) {
 					for (int i = 0; i < node.values.size(); i += 2) {
-						result.put((String) node.values.get(i), node.values.get(1));
+						result.put((String) node.values.get(i), node.values.get(i + 1));
 					}
 				}
 

@@ -23,10 +23,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.Facing;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -381,6 +378,11 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 			}
 
 			return peripheral;
+		}
+
+		@Override
+		public Vec3 getPosition() {
+			return Vec3.createVectorHelper(x(), y(), z());
 		}
 	}
 }
