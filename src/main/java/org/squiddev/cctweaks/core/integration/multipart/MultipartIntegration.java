@@ -17,8 +17,10 @@ import org.squiddev.cctweaks.core.integration.IntegrationRegistry;
  * Adds various multipart support constructs
  */
 public class MultipartIntegration extends IntegrationRegistry.ModIntegrationModule {
+	public static final String NAME = "ForgeMultipart";
+
 	public MultipartIntegration() {
-		super("ForgeMultipart");
+		super(NAME);
 	}
 
 	@Override
