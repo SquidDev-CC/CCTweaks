@@ -7,20 +7,23 @@ import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
 import codechicken.multipart.TSlottedPart;
+import com.google.common.base.Objects;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.client.render.FixedRenderBlocks;
 import dan200.computercraft.shared.peripheral.PeripheralType;
+import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
-import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
-import dan200.computercraft.shared.peripheral.modem.TileModemBase;
+import dan200.computercraft.shared.util.IDAssigner;
+import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.Facing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
@@ -32,34 +35,36 @@ import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.NetworkVisitor;
 import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.core.network.SinglePeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Map;
 
-public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPart {
+public class ModemPart extends AbstractPart implements INetworkNode, IPeripheralTile, TSlottedPart {
 	private static IIcon[] icons;
 
 	public static final String NAME = CCTweaks.NAME + ":networkModem";
 
-	protected int direction = 0;
-	protected ModemPeripheral modem;
+	protected byte direction = 0;
+	protected WiredModem modem = new WiredModem();
 
 	public ModemPart() {
 	}
 
-	public ModemPart(int direction, ModemPeripheral modem) {
-		this.direction = direction;
-		this.modem = modem;
+	public ModemPart(int direction) {
+		this.direction = (byte) direction;
 	}
 
-	public ModemPart(TileModemBase modem) {
-		this.direction = modem.getDirection();
+	public ModemPart(TileCable modem) {
+		this.direction = (byte) modem.getDirection();
 
 		try {
-			this.modem = (ModemPeripheral) ComputerAccessor.modemBaseModem.get(modem);
+			this.modem.id = ComputerAccessor.cablePeripheralId.getInt(modem);
+			this.modem.setState((byte) modem.getAnim());
 		} catch (Exception e) {
 			DebugLogger.error("Cannot get modem from tile");
 			e.printStackTrace();
@@ -179,27 +184,74 @@ public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPar
 	}
 
 	@Override
+	public void update() {
+		if (world().isRemote) return;
+
+		if (modem.modem.pollChanged()) markDirty();
+
+		modem.processQueue(tile());
+		if (!modem.peripheralsKnown) modem.findPeripherals(tile());
+	}
+
+	@Override
+	public boolean activate(EntityPlayer player, MovingObjectPosition hit, ItemStack item) {
+		if (player.isSneaking()) return false;
+		if (world().isRemote) return true;
+
+		String name = modem.getPeripheralName();
+		modem.toggleEnabled();
+		String newName = modem.getPeripheralName();
+
+		if (!Objects.equal(name, newName)) {
+			if (name != null) {
+				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", name));
+			}
+
+			if (newName != null) {
+				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
+			}
+
+			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
+			markDirty();
+		}
+
+		return true;
+	}
+
+	/**
+	 * Marks the modem as dirty to trigger a block update and client sync
+	 */
+	public void markDirty() {
+		modem.refreshState();
+		tile().notifyPartChange(this);
+		tile().markDirty();
+		sendDescUpdate();
+	}
+
+	@Override
 	public void writeDesc(MCDataOutput packet) {
 		packet.writeByte(direction);
-		packet.writeBoolean(modem != null && modem.isActive());
+		packet.writeByte(modem.state);
 	}
 
 	@Override
 	public void readDesc(MCDataInput packet) {
 		direction = packet.readByte();
-		boolean active = packet.readBoolean();
+		modem.setState(packet.readByte());
 	}
 
 	@Override
 	public void save(NBTTagCompound tag) {
-		tag.setByte("direction", (byte) direction);
-		tag.setBoolean("active", modem != null && modem.isActive());
+		tag.setByte("modem_direction", direction);
+		tag.setByte("modem_state", modem.state);
+		tag.setInteger("modem_id", modem.id);
 	}
 
 	@Override
 	public void load(NBTTagCompound tag) {
-		direction = tag.getByte("direction");
-		boolean active = tag.getBoolean("active");
+		direction = tag.getByte("modem_direction");
+		modem.setState(tag.getByte("modem_state"));
+		modem.id = tag.getInteger("modem_id");
 	}
 
 	@Override
@@ -214,21 +266,24 @@ public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPar
 
 	@Override
 	public Map<String, IPeripheral> getConnectedPeripherals() {
-		return null;
+		return modem.getConnectedPeripherals();
 	}
 
 	@Override
 	public void receivePacket(Packet packet, int distanceTravelled) {
+		modem.receivePacket(packet, distanceTravelled);
 	}
 
 	@Override
 	public void invalidateNetwork() {
+		modem.invalidateNetwork();
 	}
 
 	@Override
 	public void networkChanged() {
 		if (!world().isRemote) {
 			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
+			modem.networkChanged();
 		}
 	}
 
@@ -240,6 +295,32 @@ public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPar
 	@Override
 	public Object lock() {
 		return lock;
+	}
+
+	@Override
+	public int getDirection() {
+		return direction;
+	}
+
+	@Override
+	public void setDirection(int direction) {
+	}
+
+	@Override
+	public PeripheralType getPeripheralType() {
+		return PeripheralType.WiredModem;
+	}
+
+	@Override
+	public IPeripheral getPeripheral(int side) {
+
+		if (side == direction) return modem.modem;
+		return null;
+	}
+
+	@Override
+	public String getLabel() {
+		return null;
 	}
 
 	public class ModemRenderer extends FixedRenderBlocks {
@@ -264,14 +345,14 @@ public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPar
 
 		@Override
 		public IIcon getBlockIcon(Block block, IBlockAccess world, int x, int y, int z, int side) {
-			int tex = modem != null && modem.isActive() ? 2 : 0;
 			int dir = direction;
+			int text = modem.state * 2;
 
 			IIcon[] icons = getIcons();
 
-			if (dir == 0 || dir == 1 || side == Facing.oppositeSide[dir]) return icons[tex];
-			if (side == 2 || side == 5) return icons[tex + 1];
-			return icons[tex];
+			if (dir == 0 || dir == 1 || side == Facing.oppositeSide[dir]) return icons[text];
+			if (side == 2 || side == 5) return icons[text + 1];
+			return icons[text];
 		}
 
 		public void drawTile(IBlockAccess world, int x, int y, int z) {
@@ -281,6 +362,25 @@ public class ModemPart extends AbstractPart implements INetworkNode, TSlottedPar
 			Cuboid6 bounds = getBounds();
 			setRenderBounds(bounds.min.x, bounds.min.y, bounds.min.z, bounds.max.x, bounds.max.y, bounds.max.z);
 			renderStandardBlock(block, x, y, z);
+		}
+	}
+
+	public class WiredModem extends SinglePeripheralModem {
+		@Override
+		public IPeripheral getPeripheral() {
+			int dir = direction;
+			int x = x() + Facing.offsetsXForSide[dir];
+			int y = y() + Facing.offsetsYForSide[dir];
+			int z = z() + Facing.offsetsZForSide[dir];
+			IPeripheral peripheral = PeripheralUtil.getPeripheral(world(), x, y, z, Facing.oppositeSide[dir]);
+
+			if (peripheral == null) {
+				id = -1;
+			} else if (id <= -1) {
+				id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(world()), "computer/lastid_" + peripheral.getType() + ".txt"));
+			}
+
+			return peripheral;
 		}
 	}
 }

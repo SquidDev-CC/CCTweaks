@@ -100,7 +100,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 		return null;
 	}
 
-	private void dispatchPacket(final Packet packet) {
+	private void dispatchPacket(Packet packet) {
 		NetworkHelpers.sendPacket(worldObj, xCoord, yCoord, zCoord, packet);
 	}
 

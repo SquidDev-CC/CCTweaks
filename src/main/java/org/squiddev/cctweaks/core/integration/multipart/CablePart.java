@@ -306,7 +306,9 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 	public void onPartChanged(TMultiPart part) {
 		// Fire a network changed event when the entire part is modified.
 		// This is because it may block a connection or release a new one
-		networkChanged();
+		if (tile() != null && !world().isRemote) {
+			NetworkHelpers.fireNetworkChanged(world(), x(), y(), z());
+		}
 	}
 
 	@Override

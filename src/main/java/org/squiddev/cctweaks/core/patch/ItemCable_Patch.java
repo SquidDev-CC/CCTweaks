@@ -41,7 +41,7 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 			case Cable:
 				return MultiPartRegistry.createPart(CablePart.NAME, false);
 			case WiredModem:
-				return new ModemPart(Facing.oppositeSide[side], null);
+				return new ModemPart(Facing.oppositeSide[side]);
 		}
 
 		return null;
@@ -52,7 +52,7 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 		Block block = world.getBlock(x, y, z);
 
 		// We can always place in an air block or a cable block that doesn't have a modem already.
-		if(block.isAir(world, x, y, z) && nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
+		if (block.isAir(world, x, y, z) && nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
 			return true;
 		}
 		if (block == ComputerCraft.Blocks.cable) {
@@ -60,10 +60,10 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 			PeripheralType type = cable.getPeripheralType();
 			PeripheralType stackType = getPeripheralType(stack);
 			if ((type == PeripheralType.Cable && stackType == PeripheralType.WiredModem)
-					&& nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
+				&& nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
 				return true;
 			} else if ((type == PeripheralType.WiredModem && stackType == PeripheralType.Cable)
-					&& nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
+				&& nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
 				return true;
 			}
 		}

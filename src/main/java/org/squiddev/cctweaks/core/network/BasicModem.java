@@ -56,7 +56,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	/**
 	 * The modem to use
 	 */
-	public final WiredModem modem = new WiredModem(this);
+	public final BasicModemPeripheral modem = new BasicModemPeripheral(this);
 
 	/**
 	 * The state of the modem
@@ -110,14 +110,19 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 * @param peripheral The peripheral to attach
 	 */
 	public void attachPeripheral(String name, IPeripheral peripheral) {
-		if (peripheralWrappersByName.containsKey(name)) {
+		if (!peripheralWrappersByName.containsKey(name)) {
 			PeripheralAccess wrapper = new PeripheralAccess(peripheral, modem.getComputer(), name);
 			peripheralWrappersByName.put(name, wrapper);
 			wrapper.attach();
 		}
 	}
 
-	public void detachPeriperal(String name) {
+	/**
+	 * Detach a peripheral from the modem
+	 *
+	 * @param name The peripheral name
+	 */
+	public void detachPeripheral(String name) {
 		PeripheralAccess wrapper = peripheralWrappersByName.remove(name);
 		if (wrapper != null) wrapper.detach();
 	}
@@ -147,7 +152,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 				String name = it.next();
 				if (!newPeripherals.containsKey(name)) {
 					it.remove();
-					detachPeriperal(name);
+					detachPeripheral(name);
 				}
 
 			}
@@ -176,6 +181,13 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 		}
 	}
 
+	/**
+	 * Set the state of the modem
+	 * @param state The flags to set the state with
+	 *
+	 * @see #MODEM_ON
+	 * @see #MODEM_PERIPHERAL
+	 */
 	public void setState(byte state) {
 		this.state = state;
 		peripheralEnabled = (state & MODEM_PERIPHERAL) == MODEM_PERIPHERAL;

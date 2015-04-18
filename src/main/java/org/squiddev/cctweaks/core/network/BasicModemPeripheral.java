@@ -12,12 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * org.squiddev.cctweaks.core.network (CC-Tweaks
+ * A peripheral for modems that provide peripherals
+ *
+ * @see BasicModem
  */
-public class WiredModem extends ModemPeripheral {
+public class BasicModemPeripheral extends ModemPeripheral {
 	protected final BasicModem modem;
 
-	public WiredModem(BasicModem modem) {
+	public BasicModemPeripheral(BasicModem modem) {
 		this.modem = modem;
 	}
 
@@ -38,7 +40,7 @@ public class WiredModem extends ModemPeripheral {
 
 	@Override
 	public boolean equals(IPeripheral other) {
-		return other instanceof WiredModem && ((WiredModem) other).modem.equals(this.modem);
+		return other instanceof BasicModemPeripheral && ((BasicModemPeripheral) other).modem.equals(this.modem);
 	}
 
 	public String[] getMethodNames() {
@@ -126,7 +128,7 @@ public class WiredModem extends ModemPeripheral {
 		super.detach(computer);
 		synchronized (modem.peripheralsByName) {
 			for (String name : modem.peripheralsByName.keySet()) {
-				modem.detachPeriperal(name);
+				modem.detachPeripheral(name);
 			}
 		}
 	}
