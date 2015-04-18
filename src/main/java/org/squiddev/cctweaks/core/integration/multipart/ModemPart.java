@@ -343,13 +343,11 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 		@Override
 		public IIcon getBlockIcon(Block block, IBlockAccess world, int x, int y, int z, int side) {
 			int dir = direction;
-			int text = modem.state * 2;
+			int texture = modem.state * 2;
 
 			IIcon[] icons = getIcons();
 
-			if (dir == 0 || dir == 1 || side == Facing.oppositeSide[dir]) return icons[text];
-			if (side == 2 || side == 5) return icons[text + 1];
-			return icons[text];
+			return side == Facing.oppositeSide[dir] ? icons[texture] : icons[texture + 1];
 		}
 
 		public void drawTile(IBlockAccess world, int x, int y, int z) {
