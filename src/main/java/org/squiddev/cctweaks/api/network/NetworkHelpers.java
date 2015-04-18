@@ -46,4 +46,22 @@ public class NetworkHelpers {
 	public static void fireNetworkInvalidate(IBlockAccess world, int x, int y, int z) {
 		visitor.visitNetwork(world, x, y, z);
 	}
+
+	/**
+	 * Send a packet across the network
+	 *
+	 * @param world  The world the block lies in
+	 * @param x      The X position of the node
+	 * @param y      The Y position of the node
+	 * @param z      The Z position of the node
+	 * @param packet Packet to send
+	 */
+	public static void sendPacket(IBlockAccess world, int x, int y, int z, final Packet packet) {
+		new NetworkVisitor() {
+			@Override
+			protected void visitNode(INetworkNode node, int distance) {
+				node.receivePacket(packet, distance);
+			}
+		}.visitNetwork(world, x, y, z);
+	}
 }

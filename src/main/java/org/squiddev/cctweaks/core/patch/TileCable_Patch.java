@@ -101,14 +101,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	}
 
 	private void dispatchPacket(final Packet packet) {
-		new NetworkVisitor() {
-			@Visitors.Rewrite
-			boolean ANNOTATION;
-
-			public void visitNode(INetworkNode node, int distance) {
-				node.receivePacket(packet, distance);
-			}
-		}.visitNetwork(this);
+		NetworkHelpers.sendPacket(worldObj, xCoord, yCoord, zCoord, packet);
 	}
 
 	@Override
@@ -160,7 +153,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 
 	private void findPeripherals() {
 		// TEs are not replaced on Multipart crashes
-		if(getBlock() == null) {
+		if (getBlock() == null) {
 			worldObj.removeTileEntity(xCoord, yCoord, zCoord);
 			return;
 		}
