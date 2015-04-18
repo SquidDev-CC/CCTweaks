@@ -63,6 +63,11 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 */
 	public byte state;
 
+	/**
+	 * If this modem has gone looking for peripherals yet
+	 */
+	public boolean peripheralsKnown = false;
+
 	@Override
 	public void addReceiver(IReceiver receiver) {
 		synchronized (receivers) {
@@ -157,6 +162,8 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 					}
 				}
 			}
+
+			peripheralsKnown = true;
 		}
 	}
 
@@ -175,7 +182,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	}
 
 	public void refreshState() {
-		this.state = (byte) ((modem.isActive() ? 0 : MODEM_ON) | (peripheralEnabled ? 0 : MODEM_PERIPHERAL));
+		state = (byte) ((modem.isActive() ? MODEM_ON : 0) | (peripheralEnabled ? MODEM_PERIPHERAL : 0));
 	}
 
 	/**
@@ -233,6 +240,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 
 	@Override
 	public void invalidateNetwork() {
+		peripheralsKnown = false;
 	}
 
 	@Override

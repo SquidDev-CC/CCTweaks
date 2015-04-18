@@ -168,7 +168,7 @@ public abstract class NetworkVisitor {
 		public boolean isValid() {
 			return y >= 0 && y < world.getHeight()
 				&& BlockCable.isCable(world, x, y, z)
-				&& NetworkRegistry.getNode(world, x, y, z).canBeVisited(side.getOpposite());
+				&& NetworkRegistry.getNode(world, x, y, z).canBeVisited(side);
 		}
 
 		public SearchLoc locationInDirection(ForgeDirection direction) {

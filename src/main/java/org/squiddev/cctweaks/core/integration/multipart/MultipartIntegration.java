@@ -7,7 +7,6 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.peripheral.IPeripheralProvider;
 import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
@@ -53,8 +52,8 @@ public class MultipartIntegration extends IntegrationRegistry.ModIntegrationModu
 				TileEntity tile = world.getTileEntity(x, y, z);
 
 				if (tile != null && tile instanceof TileMultipart) {
-					TMultiPart part = ((TileMultipart) tile).partMap(Facing.oppositeSide[side]);
-					
+					TMultiPart part = ((TileMultipart) tile).partMap(side);
+
 					if (part != null) {
 						if (part instanceof IPeripheral) {
 							return (IPeripheral) part;

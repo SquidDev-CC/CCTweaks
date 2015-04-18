@@ -205,10 +205,10 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 		}
 
 		INetworkNode node = NetworkRegistry.getNode(
-				world(),
-				x() + dir.offsetX,
-				y() + dir.offsetY,
-				z() + dir.offsetZ
+			world(),
+			x() + dir.offsetX,
+			y() + dir.offsetY,
+			z() + dir.offsetZ
 		);
 
 		if (node == null) return false;
@@ -300,6 +300,13 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 		}
 
 		return nodes;
+	}
+
+	@Override
+	public void onPartChanged(TMultiPart part) {
+		// Fire a network changed event when the entire part is modified.
+		// This is because it may block a connection or release a new one
+		networkChanged();
 	}
 
 	@Override
