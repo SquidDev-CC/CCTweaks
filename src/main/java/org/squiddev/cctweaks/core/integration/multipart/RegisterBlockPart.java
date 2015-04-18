@@ -15,12 +15,13 @@ public class RegisterBlockPart implements MultiPartRegistry.IPartFactory, MultiP
 	public TMultiPart createPart(String name, boolean client) {
 		if (name.equals(CablePart.NAME)) return new CablePart();
 		if (name.equals(ModemPart.NAME)) return new ModemPart();
+		if (name.equals(ModemWithCableIntermediatePart.NAME)) return new ModemWithCableIntermediatePart();
 		return null;
 	}
 
 	public void init() {
 		MultiPartRegistry.registerConverter(this);
-		MultiPartRegistry.registerParts(this, new String[]{CablePart.NAME, ModemPart.NAME});
+		MultiPartRegistry.registerParts(this, new String[]{CablePart.NAME, ModemPart.NAME, ModemWithCableIntermediatePart.NAME});
 	}
 
 	public Iterable<Block> blockTypes() {
@@ -34,8 +35,9 @@ public class RegisterBlockPart implements MultiPartRegistry.IPartFactory, MultiP
 				case Cable:
 					return new CablePart();
 				case WiredModem:
-				case WiredModemWithCable:
 					return new ModemPart((TileCable) tile);
+				case WiredModemWithCable:
+					return new ModemWithCableIntermediatePart((TileCable) tile);
 			}
 		}
 

@@ -107,14 +107,6 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 		if (!world.isRemote) TileMultipart.addPart(world, pos, part);
 		if (!player.capabilities.isCreativeMode) item.stackSize--;
 
-		// When converting a WiredModemWithCable, add the cable in.
-		if (itemType == PeripheralType.WiredModem && blockType == PeripheralType.WiredModemWithCable) {
-			CablePart cable = new CablePart();
-			if (TileMultipart.canPlacePart(world, pos, cable) && !world.isRemote) {
-				TileMultipart.addPart(world, pos, cable);
-			}
-		}
-
 		return true;
 	}
 }
