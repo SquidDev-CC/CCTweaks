@@ -5,11 +5,9 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.NetworkHelpers;
-import org.squiddev.cctweaks.api.network.NetworkVisitor;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.asm.patch.Visitors;
 
 import java.util.*;
@@ -204,6 +202,37 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 				}
 			}
 		}
+	}
+
+	@Override
+	public AxisAlignedBB getCableBounds()
+	{
+		// Center size
+		double xMin = 0.375;
+		double yMin = 0.375;
+		double zMin = 0.375;
+		double xMax = 0.625;
+		double yMax = 0.625;
+		double zMax = 0.625;
+		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			INetworkNode node = NetworkRegistry.getNode(
+					worldObj,
+					xCoord + dir.offsetX,
+					yCoord + dir.offsetY,
+					zCoord + dir.offsetZ
+			);
+
+			if (node != null && node.canBeVisited(dir.getOpposite())) {
+				// Modify size for side
+				xMin = dir.offsetX == -1 ? 0 : xMin;
+				xMax = dir.offsetX == 1 ? 1 : xMax;
+				yMin = dir.offsetY == -1 ? 0 : yMin;
+				yMax = dir.offsetY == 1 ? 1 : yMax;
+				zMin = dir.offsetZ == -1 ? 0 : zMin;
+				zMax = dir.offsetZ == 1 ? 1 : zMax;
+			}
+		}
+		return AxisAlignedBB.getBoundingBox(xMin, yMin, zMin, xMax, yMax, zMax);
 	}
 
 	@Visitors.Stub
