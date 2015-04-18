@@ -11,8 +11,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
+import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.squiddev.cctweaks.core.asm.patch.AnnotationHelper.*;
 
 /**
@@ -59,6 +61,9 @@ public class Visitors {
 
 		private RenameContext context;
 
+		protected boolean writingOverride = false;
+		protected String superClass = null;
+
 		/**
 		 * Merge two classes together.
 		 *
@@ -71,7 +76,7 @@ public class Visitors {
 			this.cv = new RemappingClassAdapter(cv, context);
 			this.node = node;
 			this.context = context;
-			populateRemapper();
+			populateRename();
 		}
 
 		/**
@@ -117,6 +122,9 @@ public class Visitors {
 				Collections.addAll(overrideInterfaces, interfaces);
 				interfaces = overrideInterfaces.toArray(new String[overrideInterfaces.size()]);
 
+				writingOverride = true;
+				superClass = superName;
+
 				super.visit(node.version, node.access, name, node.signature, superName, interfaces);
 
 				// Visit fields
@@ -138,10 +146,12 @@ public class Visitors {
 
 				// Visit methods
 				for (MethodNode method : node.methods) {
-					if (!method.name.equals("<init>") && !method.name.equals("<cinit>") && !hasAnnotation(method.invisibleAnnotations, STUB)) {
-						method.accept(this);
-					} else {
-						this.access.put(method.name + "(" + context.mapMethodDesc(method.desc) + ")", method.access);
+					if (!method.name.equals("<init>") && !method.name.equals("<cinit>")) {
+						if (!hasAnnotation(method.invisibleAnnotations, STUB)) {
+							method.accept(this);
+						} else {
+							this.access.put(method.name + "(" + context.mapMethodDesc(method.desc) + ")", method.access);
+						}
 					}
 				}
 
@@ -152,6 +162,8 @@ public class Visitors {
 						memberNames.put(annotation.get("value") + "(" + context.mapMethodDesc(method.desc) + ")", method.name);
 					}
 				}
+
+				writingOverride = false;
 			}
 		}
 
@@ -178,7 +190,14 @@ public class Visitors {
 			name = getMap(memberNames, wholeName, name);
 
 			if (visited.add(name + description)) {
-				return super.visitMethod(access, name, desc, signature, exceptions);
+				MethodVisitor visitor = super.visitMethod(access, name, desc, signature, exceptions);
+
+				// We remap super methods if the method is not static and we are writing the override methods
+				if (visitor != null && !Modifier.isStatic(access) && writingOverride && superClass != null) {
+					return new SuperMethodVisitor(api, visitor);
+				}
+
+				return visitor;
 			}
 
 			return null;
@@ -188,7 +207,7 @@ public class Visitors {
 		 * Adds to the rename context from the {@link org.squiddev.cctweaks.core.asm.patch.Visitors.Rename} annotation
 		 */
 		@SuppressWarnings("unchecked")
-		public void populateRemapper() {
+		public void populateRename() {
 			Map<String, Object> annotation = getAnnotation(node, RENAME);
 			if (annotation != null) {
 				List<String> from = (List<String>) annotation.get("from");
@@ -203,6 +222,26 @@ public class Visitors {
 		public static <T> T getMap(Map<String, T> map, String key, T def) {
 			T result = map.get(key);
 			return result == null ? def : result;
+		}
+
+		/**
+		 * Visitor that remaps super calls
+		 */
+		public class SuperMethodVisitor extends MethodVisitor {
+			public SuperMethodVisitor(int api, MethodVisitor mv) {
+				super(api, mv);
+			}
+
+			@Override
+			public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+				// If it is a constructor, or it is in the current class (private method)
+				// we shouldn't remap to the base class
+				// Reference: http://stackoverflow.com/questions/20382652/detect-super-word-in-java-code-using-bytecode
+				if (opcode == INVOKESPECIAL && !name.equals("<init>") && owner.equals(node.superName)) {
+					owner = superClass;
+				}
+				super.visitMethodInsn(opcode, owner, name, desc, itf);
+			}
 		}
 	}
 

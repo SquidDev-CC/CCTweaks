@@ -3,18 +3,32 @@ package org.squiddev.cctweaks.core.patch;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
+import dan200.computercraft.shared.peripheral.common.BlockCable;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Facing;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.api.network.*;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.NetworkHelpers;
+import org.squiddev.cctweaks.api.network.NetworkVisitor;
+import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.asm.patch.Visitors;
 
 import java.util.*;
 
+import static org.squiddev.cctweaks.api.network.NetworkHelpers.canConnect;
+
 @SuppressWarnings("all")
 @Visitors.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
 public class TileCable_Patch extends TileCable implements INetworkNode {
+	public static final double MIN = 0.375;
+	public static final double MAX = 1 - MIN;
+
+	@Visitors.Stub
+	private static IIcon[] s_cableIcons;
 	@Visitors.Stub
 	private Map<Integer, Set<IReceiver>> m_receivers;
 	@Visitors.Stub
@@ -198,34 +212,54 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	}
 
 	@Override
-	public AxisAlignedBB getCableBounds()
-	{
-		// Center size
-		double xMin = 0.375;
-		double yMin = 0.375;
-		double zMin = 0.375;
-		double xMax = 0.625;
-		double yMax = 0.625;
-		double zMax = 0.625;
-		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-			INetworkNode node = NetworkRegistry.getNode(
-					worldObj,
-					xCoord + dir.offsetX,
-					yCoord + dir.offsetY,
-					zCoord + dir.offsetZ
-			);
+	public AxisAlignedBB getCableBounds() {
+		int x = xCoord, y = yCoord, z = zCoord;
+		World world = worldObj;
 
-			if (node != null && node.canBeVisited(dir.getOpposite())) {
-				// Modify size for side
-				xMin = dir.offsetX == -1 ? 0 : xMin;
-				xMax = dir.offsetX == 1 ? 1 : xMax;
-				yMin = dir.offsetY == -1 ? 0 : yMin;
-				yMax = dir.offsetY == 1 ? 1 : yMax;
-				zMin = dir.offsetZ == -1 ? 0 : zMin;
-				zMax = dir.offsetZ == 1 ? 1 : zMax;
-			}
+		return AxisAlignedBB.getBoundingBox(
+			canConnect(world, x, y, z, ForgeDirection.WEST) ? 0 : MIN,
+			canConnect(world, x, y, z, ForgeDirection.DOWN) ? 0 : MIN,
+			canConnect(world, x, y, z, ForgeDirection.NORTH) ? 0 : MIN,
+			canConnect(world, x, y, z, ForgeDirection.EAST) ? 1 : MAX,
+			canConnect(world, x, y, z, ForgeDirection.UP) ? 1 : MAX,
+			canConnect(world, x, y, z, ForgeDirection.SOUTH) ? 1 : MAX
+		);
+	}
+
+	@Override
+	public IIcon getTexture(int side) {
+		PeripheralType type = getPeripheralType();
+		if (BlockCable.renderAsModem) type = PeripheralType.WiredModem;
+
+		switch (type) {
+			case Cable:
+			case WiredModemWithCable:
+				int dir = -1;
+				if (type == PeripheralType.WiredModemWithCable) {
+					dir = getDirection();
+					dir -= dir % 2;
+				}
+
+				int x = xCoord, y = yCoord, z = zCoord;
+				World world = worldObj;
+
+				if (canConnect(world, x, y, z, ForgeDirection.EAST) || canConnect(world, x, y, z, ForgeDirection.WEST)) {
+					dir = dir == -1 || dir == 4 ? 4 : -2;
+				}
+				if (canConnect(world, x, y, z, ForgeDirection.UP) || canConnect(world, x, y, z, ForgeDirection.DOWN)) {
+					dir = dir == -1 || dir == 0 ? dir = 0 : -2;
+				}
+				if (canConnect(world, x, y, z, ForgeDirection.NORTH) || canConnect(world, x, y, z, ForgeDirection.SOUTH)) {
+					dir = dir == -1 || dir == 2 ? 2 : -2;
+				}
+
+				if (dir == -1) dir = 2;
+
+				if (dir >= 0 && (side == dir || side == Facing.oppositeSide[dir])) return s_cableIcons[1];
+				return s_cableIcons[0];
 		}
-		return AxisAlignedBB.getBoundingBox(xMin, yMin, zMin, xMax, yMax, zMax);
+
+		return super.getTexture(side);
 	}
 
 	@Visitors.Stub
