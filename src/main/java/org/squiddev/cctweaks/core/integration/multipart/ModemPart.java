@@ -347,7 +347,20 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 
 			IIcon[] icons = getIcons();
 
-			return side == Facing.oppositeSide[dir] ? icons[texture] : icons[texture + 1];
+			if (side == dir) {
+				// Use the dark side for the peripheral side
+				return icons[texture + 1];
+			} else if (dir == 0 || dir == 1 || side == Facing.oppositeSide[dir]) {
+				// Use the cable texture for the cable side or if the modem
+				// is facing up/down to prevent textures being on the wrong side
+				return icons[texture];
+			} else if (side == 2 || side == 5) {
+				// If the side is north/east use the side texture to prevent
+				// the dark line being on the wrong side
+				return icons[texture + 1];
+			}
+
+			return icons[texture];
 		}
 
 		public void drawTile(IBlockAccess world, int x, int y, int z) {
