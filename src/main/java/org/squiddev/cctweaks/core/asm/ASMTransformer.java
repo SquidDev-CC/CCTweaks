@@ -29,8 +29,8 @@ public class ASMTransformer implements IClassTransformer {
 			"org.squiddev.cctweaks.core.patch.ItemCable_Patch"
 		) {
 			/**
-			 * The item cable patch just implements multipart support if multipart
-			 * is not loaded, then we cannot patch this without errors
+			 * The item cable patch just implements multipart support.
+			 * If multipart is not loaded, then we cannot patch this without errors
 			 */
 			@Override
 			public boolean matches(String className) {

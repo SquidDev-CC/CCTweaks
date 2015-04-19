@@ -13,7 +13,6 @@ import org.squiddev.cctweaks.core.integration.IntegrationRegistry;
 import org.squiddev.cctweaks.core.reference.Config;
 import org.squiddev.cctweaks.core.registry.ItemRegistry;
 import org.squiddev.cctweaks.core.registry.RefuelRegistry;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 @Mod(modid = CCTweaks.ID, name = CCTweaks.NAME, version = CCTweaks.VERSION, dependencies = CCTweaks.DEPENDENCIES, guiFactory = CCTweaks.GUI_FACTORY)
 public class CCTweaks {
@@ -32,7 +31,6 @@ public class CCTweaks {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		Config.init(event.getSuggestedConfigurationFile());
-		DebugLogger.init(event.getModLog());
 
 		FMLCommonHandler.instance().bus().register(this);
 	}

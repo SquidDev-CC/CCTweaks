@@ -53,14 +53,13 @@ public abstract class ClassRewriter implements IPatcher {
 		InputStream stream = ClassRewriter.class.getResourceAsStream(source);
 
 		if (stream == null) {
-			DebugLogger.error("Cannot find custom rewrite " + source);
+			DebugLogger.warn(MARKER, "Cannot find custom rewrite " + source);
 			return null;
 		}
 		try {
 			return new ClassReader(stream);
 		} catch (Exception e) {
-			DebugLogger.error("Cannot load " + source + ", falling back to default");
-			e.printStackTrace();
+			DebugLogger.error(MARKER, "Cannot load " + source + ", falling back to default", e);
 		}
 
 		return null;

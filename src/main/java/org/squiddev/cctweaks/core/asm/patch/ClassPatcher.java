@@ -55,7 +55,7 @@ public class ClassPatcher implements IPatcher {
 		InputStream is = ClassPatcher.class.getResourceAsStream(source);
 
 		if (is == null) {
-			DebugLogger.error("Cannot find custom rewrite for " + className + " at " + source);
+			DebugLogger.warn(MARKER, "Cannot find custom rewrite for " + className + " at " + source);
 			return bytes;
 		}
 
@@ -77,7 +77,7 @@ public class ClassPatcher implements IPatcher {
 				if (len == result.length) {
 					int last = is.read();
 					if (last < 0) {
-						DebugLogger.debug("Injected custom " + className);
+						DebugLogger.debug(MARKER, "Injected custom " + className);
 						return result;
 					}
 					byte[] c = new byte[result.length + 1000];
@@ -87,8 +87,7 @@ public class ClassPatcher implements IPatcher {
 				}
 			}
 		} catch (Exception e) {
-			DebugLogger.error("Cannot replace " + className + ", falling back to default");
-			e.printStackTrace();
+			DebugLogger.error(MARKER, "Cannot replace " + className + ", falling back to default", e);
 			return bytes;
 		} finally {
 			try {

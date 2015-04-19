@@ -337,8 +337,7 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 					field.setAccessible(true);
 					icons = (IIcon[]) field.get(null);
 				} catch (ReflectiveOperationException e) {
-					DebugLogger.error("Cannot find TileCable texture");
-					e.printStackTrace();
+					DebugLogger.error("Cannot find TileCable texture", e);
 					icons = new IIcon[2];
 				}
 				CablePart.icons = icons;

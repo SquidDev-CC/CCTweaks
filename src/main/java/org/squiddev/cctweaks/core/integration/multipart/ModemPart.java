@@ -63,8 +63,7 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 			this.modem.id = ComputerAccessor.cablePeripheralId.getInt(modem);
 			this.modem.setState((byte) modem.getAnim());
 		} catch (Exception e) {
-			DebugLogger.error("Cannot get modem from tile");
-			e.printStackTrace();
+			DebugLogger.error("Cannot get modem from tile", e);
 		}
 	}
 
@@ -330,8 +329,7 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 					field.setAccessible(true);
 					icons = (IIcon[]) field.get(null);
 				} catch (ReflectiveOperationException e) {
-					DebugLogger.error("Cannot find TileCable texture");
-					e.printStackTrace();
+					DebugLogger.error("Cannot find TileCable texture", e);
 					icons = new IIcon[8];
 				}
 				ModemPart.icons = icons;

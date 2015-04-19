@@ -5,7 +5,6 @@ import dan200.computercraft.core.lua.LuaJLuaMachine;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
-import dan200.computercraft.shared.peripheral.modem.TileModemBase;
 import dan200.computercraft.shared.turtle.blocks.TileTurtle;
 
 import java.lang.reflect.Field;
@@ -50,25 +49,11 @@ public final class ComputerAccessor {
 	public static Field luaMachineGlobals;
 
 	/**
-	 * The modem of a TileModemBase
-	 *
-	 * @see dan200.computercraft.shared.peripheral.modem.TileModemBase#m_modem
-	 */
-	public static Field modemBaseModem;
-
-	/**
 	 * The peripheral ID of a wired modem
 	 *
 	 * @see TileCable#m_attachedPeripheralID
 	 */
 	public static Field cablePeripheralId;
-
-	/**
-	 * If this modem allows peripheral access
-	 *
-	 * @see TileCable#m_peripheralAccessAllowed
-	 */
-	public static Field cablePeripheralEnabled;
 
 	static {
 		try {
@@ -87,16 +72,10 @@ public final class ComputerAccessor {
 			luaMachineGlobals = LuaJLuaMachine.class.getDeclaredField("m_globals");
 			luaMachineGlobals.setAccessible(true);
 
-			modemBaseModem = TileModemBase.class.getDeclaredField("m_modem");
-			modemBaseModem.setAccessible(true);
-
 			cablePeripheralId = TileCable.class.getDeclaredField("m_attachedPeripheralID");
 			cablePeripheralId.setAccessible(true);
-
-			cablePeripheralEnabled = TileCable.class.getDeclaredField("m_peripheralAccessAllowed");
-			cablePeripheralEnabled.setAccessible(true);
 		} catch (Exception e) {
-			DebugLogger.error("CCTweaks: ComputerCraft not found.");
+			DebugLogger.error("ComputerCraft not found", e);
 			e.printStackTrace();
 		}
 	}

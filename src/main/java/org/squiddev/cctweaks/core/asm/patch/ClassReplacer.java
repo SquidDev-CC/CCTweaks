@@ -36,10 +36,10 @@ public class ClassReplacer extends ClassRewriter {
 			ClassWriter writer = new ClassWriter(0);
 			reader.accept(new RemappingClassAdapter(writer, context), ClassReader.EXPAND_FRAMES);
 
-			DebugLogger.debug("Injected custom " + className);
+			DebugLogger.debug(MARKER, "Injected custom " + className);
 			return writer.toByteArray();
 		} catch (Exception e) {
-			DebugLogger.error("Cannot replace " + className + ", falling back to default");
+			DebugLogger.error(MARKER, "Cannot replace " + className + ", falling back to default", e);
 			e.printStackTrace();
 			return bytes;
 		}
