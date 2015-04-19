@@ -1,6 +1,5 @@
 package org.squiddev.cctweaks.api.network;
 
-import dan200.computercraft.shared.peripheral.common.BlockCable;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -19,14 +18,14 @@ public abstract class NetworkVisitor {
 	/**
 	 * Visit a network with this node visitor
 	 *
-	 * @param world The world the network is in
-	 * @param x     The starting X position of the traversal
-	 * @param y     The starting Y position of the traversal
-	 * @param z     The starting Z position of the traversal
+	 * @param world   The world the network is in
+	 * @param x       The starting X position of the traversal
+	 * @param y       The starting Y position of the traversal
+	 * @param z       The starting Z position of the traversal
+	 * @param visited Already visited locations on the network
 	 */
-	public void visitNetwork(IBlockAccess world, int x, int y, int z) {
+	public void visitNetwork(IBlockAccess world, int x, int y, int z, Set<SearchLoc> visited) {
 		Queue<SearchLoc> queue = new LinkedList<SearchLoc>();
-		Set<SearchLoc> visited = new HashSet<SearchLoc>();
 		enqueue(queue, new SearchLoc(world, x, y, z, 1, ForgeDirection.UNKNOWN));
 
 		while (queue.peek() != null) {
@@ -37,7 +36,30 @@ public abstract class NetworkVisitor {
 	/**
 	 * Visit a network with this node visitor
 	 *
-	 * @param tile The node to start visiting with.
+	 * @param world The world the network is in
+	 * @param x     The starting X position of the traversal
+	 * @param y     The starting Y position of the traversal
+	 * @param z     The starting Z position of the traversal
+	 */
+	public void visitNetwork(IBlockAccess world, int x, int y, int z) {
+		visitNetwork(world, x, y, z, new HashSet<SearchLoc>());
+	}
+
+	/**
+	 * Visit a network with this node visitor
+	 *
+	 * @param tile    The node to start visiting with
+	 * @param visited Already visited locations on the network
+	 */
+	public void visitNetwork(TileEntity tile, Set<SearchLoc> visited) {
+		if (tile == null) return;
+		visitNetwork(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord, visited);
+	}
+
+	/**
+	 * Visit a network with this node visitor
+	 *
+	 * @param tile The node to start visiting with
 	 */
 	public void visitNetwork(TileEntity tile) {
 		if (tile == null) return;
@@ -157,7 +179,6 @@ public abstract class NetworkVisitor {
 			if (z != searchLoc.z) return false;
 			if (side != searchLoc.side) return false;
 			return world.equals(searchLoc.world);
-
 		}
 
 		@Override
@@ -166,9 +187,9 @@ public abstract class NetworkVisitor {
 		}
 
 		public boolean isValid() {
-			return y >= 0 && y < world.getHeight()
-				&& BlockCable.isCable(world, x, y, z)
-				&& NetworkRegistry.getNode(world, x, y, z).canBeVisited(side);
+			if (y < 0 || y >= world.getHeight()) return false;
+			INetworkNode node = NetworkRegistry.getNode(world, x, y, z);
+			return node != null && node.canBeVisited(side);
 		}
 
 		public SearchLoc locationInDirection(ForgeDirection direction) {

@@ -24,8 +24,6 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	public static final byte MODEM_ON = 1;
 	public static final byte MODEM_PERIPHERAL = 2;
 
-	private final Object lock = new Object();
-
 	/**
 	 * Set of receivers to use
 	 */
@@ -267,12 +265,8 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	}
 
 	@Override
-	public void invalidateNetwork() {
+	public void networkInvalidated() {
 		peripheralsKnown = false;
-	}
-
-	@Override
-	public void networkChanged() {
 	}
 
 	@Override
@@ -282,6 +276,6 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 
 	@Override
 	public Object lock() {
-		return lock;
+		return peripheralsByName;
 	}
 }

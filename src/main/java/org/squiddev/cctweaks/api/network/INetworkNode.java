@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.api.network;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.Map;
@@ -44,20 +45,15 @@ public interface INetworkNode {
 	void receivePacket(Packet packet, int distanceTravelled);
 
 	/**
-	 * Called when a node is destroyed on the network
+	 * Called when the network is changed in some way
 	 *
-	 * @see #networkChanged()
+	 * This includes adding/removing nodes or changing peripherals
+	 *
+	 * @see NetworkHelpers#fireNetworkInvalidate(IBlockAccess, int, int, int)
+	 * @see NetworkHelpers#fireNetworkInvalidateAdjacent(IBlockAccess, int, int, int)
 	 * @see TileCable#networkChanged()
 	 */
-	void invalidateNetwork();
-
-	/**
-	 * Called when an adjacent network node is destroyed
-	 *
-	 * @see #invalidateNetwork()
-	 * @see TileCable#networkChanged()
-	 */
-	void networkChanged();
+	void networkInvalidated();
 
 	/**
 	 * Get a list of extra node search locations.
@@ -69,7 +65,7 @@ public interface INetworkNode {
 	Iterable<NetworkVisitor.SearchLoc> getExtraNodes();
 
 	/**
-	 * Object to synchronise on whilst calling {@link #invalidateNetwork}
+	 * Object to synchronise on whilst calling {@link #networkInvalidated}
 	 *
 	 * @return The object to synchronise on
 	 */

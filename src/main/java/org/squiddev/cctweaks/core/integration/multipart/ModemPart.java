@@ -79,8 +79,6 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 		return draw;
 	}
 
-	private final Object lock = new Object();
-
 	@Override
 	public String getType() {
 		return NAME;
@@ -156,7 +154,7 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 		super.harvest(hit, player);
 
 		if (!world.isRemote) {
-			NetworkHelpers.fireNetworkChanged(world, x, y, z);
+			NetworkHelpers.fireNetworkInvalidateAdjacent(world, x, y, z);
 		}
 	}
 
@@ -271,16 +269,8 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 	}
 
 	@Override
-	public void invalidateNetwork() {
-		modem.invalidateNetwork();
-	}
-
-	@Override
-	public void networkChanged() {
-		if (!world().isRemote) {
-			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
-			modem.networkChanged();
-		}
+	public void networkInvalidated() {
+		modem.networkInvalidated();
 	}
 
 	@Override
@@ -290,7 +280,7 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 
 	@Override
 	public Object lock() {
-		return lock;
+		return modem.lock();
 	}
 
 	@Override

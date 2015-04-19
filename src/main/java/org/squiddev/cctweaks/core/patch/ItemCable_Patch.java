@@ -9,15 +9,14 @@ import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TileMultipart;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.peripheral.PeripheralType;
-import dan200.computercraft.shared.peripheral.common.BlockCable;
 import dan200.computercraft.shared.peripheral.common.ItemCable;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
+import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.asm.patch.Visitors;
 import org.squiddev.cctweaks.core.integration.multipart.CablePart;
 import org.squiddev.cctweaks.core.integration.multipart.ModemPart;
@@ -53,6 +52,9 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 
 		// We can always place in an air block or a cable block that doesn't have a modem already.
 		if (block.isAir(world, x, y, z) && nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
+			// Fire a network invalidate event on placement as the block is air, so the event isn't fired
+			if (!world.isRemote) NetworkHelpers.fireNetworkInvalidate(world, x, y, z);
+
 			return true;
 		}
 		if (block == ComputerCraft.Blocks.cable) {
@@ -72,9 +74,20 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 		Vector3 hit = new Vector3(hitX, hitY, hitZ);
 		double d = getHitDepth(hit, side);
 
-		if (d < 1 && place(stack, player, world, pos, side, hit)) return true;
+		if (
+			(d < 1 && place(stack, player, world, pos, side, hit))
+				|| nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)
+				|| place(stack, player, world, pos.offset(side), side, hit)
+			) {
 
-		return nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ) || place(stack, player, world, pos.offset(side), side, hit);
+			// We can't tell if nativePlace placed it in this block or the adjacent block
+			// so just invalidate everything
+			if (!world.isRemote) NetworkHelpers.fireNetworkInvalidateAdjacent(world, x, y, z);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -95,12 +108,6 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 	 * @return Success at placing the part
 	 */
 	public boolean place(ItemStack item, EntityPlayer player, World world, BlockCoord pos, int side, Vector3 hit) {
-		PeripheralType itemType = getPeripheralType(item);
-		Block block = world.getBlock(pos.x, pos.y, pos.z);
-		TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
-		// Will be null when not converting
-		PeripheralType blockType = block instanceof BlockCable ? ((TileCable) te).getPeripheralType() : null;
-
 		TMultiPart part = newPart(item, player, world, pos, side, hit);
 
 		if (part == null || !TileMultipart.canPlacePart(world, pos, part)) return false;

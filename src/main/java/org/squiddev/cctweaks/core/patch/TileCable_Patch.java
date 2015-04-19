@@ -93,18 +93,9 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	public void networkChanged() {
 		if (!worldObj.isRemote) {
 			if (m_destroyed) {
-				NetworkHelpers.fireNetworkChanged(worldObj, xCoord, yCoord, zCoord);
+				NetworkHelpers.fireNetworkInvalidateAdjacent(worldObj, xCoord, yCoord, zCoord);
 			} else {
-				new NetworkVisitor() {
-					@Visitors.Rewrite
-					boolean ANNOTATION;
-
-					public void visitNode(INetworkNode node, int distance) {
-						synchronized (node.lock()) {
-							node.invalidateNetwork();
-						}
-					}
-				}.visitNetwork(this);
+				NetworkHelpers.fireNetworkInvalidate(worldObj, xCoord, yCoord, zCoord);
 			}
 		}
 	}
@@ -156,7 +147,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	}
 
 	@Override
-	public void invalidateNetwork() {
+	public void networkInvalidated() {
 		m_peripheralsKnown = false;
 	}
 

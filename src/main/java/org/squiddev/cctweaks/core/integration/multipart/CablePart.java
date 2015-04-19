@@ -163,7 +163,7 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 		active = false;
 
 		if (!world.isRemote) {
-			NetworkHelpers.fireNetworkChanged(world, x, y, z);
+			NetworkHelpers.fireNetworkInvalidateAdjacent(world, x, y, z);
 		}
 	}
 
@@ -269,18 +269,11 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 	}
 
 	@Override
-	public void invalidateNetwork() {
+	public void networkInvalidated() {
 		for (TMultiPart part : tile().jPartList()) {
 			if (part instanceof INetworkNode && part != this) {
-				((INetworkNode) part).invalidateNetwork();
+				((INetworkNode) part).networkInvalidated();
 			}
-		}
-	}
-
-	@Override
-	public void networkChanged() {
-		if (!world().isRemote) {
-			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
 		}
 	}
 
@@ -307,7 +300,7 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 		// Fire a network changed event when the entire part is modified.
 		// This is because it may block a connection or release a new one
 		if (tile() != null && !world().isRemote) {
-			NetworkHelpers.fireNetworkChanged(world(), x(), y(), z());
+			NetworkHelpers.fireNetworkInvalidateAdjacent(world(), x(), y(), z());
 		}
 	}
 
