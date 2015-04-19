@@ -190,6 +190,20 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 	}
 
 	@Override
+	public void onPartChanged(TMultiPart part) {
+		// Fire a network changed event when the entire part is modified.
+		// This is because it may block a connection or release a new one
+		if (tile() != null && !world().isRemote) {
+			NetworkHelpers.fireNetworkInvalidateAdjacent(world(), x(), y(), z());
+		}
+	}
+
+	@Override
+	public boolean doesTick() {
+		return false;
+	}
+
+	@Override
 	public boolean canBeVisited(ForgeDirection from) {
 		return active && canCableExtendInDirection(from);
 	}
@@ -293,15 +307,6 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 		}
 
 		return nodes;
-	}
-
-	@Override
-	public void onPartChanged(TMultiPart part) {
-		// Fire a network changed event when the entire part is modified.
-		// This is because it may block a connection or release a new one
-		if (tile() != null && !world().isRemote) {
-			NetworkHelpers.fireNetworkInvalidateAdjacent(world(), x(), y(), z());
-		}
 	}
 
 	@Override

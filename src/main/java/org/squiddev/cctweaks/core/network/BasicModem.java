@@ -213,10 +213,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 			peripheralEnabled = false;
 		} else {
 			peripheralEnabled = true;
-			Map<String, IPeripheral> peripherals = getConnectedPeripherals();
-			if (peripherals == null || peripherals.size() == 0) {
-				peripheralEnabled = false;
-			}
+			updateEnabled();
 		}
 
 		refreshState();
@@ -224,7 +221,24 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	}
 
 	/**
-	 * Toggles if the modem is enabled
+	 * Scans for peripherals and disabled if none found
+	 *
+	 * @return If the connection state changed
+	 */
+	public boolean updateEnabled() {
+		if (!peripheralEnabled) return false;
+
+		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
+		if (peripherals == null || peripherals.size() == 0) {
+			peripheralEnabled = false;
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if the modem is enabled
 	 *
 	 * @return If it can connect to peripherals
 	 */
@@ -233,9 +247,9 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	}
 
 	/**
-	 * Check if the modem is a active
+	 * Check if the modem is active
 	 *
-	 * @return If the modem is active
+	 * @return If the modem has a channel open
 	 */
 	public boolean isActive() {
 		return modem != null && modem.isActive();

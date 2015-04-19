@@ -188,6 +188,11 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 	}
 
 	@Override
+	public void onNeighborChanged() {
+		if(modem.updateEnabled()) markDirty();
+	}
+
+	@Override
 	public boolean activate(EntityPlayer player, MovingObjectPosition hit, ItemStack item) {
 		if (player.isSneaking()) return false;
 		if (world().isRemote) return true;

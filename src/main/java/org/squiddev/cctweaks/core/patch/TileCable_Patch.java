@@ -111,12 +111,13 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 
 	@Override
 	public boolean canBeVisited(ForgeDirection from) {
-		return !m_destroyed;
+		// Can't be visited by other nodes if it is destroyed or has no cable
+		return !m_destroyed && getPeripheralType() != PeripheralType.WiredModem;
 	}
 
 	@Override
 	public boolean canVisitTo(ForgeDirection to) {
-		return !m_destroyed;
+		return !m_destroyed && getPeripheralType() != PeripheralType.WiredModem;
 	}
 
 	@Override
