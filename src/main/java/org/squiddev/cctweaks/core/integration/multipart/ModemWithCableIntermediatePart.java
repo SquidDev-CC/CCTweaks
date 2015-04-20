@@ -93,6 +93,7 @@ public class ModemWithCableIntermediatePart extends CablePart implements IPeriph
 
 	@Override
 	public void onNeighborChanged() {
+		super.onNeighborChanged();
 		modem.onNeighborChanged();
 	}
 

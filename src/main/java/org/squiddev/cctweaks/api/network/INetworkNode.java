@@ -15,6 +15,9 @@ public interface INetworkNode {
 	 * If this node can be visited whilst scanning.
 	 * If you return false, nodes after this one will not be scanned
 	 *
+	 * You must fire a block update if this is changed, otherwise
+	 * other blocks may not notice this
+	 *
 	 * @param from The direction the node is being visited from. Might be UNKNOWN
 	 * @return If this node can be visited
 	 */
