@@ -220,7 +220,7 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 	/**
 	 * Marks the modem as dirty to trigger a block update and client sync
 	 */
-	public void markDirty() {
+	protected void markDirty() {
 		modem.refreshState();
 		tile().notifyPartChange(this);
 		tile().markDirty();

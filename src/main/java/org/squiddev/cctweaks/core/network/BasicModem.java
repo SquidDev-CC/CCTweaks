@@ -144,6 +144,14 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 				}
 			}.visitNetwork(start);
 
+			// Exclude this items peripherals from the peripheral list
+			Map<String, IPeripheral> localPeripherals = getConnectedPeripherals();
+			if (localPeripherals != null) {
+				for (String name : localPeripherals.keySet()) {
+					newPeripherals.remove(name);
+				}
+			}
+
 			Map<String, IPeripheral> currentPeripherals = peripheralsByName;
 			boolean attached = modem != null && modem.getComputer() != null;
 
