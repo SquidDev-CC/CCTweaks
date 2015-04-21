@@ -2,10 +2,7 @@ package org.squiddev.cctweaks.core.asm;
 
 import cpw.mods.fml.common.Loader;
 import net.minecraft.launchwrapper.IClassTransformer;
-import org.squiddev.cctweaks.core.asm.patch.ClassPartialPatcher;
-import org.squiddev.cctweaks.core.asm.patch.ClassPatcher;
-import org.squiddev.cctweaks.core.asm.patch.ClassReplacer;
-import org.squiddev.cctweaks.core.asm.patch.IPatcher;
+import org.squiddev.cctweaks.core.asm.patch.*;
 import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
 
 public class ASMTransformer implements IClassTransformer {
@@ -24,6 +21,7 @@ public class ASMTransformer implements IClassTransformer {
 			"dan200.computercraft.shared.peripheral.modem.TileCable",
 			"org.squiddev.cctweaks.core.patch.TileCable_Patch"
 		),
+		new StripFinal("dan200.computercraft.shared.peripheral.modem.TileModemBase"),
 		new ClassPartialPatcher(
 			"dan200.computercraft.shared.peripheral.common.ItemCable",
 			"org.squiddev.cctweaks.core.patch.ItemCable_Patch"

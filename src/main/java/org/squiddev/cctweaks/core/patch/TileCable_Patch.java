@@ -9,37 +9,37 @@ import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Facing;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.NetworkVisitor;
 import org.squiddev.cctweaks.api.network.Packet;
-import org.squiddev.cctweaks.core.asm.patch.Visitors;
+import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
 
 import java.util.*;
 
 import static org.squiddev.cctweaks.api.network.NetworkHelpers.canConnect;
 
 @SuppressWarnings("all")
-@Visitors.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
+@MergeVisitor.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
 public class TileCable_Patch extends TileCable implements INetworkNode {
 	public static final double MIN = 0.375;
 	public static final double MAX = 1 - MIN;
 
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private static IIcon[] s_cableIcons;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private Map<Integer, Set<IReceiver>> m_receivers;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private Map<String, IPeripheral> m_peripheralsByName;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private Map<String, RemotePeripheralWrapper> m_peripheralWrappersByName;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private boolean m_peripheralsKnown;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private boolean m_destroyed;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private Queue<Packet> m_transmitQueue;
 
 	@Override
@@ -130,7 +130,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 		return null;
 	}
 
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	public IPeripheral getConnectedPeripheral() {
 		return null;
 	}
@@ -169,7 +169,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 			final Map<String, IPeripheral> newPeripheralsByName = new HashMap<String, IPeripheral>();
 			if (getPeripheralType() == PeripheralType.WiredModemWithCable) {
 				new NetworkVisitor() {
-					@Visitors.Rewrite
+					@MergeVisitor.Rewrite
 					boolean ANNOTATION;
 
 					public void visitNode(INetworkNode node, int distance) {
@@ -206,7 +206,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	@Override
 	public AxisAlignedBB getCableBounds() {
 		int x = xCoord, y = yCoord, z = zCoord;
-		World world = worldObj;
+		IBlockAccess world = worldObj;
 
 		return AxisAlignedBB.getBoundingBox(
 			canConnect(world, x, y, z, ForgeDirection.WEST) ? 0 : MIN,
@@ -233,7 +233,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 				}
 
 				int x = xCoord, y = yCoord, z = zCoord;
-				World world = worldObj;
+				IBlockAccess world = worldObj;
 
 				if (canConnect(world, x, y, z, ForgeDirection.EAST) || canConnect(world, x, y, z, ForgeDirection.WEST)) {
 					dir = dir == -1 || dir == 4 ? 4 : -2;
@@ -254,7 +254,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 		return super.getTexture(side);
 	}
 
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private static class RemotePeripheralWrapper {
 		public RemotePeripheralWrapper(IPeripheral peripheral, IComputerAccess computer, String name) {
 		}

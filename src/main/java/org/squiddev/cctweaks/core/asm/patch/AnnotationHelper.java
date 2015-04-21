@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.squiddev.cctweaks.core.asm.patch.Visitors.*;
+import static org.squiddev.cctweaks.core.asm.patch.MergeVisitor.*;
 
 /**
  * Helpers for reading annotations from nodes
@@ -18,7 +18,6 @@ public class AnnotationHelper {
 	public final static String STUB = Type.getDescriptor(Stub.class);
 	public final static String REWRITE = Type.getDescriptor(Rewrite.class);
 	public final static String RENAME = Type.getDescriptor(Rename.class);
-	public final static String NAME = Type.getDescriptor(Name.class);
 
 	/**
 	 * We use a field called {@code ANNOTATION} to store data about the class itself
@@ -32,7 +31,7 @@ public class AnnotationHelper {
 	 * @param name  Name of the annotation to find
 	 * @return Map of name to value annotations
 	 */
-	protected static Map<String, Object> getAnnotation(List<AnnotationNode> nodes, String name) {
+	public static Map<String, Object> getAnnotation(List<AnnotationNode> nodes, String name) {
 		if (nodes == null) return null;
 		for (AnnotationNode node : nodes) {
 			if (node.desc.equals(name)) {
@@ -57,7 +56,7 @@ public class AnnotationHelper {
 	 * @param name The name of the annotation
 	 * @return Map of name to value annotations
 	 */
-	protected static Map<String, Object> getAnnotation(ClassNode node, String name) {
+	public static Map<String, Object> getAnnotation(ClassNode node, String name) {
 		Map<String, Object> annotation = getAnnotation(node.invisibleAnnotations, name);
 		if (annotation != null) return annotation;
 
@@ -77,7 +76,7 @@ public class AnnotationHelper {
 	 * @param name  The name of the annotation
 	 * @return If this item has the annotation
 	 */
-	protected static boolean hasAnnotation(List<AnnotationNode> nodes, String name) {
+	public static boolean hasAnnotation(List<AnnotationNode> nodes, String name) {
 		return getAnnotation(nodes, name) != null;
 	}
 
@@ -89,7 +88,27 @@ public class AnnotationHelper {
 	 * @param name The name of the annotation
 	 * @return If this class has the annotation
 	 */
-	protected static boolean hasAnnotation(ClassNode node, String name) {
+	public static boolean hasAnnotation(ClassNode node, String name) {
 		return getAnnotation(node, name) != null;
+	}
+
+	/**
+	 * Gets the value of a annotation
+	 *
+	 * @param annotation The annotation data
+	 * @param key        Key of the value to get
+	 * @param <T>        Type of the return value
+	 * @return The found value or null.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getAnnotationValue(Map<String, Object> annotation, String key) {
+		if (annotation == null) return null;
+
+		Object value = annotation.get(key);
+		if (value == null) return null;
+
+		if (value instanceof List) return ((List<T>) value).get(0);
+
+		return (T) value;
 	}
 }

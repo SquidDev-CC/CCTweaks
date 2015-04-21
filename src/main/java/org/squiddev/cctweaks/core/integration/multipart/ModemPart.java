@@ -142,11 +142,6 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 	}
 
 	@Override
-	public Cuboid6 getRenderBounds() {
-		return getBounds();
-	}
-
-	@Override
 	public void harvest(MovingObjectPosition hit, EntityPlayer player) {
 		World world = world();
 		int x = x(), y = y(), z = z();
@@ -189,7 +184,10 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 
 	@Override
 	public void onNeighborChanged() {
-		if(modem.updateEnabled()) markDirty();
+		if (modem.updateEnabled()) {
+			markDirty();
+			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
+		}
 	}
 
 	@Override
@@ -255,12 +253,12 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 
 	@Override
 	public boolean canBeVisited(ForgeDirection from) {
-		return true;
+		return from.getOpposite().ordinal() != direction;
 	}
 
 	@Override
 	public boolean canVisitTo(ForgeDirection to) {
-		return true;
+		return to.ordinal() != direction;
 	}
 
 	@Override

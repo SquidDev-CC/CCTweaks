@@ -17,6 +17,7 @@ import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.network.Packet;
 
@@ -87,11 +88,6 @@ public class ModemWithCableIntermediatePart extends CablePart implements IPeriph
 	}
 
 	@Override
-	public Cuboid6 getRenderBounds() {
-		return getBounds();
-	}
-
-	@Override
 	public void onNeighborChanged() {
 		super.onNeighborChanged();
 		modem.onNeighborChanged();
@@ -123,6 +119,16 @@ public class ModemWithCableIntermediatePart extends CablePart implements IPeriph
 	public void readDesc(MCDataInput packet) {
 		super.readDesc(packet);
 		modem.readDesc(packet);
+	}
+
+	@Override
+	public boolean canBeVisited(ForgeDirection from) {
+		return super.canBeVisited(from) && modem.canBeVisited(from);
+	}
+
+	@Override
+	public boolean canVisitTo(ForgeDirection to) {
+		return super.canVisitTo(to) && modem.canVisitTo(to);
 	}
 
 	@Override

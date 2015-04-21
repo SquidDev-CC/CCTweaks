@@ -26,6 +26,9 @@ public interface INetworkNode {
 	/**
 	 * If the network can visit nodes that may be found one block away in a particular direction.
 	 *
+	 * The visitor will determine if the adjacent block can be visited from this direction.
+	 * No need for this method to try to determine if the adjacent block wants to be visited.
+	 *
 	 * @param to The direction of the block that may be visited
 	 * @return If this node doesn't block connection in the direction.
 	 */

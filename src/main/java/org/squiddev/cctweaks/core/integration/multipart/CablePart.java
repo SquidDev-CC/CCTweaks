@@ -1,9 +1,13 @@
 package org.squiddev.cctweaks.core.integration.multipart;
 
+import codechicken.lib.data.MCDataInput;
+import codechicken.lib.data.MCDataOutput;
 import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
+import codechicken.microblock.ISidedHollowConnect;
+import codechicken.multipart.INeighborTileChange;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TSlottedPart;
 import cpw.mods.fml.relauncher.Side;
@@ -33,7 +37,7 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class CablePart extends AbstractPart implements INetworkNode, TSlottedPart {
+public class CablePart extends AbstractPart implements INetworkNode, TSlottedPart, INeighborTileChange, ISidedHollowConnect {
 	public static final String NAME = CCTweaks.NAME + ":networkCable";
 	private static IIcon[] icons;
 
@@ -62,15 +66,6 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 	 * Each byte is represented with {@code 1 << side}
 	 */
 	private int cableConnection = 0;
-
-	/**
-	 * Caches list of connections that occur externally
-	 * - nodes that are outside the multipart
-	 *
-	 * Each byte is represented with {@code 1 << side}
-	 */
-	private int externalConnection = 0;
-
 
 	@SideOnly(Side.CLIENT)
 	private CableRenderer render;
@@ -145,13 +140,12 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 		double zMax = MAX;
 
 		if (tile() != null) {
-			int external = externalConnection;
-			if (canConnectCached(external, ForgeDirection.WEST)) xMin = 0.0D;
-			if (canConnectCached(external, ForgeDirection.EAST)) xMax = 1.0D;
-			if (canConnectCached(external, ForgeDirection.DOWN)) yMin = 0.0D;
-			if (canConnectCached(external, ForgeDirection.UP)) yMax = 1.0D;
-			if (canConnectCached(external, ForgeDirection.NORTH)) zMin = 0.0D;
-			if (canConnectCached(external, ForgeDirection.SOUTH)) zMax = 1.0D;
+			if (canConnect(ForgeDirection.WEST)) xMin = 0.0D;
+			if (canConnect(ForgeDirection.EAST)) xMax = 1.0D;
+			if (canConnect(ForgeDirection.DOWN)) yMin = 0.0D;
+			if (canConnect(ForgeDirection.UP)) yMax = 1.0D;
+			if (canConnect(ForgeDirection.NORTH)) zMin = 0.0D;
+			if (canConnect(ForgeDirection.SOUTH)) zMax = 1.0D;
 		}
 
 		return new Cuboid6(xMin, yMin, zMin, xMax, yMax, zMax);
@@ -163,23 +157,22 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 		parts.add(new IndexedCuboid6(ForgeDirection.UNKNOWN, new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX)));
 
 		if (tile() != null) {
-			int connections = externalConnection; // Could be extended to contain internalConnection
-			if (canConnectCached(connections, ForgeDirection.WEST)) {
+			if (canConnect(ForgeDirection.WEST)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.WEST, new Cuboid6(0, MIN, MIN, MIN, MAX, MAX)));
 			}
-			if (canConnectCached(connections, ForgeDirection.EAST)) {
+			if (canConnect(ForgeDirection.EAST)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.EAST, new Cuboid6(MAX, MIN, MIN, 1, MAX, MAX)));
 			}
-			if (canConnectCached(connections, ForgeDirection.DOWN)) {
+			if (canConnect(ForgeDirection.DOWN)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.DOWN, new Cuboid6(MIN, 0, MIN, MAX, MIN, MAX)));
 			}
-			if (canConnectCached(connections, ForgeDirection.UP)) {
+			if (canConnect(ForgeDirection.UP)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.UP, new Cuboid6(MIN, MAX, MIN, MAX, 1, MAX)));
 			}
-			if (canConnectCached(connections, ForgeDirection.NORTH)) {
+			if (canConnect(ForgeDirection.NORTH)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.NORTH, new Cuboid6(MIN, MIN, 0, MAX, MAX, MIN)));
 			}
-			if (canConnectCached(connections, ForgeDirection.SOUTH)) {
+			if (canConnect(ForgeDirection.SOUTH)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.SOUTH, new Cuboid6(MIN, MIN, MAX, MAX, MAX, 1)));
 			}
 		}
@@ -229,8 +222,10 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 		// Fire a network changed event when the entire part is modified.
 		// This is because it may block a connection or release a new one
 		if (tile() != null) {
-			rebuildConnections();
-			if (!world().isRemote) NetworkHelpers.fireNetworkInvalidateAdjacent(world(), x(), y(), z());
+			if (!world().isRemote && rebuildConnections()) {
+				NetworkHelpers.fireNetworkInvalidateAdjacent(world(), x(), y(), z());
+				sendDescUpdate();
+			}
 		}
 	}
 
@@ -241,7 +236,22 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 
 	@Override
 	public void onNeighborChanged() {
-		rebuildConnections();
+		if (!world().isRemote && rebuildConnections()) sendDescUpdate();
+	}
+
+	@Override
+	public boolean weakTileChanges() {
+		return false;
+	}
+
+	@Override
+	public void onNeighborTileChanged(int side, boolean weak) {
+		onNeighborChanged();
+	}
+
+	@Override
+	public int getHollowSize(int i) {
+		return 4;
 	}
 
 	@Override
@@ -256,7 +266,7 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 
 	@Override
 	public boolean canVisitTo(ForgeDirection to) {
-		return active && canConnectCached(cableConnection & externalConnection, to);
+		return active && canConnectCached(cableConnection, to);
 	}
 
 	/**
@@ -289,26 +299,38 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 	}
 
 	/**
+	 * Checks if we can connect to that side
+	 *
+	 * @param side The side to connect to
+	 * @return If a connection can occur
+	 */
+	protected boolean canConnect(ForgeDirection side) {
+		return canConnectCached(cableConnection, side) && NetworkHelpers.canConnect(world(), x(), y(), z(), side);
+	}
+
+	/**
 	 * Rebuild the cache of connections
 	 *
 	 * @see #internalConnection
 	 * @see #cableConnection
-	 * @see #externalConnection
 	 */
-	protected void rebuildConnections() {
-		int internal = 0, cable = 0, external = 0;
+	protected boolean rebuildConnections() {
+		// Always allow from ForgeDirection.UNKNOWN
+		int internal = 1 << 6, cable = 1 << 6;
 
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
 			int flag = 1 << direction.ordinal();
 
 			if (canConnectInternally(direction)) internal |= flag;
 			if (canCableExtendInDirection(direction)) cable |= flag;
-			if (NetworkHelpers.canConnect(world(), x(), y(), z(), direction)) external |= flag;
 		}
+
+		boolean changed = internalConnection != internal || cableConnection != cable;
 
 		internalConnection = internal;
 		cableConnection = cable;
-		externalConnection = external;
+
+		return changed;
 	}
 
 	/**
@@ -321,6 +343,16 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 	protected boolean canConnectCached(int flags, ForgeDirection direction) {
 		int flag = 1 << direction.ordinal();
 		return (flags & flag) == flag;
+	}
+
+	@Override
+	public void writeDesc(MCDataOutput packet) {
+		packet.writeBoolean(true);
+	}
+
+	@Override
+	public void readDesc(MCDataInput packet) {
+		if (packet.readBoolean() && tile() != null) rebuildConnections();
 	}
 
 	@Override
@@ -438,9 +470,8 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 			renderStandardBlock(block, x, y, z);
 
 			int internal = internalConnection;
-			int external = externalConnection;
 
-			if (canConnectCached(external, ForgeDirection.DOWN)) {
+			if (canConnect(ForgeDirection.DOWN)) {
 				setRenderBounds(MIN, 0, MIN, MAX, MIN, MAX);
 				renderStandardBlock(block, x, y, z);
 			} else if (canConnectCached(internal, ForgeDirection.DOWN)) {
@@ -448,7 +479,7 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 				renderStandardBlock(block, x, y, z);
 			}
 
-			if (canConnectCached(external, ForgeDirection.UP)) {
+			if (canConnect(ForgeDirection.UP)) {
 				setRenderBounds(MIN, MAX, MIN, MAX, 1, MAX);
 				renderStandardBlock(block, x, y, z);
 			} else if (canConnectCached(internal, ForgeDirection.UP)) {
@@ -456,7 +487,7 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 				renderStandardBlock(block, x, y, z);
 			}
 
-			if (canConnectCached(external, ForgeDirection.NORTH)) {
+			if (canConnect(ForgeDirection.NORTH)) {
 				setRenderBounds(MIN, MIN, 0, MAX, MAX, MIN);
 				renderStandardBlock(block, x, y, z);
 			} else if (canConnectCached(internal, ForgeDirection.NORTH)) {
@@ -464,7 +495,7 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 				renderStandardBlock(block, x, y, z);
 			}
 
-			if (canConnectCached(external, ForgeDirection.SOUTH)) {
+			if (canConnect(ForgeDirection.SOUTH)) {
 				setRenderBounds(MIN, MIN, MAX, MAX, MAX, 1);
 				renderStandardBlock(block, x, y, z);
 			} else if (canConnectCached(internal, ForgeDirection.SOUTH)) {
@@ -472,7 +503,7 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 				renderStandardBlock(block, x, y, z);
 			}
 
-			if (canConnectCached(external, ForgeDirection.WEST)) {
+			if (canConnect(ForgeDirection.WEST)) {
 				setRenderBounds(0, MIN, MIN, MIN, MAX, MAX);
 				renderStandardBlock(block, x, y, z);
 			} else if (canConnectCached(internal, ForgeDirection.WEST)) {
@@ -480,28 +511,24 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 				renderStandardBlock(block, x, y, z);
 			}
 
-			if (canConnectCached(external, ForgeDirection.EAST)) {
+			if (canVisuallyConnect(ForgeDirection.EAST)) {
 				setRenderBounds(MAX, MIN, MIN, 1, MAX, MAX);
 				renderStandardBlock(block, x, y, z);
 			} else if (canConnectCached(internal, ForgeDirection.EAST)) {
 				setRenderBounds(MAX, MIN, MIN, 1 - RENDER_PADDING, MAX, MAX);
 				renderStandardBlock(block, x, y, z);
 			}
-
-			block.setBlockBoundsBasedOnState(world, x, y, z);
 		}
 
 		/**
 		 * Tests to see if there is something to connect to, either in the
-		 * same block space or using {@link NetworkHelpers#canConnect(IBlockAccess, int, int, int, ForgeDirection)}
-		 *
-		 * This is a render exclusive method so lives in the renderer
+		 * same block space or using {@link #canConnect(ForgeDirection)}
 		 *
 		 * @param side The side to check
 		 * @return If we should appear to connect on that side.
 		 */
 		public boolean canVisuallyConnect(ForgeDirection side) {
-			return canConnectCached(internalConnection | externalConnection, side);
+			return canConnectCached(internalConnection, side) || canConnect(side);
 		}
 	}
 }

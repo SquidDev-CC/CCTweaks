@@ -40,7 +40,6 @@ public class ClassReplacer extends ClassRewriter {
 			return writer.toByteArray();
 		} catch (Exception e) {
 			DebugLogger.error(MARKER, "Cannot replace " + className + ", falling back to default", e);
-			e.printStackTrace();
 			return bytes;
 		}
 	}

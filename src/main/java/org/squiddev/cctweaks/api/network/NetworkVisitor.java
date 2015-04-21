@@ -26,7 +26,7 @@ public abstract class NetworkVisitor {
 	 */
 	public void visitNetwork(IBlockAccess world, int x, int y, int z, Set<SearchLoc> visited) {
 		Queue<SearchLoc> queue = new LinkedList<SearchLoc>();
-		enqueue(queue, new SearchLoc(world, x, y, z, 1, ForgeDirection.UNKNOWN));
+		enqueue(queue, visited, new SearchLoc(world, x, y, z, 1, ForgeDirection.UNKNOWN));
 
 		while (queue.peek() != null) {
 			visitBlock(queue, visited, queue.remove());
@@ -82,46 +82,17 @@ public abstract class NetworkVisitor {
 	 * @param location Location of the current node
 	 */
 	protected void visitBlock(Queue<SearchLoc> queue, Set<SearchLoc> visited, SearchLoc location) {
-		if (location.distanceTravelled >= maxDistance || !visited.add(location)) {
-			return;
+		INetworkNode node = location.getNode();
+		visitNode(node, location.distanceTravelled + 1);
+
+		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+			enqueue(queue, visited, location, direction);
 		}
 
-		TileEntity tile = location.world.getTileEntity(location.x, location.y, location.z);
-		INetworkNode node;
-		if (tile != null && (node = NetworkRegistry.getNode(tile)) != null) {
-			visitNode(node, location.distanceTravelled + 1);
-
-			SearchLoc downLocation = location.locationInDirection(ForgeDirection.DOWN);
-			SearchLoc upLocation = location.locationInDirection(ForgeDirection.UP);
-			SearchLoc northLocation = location.locationInDirection(ForgeDirection.NORTH);
-			SearchLoc southLocation = location.locationInDirection(ForgeDirection.SOUTH);
-			SearchLoc westLocation = location.locationInDirection(ForgeDirection.WEST);
-			SearchLoc eastLocation = location.locationInDirection(ForgeDirection.EAST);
-
-			if (node.canVisitTo(ForgeDirection.DOWN)) {
-				enqueue(queue, downLocation);
-			}
-			if (node.canVisitTo(ForgeDirection.UP)) {
-				enqueue(queue, upLocation);
-			}
-			if (node.canVisitTo(ForgeDirection.NORTH)) {
-				enqueue(queue, northLocation);
-			}
-			if (node.canVisitTo(ForgeDirection.SOUTH)) {
-				enqueue(queue, southLocation);
-			}
-			if (node.canVisitTo(ForgeDirection.WEST)) {
-				enqueue(queue, westLocation);
-			}
-			if (node.canVisitTo(ForgeDirection.EAST)) {
-				enqueue(queue, eastLocation);
-			}
-
-			Iterable<SearchLoc> searches = node.getExtraNodes();
-			if (searches != null) {
-				for (SearchLoc search : searches) {
-					enqueue(queue, search);
-				}
+		Iterable<SearchLoc> searches = node.getExtraNodes();
+		if (searches != null) {
+			for (SearchLoc search : searches) {
+				enqueue(queue, visited, search);
 			}
 		}
 	}
@@ -130,11 +101,26 @@ public abstract class NetworkVisitor {
 	 * Add a node to the queue
 	 *
 	 * @param queue    The queue to add to
+	 * @param visited  List of visited locations
 	 * @param location The location of the node to add
 	 */
-	protected void enqueue(Queue<SearchLoc> queue, SearchLoc location) {
-		if (location.isValid()) {
+	protected void enqueue(Queue<SearchLoc> queue, Set<SearchLoc> visited, SearchLoc location) {
+		if (location.distanceTravelled < maxDistance && visited.add(location) && location.getNode() != null) {
 			queue.offer(location);
+		}
+	}
+
+	/**
+	 * Add a node to the queue if it doesn't exist already
+	 *
+	 * @param queue   The queue
+	 * @param visited List of visited locations
+	 * @param current The current node
+	 * @param to      Direction to visit in
+	 */
+	protected void enqueue(Queue<SearchLoc> queue, Set<SearchLoc> visited, SearchLoc current, ForgeDirection to) {
+		if (current.getNode().canVisitTo(to)) {
+			enqueue(queue, visited, current.locationInDirection(to));
 		}
 	}
 
@@ -150,6 +136,8 @@ public abstract class NetworkVisitor {
 		public final ForgeDirection side;
 
 		protected final int hash;
+
+		protected INetworkNode node = null;
 
 		public SearchLoc(IBlockAccess world, int x, int y, int z, int distanceTravelled, ForgeDirection side) {
 			this.world = world;
@@ -186,10 +174,20 @@ public abstract class NetworkVisitor {
 			return hash;
 		}
 
-		public boolean isValid() {
-			if (y < 0 || y >= world.getHeight()) return false;
-			INetworkNode node = NetworkRegistry.getNode(world, x, y, z);
-			return node != null && node.canBeVisited(side);
+		public INetworkNode getNode() {
+			INetworkNode node = this.node;
+			if (node != null) return node;
+
+			if (y >= 0 && y < world.getHeight()) {
+				node = NetworkRegistry.getNode(world, x, y, z);
+				if (node != null && node.canBeVisited(side)) {
+					this.node = node;
+				} else {
+					node = null;
+				}
+			}
+
+			return node;
 		}
 
 		public SearchLoc locationInDirection(ForgeDirection direction) {

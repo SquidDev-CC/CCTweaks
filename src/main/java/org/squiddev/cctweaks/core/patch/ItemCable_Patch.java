@@ -17,7 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
-import org.squiddev.cctweaks.core.asm.patch.Visitors;
+import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
 import org.squiddev.cctweaks.core.integration.multipart.CablePart;
 import org.squiddev.cctweaks.core.integration.multipart.ModemPart;
 
@@ -96,8 +96,8 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 	 *
 	 * @return Success at placing the cable
 	 */
-	@Visitors.Stub
-	@Visitors.Name("onItemUse")
+	@MergeVisitor.Stub
+	@MergeVisitor.Rename(from = "onItemUse")
 	public boolean nativePlace(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
 		return false;
 	}

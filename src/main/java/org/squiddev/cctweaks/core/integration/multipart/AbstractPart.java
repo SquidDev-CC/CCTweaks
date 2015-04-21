@@ -38,6 +38,11 @@ public abstract class AbstractPart extends TMultiPart implements JNormalOcclusio
 	}
 
 	@Override
+	public Cuboid6 getRenderBounds() {
+		return getBounds();
+	}
+
+	@Override
 	public Iterable<Cuboid6> getCollisionBoxes() {
 		List<Cuboid6> boxes = new ArrayList<Cuboid6>();
 
