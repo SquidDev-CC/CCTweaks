@@ -3,7 +3,7 @@ package org.squiddev.cctweaks.api.network;
 /**
  * A packet sent along a wired network
  *
- * @see dan200.computercraft.shared.peripheral.modem.TileCable.Packet
+ * Previously dan200.computercraft.shared.peripheral.modem.TileCable.Packet
  */
 public class Packet {
 	public final int channel;

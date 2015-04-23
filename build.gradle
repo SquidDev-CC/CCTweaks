@@ -16,27 +16,9 @@ buildscript {
 }
 
 apply plugin: 'forge'
-
-repositories {
-	maven {
-		name = "chickenbones"
-		url = "http://chickenbones.net/maven"
-	}
-
-	maven {
-		name = "squiddev"
-		url = "http://maven.bonzodandd.co.uk"
-	}
-
-	ivy {
-		name = "computercraft"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2228/723/[module][revision].[ext]"
-	}
-}
-
-configurations {
-	fatPackage
-}
+apply from: 'gradle/scripts/dependencies.gradle'
+apply from: 'gradle/scripts/artifacts.gradle'
+apply from: 'gradle/scripts/upload.gradle'
 
 group = "org.squiddev"
 archivesBaseName = "CCTweaks"
@@ -49,28 +31,6 @@ minecraft {
 	replace '${mod_version}', project.mod_version
 	replace '${mc_version}', project.mc_version
 }
-
-dependencies {
-	compile group: 'ComputerCraft', name: 'ComputerCraft', version: "${project.cc_version}", ext: 'jar'
-
-	compile "codechicken:ForgeMultipart:${project.mc_version}-${project.multipart_version}:dev"
-	compile "codechicken:CodeChickenLib:${project.mc_version}-${project.ccl_version}:dev"
-	compile "codechicken:NotEnoughItems:${project.mc_version}-${project.nei_version}:dev"
-	compile "codechicken:CodeChickenCore:${project.mc_version}-${project.ccc_version}:dev"
-
-	fatPackage(group: 'org.squiddev', name: 'luaj.luajc', version: '1.+') {
-		// We provide a custom LuaJ source with ComputerCraft
-		exclude group: 'org.ow2.asm'
-		exclude group: 'org.luaj'
-	}
-
-	testCompile group: "junit", name: "junit", version: "4.+"
-	fatPackage group: 'org.squiddev', name: 'luaj.luajc', version: '1.+'
-}
-sourceSets.main.compileClasspath += [configurations.fatPackage]
-
-idea.module.scopes.PROVIDED.plus += [configurations.fatPackage]
-eclipse.classpath.plusConfigurations += [configurations.fatPackage]
 
 jar {
 	manifest {
