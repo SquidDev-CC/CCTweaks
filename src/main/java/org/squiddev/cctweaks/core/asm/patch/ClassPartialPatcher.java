@@ -34,13 +34,12 @@ public class ClassPartialPatcher extends ClassRewriter {
 			if (override == null) return bytes;
 
 			ClassWriter writer = new ClassWriter(0);
-			original.accept(new Visitors.MergeVisitor(writer, override, mapper), ClassReader.EXPAND_FRAMES);
+			original.accept(new MergeVisitor(writer, override, context), ClassReader.EXPAND_FRAMES);
 
-			DebugLogger.debug("Injected custom " + className);
+			DebugLogger.debug(MARKER, "Injected custom " + className);
 			return writer.toByteArray();
 		} catch (Exception e) {
-			DebugLogger.error("Cannot replace " + className + ", falling back to default");
-			e.printStackTrace();
+			DebugLogger.error(MARKER, "Cannot replace " + className + ", falling back to default", e);
 			return bytes;
 		}
 	}

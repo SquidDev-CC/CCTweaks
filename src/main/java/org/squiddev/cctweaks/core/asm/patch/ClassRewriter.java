@@ -1,7 +1,6 @@
 package org.squiddev.cctweaks.core.asm.patch;
 
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.commons.Remapper;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.io.InputStream;
@@ -35,7 +34,7 @@ public abstract class ClassRewriter implements IPatcher {
 	/**
 	 * The remapper to use
 	 */
-	protected final Remapper mapper;
+	protected final RenameContext context;
 
 	public ClassRewriter(String className, String patchName) {
 		this.className = className;
@@ -45,7 +44,8 @@ public abstract class ClassRewriter implements IPatcher {
 		this.patchName = patchName;
 		patchType = patchName.replace('.', '/');
 
-		mapper = new Visitors.PrefixRemapper(patchType, classType);
+		RenameContext context = this.context = new RenameContext();
+		context.prefixRenames.put(patchType, classType);
 	}
 
 	protected ClassReader getSource(String source) {
@@ -53,14 +53,13 @@ public abstract class ClassRewriter implements IPatcher {
 		InputStream stream = ClassRewriter.class.getResourceAsStream(source);
 
 		if (stream == null) {
-			DebugLogger.error("Cannot find custom rewrite " + source);
+			DebugLogger.warn(MARKER, "Cannot find custom rewrite " + source);
 			return null;
 		}
 		try {
 			return new ClassReader(stream);
 		} catch (Exception e) {
-			DebugLogger.error("Cannot load " + source + ", falling back to default");
-			e.printStackTrace();
+			DebugLogger.error(MARKER, "Cannot load " + source + ", falling back to default", e);
 		}
 
 		return null;

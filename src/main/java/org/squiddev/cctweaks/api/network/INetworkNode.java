@@ -2,6 +2,8 @@ package org.squiddev.cctweaks.api.network;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.Map;
 
@@ -13,9 +15,24 @@ public interface INetworkNode {
 	 * If this node can be visited whilst scanning.
 	 * If you return false, nodes after this one will not be scanned
 	 *
+	 * You must fire a block update if this is changed, otherwise
+	 * other blocks may not notice this
+	 *
+	 * @param from The direction the node is being visited from. Might be UNKNOWN
 	 * @return If this node can be visited
 	 */
-	boolean canVisit();
+	boolean canBeVisited(ForgeDirection from);
+
+	/**
+	 * If the network can visit nodes that may be found one block away in a particular direction.
+	 *
+	 * The visitor will determine if the adjacent block can be visited from this direction.
+	 * No need for this method to try to determine if the adjacent block wants to be visited.
+	 *
+	 * @param to The direction of the block that may be visited
+	 * @return If this node doesn't block connection in the direction.
+	 */
+	boolean canVisitTo(ForgeDirection to);
 
 	/**
 	 * Get connected peripherals this node provides
@@ -34,20 +51,15 @@ public interface INetworkNode {
 	void receivePacket(Packet packet, int distanceTravelled);
 
 	/**
-	 * Called when a node is destroyed on the network
+	 * Called when the network is changed in some way
 	 *
-	 * @see #networkChanged()
+	 * This includes adding/removing nodes or changing peripherals
+	 *
+	 * @see NetworkHelpers#fireNetworkInvalidate(IBlockAccess, int, int, int)
+	 * @see NetworkHelpers#fireNetworkInvalidateAdjacent(IBlockAccess, int, int, int)
 	 * @see TileCable#networkChanged()
 	 */
-	void invalidateNetwork();
-
-	/**
-	 * Called when an adjacent network node is destroyed
-	 *
-	 * @see #invalidateNetwork()
-	 * @see TileCable#networkChanged()
-	 */
-	void networkChanged();
+	void networkInvalidated();
 
 	/**
 	 * Get a list of extra node search locations.
@@ -56,10 +68,10 @@ public interface INetworkNode {
 	 *
 	 * @return Array of custom search locations, or {@code null} if none provided
 	 */
-	NetworkVisitor.SearchLoc[] getExtraNodes();
+	Iterable<NetworkVisitor.SearchLoc> getExtraNodes();
 
 	/**
-	 * Object to synchronise on whilst calling {@link #invalidateNetwork}
+	 * Object to synchronise on whilst calling {@link #networkInvalidated}
 	 *
 	 * @return The object to synchronise on
 	 */

@@ -24,6 +24,8 @@ public class NetworkRegistry {
 	 * @return The network node or {@code null} if not found
 	 */
 	public static INetworkNode getNode(TileEntity tile) {
+		if (tile == null) return null;
+
 		if (tile instanceof INetworkNode) {
 			return (INetworkNode) tile;
 		}
@@ -50,6 +52,23 @@ public class NetworkRegistry {
 	/**
 	 * Get the network node for the specific block.
 	 *
+	 * This first checks for an instance of {@link INetworkNode} on the TE of the block
+	 * then checks if the block is an instance of {@link INetworkNodeBlock} then
+	 * uses {@link INetworkNodeProvider} to find it.
+	 *
+	 * @param world The world the block is in
+	 * @param x     X coordinates of the block
+	 * @param y     Y coordinates of the block
+	 * @param z     Z coordinates of the block
+	 * @return The network node or {@code null} if not found
+	 */
+	public static INetworkNode getNode(IBlockAccess world, int x, int y, int z) {
+		return y > 0 && y < world.getHeight() ? getNode(world.getTileEntity(x, y, z)) : null;
+	}
+
+	/**
+	 * Get the network node for the specific block.
+	 *
 	 * This first checks for an instance of {@link INetworkNodeBlock} on the block
 	 * then follows the same process as {@link #getNode(TileEntity)}
 	 *
@@ -61,6 +80,8 @@ public class NetworkRegistry {
 	 * @return If this block is a network node
 	 */
 	public static boolean isNode(Block block, IBlockAccess world, int x, int y, int z) {
+		if (block == null) return false;
+
 		if (block instanceof INetworkNodeBlock) {
 			return true;
 		}
@@ -88,7 +109,7 @@ public class NetworkRegistry {
 	 * @return If this block is a network node
 	 */
 	public static boolean isNode(IBlockAccess world, int x, int y, int z) {
-		return isNode(world.getBlock(x, y, z), world, x, y, z);
+		return y > 0 && y < world.getHeight() && isNode(world.getBlock(x, y, z), world, x, y, z);
 	}
 
 	/**
@@ -97,6 +118,6 @@ public class NetworkRegistry {
 	 * @param provider The provider to add
 	 */
 	public static void addNodeProvider(INetworkNodeProvider provider) {
-		if(provider != null) providers.add(provider);
+		if (provider != null) providers.add(provider);
 	}
 }

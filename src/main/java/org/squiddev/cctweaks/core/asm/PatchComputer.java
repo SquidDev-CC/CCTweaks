@@ -6,6 +6,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 import org.squiddev.cctweaks.core.asm.chickenlib.ASMMatcher;
 import org.squiddev.cctweaks.core.asm.chickenlib.InsnListSection;
+import org.squiddev.cctweaks.core.asm.patch.IPatcher;
 import org.squiddev.cctweaks.core.reference.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
@@ -52,10 +53,9 @@ public class PatchComputer implements Opcodes {
 						found.insert(insert);
 
 						changed = true;
-						DebugLogger.debug("Injected LuaJCRewrite.install() call into LuaJLuaMachine.<init>");
+						DebugLogger.debug(IPatcher.MARKER, "Injected LuaJCRewrite.install() call into LuaJLuaMachine.<init>");
 					} catch (Exception e) {
-						DebugLogger.error("Cannot inject LuaJCRewrite.install() into LuaJLuaMachine.<init>");
-						e.printStackTrace();
+						DebugLogger.error(IPatcher.MARKER, "Cannot inject LuaJCRewrite.install() into LuaJLuaMachine.<init>", e);
 					}
 				}
 
@@ -96,10 +96,9 @@ public class PatchComputer implements Opcodes {
 							}
 						}
 
-						DebugLogger.debug("Injected whitelisted globals into LuaJLuaMachine.<init>");
+						DebugLogger.debug(IPatcher.MARKER, "Injected whitelisted globals into LuaJLuaMachine.<init>");
 					} catch (Exception e) {
-						DebugLogger.error("Cannot inject whitelisted globals into LuaJLuaMachine.<init>");
-						e.printStackTrace();
+						DebugLogger.error(IPatcher.MARKER, "Cannot inject whitelisted globals into LuaJLuaMachine.<init>", e);
 					}
 				}
 			}
@@ -140,10 +139,9 @@ public class PatchComputer implements Opcodes {
 					InsnListSection found = ASMMatcher.findOnce(method.instructions, new InsnListSection(finding), true);
 					((LdcInsnNode) found.get(1)).cst = targetTimeout;
 
-					DebugLogger.debug("Inject timeout into ComputerThread.Run");
+					DebugLogger.debug(IPatcher.MARKER, "Inject timeout into ComputerThread.Run");
 				} catch (Exception e) {
-					DebugLogger.error("Cannot inject timeout into ComputerThread.Run");
-					e.printStackTrace();
+					DebugLogger.error(IPatcher.MARKER, "Cannot inject timeout into ComputerThread.Run", e);
 				}
 			}
 		}

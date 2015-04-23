@@ -1,6 +1,6 @@
 package org.squiddev.cctweaks.core.asm.patch.classes;
 
-import org.squiddev.cctweaks.core.asm.patch.Visitors;
+import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
 
 public class BaseClass_Patch extends BaseClass {
 	@Override
@@ -13,14 +13,14 @@ public class BaseClass_Patch extends BaseClass {
 		return new Internal().get() + "_Patch";
 	}
 
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private class Internal {
 		public String get() {
 			return null;
 		}
 	}
 
-	@Visitors.Rewrite
+	@MergeVisitor.Rewrite
 	public class PublicInternal {
 		public void get(String a) {
 		}

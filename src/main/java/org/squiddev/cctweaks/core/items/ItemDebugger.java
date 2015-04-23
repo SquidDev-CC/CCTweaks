@@ -26,7 +26,7 @@ public class ItemDebugger extends ItemComputerAction {
 			Object luaMachine = ComputerAccessor.computerMachine.get(computer);
 
 			if (!(luaMachine instanceof LuaJLuaMachine)) {
-				DebugLogger.debug("Computer is not instance of LuaJLuaMachine, cannot get globals");
+				DebugLogger.warn("Computer is not instance of LuaJLuaMachine, cannot get globals");
 				return false;
 			}
 
@@ -34,14 +34,13 @@ public class ItemDebugger extends ItemComputerAction {
 			globals.load(new DebugLib());
 
 		} catch (ReflectiveOperationException e) {
-			DebugLogger.debug("Could not add DebugLib: " + e.toString());
+			DebugLogger.warn("Could not add DebugLib", e);
 			return false;
 		} catch (NullPointerException e) {
-			DebugLogger.debug("Could not add DebugLib: " + e.toString());
+			DebugLogger.warn("Could not add DebugLib", e);
 			return false;
 		} catch (Exception e) {
-			DebugLogger.debug("Unknown error in injecting DebugLib");
-			e.printStackTrace();
+			DebugLogger.error("Unknown error in injecting DebugLib", e);
 			return false;
 		}
 

@@ -6,30 +6,40 @@ import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.BlockCable;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Facing;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.NetworkRegistry;
+import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.NetworkVisitor;
 import org.squiddev.cctweaks.api.network.Packet;
-import org.squiddev.cctweaks.core.asm.patch.Visitors;
+import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
 
 import java.util.*;
 
+import static org.squiddev.cctweaks.api.network.NetworkHelpers.canConnect;
+
 @SuppressWarnings("all")
-@Visitors.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
+@MergeVisitor.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
 public class TileCable_Patch extends TileCable implements INetworkNode {
-	@Visitors.Stub
+	public static final double MIN = 0.375;
+	public static final double MAX = 1 - MIN;
+
+	@MergeVisitor.Stub
+	private static IIcon[] s_cableIcons;
+	@MergeVisitor.Stub
 	private Map<Integer, Set<IReceiver>> m_receivers;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private Map<String, IPeripheral> m_peripheralsByName;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private Map<String, RemotePeripheralWrapper> m_peripheralWrappersByName;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private boolean m_peripheralsKnown;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private boolean m_destroyed;
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	private Queue<Packet> m_transmitQueue;
 
 	@Override
@@ -83,52 +93,31 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	public void networkChanged() {
 		if (!worldObj.isRemote) {
 			if (m_destroyed) {
-				for (int dir = 0; dir < 6; dir++) {
-					int x = xCoord + Facing.offsetsXForSide[dir];
-					int y = yCoord + Facing.offsetsYForSide[dir];
-					int z = zCoord + Facing.offsetsZForSide[dir];
-					if (y >= 0 && y < worldObj.getHeight() && BlockCable.isCable(worldObj, x, y, z)) {
-						TileEntity tile = worldObj.getTileEntity(x, y, z);
-						INetworkNode node;
-						if (tile != null && (node = NetworkRegistry.getNode(tile)) != null) {
-							node.networkChanged();
-						}
-					}
-				}
+				NetworkHelpers.fireNetworkInvalidateAdjacent(worldObj, xCoord, yCoord, zCoord);
 			} else {
-				new NetworkVisitor() {
-					@Visitors.Rewrite
-					boolean ANNOTATION;
-
-					public void visitNode(INetworkNode node, int distance) {
-						synchronized (node.lock()) {
-							node.invalidateNetwork();
-						}
-					}
-				}.visitNetwork(this);
+				NetworkHelpers.fireNetworkInvalidate(worldObj, xCoord, yCoord, zCoord);
 			}
 		}
 	}
 
 	@Override
-	public NetworkVisitor.SearchLoc[] getExtraNodes() {
+	public Iterable<NetworkVisitor.SearchLoc> getExtraNodes() {
 		return null;
 	}
 
-	private void dispatchPacket(final Packet packet) {
-		new NetworkVisitor() {
-			@Visitors.Rewrite
-			boolean ANNOTATION;
-
-			public void visitNode(INetworkNode node, int distance) {
-				node.receivePacket(packet, distance);
-			}
-		}.visitNetwork(this);
+	private void dispatchPacket(Packet packet) {
+		NetworkHelpers.sendPacket(worldObj, xCoord, yCoord, zCoord, packet);
 	}
 
 	@Override
-	public boolean canVisit() {
-		return !m_destroyed;
+	public boolean canBeVisited(ForgeDirection from) {
+		// Can't be visited by other nodes if it is destroyed or has no cable
+		return !m_destroyed && getPeripheralType() != PeripheralType.WiredModem;
+	}
+
+	@Override
+	public boolean canVisitTo(ForgeDirection to) {
+		return !m_destroyed && getPeripheralType() != PeripheralType.WiredModem;
 	}
 
 	@Override
@@ -141,7 +130,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 		return null;
 	}
 
-	@Visitors.Stub
+	@MergeVisitor.Stub
 	public IPeripheral getConnectedPeripheral() {
 		return null;
 	}
@@ -159,7 +148,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	}
 
 	@Override
-	public void invalidateNetwork() {
+	public void networkInvalidated() {
 		m_peripheralsKnown = false;
 	}
 
@@ -169,12 +158,18 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	}
 
 	private void findPeripherals() {
+		// TEs are not replaced on Multipart crashes
+		if (getBlock() == null) {
+			worldObj.removeTileEntity(xCoord, yCoord, zCoord);
+			return;
+		}
+
 		final TileCable_Patch origin = this;
 		synchronized (m_peripheralsByName) {
 			final Map<String, IPeripheral> newPeripheralsByName = new HashMap<String, IPeripheral>();
 			if (getPeripheralType() == PeripheralType.WiredModemWithCable) {
 				new NetworkVisitor() {
-					@Visitors.Rewrite
+					@MergeVisitor.Rewrite
 					boolean ANNOTATION;
 
 					public void visitNode(INetworkNode node, int distance) {
@@ -208,7 +203,58 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 		}
 	}
 
-	@Visitors.Stub
+	@Override
+	public AxisAlignedBB getCableBounds() {
+		int x = xCoord, y = yCoord, z = zCoord;
+		IBlockAccess world = worldObj;
+
+		return AxisAlignedBB.getBoundingBox(
+			canConnect(world, x, y, z, ForgeDirection.WEST) ? 0 : MIN,
+			canConnect(world, x, y, z, ForgeDirection.DOWN) ? 0 : MIN,
+			canConnect(world, x, y, z, ForgeDirection.NORTH) ? 0 : MIN,
+			canConnect(world, x, y, z, ForgeDirection.EAST) ? 1 : MAX,
+			canConnect(world, x, y, z, ForgeDirection.UP) ? 1 : MAX,
+			canConnect(world, x, y, z, ForgeDirection.SOUTH) ? 1 : MAX
+		);
+	}
+
+	@Override
+	public IIcon getTexture(int side) {
+		PeripheralType type = getPeripheralType();
+		if (BlockCable.renderAsModem) type = PeripheralType.WiredModem;
+
+		switch (type) {
+			case Cable:
+			case WiredModemWithCable:
+				int dir = -1;
+				if (type == PeripheralType.WiredModemWithCable) {
+					dir = getDirection();
+					dir -= dir % 2;
+				}
+
+				int x = xCoord, y = yCoord, z = zCoord;
+				IBlockAccess world = worldObj;
+
+				if (canConnect(world, x, y, z, ForgeDirection.EAST) || canConnect(world, x, y, z, ForgeDirection.WEST)) {
+					dir = dir == -1 || dir == 4 ? 4 : -2;
+				}
+				if (canConnect(world, x, y, z, ForgeDirection.UP) || canConnect(world, x, y, z, ForgeDirection.DOWN)) {
+					dir = dir == -1 || dir == 0 ? dir = 0 : -2;
+				}
+				if (canConnect(world, x, y, z, ForgeDirection.NORTH) || canConnect(world, x, y, z, ForgeDirection.SOUTH)) {
+					dir = dir == -1 || dir == 2 ? 2 : -2;
+				}
+
+				if (dir == -1) dir = 2;
+
+				if (dir >= 0 && (side == dir || side == Facing.oppositeSide[dir])) return s_cableIcons[1];
+				return s_cableIcons[0];
+		}
+
+		return super.getTexture(side);
+	}
+
+	@MergeVisitor.Stub
 	private static class RemotePeripheralWrapper {
 		public RemotePeripheralWrapper(IPeripheral peripheral, IComputerAccess computer, String name) {
 		}

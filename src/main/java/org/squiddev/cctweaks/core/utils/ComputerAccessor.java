@@ -4,6 +4,7 @@ import dan200.computercraft.core.computer.Computer;
 import dan200.computercraft.core.lua.LuaJLuaMachine;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ServerComputer;
+import dan200.computercraft.shared.peripheral.modem.TileCable;
 import dan200.computercraft.shared.turtle.blocks.TileTurtle;
 
 import java.lang.reflect.Field;
@@ -47,6 +48,13 @@ public final class ComputerAccessor {
 	 */
 	public static Field luaMachineGlobals;
 
+	/**
+	 * The peripheral ID of a wired modem
+	 *
+	 * @see TileCable#m_attachedPeripheralID
+	 */
+	public static Field cablePeripheralId;
+
 	static {
 		try {
 			tileCopy = TileComputerBase.class.getDeclaredMethod("transferStateFrom", TileComputerBase.class);
@@ -64,8 +72,10 @@ public final class ComputerAccessor {
 			luaMachineGlobals = LuaJLuaMachine.class.getDeclaredField("m_globals");
 			luaMachineGlobals.setAccessible(true);
 
+			cablePeripheralId = TileCable.class.getDeclaredField("m_attachedPeripheralID");
+			cablePeripheralId.setAccessible(true);
 		} catch (Exception e) {
-			DebugLogger.error("CCTweaks: ComputerCraft not found.");
+			DebugLogger.error("ComputerCraft not found", e);
 			e.printStackTrace();
 		}
 	}

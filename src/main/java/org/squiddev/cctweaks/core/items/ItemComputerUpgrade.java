@@ -44,7 +44,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		try {
 			ComputerAccessor.tileCopy.invoke(newComputer, computerTile);
 		} catch (Exception e) {
-			DebugLogger.warning("Cannot copy tile in ItemComputerUpgrade");
+			DebugLogger.warn("Cannot copy tile in ItemComputerUpgrade", e);
 			return false;
 		}
 
@@ -64,7 +64,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		try {
 			ComputerAccessor.turtleTileMoved.setBoolean(computerTile, true);
 		} catch (Exception e) {
-			DebugLogger.warning("Cannot set TurtleTile m_moved in ItemComputerUpgrade");
+			DebugLogger.warn("Cannot set TurtleTile m_moved in ItemComputerUpgrade", e);
 			return false;
 		}
 
