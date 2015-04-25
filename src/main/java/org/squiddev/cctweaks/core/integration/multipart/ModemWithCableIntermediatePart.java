@@ -146,7 +146,10 @@ public class ModemWithCableIntermediatePart extends CablePart implements IPeriph
 	@Override
 	public Map<String, IPeripheral> getConnectedPeripherals() {
 		Map<String, IPeripheral> peripherals = super.getConnectedPeripherals();
-		peripherals.putAll(modem.getConnectedPeripherals());
+
+		Map<String, IPeripheral> modemPerips = modem.getConnectedPeripherals();
+		if (modemPerips != null) peripherals.putAll(modemPerips);
+
 		return peripherals;
 	}
 
@@ -179,6 +182,4 @@ public class ModemWithCableIntermediatePart extends CablePart implements IPeriph
 	public void setDirection(int direction) {
 		modem.setDirection(direction);
 	}
-
-
 }

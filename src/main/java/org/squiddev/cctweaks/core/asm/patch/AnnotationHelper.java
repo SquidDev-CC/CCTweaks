@@ -107,8 +107,6 @@ public class AnnotationHelper {
 		Object value = annotation.get(key);
 		if (value == null) return null;
 
-		if (value instanceof List) return ((List<T>) value).get(0);
-
 		return (T) value;
 	}
 }

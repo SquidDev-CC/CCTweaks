@@ -97,7 +97,7 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 	 * @return Success at placing the cable
 	 */
 	@MergeVisitor.Stub
-	@MergeVisitor.Rename(from = "onItemUse")
+	@MergeVisitor.Rename(from = {"onItemUse", "func_77648_a"})
 	public boolean nativePlace(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
 		return false;
 	}

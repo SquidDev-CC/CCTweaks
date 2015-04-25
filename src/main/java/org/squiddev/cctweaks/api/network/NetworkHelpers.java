@@ -20,7 +20,7 @@ public class NetworkHelpers {
 	};
 
 	/**
-	 * Fire {@link INetworkNode#networkInvalidated()} on adjacent nodes
+	 * Fire {@link INetworkNode#networkInvalidated()} on current and adjacent nodes
 	 *
 	 * @param world The world the block lies in
 	 * @param x     The X position of the node
@@ -29,6 +29,8 @@ public class NetworkHelpers {
 	 */
 	public static void fireNetworkInvalidateAdjacent(IBlockAccess world, int x, int y, int z) {
 		Set<NetworkVisitor.SearchLoc> visited = new HashSet<NetworkVisitor.SearchLoc>();
+
+		invalidateVisitor.visitNetwork(world, x, y, z, visited);
 
 		for (int dir = 0; dir < 6; dir++) {
 			invalidateVisitor.visitNetwork(

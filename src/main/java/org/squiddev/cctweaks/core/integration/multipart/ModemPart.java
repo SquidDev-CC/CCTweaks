@@ -302,7 +302,6 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 
 	@Override
 	public IPeripheral getPeripheral(int side) {
-
 		if (side == direction) return modem.modem;
 		return null;
 	}

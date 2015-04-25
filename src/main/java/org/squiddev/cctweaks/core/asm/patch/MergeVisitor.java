@@ -99,10 +99,15 @@ public class MergeVisitor extends ClassVisitor {
 			// Visit fields
 			for (FieldNode field : node.fields) {
 				if (!hasAnnotation(field.invisibleAnnotations, STUB) && !field.name.equals(ANNOTATION)) {
-					String to = getAnnotationValue(getAnnotation(field.invisibleAnnotations, RENAME), "to");
-					if (to != null) field.name = to;
-
-					field.accept(this);
+					List<String> renameTo = getAnnotationValue(getAnnotation(field.invisibleAnnotations, RENAME), "to");
+					if (renameTo == null) {
+						field.accept(this);
+					} else {
+						for (String to : renameTo) {
+							field.name = to;
+							field.accept(this);
+						}
+					}
 				} else {
 					this.access.put(field.name, field.access);
 				}
@@ -110,18 +115,27 @@ public class MergeVisitor extends ClassVisitor {
 
 			// Prepare field renames
 			for (FieldNode field : node.fields) {
-				String from = getAnnotationValue(getAnnotation(field.invisibleAnnotations, RENAME), "from");
-				if (from != null) memberNames.put(from, field.name);
+				List<String> renameFrom = getAnnotationValue(getAnnotation(field.invisibleAnnotations, RENAME), "from");
+				if (renameFrom != null) {
+					for (String from : renameFrom) {
+						memberNames.put(from, field.name);
+					}
+				}
 			}
 
 			// Visit methods
 			for (MethodNode method : node.methods) {
 				if (!method.name.equals("<init>") && !method.name.equals("<cinit>")) {
 					if (!hasAnnotation(method.invisibleAnnotations, STUB)) {
-						String to = getAnnotationValue(getAnnotation(method.invisibleAnnotations, RENAME), "to");
-						if (to != null) method.name = to;
-
-						method.accept(this);
+						List<String> renameFrom = getAnnotationValue(getAnnotation(method.invisibleAnnotations, RENAME), "to");
+						if (renameFrom == null) {
+							method.accept(this);
+						} else {
+							for (String to : renameFrom) {
+								method.name = to;
+								method.accept(this);
+							}
+						}
 					} else {
 						this.access.put(method.name + "(" + context.mapMethodDesc(method.desc) + ")", method.access);
 					}
@@ -130,8 +144,12 @@ public class MergeVisitor extends ClassVisitor {
 
 			// Prepare method renames
 			for (MethodNode method : node.methods) {
-				String from = getAnnotationValue(getAnnotation(method.invisibleAnnotations, RENAME), "from");
-				if (from != null) memberNames.put(from + "(" + context.mapMethodDesc(method.desc) + ")", method.name);
+				List<String> renameTo = getAnnotationValue(getAnnotation(method.invisibleAnnotations, RENAME), "from");
+				if (renameTo != null) {
+					for (String from : renameTo) {
+						memberNames.put(from + "(" + context.mapMethodDesc(method.desc) + ")", method.name);
+					}
+				}
 			}
 
 			writingOverride = false;
@@ -177,13 +195,12 @@ public class MergeVisitor extends ClassVisitor {
 	/**
 	 * Adds to the rename context from the {@link MergeVisitor.Rename} annotation
 	 */
-	@SuppressWarnings("unchecked")
 	public void populateRename() {
 		Map<String, Object> annotation = getAnnotation(node, RENAME);
-		if (annotation != null) {
-			List<String> from = (List<String>) annotation.get("from");
-			List<String> to = (List<String>) annotation.get("to");
+		List<String> from = getAnnotationValue(annotation, "from");
+		List<String> to = getAnnotationValue(annotation, "to");
 
+		if (from != null && to != null && from.size() == to.size()) {
 			for (int i = 0; i < from.size(); i++) {
 				context.renames.put(from.get(i), to.get(i));
 			}
