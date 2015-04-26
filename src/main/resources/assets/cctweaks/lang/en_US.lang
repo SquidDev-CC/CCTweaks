@@ -1,7 +1,10 @@
 item.cctweaks.computerUpgrade.name=Computer Upgrade
 item.cctweaks.debugger.name=Debug Wand
+item.cctweaks.networkBinder.name=Network Binder
 
-cctweaks.tooltip.items.computerUpgrade.normal=Normal to Advanced
+tile.cctweaks.wirelessBridge.name=Wireless bridge
+
+gui.tooltip.cctweaks.computerUpgrade.normal=Normal to Advanced
 
 config.cctweaks.turtle=Turtle
 config.cctweaks.computer=Computer

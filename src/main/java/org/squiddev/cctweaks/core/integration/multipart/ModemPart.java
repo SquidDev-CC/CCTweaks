@@ -28,9 +28,9 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
-import org.squiddev.cctweaks.api.network.NetworkVisitor;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.SinglePeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
@@ -277,7 +277,7 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 	}
 
 	@Override
-	public Iterable<NetworkVisitor.SearchLoc> getExtraNodes() {
+	public Iterable<IWorldPosition> getExtraNodes() {
 		return null;
 	}
 

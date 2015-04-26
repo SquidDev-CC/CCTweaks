@@ -9,6 +9,7 @@ import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
+import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.NetworkVisitor;
@@ -292,7 +293,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	}
 
 	@Override
-	public Iterable<NetworkVisitor.SearchLoc> getExtraNodes() {
+	public Iterable<IWorldPosition> getExtraNodes() {
 		return null;
 	}
 

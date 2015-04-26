@@ -4,6 +4,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
+import org.squiddev.cctweaks.api.IWorldPosition;
 
 import java.util.Map;
 
@@ -68,7 +69,7 @@ public interface INetworkNode {
 	 *
 	 * @return Array of custom search locations, or {@code null} if none provided
 	 */
-	Iterable<NetworkVisitor.SearchLoc> getExtraNodes();
+	Iterable<IWorldPosition> getExtraNodes();
 
 	/**
 	 * Object to synchronise on whilst calling {@link #networkInvalidated}
