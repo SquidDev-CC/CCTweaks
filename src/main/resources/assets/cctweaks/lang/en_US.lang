@@ -6,6 +6,10 @@ tile.cctweaks.wirelessBridge.name=Wireless bridge
 
 gui.tooltip.cctweaks.computerUpgrade.normal=Normal to Advanced
 
+chat.cctweaks.data.messages.Loaded=Settings loaded
+chat.cctweaks.data.messages.Stored=Settings stored
+chat.cctweaks.data.messages.Cleared=Settings cleared
+
 config.cctweaks.turtle=Turtle
 config.cctweaks.computer=Computer
 config.cctweaks.misc=Misc

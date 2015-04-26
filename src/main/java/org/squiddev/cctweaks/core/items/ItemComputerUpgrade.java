@@ -1,16 +1,26 @@
 package org.squiddev.cctweaks.core.items;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
+import dan200.computercraft.shared.computer.items.ComputerItemFactory;
+import dan200.computercraft.shared.pocket.items.PocketComputerItemFactory;
 import dan200.computercraft.shared.turtle.blocks.TileTurtle;
+import dan200.computercraft.shared.turtle.items.TurtleItemFactory;
+import dan200.computercraft.shared.util.ImpostorShapelessRecipe;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.RecipeSorter;
+import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.core.registry.ComputerUpgradeCrafting;
 import org.squiddev.cctweaks.core.utils.BlockNotifyFlags;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -88,9 +98,59 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 	}
 
 	@Override
+	public void registerItem() {
+		super.registerItem();
+
+		RecipeSorter.register(CCTweaks.RESOURCE_DOMAIN + ":computer_upgrade_crafting", ComputerUpgradeCrafting.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+
+		ItemStack stack = new ItemStack(this);
+		GameRegistry.addRecipe(stack, "GGG", "GSG", "GSG", 'G', Items.gold_ingot, 'S', Blocks.stone);
+		GameRegistry.addRecipe(new ComputerUpgradeCrafting());
+
+		// Add some impostor recipes for NEI. We just use CC's default ones
+		{
+			// Computer
+			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
+				ComputerItemFactory.create(-1, null, ComputerFamily.Advanced),
+				new Object[]{
+					ComputerItemFactory.create(-1, null, ComputerFamily.Normal),
+					stack
+				}
+			));
+
+			// Turtle (Is is silly to include every possible upgrade so we just do the normal one)
+			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
+				TurtleItemFactory.create(-1, null, null, ComputerFamily.Advanced, null, null, 0),
+				new Object[]{
+					TurtleItemFactory.create(-1, null, null, ComputerFamily.Normal, null, null, 0),
+					stack
+				}
+			));
+
+			// Non-wireless pocket computer
+			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
+				PocketComputerItemFactory.create(-1, null, ComputerFamily.Advanced, false),
+				new Object[]{
+					PocketComputerItemFactory.create(-1, null, ComputerFamily.Normal, false),
+					stack
+				}
+			));
+
+			// Wireless pocket computer
+			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
+				PocketComputerItemFactory.create(-1, null, ComputerFamily.Advanced, true),
+				new Object[]{
+					PocketComputerItemFactory.create(-1, null, ComputerFamily.Normal, true),
+					stack
+				}
+			));
+		}
+	}
+
+	@Override
 	@SideOnly(Side.CLIENT)
 	@SuppressWarnings("unchecked")
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
-		list.add(StatCollector.translateToLocal("cctweaks.tooltip.items.computerUpgrade.normal"));
+		list.add(StatCollector.translateToLocal("gui.tooltip.cctweaks.computerUpgrade.normal"));
 	}
 }
