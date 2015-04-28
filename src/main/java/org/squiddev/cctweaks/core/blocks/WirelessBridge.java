@@ -1,7 +1,11 @@
 package org.squiddev.cctweaks.core.blocks;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import dan200.computercraft.shared.peripheral.PeripheralType;
+import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -29,5 +33,20 @@ public class WirelessBridge extends BlockBase<WirelessBridgeTile> implements ITi
 		}
 
 		return false;
+	}
+
+	@Override
+	public void registerBlock() {
+		super.registerBlock();
+
+		GameRegistry.addRecipe(new ItemStack(this),
+			"GCG",
+			"CMC",
+			"GCG",
+
+			'G', Items.gold_ingot,
+			'C', PeripheralItemFactory.create(PeripheralType.Cable, null, 1),
+			'M', PeripheralItemFactory.create(PeripheralType.WirelessModem, null, 1)
+		);
 	}
 }
