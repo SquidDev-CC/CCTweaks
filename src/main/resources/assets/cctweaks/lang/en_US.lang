@@ -5,6 +5,8 @@ item.cctweaks.networkBinder.name=Network Binder
 tile.cctweaks.wirelessBridge.name=Wireless bridge
 
 gui.tooltip.cctweaks.computerUpgrade.normal=Normal to Advanced
+gui.tooltip.cctweaks.data.empty=Empty
+gui.tooltip.cctweaks.data.networkBinder=Network bridge
 
 chat.cctweaks.data.messages.Loaded=Settings loaded
 chat.cctweaks.data.messages.Stored=Settings stored

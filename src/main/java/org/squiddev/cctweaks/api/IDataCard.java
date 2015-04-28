@@ -11,24 +11,33 @@ import net.minecraft.util.IChatComponent;
  */
 public interface IDataCard {
 	/**
+	 * Variable to return if no data is stored
+	 */
+	String EMPTY = "cctweaks.data.empty";
+	/**
 	 * Set the current data for this stack
 	 *
 	 * @param stack The stack to set the data for
-	 * @param type  The type of data this card stores. This should be a localised string
-	 * @param data  The data that this card stores
+	 * @param type  The type of data this card stores. {@see #getType}
+	 * @param data  The data that this card stores {@see #getData}
 	 */
 	void setSettings(ItemStack stack, String type, NBTTagCompound data);
 
 	/**
-	 * Get the type this card stores
+	 * Get the type this card stores.
+	 *
+	 * This will be translated using gui.tooltip.${name} and then ${name}.
 	 *
 	 * @param stack The stack to read the data from
-	 * @return The type this card contains
+	 * @return The type this card contains or {@link #EMPTY} if nothing is stored
 	 */
 	String getType(ItemStack stack);
 
 	/**
 	 * Get the data this card stores
+	 *
+	 * A string called "tooltip" will be displayed
+	 * A string called "details" will be displayed if F3+H is on
 	 *
 	 * @param stack The stack to read the data from
 	 * @return The data that is stored on this card
