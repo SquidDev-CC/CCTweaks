@@ -1,10 +1,12 @@
 package org.squiddev.cctweaks.core.blocks;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
 
 /**
@@ -38,6 +40,14 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer {
 		}
 
 		return null;
+	}
+
+	@Override
+	public void breakBlock(World world, int x, int y, int z, Block block, int damage) {
+		T tile = getTile(world, x, y, z);
+		if (tile != null) tile.onRemove();
+
+		super.breakBlock(world, x, y, z, block, damage);
 	}
 
 	public void registerBlock() {
