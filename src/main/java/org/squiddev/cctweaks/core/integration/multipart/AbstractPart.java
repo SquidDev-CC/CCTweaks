@@ -8,6 +8,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.IBlockAccess;
+import org.squiddev.cctweaks.api.IWorldPosition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.List;
 /**
  * Base class for multiparts
  */
-public abstract class AbstractPart extends TMultiPart implements JNormalOcclusion, JIconHitEffects {
+public abstract class AbstractPart extends TMultiPart implements JNormalOcclusion, JIconHitEffects, IWorldPosition {
 	@Override
 	public boolean occlusionTest(TMultiPart npart) {
 		return NormalOcclusionTest.apply(this, npart);
@@ -51,5 +53,29 @@ public abstract class AbstractPart extends TMultiPart implements JNormalOcclusio
 		}
 
 		return boxes;
+	}
+
+	@Override
+	public IBlockAccess getWorld() {
+		TileMultipart tile = tile();
+		return tile == null ? null : tile.getWorldObj();
+	}
+
+	@Override
+	public int getX() {
+		TileMultipart tile = tile();
+		return tile == null ? 0 : tile.xCoord;
+	}
+
+	@Override
+	public int getY() {
+		TileMultipart tile = tile();
+		return tile == null ? 0 : tile.yCoord;
+	}
+
+	@Override
+	public int getZ() {
+		TileMultipart tile = tile();
+		return tile == null ? 0 : tile.zCoord;
 	}
 }
