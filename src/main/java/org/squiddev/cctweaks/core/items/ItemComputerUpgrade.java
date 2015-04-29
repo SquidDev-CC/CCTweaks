@@ -98,9 +98,15 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 	}
 
 	@Override
-	public void registerItem() {
-		super.registerItem();
+	@SideOnly(Side.CLIENT)
+	@SuppressWarnings("unchecked")
+	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
+		list.add(StatCollector.translateToLocal("gui.tooltip.cctweaks.computerUpgrade.normal"));
+	}
 
+	@Override
+	public void init() {
+		super.init();
 		RecipeSorter.register(CCTweaks.RESOURCE_DOMAIN + ":computer_upgrade_crafting", ComputerUpgradeCrafting.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 
 		ItemStack stack = new ItemStack(this);
@@ -145,12 +151,5 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 				}
 			));
 		}
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	@SuppressWarnings("unchecked")
-	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
-		list.add(StatCollector.translateToLocal("gui.tooltip.cctweaks.computerUpgrade.normal"));
 	}
 }

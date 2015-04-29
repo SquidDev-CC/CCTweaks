@@ -36,8 +36,8 @@ public class WirelessBridge extends BlockBase<WirelessBridgeTile> implements ITi
 	}
 
 	@Override
-	public void registerBlock() {
-		super.registerBlock();
+	public void init() {
+		super.init();
 
 		GameRegistry.addRecipe(new ItemStack(this),
 			"GCG",

@@ -8,11 +8,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.core.registry.IRegisterable;
 
 /**
  * Base class for all blocks
  */
-public abstract class BlockBase<T extends TileBase> extends BlockContainer {
+public abstract class BlockBase<T extends TileBase> extends BlockContainer implements IRegisterable{
 	protected final String name;
 	protected final Class<T> klass;
 
@@ -50,8 +51,13 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer {
 		super.breakBlock(world, x, y, z, block, damage);
 	}
 
-	public void registerBlock() {
+	@Override
+	public void preInit() {
 		GameRegistry.registerBlock(this, name);
 		GameRegistry.registerTileEntity(klass, name);
+	}
+
+	@Override
+	public void init() {
 	}
 }

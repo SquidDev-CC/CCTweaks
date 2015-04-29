@@ -113,7 +113,9 @@ public class NetworkRegistry {
 	}
 
 	/**
-	 * Add a node provider to the registry
+	 * Add a node provider to the registry.
+	 *
+	 * Ideally this should be done in the init stages of a mod, though it doesn't matter too much.
 	 *
 	 * @param provider The provider to add
 	 */

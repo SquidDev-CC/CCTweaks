@@ -82,9 +82,8 @@ public class ItemNetworkBinder extends ItemBase implements IDataCard {
 	}
 
 	@Override
-	public void registerItem() {
-		super.registerItem();
-		
+	public void init() {
+		super.init();
 		GameRegistry.addRecipe(new ItemStack(this),
 			"SSS",
 			"GRR",
