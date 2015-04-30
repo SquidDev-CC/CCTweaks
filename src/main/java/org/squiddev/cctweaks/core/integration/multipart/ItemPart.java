@@ -5,12 +5,11 @@ import codechicken.lib.vec.Rotation;
 import codechicken.lib.vec.Vector3;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Facing;
@@ -43,21 +42,13 @@ public class ItemPart extends ItemBase {
 
 	@SideOnly(Side.CLIENT)
 	public IIcon getIconFromDamage(int damage) {
-		Block block = getBlock(damage);
-		return block == null ? null : block.getIcon(0, damage);
+		return getIcon(damage, 0);
 	}
 
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
 		BlockBase block = getBlock(stack.getItemDamage());
 		return block == null ? super.getItemStackDisplayName(stack) : block.getLocalizedName();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void getSubItems(Item item, CreativeTabs tab, List itemStacks) {
-		// Wireless bridge
-		itemStacks.add(new ItemStack(this, 1, 0));
 	}
 
 	public static BlockBase getBlock(int damage) {
@@ -78,9 +69,30 @@ public class ItemPart extends ItemBase {
 		}
 	}
 
+	public static IIcon getIcon(int damage, int side) {
+		switch (damage) {
+			case 0:
+				return WirelessBridgePart.getRenderer().getBlockIconFromSide(Registry.blockWirelessBridge, side);
+			default:
+				return null;
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void getSubItems(Item item, CreativeTabs tab, List itemStacks) {
+		// Wireless bridge
+		itemStacks.add(new ItemStack(this, 1, 0));
+	}
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IIconRegister register) {
+	}
+
+	@Override
+	public int getSpriteNumber() {
+		return 0;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -99,45 +111,54 @@ public class ItemPart extends ItemBase {
 
 		@Override
 		public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
-			BlockBase block = getBlock(item.getItemDamage());
+			int damage = item.getItemDamage();
+			BlockBase block = getBlock(damage);
 			if (block == null) return;
 
 			GL11.glPushMatrix();
 
-			// renderer.setRenderBounds(0.125, 0.125, 0.0, 0.875, 0.875, 0.1875);
-			renderer.renderBlockAsItem(Blocks.dirt, 0, 0);
-			/*Tessellator tessellator = Tessellator.instance;
+			// Reverse previous translate
+			GL11.glTranslatef(0.5f, 0.5f, 0.5f);
 
-			IIcon icon = Registry.blockWirelessBridge.getIcon(0, 0);
+			// Scale so it fills the entire screen
+			GL11.glScalef(1.333f, 1.333f, 1.333f);
+
+			// Translate back again
+			GL11.glTranslatef(-0.5f, -0.5f, -0.09375f);
+
+			renderer.setRenderBounds(0.125, 0.125, 0.0, 0.875, 0.875, 0.1875);
+
+			Tessellator tessellator = Tessellator.instance;
+
 			tessellator.startDrawingQuads();
-			tessellator.setNormal(0.0F, -1.0F, 0.0F);
-			renderer.renderFaceYNeg(block, 0.0D, 0.0D, 0.0D, icon);
+			tessellator.setNormal(0.0f, -1.0f, 0.0f);
+			renderer.renderFaceYNeg(block, 0.0, 0.0, 0.0, getIcon(damage, 0));
 			tessellator.draw();
 
 			tessellator.startDrawingQuads();
-			tessellator.setNormal(0.0F, 1.0F, 0.0F);
-			renderer.renderFaceYPos(block, 0.0D, 0.0D, 0.0D, icon);
+			tessellator.setNormal(0.0f, 1.0f, 0.0f);
+			renderer.renderFaceYPos(block, 0.0, 0.0, 0.0, getIcon(damage, 1));
 			tessellator.draw();
 
 			tessellator.startDrawingQuads();
-			tessellator.setNormal(0.0F, 0.0F, -1.0F);
-			renderer.renderFaceZNeg(block, 0.0D, 0.0D, 0.0D, icon);
+			tessellator.setNormal(0.0f, 0.0f, -1.0f);
+			renderer.renderFaceZNeg(block, 0.0, 0.0, 0.0, getIcon(damage, 2));
 			tessellator.draw();
 
 			tessellator.startDrawingQuads();
-			tessellator.setNormal(0.0F, 0.0F, 1.0F);
-			renderer.renderFaceZPos(block, 0.0D, 0.0D, 0.0D, icon);
+			tessellator.setNormal(0.0f, 0.0f, 1.0f);
+			renderer.renderFaceZPos(block, 0.0, 0.0, 0.0, getIcon(damage, 3));
 			tessellator.draw();
 
 			tessellator.startDrawingQuads();
-			tessellator.setNormal(-1.0F, 0.0F, 0.0F);
-			renderer.renderFaceXNeg(block, 0.0D, 0.0D, 0.0D, icon);
+			tessellator.setNormal(-1.0f, 0.0f, 0.0f);
+			renderer.renderFaceXNeg(block, 0.0, 0.0, 0.0, getIcon(damage, 4));
 			tessellator.draw();
 
 			tessellator.startDrawingQuads();
-			tessellator.setNormal(1.0F, 0.0F, 0.0F);
-			renderer.renderFaceXPos(block, 0.0D, 0.0D, 0.0D, icon);
-			tessellator.draw();*/
+			tessellator.setNormal(1.0f, 0.0f, 0.0f);
+			renderer.renderFaceXPos(block, 0.0, 0.0, 0.0, getIcon(damage, 5));
+			tessellator.draw();
 
 			GL11.glPopMatrix();
 		}

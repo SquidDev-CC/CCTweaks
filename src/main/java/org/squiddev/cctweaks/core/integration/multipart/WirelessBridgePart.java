@@ -16,6 +16,7 @@ import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.core.blocks.WirelessBridge;
 import org.squiddev.cctweaks.core.network.NetworkBinding;
 import org.squiddev.cctweaks.core.registry.Registry;
 
@@ -31,7 +32,7 @@ public class WirelessBridgePart extends SidedNetworkPart {
 	protected final NetworkBinding binding = new NetworkBinding(this);
 
 	public WirelessBridgePart(int direction) {
-		this.direction = (byte)direction;
+		this.direction = (byte) direction;
 	}
 
 	public String getType() {
@@ -89,25 +90,25 @@ public class WirelessBridgePart extends SidedNetworkPart {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean renderStatic(Vector3 pos, int pass) {
-		if (pass == 0 || pass == -1) {
+		if (pass == 0) {
 			TextureUtils.bindAtlas(0);
 
-			BridgeRenderer render = renderBlocks;
-			if (render == null) render = renderBlocks = new BridgeRenderer();
-
+			BridgeRenderer render = getRenderer();
 			Cuboid6 bounds = getBounds();
 			render.setRenderBounds(bounds.min.x, bounds.min.y, bounds.min.z, bounds.max.x, bounds.max.y, bounds.max.z);
-
-			if (pass == 0) {
-				render.setWorld(world());
-				render.renderStandardBlock(Registry.blockWirelessBridge, x(), y(), z());
-			} else {
-				render.renderBlockAsItem(Registry.blockWirelessBridge, 0, 1);
-			}
+			render.setWorld(world());
+			render.renderStandardBlock(Registry.blockWirelessBridge, x(), y(), z());
 			return true;
 		}
 
 		return false;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static BridgeRenderer getRenderer() {
+		BridgeRenderer render = renderBlocks;
+		if (render == null) render = renderBlocks = new BridgeRenderer();
+		return render;
 	}
 
 	@Override
@@ -119,7 +120,12 @@ public class WirelessBridgePart extends SidedNetworkPart {
 	public static class BridgeRenderer extends FixedRenderBlocks {
 		@Override
 		public IIcon getBlockIcon(Block block, IBlockAccess world, int x, int y, int z, int side) {
-			return Registry.blockWirelessBridge.getIcon(0, 0);
+			return getBlockIconFromSide(block, side);
+		}
+
+		@Override
+		public IIcon getBlockIconFromSide(Block block, int side) {
+			return getIconSafe(WirelessBridge.smallIcon);
 		}
 
 		@Override
