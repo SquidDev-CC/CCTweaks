@@ -57,8 +57,7 @@ public abstract class AbstractPart extends TMultiPart implements JNormalOcclusio
 
 	@Override
 	public IBlockAccess getWorld() {
-		TileMultipart tile = tile();
-		return tile == null ? null : tile.getWorldObj();
+		return world();
 	}
 
 	@Override

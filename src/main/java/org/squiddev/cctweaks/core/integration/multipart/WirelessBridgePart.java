@@ -45,14 +45,14 @@ public class WirelessBridgePart extends SidedNetworkPart {
 	}
 
 	@Override
-	public void onRemoved() {
-		super.onRemoved();
+	public void onWorldSeparate() {
+		super.onWorldSeparate();
 		binding.remove();
 	}
 
 	@Override
-	public void onAdded() {
-		super.onAdded();
+	public void onWorldJoin() {
+		super.onWorldJoin();
 		binding.add();
 	}
 

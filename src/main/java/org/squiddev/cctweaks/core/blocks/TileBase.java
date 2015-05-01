@@ -5,7 +5,7 @@ import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
 /**
- * org.squiddev.cctweaks.core.blocks (CC-Tweaks
+ * Base tile for all TileEntities
  */
 public abstract class TileBase extends TileEntity implements IWorldPosition {
 	@Override
