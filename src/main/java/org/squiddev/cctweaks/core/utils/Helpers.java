@@ -1,5 +1,7 @@
 package org.squiddev.cctweaks.core.utils;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 
 /**
@@ -30,5 +32,10 @@ public class Helpers {
 		}
 
 		return def;
+	}
+
+	public static void twoWayCrafting(ItemStack a, ItemStack b) {
+		GameRegistry.addShapelessRecipe(a, b);
+		GameRegistry.addShapelessRecipe(b, a);
 	}
 }

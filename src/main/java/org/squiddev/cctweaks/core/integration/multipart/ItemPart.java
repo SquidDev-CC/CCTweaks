@@ -36,8 +36,13 @@ public class ItemPart extends ItemBase {
 		BlockCoord pos = new BlockCoord(x, y, z);
 		double hitDepth = new Vector3(hitX, hitY, hitZ).scalarProject(Rotation.axes[side]) + (side % 2 ^ 1);
 
-		return (hitDepth < 1 && MultipartHelpers.place(world, pos, getPart(stack.getItemDamage(), side)))
-			|| MultipartHelpers.place(world, pos.offset(side), getPart(stack.getItemDamage(), Facing.oppositeSide[side]));
+		if (hitDepth < 1 && MultipartHelpers.place(world, pos, getPart(stack.getItemDamage(), side))
+			|| MultipartHelpers.place(world, pos.offset(side), getPart(stack.getItemDamage(), Facing.oppositeSide[side]))) {
+			if (!player.capabilities.isCreativeMode) stack.stackSize--;
+			return true;
+		}
+
+		return false;
 	}
 
 	@SideOnly(Side.CLIENT)

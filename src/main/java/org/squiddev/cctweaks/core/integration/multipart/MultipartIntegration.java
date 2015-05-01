@@ -8,6 +8,7 @@ import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.peripheral.IPeripheralProvider;
 import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
@@ -15,6 +16,8 @@ import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
 import org.squiddev.cctweaks.api.network.NetworkRegistry;
 import org.squiddev.cctweaks.core.integration.IntegrationRegistry;
+import org.squiddev.cctweaks.core.registry.Registry;
+import org.squiddev.cctweaks.core.utils.Helpers;
 
 /**
  * Adds various multipart support constructs
@@ -38,6 +41,8 @@ public class MultipartIntegration extends IntegrationRegistry.ModIntegrationModu
 	@Override
 	public void init() {
 		itemPart.init();
+
+		Helpers.twoWayCrafting(new ItemStack(Registry.blockWirelessBridge), new ItemStack(itemPart));
 
 		NetworkRegistry.addNodeProvider(new INetworkNodeProvider() {
 			@Override
