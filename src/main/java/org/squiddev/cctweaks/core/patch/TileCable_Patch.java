@@ -11,6 +11,7 @@ import net.minecraft.util.Facing;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
+import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.NetworkVisitor;
@@ -101,7 +102,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode {
 	}
 
 	@Override
-	public Iterable<NetworkVisitor.SearchLoc> getExtraNodes() {
+	public Iterable<IWorldPosition> getExtraNodes() {
 		return null;
 	}
 

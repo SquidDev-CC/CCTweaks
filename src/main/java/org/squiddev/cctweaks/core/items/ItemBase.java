@@ -1,20 +1,21 @@
 package org.squiddev.cctweaks.core.items;
 
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.core.registry.IRegisterable;
 
-public abstract class ItemBase extends Item {
-
-	private final String name;
+public abstract class ItemBase extends Item implements IRegisterable {
+	protected final String name;
 
 	public ItemBase(String itemName, int stackSize) {
 		name = itemName;
 
-		setUnlocalizedName(CCTweaks.RESOURCE_DOMAIN + "." + name);
+		setUnlocalizedName(CCTweaks.RESOURCE_DOMAIN + "." + itemName);
+		setTextureName(CCTweaks.RESOURCE_DOMAIN + ":" + itemName);
+
 		setCreativeTab(CCTweaks.getCreativeTab());
 		setMaxStackSize(stackSize);
 	}
@@ -23,13 +24,18 @@ public abstract class ItemBase extends Item {
 		this(itemName, 64);
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerIcons(IIconRegister registry) {
-		itemIcon = registry.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":" + name);
+	public NBTTagCompound getTag(ItemStack stack) {
+		NBTTagCompound tag = stack.getTagCompound();
+		if (tag == null) stack.setTagCompound(tag = new NBTTagCompound());
+		return tag;
 	}
 
-	public void registerItem() {
-		GameRegistry.registerItem(this, getUnlocalizedName());
+	@Override
+	public void preInit() {
+		GameRegistry.registerItem(this, name);
+	}
+
+	@Override
+	public void init() {
 	}
 }

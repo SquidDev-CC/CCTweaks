@@ -2,11 +2,9 @@ package org.squiddev.cctweaks.core.integration.multipart;
 
 import codechicken.lib.data.MCDataInput;
 import codechicken.lib.data.MCDataOutput;
-import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
-import codechicken.multipart.TSlottedPart;
 import com.google.common.base.Objects;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -28,9 +26,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
-import org.squiddev.cctweaks.api.network.NetworkVisitor;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.SinglePeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
@@ -38,15 +34,13 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.Map;
 
-public class ModemPart extends AbstractPart implements INetworkNode, IPeripheralTile, TSlottedPart {
+public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 	private static IIcon[] icons;
 
 	public static final String NAME = CCTweaks.NAME + ":networkModem";
 
-	protected byte direction = 0;
 	protected WiredModem modem = new WiredModem();
 
 	public ModemPart() {
@@ -82,63 +76,6 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 	@Override
 	public String getType() {
 		return NAME;
-	}
-
-	@Override
-	public int getSlotMask() {
-		return 1 << direction;
-	}
-
-	@Override
-	public Iterable<Cuboid6> getOcclusionBoxes() {
-		Cuboid6 box;
-		switch (direction) {
-			case 0:
-			default:
-				box = new Cuboid6(0.125D, 0.0D, 0.125D, 0.875D, 0.125D, 0.875D);
-				break;
-			case 1:
-				box = new Cuboid6(0.125D, 0.875D, 0.125D, 0.875D, 1.0D, 0.875D);
-				break;
-			case 2:
-				box = new Cuboid6(0.125D, 0.125D, 0.0D, 0.875D, 0.875D, 0.125D);
-				break;
-			case 3:
-				box = new Cuboid6(0.125D, 0.125D, 0.875D, 0.875D, 0.875D, 1.0D);
-				break;
-			case 4:
-				box = new Cuboid6(0.0D, 0.125D, 0.125D, 0.125D, 0.875D, 0.875D);
-				break;
-			case 5:
-				box = new Cuboid6(0.875D, 0.125D, 0.125D, 1.0D, 0.875D, 0.875D);
-				break;
-		}
-
-		return Collections.singletonList(box);
-	}
-
-	@Override
-	public Iterable<IndexedCuboid6> getSubParts() {
-		return Collections.singletonList(new IndexedCuboid6(direction, getBounds()));
-	}
-
-	@Override
-	public Cuboid6 getBounds() {
-		switch (direction) {
-			case 0:
-			default:
-				return new Cuboid6(0.125D, 0.0D, 0.125D, 0.875D, 0.1875D, 0.875D);
-			case 1:
-				return new Cuboid6(0.125D, 0.8125D, 0.125D, 0.875D, 1.0D, 0.875D);
-			case 2:
-				return new Cuboid6(0.125D, 0.125D, 0.0D, 0.875D, 0.875D, 0.1875D);
-			case 3:
-				return new Cuboid6(0.125D, 0.125D, 0.8125D, 0.875D, 0.875D, 1.0D);
-			case 4:
-				return new Cuboid6(0.0D, 0.125D, 0.125D, 0.1875D, 0.875D, 0.875D);
-			case 5:
-				return new Cuboid6(0.8125D, 0.125D, 0.125D, 1.0D, 0.875D, 0.875D);
-		}
 	}
 
 	@Override
@@ -274,11 +211,6 @@ public class ModemPart extends AbstractPart implements INetworkNode, IPeripheral
 	@Override
 	public void networkInvalidated() {
 		modem.networkInvalidated();
-	}
-
-	@Override
-	public Iterable<NetworkVisitor.SearchLoc> getExtraNodes() {
-		return null;
 	}
 
 	@Override

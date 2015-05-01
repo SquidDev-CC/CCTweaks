@@ -7,13 +7,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.api.turtle.TurtleFuelRegistry;
-import org.squiddev.cctweaks.core.reference.Config;
+import org.squiddev.cctweaks.core.Config;
 
 /**
  * Holds a list of items
  */
-public class RefuelRegistry {
-	public static void init() {
+public class RefuelRegisters implements IRegisterable{
+	@Override
+	public void preInit() {
+	}
+
+	public void init() {
 		// Furnace handler
 		TurtleFuelRegistry.addFuelProvider(new ITurtleFuelProvider() {
 			@Override
@@ -67,6 +71,5 @@ public class RefuelRegistry {
 				return progress / fluxAmount;
 			}
 		});
-
 	}
 }

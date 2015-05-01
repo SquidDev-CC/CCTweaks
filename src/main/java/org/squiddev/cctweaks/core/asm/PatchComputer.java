@@ -4,10 +4,10 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
+import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.asm.chickenlib.ASMMatcher;
 import org.squiddev.cctweaks.core.asm.chickenlib.InsnListSection;
 import org.squiddev.cctweaks.core.asm.patch.IPatcher;
-import org.squiddev.cctweaks.core.reference.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.List;

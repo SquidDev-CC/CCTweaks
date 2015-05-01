@@ -27,9 +27,9 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
-import org.squiddev.cctweaks.api.network.NetworkVisitor;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
@@ -372,14 +372,14 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 	}
 
 	@Override
-	public Iterable<NetworkVisitor.SearchLoc> getExtraNodes() {
-		Set<NetworkVisitor.SearchLoc> nodes = new HashSet<NetworkVisitor.SearchLoc>();
+	public Iterable<IWorldPosition> getExtraNodes() {
+		Set<IWorldPosition> nodes = new HashSet<IWorldPosition>();
 
 		for (TMultiPart part : tile().jPartList()) {
 			if (part instanceof INetworkNode && part != this) {
-				Iterable<NetworkVisitor.SearchLoc> extras = ((INetworkNode) part).getExtraNodes();
+				Iterable<IWorldPosition> extras = ((INetworkNode) part).getExtraNodes();
 				if (extras != null) {
-					for (NetworkVisitor.SearchLoc extra : extras) {
+					for (IWorldPosition extra : extras) {
 						nodes.add(extra);
 					}
 				}

@@ -16,12 +16,14 @@ public class RegisterBlockPart implements MultiPartRegistry.IPartFactory, MultiP
 		if (name.equals(CablePart.NAME)) return new CablePart();
 		if (name.equals(ModemPart.NAME)) return new ModemPart();
 		if (name.equals(ModemWithCableIntermediatePart.NAME)) return new ModemWithCableIntermediatePart();
+		if (name.equals(WirelessBridgePart.NAME)) return new WirelessBridgePart(0);
+
 		return null;
 	}
 
 	public void init() {
 		MultiPartRegistry.registerConverter(this);
-		MultiPartRegistry.registerParts(this, new String[]{CablePart.NAME, ModemPart.NAME, ModemWithCableIntermediatePart.NAME});
+		MultiPartRegistry.registerParts(this, new String[]{CablePart.NAME, ModemPart.NAME, ModemWithCableIntermediatePart.NAME, WirelessBridgePart.NAME});
 	}
 
 	public Iterable<Block> blockTypes() {

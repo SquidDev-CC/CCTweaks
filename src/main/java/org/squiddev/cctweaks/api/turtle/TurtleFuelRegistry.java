@@ -14,7 +14,9 @@ public class TurtleFuelRegistry {
 	public static final List<ITurtleFuelProvider> refuelList = Collections.unmodifiableList(internalRefuelList);
 
 	/**
-	 * Add a fuel provider
+	 * Add a fuel provider.
+	 *
+	 * Ideally this should be done in the init stages of a mod, though it doesn't matter too much.
 	 *
 	 * @param provider The fuel provider to register with
 	 */

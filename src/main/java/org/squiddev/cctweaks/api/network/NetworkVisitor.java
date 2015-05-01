@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.api.network;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
+import org.squiddev.cctweaks.api.IWorldPosition;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -89,10 +90,10 @@ public abstract class NetworkVisitor {
 			enqueue(queue, visited, location, direction);
 		}
 
-		Iterable<SearchLoc> searches = node.getExtraNodes();
+		Iterable<IWorldPosition> searches = node.getExtraNodes();
 		if (searches != null) {
-			for (SearchLoc search : searches) {
-				enqueue(queue, visited, search);
+			for (IWorldPosition search : searches) {
+				enqueue(queue, visited, new SearchLoc(search, location.distanceTravelled + 1, ForgeDirection.UNKNOWN));
 			}
 		}
 	}
@@ -153,6 +154,10 @@ public abstract class NetworkVisitor {
 			hash = 31 * hash + y;
 			hash = 31 * hash + z;
 			this.hash = hash;
+		}
+
+		public SearchLoc(IWorldPosition position, int distanceTravelled, ForgeDirection side) {
+			this(position.getWorld(), position.getX(), position.getY(), position.getZ(), distanceTravelled, side);
 		}
 
 		@Override

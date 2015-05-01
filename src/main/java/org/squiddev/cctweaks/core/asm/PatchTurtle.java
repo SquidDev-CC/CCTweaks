@@ -5,7 +5,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.squiddev.cctweaks.core.reference.Config;
+import org.squiddev.cctweaks.core.Config;
 
 public class PatchTurtle implements Opcodes {
 	/**

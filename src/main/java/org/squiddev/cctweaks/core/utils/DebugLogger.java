@@ -4,11 +4,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.reference.Config;
+import org.squiddev.cctweaks.core.Config;
 
 /**
  * Facade to the basic logger, which also forces debug calls
- * if {@link org.squiddev.cctweaks.core.reference.Config.ConfigData#debug} is enabled
+ * if {@link Config.ConfigData#debug} is enabled
  */
 public class DebugLogger {
 	private static final Logger logger = LogManager.getLogger(CCTweaks.ID);

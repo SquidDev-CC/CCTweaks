@@ -5,7 +5,7 @@ import cpw.mods.fml.client.config.IConfigElement;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.config.ConfigElement;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.reference.Config;
+import org.squiddev.cctweaks.core.Config;
 
 import java.util.ArrayList;
 import java.util.List;

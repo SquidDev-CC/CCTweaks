@@ -2,12 +2,15 @@ package org.squiddev.cctweaks.core.integration.multipart;
 
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TileMultipart;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.peripheral.IPeripheralProvider;
 import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.client.MinecraftForgeClient;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
 import org.squiddev.cctweaks.api.network.NetworkRegistry;
@@ -19,13 +22,22 @@ import org.squiddev.cctweaks.core.integration.IntegrationRegistry;
 public class MultipartIntegration extends IntegrationRegistry.ModIntegrationModule {
 	public static final String NAME = "ForgeMultipart";
 
+	public static ItemPart itemPart;
+
 	public MultipartIntegration() {
 		super(NAME);
 	}
 
 	@Override
-	public void load() {
+	public void preInit() {
 		new RegisterBlockPart().init();
+		itemPart = new ItemPart();
+		itemPart.preInit();
+	}
+
+	@Override
+	public void init() {
+		itemPart.init();
 
 		NetworkRegistry.addNodeProvider(new INetworkNodeProvider() {
 			@Override
@@ -68,5 +80,18 @@ public class MultipartIntegration extends IntegrationRegistry.ModIntegrationModu
 				return null;
 			}
 		});
+	}
+
+	/**
+	 * A wrapper class to enable using magic with side only
+	 */
+	public static class MultipartIntegrationWrapper extends MultipartIntegration {
+		@Override
+		@SideOnly(Side.CLIENT)
+		public void init() {
+			super.init();
+
+			MinecraftForgeClient.registerItemRenderer(itemPart, new ItemPart.Renderer());
+		}
 	}
 }
