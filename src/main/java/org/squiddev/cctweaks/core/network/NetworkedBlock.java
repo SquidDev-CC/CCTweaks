@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.network.bridge;
+package org.squiddev.cctweaks.core.network;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -11,19 +11,23 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.api.IDataCard;
+import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.INetworkNodeBlock;
 import org.squiddev.cctweaks.core.blocks.BaseBlock;
 import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
+import org.squiddev.cctweaks.core.network.bridge.WirelessBridgeTile;
 
 /**
  * A bridge between two networks so they can communicate with each other
  */
-public class WirelessBridgeBlock extends BaseBlock<WirelessBridgeTile> implements ITileEntityProvider {
+public class NetworkedBlock extends BaseBlock<NetworkedTile> implements ITileEntityProvider, INetworkNodeBlock {
 	public static IIcon smallIcon;
 
-	public WirelessBridgeBlock() {
-		super("wirelessBridge", WirelessBridgeTile.class);
+	public NetworkedBlock() {
+		super("networkedBlock", NetworkedTile.class);
 	}
 
 	@Override
@@ -33,24 +37,25 @@ public class WirelessBridgeBlock extends BaseBlock<WirelessBridgeTile> implement
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-		ItemStack stack = player.getHeldItem();
-		if (stack != null && stack.getItem() instanceof IDataCard) {
-			WirelessBridgeTile tile = getTile(world, x, y, z);
-			if (tile != null) return tile.onActivated(stack, (IDataCard) stack.getItem(), player);
-		}
-
-		return false;
+		NetworkedTile tile = getTile(world, x, y, z);
+		return tile != null && tile.onActivated(player, side);
 	}
 
 	@Override
 	public void registerBlockIcons(IIconRegister register) {
-		super.registerBlockIcons(register);
+		blockIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":wirelessBridge");
 
 		// We need to find a better way to handle this as we are only checking if FMP is installed
 		// However, we have to register under blocks, otherwise rendering gets borked
 		if (Loader.isModLoaded(MultipartIntegration.NAME)) {
-			smallIcon = register.registerIcon(this.getTextureName() + "Small");
+			smallIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":wirelessBridgeSmall");
 		}
+	}
+
+	@Override
+	public void preInit() {
+		GameRegistry.registerBlock(this, name);
+		GameRegistry.registerTileEntity(WirelessBridgeTile.class, "wirelessBridge");
 	}
 
 	@Override
@@ -58,13 +63,19 @@ public class WirelessBridgeBlock extends BaseBlock<WirelessBridgeTile> implement
 		super.init();
 
 		GameRegistry.addRecipe(new ItemStack(this),
-			"GCG",
-			"CMC",
-			"GCG",
+			"GMG",
+			"CDC",
+			"GMG",
 
 			'G', Items.gold_ingot,
+			'D', Items.diamond,
 			'C', PeripheralItemFactory.create(PeripheralType.Cable, null, 1),
 			'M', PeripheralItemFactory.create(PeripheralType.WirelessModem, null, 1)
 		);
+	}
+
+	@Override
+	public INetworkNode getNode(IBlockAccess world, int x, int y, int z, int meta) {
+		return getTile(world, x, y, z);
 	}
 }

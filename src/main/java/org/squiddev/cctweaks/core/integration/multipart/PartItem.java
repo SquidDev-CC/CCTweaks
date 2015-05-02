@@ -61,7 +61,7 @@ public class PartItem extends BaseItem {
 	public static BaseBlock getBlock(int damage) {
 		switch (damage) {
 			case 0:
-				return Registry.blockWirelessBridge;
+				return Registry.blockNetworkedBlock;
 			default:
 				return null;
 		}
@@ -79,7 +79,7 @@ public class PartItem extends BaseItem {
 	public static IIcon getIcon(int damage, int side) {
 		switch (damage) {
 			case 0:
-				return WirelessBridgePart.getRenderer().getBlockIconFromSide(Registry.blockWirelessBridge, side);
+				return WirelessBridgePart.getRenderer().getBlockIconFromSide(Registry.blockNetworkedBlock, side);
 			default:
 				return null;
 		}

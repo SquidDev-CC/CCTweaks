@@ -7,10 +7,9 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.core.network.NetworkedTile;
-import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 
 /**
- * Create a new networked item
+ * Bind networks together
  */
 public class WirelessBridgeTile extends NetworkedTile {
 	protected final NetworkBinding binding = new NetworkBinding(this);
@@ -41,6 +40,13 @@ public class WirelessBridgeTile extends NetworkedTile {
 	public void setWorldObj(World world) {
 		super.setWorldObj(world);
 		binding.add();
+	}
+
+	@Override
+	public boolean onActivated(EntityPlayer player, int side) {
+		ItemStack stack = player.getHeldItem();
+		return stack != null && stack.getItem() instanceof IDataCard && onActivated(stack, (IDataCard) stack.getItem(), player);
+
 	}
 
 	public boolean onActivated(ItemStack stack, IDataCard card, EntityPlayer player) {

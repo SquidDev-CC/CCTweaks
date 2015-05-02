@@ -10,7 +10,7 @@ import org.squiddev.cctweaks.core.items.BaseItem;
 import org.squiddev.cctweaks.core.items.ComputerUpgradeItem;
 import org.squiddev.cctweaks.core.items.DataCardItem;
 import org.squiddev.cctweaks.core.items.DebuggerItem;
-import org.squiddev.cctweaks.core.network.bridge.WirelessBridgeBlock;
+import org.squiddev.cctweaks.core.network.NetworkedBlock;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +23,7 @@ public final class Registry {
 	public static final DebuggerItem itemDebugger;
 	public static final BaseItem itemNetworkBinder;
 
-	public static final BaseBlock blockWirelessBridge;
+	public static final BaseBlock blockNetworkedBlock;
 
 	private static final Set<IModule> modules = new HashSet<IModule>();
 
@@ -35,7 +35,7 @@ public final class Registry {
 		addModule(itemDebugger = new DebuggerItem());
 
 		addModule(itemNetworkBinder = new DataCardItem());
-		addModule(blockWirelessBridge = new WirelessBridgeBlock());
+		addModule(blockNetworkedBlock = new NetworkedBlock());
 
 		addModule(new MultipartIntegration());
 
