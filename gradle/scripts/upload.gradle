@@ -1,6 +1,6 @@
 uploadArchives {
 	repositories {
-		if (!project.hasProperty("ftpHost")) {
+		if (!project.hasProperty("aftpHost")) {
 			mavenLocal()
 		} else {
 			mavenDeployer {
@@ -10,7 +10,7 @@ uploadArchives {
 				}
 
 				pom.project {
-					name 'CC-Tweaks'
+					name 'CCTweaks'
 					packaging 'jar'
 					description 'Random additions to ComputerCraft'
 					url 'https://github.com/SquidDev-CC/CC-Tweaks'

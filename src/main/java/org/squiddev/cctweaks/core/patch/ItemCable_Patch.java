@@ -18,8 +18,8 @@ import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
-import org.squiddev.cctweaks.core.integration.multipart.CablePart;
-import org.squiddev.cctweaks.core.integration.multipart.ModemPart;
+import org.squiddev.cctweaks.core.integration.multipart.network.CablePart;
+import org.squiddev.cctweaks.core.integration.multipart.network.ModemPart;
 
 /**
  * Patch class for adding cables into multipart blocks

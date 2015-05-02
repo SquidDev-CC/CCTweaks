@@ -7,7 +7,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.creativetab.CreativeTabs;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.integration.IntegrationRegistry;
 import org.squiddev.cctweaks.core.registry.Registry;
 
 @Mod(modid = CCTweaks.ID, name = CCTweaks.NAME, version = CCTweaks.VERSION, dependencies = CCTweaks.DEPENDENCIES, guiFactory = CCTweaks.GUI_FACTORY)
@@ -25,19 +24,15 @@ public class CCTweaks {
 		return ComputerCraft.mainCreativeTab;
 	}
 
-	private static final Registry registry = new Registry();
-
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		Config.init(event.getSuggestedConfigurationFile());
-		
-		registry.preInit();
-		IntegrationRegistry.preInit();
+
+		Registry.preInit();
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		registry.init();
-		IntegrationRegistry.init();
+		Registry.init();
 	}
 }
