@@ -1,25 +1,24 @@
-def includePath = "org/squiddev/cctweaks/api/**";
-
 task sourcesJar(type: Jar, dependsOn:classes) {
-	from sourceSets.main.allSource
-	include includePath
-
+	from sourceSets.api.allSource
 	classifier = "sources"
 }
 
 // Build the Javadocs for the API
 task javadocAPI(type: Javadoc) {
-	source = sourceSets.main.java
-	include includePath
-
+	source = sourceSets.api.java
 	classpath = configurations.compile
 }
 
 // Package Javadocs into a Jar
 task javadocJar(type: Jar, dependsOn:javadocAPI) {
 	from javadocAPI.destinationDir
-
 	classifier = "javadoc"
+}
+
+// API dist Jar
+task apiJar(type: Jar) {
+	from sourceSets.api.output
+	classifier = 'api'
 }
 
 // Build a non-obsfucated jar
@@ -46,19 +45,11 @@ task devJar(type: Jar) {
 	classifier = 'dev'
 }
 
-// Build an API jar
-task apiJar(type: Jar) {
-	from sourceSets.main.output
-	include includePath
-
-	classifier = 'api'
-}
-
 // All the artifacts to build
 artifacts {
 	archives jar
-
 	archives devJar
+
 	archives apiJar
 	archives sourcesJar
 	archives javadocJar

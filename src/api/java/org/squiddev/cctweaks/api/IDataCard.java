@@ -18,8 +18,8 @@ public interface IDataCard {
 	 * Set the current data for this stack
 	 *
 	 * @param stack The stack to set the data for
-	 * @param type  The type of data this card stores. {@see #getType}
-	 * @param data  The data that this card stores {@see #getData}
+	 * @param type  The type of data this card stores. {@link #getType}
+	 * @param data  The data that this card stores {@link #getData}
 	 */
 	void setSettings(ItemStack stack, String type, NBTTagCompound data);
 

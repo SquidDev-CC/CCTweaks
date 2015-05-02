@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.integration;
 
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModAPIManager;
 import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
 import org.squiddev.cctweaks.core.registry.IRegisterable;
 
@@ -25,6 +26,19 @@ public class IntegrationRegistry {
 		@Override
 		public boolean canLoad() {
 			return Loader.isModLoaded(modName);
+		}
+	}
+
+	public static abstract class APIIntegrationModule implements IIntegrationModule {
+		public final String apiName;
+
+		public APIIntegrationModule(String modName) {
+			this.apiName = modName;
+		}
+
+		@Override
+		public boolean canLoad() {
+			return ModAPIManager.INSTANCE.hasAPI(apiName);
 		}
 	}
 
@@ -57,5 +71,6 @@ public class IntegrationRegistry {
 
 	static {
 		addModule(new MultipartIntegration.MultipartIntegrationWrapper());
+		addModule(new RedstoneFlux());
 	}
 }

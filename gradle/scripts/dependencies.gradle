@@ -14,6 +14,11 @@ repositories {
 		url = "http://maven.bonzodandd.co.uk"
 	}
 
+	maven {
+		name "FireBall API Depot"
+		url "http://dl.tsr.me/artifactory/libs-release-local"
+	}
+
 	ivy {
 		name = "computercraft"
 		artifactPattern "http://addons-origin.cursecdn.com/files/2228/723/[module][revision].[ext]"
@@ -32,6 +37,9 @@ dependencies {
 	compile "codechicken:CodeChickenLib:${project.mc_version}-${project.ccl_version}:dev"
 	compile "codechicken:NotEnoughItems:${project.mc_version}-${project.nei_version}:dev"
 	compile "codechicken:CodeChickenCore:${project.mc_version}-${project.ccc_version}:dev"
+
+	compile "api:ic2:${project.api_ic2_version}"
+	compile "api:rf:${project.api_rf_version}"
 
 	fatPackage(group: 'org.squiddev', name: 'luaj.luajc', version: '1.+') {
 		// We provide a custom LuaJ source with ComputerCraft
