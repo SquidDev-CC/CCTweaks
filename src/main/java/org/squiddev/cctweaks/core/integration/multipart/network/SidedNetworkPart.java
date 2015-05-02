@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.integration.multipart;
+package org.squiddev.cctweaks.core.integration.multipart.network;
 
 import codechicken.lib.data.MCDataInput;
 import codechicken.lib.data.MCDataOutput;
@@ -11,6 +11,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.core.integration.multipart.AbstractPart;
+import org.squiddev.cctweaks.core.integration.multipart.MultipartHelpers;
 
 import java.util.Collections;
 import java.util.Map;

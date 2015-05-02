@@ -7,10 +7,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.registry.IRegisterable;
 
-public abstract class ItemBase extends Item implements IRegisterable {
+public abstract class BaseItem extends Item implements IRegisterable {
 	protected final String name;
 
-	public ItemBase(String itemName, int stackSize) {
+	public BaseItem(String itemName, int stackSize) {
 		name = itemName;
 
 		setUnlocalizedName(CCTweaks.RESOURCE_DOMAIN + "." + itemName);
@@ -20,7 +20,7 @@ public abstract class ItemBase extends Item implements IRegisterable {
 		setMaxStackSize(stackSize);
 	}
 
-	public ItemBase(String itemName) {
+	public BaseItem(String itemName) {
 		this(itemName, 64);
 	}
 

@@ -10,8 +10,8 @@ import net.minecraft.world.World;
 /**
  * Handles actions on computers
  */
-public abstract class ItemComputerAction extends ItemBase {
-	public ItemComputerAction(String itemName) {
+public abstract class ComputerActionItem extends BaseItem {
+	public ComputerActionItem(String itemName) {
 		super(itemName);
 	}
 

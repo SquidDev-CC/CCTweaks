@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.integration.multipart;
+package org.squiddev.cctweaks.core.integration.multipart.network;
 
 import codechicken.lib.data.MCDataInput;
 import codechicken.lib.data.MCDataOutput;
@@ -31,6 +31,7 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.core.integration.multipart.AbstractPart;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.lang.reflect.Field;

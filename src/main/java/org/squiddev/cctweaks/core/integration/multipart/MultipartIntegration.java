@@ -25,7 +25,7 @@ import org.squiddev.cctweaks.core.utils.Helpers;
 public class MultipartIntegration extends IntegrationRegistry.ModIntegrationModule {
 	public static final String NAME = "ForgeMultipart";
 
-	public static ItemPart itemPart;
+	public static PartItem itemPart;
 
 	public MultipartIntegration() {
 		super(NAME);
@@ -34,7 +34,7 @@ public class MultipartIntegration extends IntegrationRegistry.ModIntegrationModu
 	@Override
 	public void preInit() {
 		new RegisterBlockPart().init();
-		itemPart = new ItemPart();
+		itemPart = new PartItem();
 		itemPart.preInit();
 	}
 
@@ -96,7 +96,7 @@ public class MultipartIntegration extends IntegrationRegistry.ModIntegrationModu
 		public void init() {
 			super.init();
 
-			MinecraftForgeClient.registerItemRenderer(itemPart, new ItemPart.Renderer());
+			MinecraftForgeClient.registerItemRenderer(itemPart, new PartItem.Renderer());
 		}
 	}
 }

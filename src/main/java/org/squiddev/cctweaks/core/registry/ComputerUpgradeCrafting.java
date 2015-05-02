@@ -14,7 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.core.items.ItemComputerUpgrade;
+import org.squiddev.cctweaks.core.items.ComputerUpgradeItem;
 
 /**
  * Handles crafting with ComputerUpgrades
@@ -86,7 +86,7 @@ public class ComputerUpgradeCrafting implements IRecipe {
 				}
 
 				computerStack = itemStack;
-			} else if (item instanceof ItemComputerUpgrade) {
+			} else if (item instanceof ComputerUpgradeItem) {
 				// Don't allow more than one upgrade
 				if (hasUpgrade) return null;
 

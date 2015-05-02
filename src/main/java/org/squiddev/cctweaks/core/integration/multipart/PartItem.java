@@ -17,8 +17,10 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.client.IItemRenderer;
 import org.lwjgl.opengl.GL11;
-import org.squiddev.cctweaks.core.blocks.BlockBase;
-import org.squiddev.cctweaks.core.items.ItemBase;
+import org.squiddev.cctweaks.core.blocks.BaseBlock;
+import org.squiddev.cctweaks.core.integration.multipart.network.SidedNetworkPart;
+import org.squiddev.cctweaks.core.integration.multipart.network.WirelessBridgePart;
+import org.squiddev.cctweaks.core.items.BaseItem;
 import org.squiddev.cctweaks.core.registry.Registry;
 
 import java.util.List;
@@ -26,8 +28,8 @@ import java.util.List;
 /**
  * A part that can be used to place multiparts as well
  */
-public class ItemPart extends ItemBase {
-	public ItemPart() {
+public class PartItem extends BaseItem {
+	public PartItem() {
 		super("multipart");
 	}
 
@@ -52,11 +54,11 @@ public class ItemPart extends ItemBase {
 
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
-		BlockBase block = getBlock(stack.getItemDamage());
+		BaseBlock block = getBlock(stack.getItemDamage());
 		return block == null ? super.getItemStackDisplayName(stack) : block.getLocalizedName();
 	}
 
-	public static BlockBase getBlock(int damage) {
+	public static BaseBlock getBlock(int damage) {
 		switch (damage) {
 			case 0:
 				return Registry.blockWirelessBridge;
@@ -117,7 +119,7 @@ public class ItemPart extends ItemBase {
 		@Override
 		public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
 			int damage = item.getItemDamage();
-			BlockBase block = getBlock(damage);
+			BaseBlock block = getBlock(damage);
 			if (block == null) return;
 
 			GL11.glPushMatrix();

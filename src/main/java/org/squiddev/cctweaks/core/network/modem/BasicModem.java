@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.network;
+package org.squiddev.cctweaks.core.network.modem;
 
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;

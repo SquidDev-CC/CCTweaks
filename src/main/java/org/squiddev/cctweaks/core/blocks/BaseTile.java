@@ -7,7 +7,7 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 /**
  * Base tile for all TileEntities
  */
-public abstract class TileBase extends TileEntity implements IWorldPosition {
+public abstract class BaseTile extends TileEntity implements IWorldPosition {
 	@Override
 	public int getX() {
 		return xCoord;

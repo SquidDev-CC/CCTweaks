@@ -1,12 +1,12 @@
 package org.squiddev.cctweaks.core.registry;
 
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.blocks.BlockBase;
-import org.squiddev.cctweaks.core.blocks.WirelessBridge;
-import org.squiddev.cctweaks.core.items.ItemBase;
-import org.squiddev.cctweaks.core.items.ItemComputerUpgrade;
-import org.squiddev.cctweaks.core.items.ItemDebugger;
-import org.squiddev.cctweaks.core.items.ItemNetworkBinder;
+import org.squiddev.cctweaks.core.blocks.BaseBlock;
+import org.squiddev.cctweaks.core.network.bridge.WirelessBridgeBlock;
+import org.squiddev.cctweaks.core.items.BaseItem;
+import org.squiddev.cctweaks.core.items.ComputerUpgradeItem;
+import org.squiddev.cctweaks.core.items.DebuggerItem;
+import org.squiddev.cctweaks.core.items.DataCardItem;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,20 +15,20 @@ import java.util.Set;
  * The proxy class
  */
 public class Registry implements IRegisterable {
-	public static ItemBase itemComputerUpgrade;
-	public static ItemBase itemDebugger;
-	public static ItemBase itemNetworkBinder;
+	public static BaseItem itemComputerUpgrade;
+	public static BaseItem itemDebugger;
+	public static BaseItem itemNetworkBinder;
 
-	public static BlockBase blockWirelessBridge;
+	public static BaseBlock blockWirelessBridge;
 
 	private final Set<IRegisterable> registers = new HashSet<IRegisterable>();
 
 	protected void setup() {
-		if (Config.config.enableComputerUpgrades) registers.add(itemComputerUpgrade = new ItemComputerUpgrade());
-		if (Config.config.enableDebugWand) registers.add(itemDebugger = new ItemDebugger());
+		if (Config.config.enableComputerUpgrades) registers.add(itemComputerUpgrade = new ComputerUpgradeItem());
+		if (Config.config.enableDebugWand) registers.add(itemDebugger = new DebuggerItem());
 
-		registers.add(itemNetworkBinder = new ItemNetworkBinder());
-		registers.add(blockWirelessBridge = new WirelessBridge());
+		registers.add(itemNetworkBinder = new DataCardItem());
+		registers.add(blockWirelessBridge = new WirelessBridgeBlock());
 
 		registers.add(new RefuelRegisters());
 	}

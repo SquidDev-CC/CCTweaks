@@ -8,6 +8,10 @@ import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import org.squiddev.cctweaks.core.integration.multipart.network.CablePart;
+import org.squiddev.cctweaks.core.integration.multipart.network.ModemPart;
+import org.squiddev.cctweaks.core.integration.multipart.network.ModemWithCableIntermediatePart;
+import org.squiddev.cctweaks.core.integration.multipart.network.WirelessBridgePart;
 
 import java.util.Arrays;
 

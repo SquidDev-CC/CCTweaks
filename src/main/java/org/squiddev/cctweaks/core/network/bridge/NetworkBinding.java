@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.network;
+package org.squiddev.cctweaks.core.network.bridge;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;

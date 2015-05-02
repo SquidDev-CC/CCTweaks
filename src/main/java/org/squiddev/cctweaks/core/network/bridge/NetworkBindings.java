@@ -1,8 +1,9 @@
-package org.squiddev.cctweaks.core.network;
+package org.squiddev.cctweaks.core.network.bridge;
 
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkVisitor;
+import org.squiddev.cctweaks.core.network.SafeNetworkVisitor;
 
 import java.util.*;
 

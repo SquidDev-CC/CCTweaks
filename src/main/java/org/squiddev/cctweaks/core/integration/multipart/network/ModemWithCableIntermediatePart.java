@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.integration.multipart;
+package org.squiddev.cctweaks.core.integration.multipart.network;
 
 import codechicken.lib.data.MCDataInput;
 import codechicken.lib.data.MCDataOutput;

@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.integration.multipart;
+package org.squiddev.cctweaks.core.integration.multipart.network;
 
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
@@ -16,12 +16,12 @@ import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.core.blocks.WirelessBridge;
-import org.squiddev.cctweaks.core.network.NetworkBinding;
+import org.squiddev.cctweaks.core.network.bridge.WirelessBridgeBlock;
+import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.registry.Registry;
 
 /**
- * A multipart equivalent of {@link org.squiddev.cctweaks.core.blocks.WirelessBridge}
+ * A multipart equivalent of {@link WirelessBridgeBlock}
  */
 public class WirelessBridgePart extends SidedNetworkPart {
 	public static final String NAME = CCTweaks.NAME + ":wirelessBridge";
@@ -125,7 +125,7 @@ public class WirelessBridgePart extends SidedNetworkPart {
 
 		@Override
 		public IIcon getBlockIconFromSide(Block block, int side) {
-			return getIconSafe(WirelessBridge.smallIcon);
+			return getIconSafe(WirelessBridgeBlock.smallIcon);
 		}
 
 		@Override

@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.network;
+package org.squiddev.cctweaks.core.network.modem;
 
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;

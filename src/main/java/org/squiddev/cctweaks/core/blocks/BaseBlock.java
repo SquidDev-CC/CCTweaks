@@ -13,11 +13,11 @@ import org.squiddev.cctweaks.core.registry.IRegisterable;
 /**
  * Base class for all blocks
  */
-public abstract class BlockBase<T extends TileBase> extends BlockContainer implements IRegisterable{
+public abstract class BaseBlock<T extends BaseTile> extends BlockContainer implements IRegisterable{
 	protected final String name;
 	protected final Class<T> klass;
 
-	public BlockBase(String blockName, Material material, Class<T> klass) {
+	public BaseBlock(String blockName, Material material, Class<T> klass) {
 		super(material);
 
 		this.klass = klass;
@@ -29,7 +29,7 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 		setCreativeTab(CCTweaks.getCreativeTab());
 	}
 
-	public BlockBase(String name, Class<T> klass) {
+	public BaseBlock(String name, Class<T> klass) {
 		this(name, Material.rock, klass);
 	}
 

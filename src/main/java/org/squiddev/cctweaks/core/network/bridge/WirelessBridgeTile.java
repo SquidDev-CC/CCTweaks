@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.blocks;
+package org.squiddev.cctweaks.core.network.bridge;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -6,7 +6,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.core.network.NetworkBinding;
+import org.squiddev.cctweaks.core.network.NetworkedTile;
+import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 
 /**
  * Create a new networked item

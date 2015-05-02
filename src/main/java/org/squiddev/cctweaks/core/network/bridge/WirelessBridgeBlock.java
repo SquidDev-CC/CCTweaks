@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.blocks;
+package org.squiddev.cctweaks.core.network.bridge;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -13,15 +13,16 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IDataCard;
+import org.squiddev.cctweaks.core.blocks.BaseBlock;
 import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
 
 /**
  * A bridge between two networks so they can communicate with each other
  */
-public class WirelessBridge extends BlockBase<WirelessBridgeTile> implements ITileEntityProvider {
+public class WirelessBridgeBlock extends BaseBlock<WirelessBridgeTile> implements ITileEntityProvider {
 	public static IIcon smallIcon;
 
-	public WirelessBridge() {
+	public WirelessBridgeBlock() {
 		super("wirelessBridge", WirelessBridgeTile.class);
 	}
 

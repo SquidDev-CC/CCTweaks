@@ -28,8 +28,8 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import java.util.List;
 
 
-public class ItemComputerUpgrade extends ItemComputerAction {
-	public ItemComputerUpgrade() {
+public class ComputerUpgradeItem extends ComputerActionItem {
+	public ComputerUpgradeItem() {
 		super("computerUpgrade");
 	}
 

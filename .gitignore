@@ -83,3 +83,4 @@ $RECYCLE.BIN/
 *.lock
 /.metadata/
 out
+logs/

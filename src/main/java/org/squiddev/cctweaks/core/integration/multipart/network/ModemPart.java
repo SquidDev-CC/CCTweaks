@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.integration.multipart;
+package org.squiddev.cctweaks.core.integration.multipart.network;
 
 import codechicken.lib.data.MCDataInput;
 import codechicken.lib.data.MCDataOutput;
@@ -28,7 +28,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.Packet;
-import org.squiddev.cctweaks.core.network.SinglePeripheralModem;
+import org.squiddev.cctweaks.core.network.modem.SinglePeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 

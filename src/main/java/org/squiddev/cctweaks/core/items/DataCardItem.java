@@ -17,9 +17,9 @@ import java.util.List;
 /**
  * Item to bind networks together
  */
-public class ItemNetworkBinder extends ItemBase implements IDataCard {
-	public ItemNetworkBinder() {
-		super("networkBinder", 1);
+public class DataCardItem extends BaseItem implements IDataCard {
+	public DataCardItem() {
+		super("dataCard", 1);
 	}
 
 	@Override

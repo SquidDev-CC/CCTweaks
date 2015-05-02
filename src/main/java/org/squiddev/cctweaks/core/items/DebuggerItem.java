@@ -11,8 +11,8 @@ import org.luaj.vm2.lib.DebugLib;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
-public class ItemDebugger extends ItemComputerAction {
-	public ItemDebugger() {
+public class DebuggerItem extends ComputerActionItem {
+	public DebuggerItem() {
 		super("debugger");
 	}
 

@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.network;
+package org.squiddev.cctweaks.core.network.modem;
 
 import dan200.computercraft.api.filesystem.IMount;
 import dan200.computercraft.api.filesystem.IWritableMount;
