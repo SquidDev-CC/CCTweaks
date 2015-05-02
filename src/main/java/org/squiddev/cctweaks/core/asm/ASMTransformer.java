@@ -50,7 +50,7 @@ public class ASMTransformer implements IClassTransformer {
 		} else if (className.equals("dan200.computercraft.core.computer.ComputerThread$1")) {
 			return PatchComputer.patchLuaThread(bytes);
 		} else if (className.startsWith("dan200.computercraft.shared.turtle.core.Turtle") && className.endsWith("Command")) {
-			return PatchTurtle.disableTurtleCommand(className, bytes);
+			bytes = PatchTurtle.disableTurtleCommand(className, bytes);
 		}
 
 		for (IPatcher replacer : patches) {

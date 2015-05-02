@@ -3,7 +3,8 @@ package org.squiddev.cctweaks.core.registry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.core.blocks.BaseBlock;
-import org.squiddev.cctweaks.core.integration.RedstoneFlux;
+import org.squiddev.cctweaks.core.integration.IndustrialCraftIntegration;
+import org.squiddev.cctweaks.core.integration.RedstoneFluxIntegration;
 import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
 import org.squiddev.cctweaks.core.items.BaseItem;
 import org.squiddev.cctweaks.core.items.ComputerUpgradeItem;
@@ -36,9 +37,11 @@ public final class Registry {
 		addModule(itemNetworkBinder = new DataCardItem());
 		addModule(blockWirelessBridge = new WirelessBridgeBlock());
 
-		addModule(new RefuelRegisters());
 		addModule(new MultipartIntegration());
-		addModule(new RedstoneFlux());
+
+		addModule(new TurtleRegistry());
+		addModule(new RedstoneFluxIntegration());
+		addModule(new IndustrialCraftIntegration());
 	}
 
 	public static void addModule(IModule module) {

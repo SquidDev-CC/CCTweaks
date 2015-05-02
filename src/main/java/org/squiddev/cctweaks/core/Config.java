@@ -67,6 +67,20 @@ public final class Config {
 			"Amount of RF required for one refuel point"
 		);
 
+		data.turtleEuRefuelEnable = configuration.getBoolean(
+			"EU refuel",
+			TURTLE,
+			defaults.turtleEuRefuelEnable,
+			"Enable refuel from IC2 batteries"
+		);
+		data.turtleEuRefuelAmount = configuration.getInt(
+			"EU refuel amount",
+			TURTLE,
+			data.turtleEuRefuelAmount,
+			1, Integer.MAX_VALUE,
+			"Amount of Eu required for one refuel point"
+		);
+
 		data.turtleDisabledActions = configuration.getStringList(
 			"Disabled turtle actions",
 			TURTLE,
@@ -161,6 +175,16 @@ public final class Config {
 		 * RF refuel amount
 		 */
 		public int turtleFluxRefuelAmount = 100;
+
+		/**
+		 * Enable EU refueling
+		 */
+		public boolean turtleEuRefuelEnable = true;
+
+		/**
+		 * EU refuel amount
+		 */
+		public int turtleEuRefuelAmount = turtleFluxRefuelAmount / 4;
 
 		/**
 		 * Disabled turtle verbs

@@ -8,9 +8,9 @@ import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.api.turtle.TurtleFuelRegistry;
 
 /**
- * Holds a list of items
+ * Registers turtle related things
  */
-public class RefuelRegisters implements IModule {
+public class TurtleRegistry implements IModule {
 	@Override
 	public boolean canLoad() {
 		return true;
@@ -21,7 +21,7 @@ public class RefuelRegisters implements IModule {
 	}
 
 	public void init() {
-		// Furnace handler
+		// Add default furnace fuel provider
 		TurtleFuelRegistry.addFuelProvider(new ITurtleFuelProvider() {
 			@Override
 			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack, int limit) {

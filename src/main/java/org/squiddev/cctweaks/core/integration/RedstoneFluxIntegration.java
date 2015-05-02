@@ -10,8 +10,8 @@ import org.squiddev.cctweaks.core.Config;
 /**
  * Registers Redstone Flux as a fuel
  */
-public class RedstoneFlux extends APIIntegrationModule {
-	public RedstoneFlux() {
+public class RedstoneFluxIntegration extends APIIntegrationModule {
+	public RedstoneFluxIntegration() {
 		super("CoFHAPI|energy");
 	}
 
@@ -24,7 +24,7 @@ public class RedstoneFlux extends APIIntegrationModule {
 		TurtleFuelRegistry.addFuelProvider(new ITurtleFuelProvider() {
 			@Override
 			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack, int limit) {
-				return Config.config.turtleFluxRefuelEnable && stack != null && stack.getItem() instanceof IEnergyContainerItem;
+				return Config.config.turtleFluxRefuelEnable && stack.getItem() instanceof IEnergyContainerItem;
 			}
 
 			@Override
