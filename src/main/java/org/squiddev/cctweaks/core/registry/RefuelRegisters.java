@@ -1,18 +1,21 @@
 package org.squiddev.cctweaks.core.registry;
 
-import cofh.api.energy.IEnergyContainerItem;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.shared.util.InventoryUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.api.turtle.TurtleFuelRegistry;
-import org.squiddev.cctweaks.core.Config;
 
 /**
  * Holds a list of items
  */
-public class RefuelRegisters implements IRegisterable{
+public class RefuelRegisters implements IModule {
+	@Override
+	public boolean canLoad() {
+		return true;
+	}
+
 	@Override
 	public void preInit() {
 	}

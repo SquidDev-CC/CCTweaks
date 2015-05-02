@@ -10,7 +10,7 @@ import org.squiddev.cctweaks.core.Config;
 /**
  * Registers Redstone Flux as a fuel
  */
-public class RedstoneFlux extends IntegrationRegistry.APIIntegrationModule {
+public class RedstoneFlux extends APIIntegrationModule {
 	public RedstoneFlux() {
 		super("CoFHAPI|energy");
 	}

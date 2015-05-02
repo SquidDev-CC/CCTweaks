@@ -5,9 +5,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.registry.IRegisterable;
+import org.squiddev.cctweaks.core.registry.IModule;
 
-public abstract class BaseItem extends Item implements IRegisterable {
+public abstract class BaseItem extends Item implements IModule {
 	protected final String name;
 
 	public BaseItem(String itemName, int stackSize) {
@@ -28,6 +28,11 @@ public abstract class BaseItem extends Item implements IRegisterable {
 		NBTTagCompound tag = stack.getTagCompound();
 		if (tag == null) stack.setTagCompound(tag = new NBTTagCompound());
 		return tag;
+	}
+
+	@Override
+	public boolean canLoad() {
+		return true;
 	}
 
 	@Override

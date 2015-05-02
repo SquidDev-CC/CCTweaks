@@ -20,6 +20,7 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.RecipeSorter;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.ComputerUpgradeCrafting;
 import org.squiddev.cctweaks.core.utils.BlockNotifyFlags;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
@@ -102,6 +103,11 @@ public class ComputerUpgradeItem extends ComputerActionItem {
 	@SuppressWarnings("unchecked")
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
 		list.add(StatCollector.translateToLocal("gui.tooltip.cctweaks.computerUpgrade.normal"));
+	}
+
+	@Override
+	public boolean canLoad() {
+		return Config.config.enableComputerUpgrades;
 	}
 
 	@Override

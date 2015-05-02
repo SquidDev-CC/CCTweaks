@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.DebugLib;
+import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
@@ -45,5 +46,10 @@ public class DebuggerItem extends ComputerActionItem {
 		}
 
 		return true;
+	}
+
+	@Override
+	public boolean canLoad() {
+		return Config.config.enableDebugWand;
 	}
 }

@@ -15,14 +15,15 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
 import org.squiddev.cctweaks.api.network.NetworkRegistry;
-import org.squiddev.cctweaks.core.integration.IntegrationRegistry;
+import org.squiddev.cctweaks.core.integration.ModIntegrationModule;
+import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
 /**
  * Adds various multipart support constructs
  */
-public class MultipartIntegration extends IntegrationRegistry.ModIntegrationModule {
+public class MultipartIntegration extends ModIntegrationModule implements IClientModule {
 	public static final String NAME = "ForgeMultipart";
 
 	public static PartItem itemPart;
@@ -87,16 +88,9 @@ public class MultipartIntegration extends IntegrationRegistry.ModIntegrationModu
 		});
 	}
 
-	/**
-	 * A wrapper class to enable using magic with side only
-	 */
-	public static class MultipartIntegrationWrapper extends MultipartIntegration {
-		@Override
-		@SideOnly(Side.CLIENT)
-		public void init() {
-			super.init();
-
-			MinecraftForgeClient.registerItemRenderer(itemPart, new PartItem.Renderer());
-		}
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void clientInit() {
+		MinecraftForgeClient.registerItemRenderer(itemPart, new PartItem.Renderer());
 	}
 }

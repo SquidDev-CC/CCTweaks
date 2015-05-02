@@ -8,12 +8,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.registry.IRegisterable;
+import org.squiddev.cctweaks.core.registry.IModule;
 
 /**
  * Base class for all blocks
  */
-public abstract class BaseBlock<T extends BaseTile> extends BlockContainer implements IRegisterable{
+public abstract class BaseBlock<T extends BaseTile> extends BlockContainer implements IModule {
 	protected final String name;
 	protected final Class<T> klass;
 
@@ -49,6 +49,11 @@ public abstract class BaseBlock<T extends BaseTile> extends BlockContainer imple
 		if (tile != null) tile.onRemove();
 
 		super.breakBlock(world, x, y, z, block, damage);
+	}
+
+	@Override
+	public boolean canLoad() {
+		return true;
 	}
 
 	@Override

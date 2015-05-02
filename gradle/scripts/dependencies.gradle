@@ -19,6 +19,11 @@ repositories {
 		url "http://dl.tsr.me/artifactory/libs-release-local"
 	}
 
+	maven {
+		name "IC2"
+		url "http://maven.ic2.player.to"
+	}
+
 	ivy {
 		name = "computercraft"
 		artifactPattern "http://addons-origin.cursecdn.com/files/2228/723/[module][revision].[ext]"
@@ -38,8 +43,8 @@ dependencies {
 	compile "codechicken:NotEnoughItems:${project.mc_version}-${project.nei_version}:dev"
 	compile "codechicken:CodeChickenCore:${project.mc_version}-${project.ccc_version}:dev"
 
-	compile "api:ic2:${project.api_ic2_version}"
 	compile "api:rf:${project.api_rf_version}"
+	compile "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
 
 	fatPackage(group: 'org.squiddev', name: 'luaj.luajc', version: '1.+') {
 		// We provide a custom LuaJ source with ComputerCraft
