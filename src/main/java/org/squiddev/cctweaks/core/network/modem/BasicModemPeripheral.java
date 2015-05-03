@@ -7,6 +7,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.Vec3;
+import org.squiddev.cctweaks.api.IWorldPosition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,8 @@ public class BasicModemPeripheral extends ModemPeripheral {
 
 	@Override
 	protected Vec3 getPosition() {
-		return modem.getPosition();
+		IWorldPosition position = modem.getPosition();
+		return Vec3.createVectorHelper(position.getX(), position.getY(), position.getZ());
 	}
 
 	@Override

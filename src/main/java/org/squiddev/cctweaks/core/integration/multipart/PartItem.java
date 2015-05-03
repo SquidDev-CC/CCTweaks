@@ -31,6 +31,7 @@ import java.util.List;
 public class PartItem extends BaseItem {
 	public PartItem() {
 		super("multipart");
+		setHasSubtypes(true);
 	}
 
 	@Override

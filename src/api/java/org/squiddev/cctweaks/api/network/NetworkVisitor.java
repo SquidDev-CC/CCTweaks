@@ -68,6 +68,27 @@ public abstract class NetworkVisitor {
 	}
 
 	/**
+	 * Visit a network with this node visitor
+	 *
+	 * @param pos     The node to start visiting with
+	 * @param visited Already visited locations on the network
+	 */
+	public void visitNetwork(IWorldPosition pos, Set<SearchLoc> visited) {
+		if (pos == null) return;
+		visitNetwork(pos.getWorld(), pos.getX(), pos.getY(), pos.getZ(), visited);
+	}
+
+	/**
+	 * Visit a network with this node visitor
+	 *
+	 * @param pos The node to start visiting with
+	 */
+	public void visitNetwork(IWorldPosition pos) {
+		if (pos == null) return;
+		visitNetwork(pos.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	/**
 	 * Visit a node on the network. Override in child classes for functionality
 	 *
 	 * @param node     The node to visit
