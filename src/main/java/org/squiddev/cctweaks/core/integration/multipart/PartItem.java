@@ -18,6 +18,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.IItemRenderer;
 import org.lwjgl.opengl.GL11;
 import org.squiddev.cctweaks.core.blocks.BaseBlock;
+import org.squiddev.cctweaks.core.blocks.IMultiBlock;
 import org.squiddev.cctweaks.core.integration.multipart.network.SidedNetworkPart;
 import org.squiddev.cctweaks.core.integration.multipart.network.WirelessBridgePart;
 import org.squiddev.cctweaks.core.items.BaseItem;
@@ -54,9 +55,12 @@ public class PartItem extends BaseItem {
 	}
 
 	@Override
-	public String getItemStackDisplayName(ItemStack stack) {
+	public String getUnlocalizedName(ItemStack stack) {
 		BaseBlock block = getBlock(stack.getItemDamage());
-		return block == null ? super.getItemStackDisplayName(stack) : block.getLocalizedName();
+
+		if (block == null) return super.getUnlocalizedName(stack);
+		if (block instanceof IMultiBlock) return ((IMultiBlock) block).getUnlocalizedName(stack.getItemDamage());
+		return block.getUnlocalizedName();
 	}
 
 	public static BaseBlock getBlock(int damage) {

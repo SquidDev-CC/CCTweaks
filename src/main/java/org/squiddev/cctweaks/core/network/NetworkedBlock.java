@@ -17,14 +17,18 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.INetworkNodeBlock;
 import org.squiddev.cctweaks.core.blocks.BaseBlock;
+import org.squiddev.cctweaks.core.blocks.IMultiBlock;
 import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
+import org.squiddev.cctweaks.core.items.MultiBlockItem;
 import org.squiddev.cctweaks.core.network.bridge.WirelessBridgeTile;
+import org.squiddev.cctweaks.core.utils.Helpers;
 
 /**
  * A bridge between two networks so they can communicate with each other
  */
-public class NetworkedBlock extends BaseBlock<NetworkedTile> implements ITileEntityProvider, INetworkNodeBlock {
-	public static IIcon smallIcon;
+public class NetworkedBlock extends BaseBlock<NetworkedTile> implements INetworkNodeBlock, IMultiBlock {
+	public static IIcon bridgeIcon;
+	public static IIcon bridgeSmallIcon;
 
 	public NetworkedBlock() {
 		super("networkedBlock", NetworkedTile.class);
@@ -32,7 +36,11 @@ public class NetworkedBlock extends BaseBlock<NetworkedTile> implements ITileEnt
 
 	@Override
 	public TileEntity createNewTileEntity(World world, int meta) {
-		return new WirelessBridgeTile();
+		switch (meta) {
+			case 0:
+				return new WirelessBridgeTile();
+		}
+		return null;
 	}
 
 	@Override
@@ -43,18 +51,33 @@ public class NetworkedBlock extends BaseBlock<NetworkedTile> implements ITileEnt
 
 	@Override
 	public void registerBlockIcons(IIconRegister register) {
-		blockIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":wirelessBridge");
+		bridgeIcon = blockIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":wirelessBridge");
 
-		// We need to find a better way to handle this as we are only checking if FMP is installed
+		// We need to find a better way to handle this as we are only checking if CBMP is installed
 		// However, we have to register under blocks, otherwise rendering gets borked
 		if (Loader.isModLoaded(MultipartIntegration.NAME)) {
-			smallIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":wirelessBridgeSmall");
+			bridgeSmallIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":wirelessBridgeSmall");
 		}
+	}
+
+
+	@Override
+	public String getUnlocalizedName(int meta) {
+		switch (meta) {
+			case 0:
+				return getUnlocalizedName() + ".wirelessBridge";
+		}
+		return getUnlocalizedName();
+	}
+
+	@Override
+	public int damageDropped(int damage) {
+		return damage;
 	}
 
 	@Override
 	public void preInit() {
-		GameRegistry.registerBlock(this, name);
+		GameRegistry.registerBlock(this, MultiBlockItem.class, name);
 		GameRegistry.registerTileEntity(WirelessBridgeTile.class, "wirelessBridge");
 	}
 
@@ -62,7 +85,7 @@ public class NetworkedBlock extends BaseBlock<NetworkedTile> implements ITileEnt
 	public void init() {
 		super.init();
 
-		GameRegistry.addRecipe(new ItemStack(this),
+		Helpers.alternateCrafting(new ItemStack(this), 'C', 'M',
 			"GMG",
 			"CDC",
 			"GMG",

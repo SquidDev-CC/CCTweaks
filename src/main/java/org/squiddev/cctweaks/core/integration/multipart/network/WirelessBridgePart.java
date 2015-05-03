@@ -125,7 +125,7 @@ public class WirelessBridgePart extends SidedNetworkPart {
 
 		@Override
 		public IIcon getBlockIconFromSide(Block block, int side) {
-			return getIconSafe(NetworkedBlock.smallIcon);
+			return getIconSafe(NetworkedBlock.bridgeSmallIcon);
 		}
 
 		@Override

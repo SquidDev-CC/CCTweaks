@@ -6,24 +6,19 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import org.squiddev.cctweaks.core.blocks.BaseBlock;
 import org.squiddev.cctweaks.core.blocks.IMultiBlock;
 
 /**
  * An item to place instances of {@link IMultiBlock}
  */
 public class MultiBlockItem extends ItemBlock {
-	public MultiBlockItem(Block block, int stackSize) {
+	public MultiBlockItem(Block block) {
 		super(block);
 		if (!(block instanceof IMultiBlock)) throw new RuntimeException(block + " must be instance of IMultiBlock");
 
-		setMaxStackSize(stackSize);
+		setMaxStackSize(64);
 		setMaxDamage(0);
 		setHasSubtypes(true);
-	}
-
-	public MultiBlockItem(BaseBlock block) {
-		this(block, 64);
 	}
 
 	public int getMetadata(int meta) {
