@@ -14,8 +14,8 @@ import org.squiddev.cctweaks.core.registry.IModule;
  * Base class for all blocks
  */
 public abstract class BaseBlock<T extends BaseTile> extends BlockContainer implements IModule {
-	protected final String name;
-	protected final Class<T> klass;
+	public final String name;
+	public final Class<T> klass;
 
 	public BaseBlock(String blockName, Material material, Class<T> klass) {
 		super(material);
