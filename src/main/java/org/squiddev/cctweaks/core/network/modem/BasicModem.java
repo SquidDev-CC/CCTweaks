@@ -38,14 +38,14 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 *
 	 * @see #peripheralWrappersByName
 	 */
-	protected final Map<String, IPeripheral> peripheralsByName = new HashMap<String, IPeripheral>();
+	public final Map<String, IPeripheral> peripheralsByName = new HashMap<String, IPeripheral>();
 
 	/**
 	 * List of wrappers for peripherals on the remote network
 	 *
 	 * @see #peripheralsByName
 	 */
-	protected final Map<String, PeripheralAccess> peripheralWrappersByName = new HashMap<String, PeripheralAccess>();
+	public final Map<String, PeripheralAccess> peripheralWrappersByName = new HashMap<String, PeripheralAccess>();
 
 	/**
 	 * If this modem is active and can connect to peripherals
@@ -263,7 +263,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 * @return The created peripheral
 	 */
 	protected BasicModemPeripheral createPeripheral() {
-		return new BasicModemPeripheral(this);
+		return new BasicModemPeripheral<BasicModem>(this);
 	}
 
 	/**
@@ -288,7 +288,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 
 	@Override
 	public boolean canVisitTo(ForgeDirection to) {
-		return true;
+		return canBeVisited(to);
 	}
 
 	@Override

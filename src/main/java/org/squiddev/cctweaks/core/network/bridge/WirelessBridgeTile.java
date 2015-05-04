@@ -64,10 +64,13 @@ public class WirelessBridgeTile extends NetworkedTile implements IPeripheralTile
 	public boolean onActivated(ItemStack stack, IDataCard card, EntityPlayer player) {
 		if (player.isSneaking()) {
 			binding.save(stack, card);
+			markDirty(); // Mark dirty to ensure the UUID is stored
+
 			card.notifyPlayer(player, IDataCard.Messages.Stored);
 			return true;
 		} else if (binding.load(stack, card)) {
 			card.notifyPlayer(player, IDataCard.Messages.Loaded);
+			markDirty();
 			return true;
 		}
 

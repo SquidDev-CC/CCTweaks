@@ -76,9 +76,11 @@ public class WirelessBridgePart extends SidedNetworkPart {
 
 			if (player.isSneaking()) {
 				binding.save(stack, card);
+				tile().markDirty();
 				card.notifyPlayer(player, IDataCard.Messages.Stored);
 				return true;
 			} else if (binding.load(stack, card)) {
+				tile().markDirty();
 				card.notifyPlayer(player, IDataCard.Messages.Loaded);
 				return true;
 			}
