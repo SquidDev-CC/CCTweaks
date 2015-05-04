@@ -38,4 +38,55 @@ public class Helpers {
 		GameRegistry.addShapelessRecipe(a, b);
 		GameRegistry.addShapelessRecipe(b, a);
 	}
+
+	/**
+	 * Add a series of crafting recipes with positions swapped.
+	 *
+	 * @param output The output stack
+	 * @param a      The first item to swap
+	 * @param b      The second item to swap
+	 * @param args   Args as passed to {@link GameRegistry#addRecipe(net.minecraft.item.crafting.IRecipe)}
+	 */
+	public static void alternateCrafting(ItemStack output, char a, char b, Object... args) {
+		GameRegistry.addRecipe(output, args);
+
+		if (args[0] instanceof String[]) {
+			String[] inputs = (String[]) args[0];
+
+			for (int i = 0; i < inputs.length; i++) {
+				inputs[i] = swapCharacters(inputs[i], a, b);
+			}
+		} else {
+			int i = 0;
+			while (args[i] instanceof String) {
+				args[i] = swapCharacters((String) args[i], a, b);
+				++i;
+			}
+		}
+
+		GameRegistry.addRecipe(output, args);
+	}
+
+	/**
+	 * Swap two characters in a string
+	 *
+	 * @param word The string to swap
+	 * @param a    First character
+	 * @param b    Second character
+	 * @return Swapped string
+	 */
+	public static String swapCharacters(String word, char a, char b) {
+		StringBuilder builder = new StringBuilder(word.length());
+
+		for (int i = 0; i < word.length(); i++) {
+			char c = word.charAt(i);
+			if (c == a) {
+				c = b;
+			} else if (c == b) {
+				c = a;
+			}
+			builder.append(c);
+		}
+		return builder.toString();
+	}
 }

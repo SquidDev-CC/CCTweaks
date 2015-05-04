@@ -14,6 +14,7 @@ import dan200.computercraft.client.render.FixedRenderBlocks;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
+import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import dan200.computercraft.shared.util.IDAssigner;
 import dan200.computercraft.shared.util.PeripheralUtil;
@@ -21,11 +22,15 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.*;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.Facing;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.modem.SinglePeripheralModem;
@@ -37,6 +42,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
+	@SideOnly(Side.CLIENT)
 	private static IIcon[] icons;
 
 	public static final String NAME = CCTweaks.NAME + ":networkModem";
@@ -105,7 +111,7 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 	}
 
 	@Override
-	public ItemStack pickItem(MovingObjectPosition hit) {
+	public ItemStack getItem() {
 		return PeripheralItemFactory.create(PeripheralType.WiredModem, null, 1);
 	}
 
@@ -115,8 +121,8 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 
 		if (modem.modem.pollChanged()) markDirty();
 
-		modem.processQueue(tile());
-		if (!modem.peripheralsKnown) modem.findPeripherals(tile());
+		modem.processQueue();
+		if (!modem.peripheralsKnown) modem.findPeripherals();
 	}
 
 	@Override
@@ -152,6 +158,12 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 		return true;
 	}
 
+	@Override
+	public void onWorldSeparate() {
+		super.onWorldSeparate();
+		modem.modem.destroy();
+	}
+
 	/**
 	 * Marks the modem as dirty to trigger a block update and client sync
 	 */
@@ -177,14 +189,14 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 	@Override
 	public void save(NBTTagCompound tag) {
 		tag.setByte("modem_direction", direction);
-		tag.setByte("modem_state", modem.state);
+		tag.setBoolean("modem_enabled", modem.isEnabled());
 		tag.setInteger("modem_id", modem.id);
 	}
 
 	@Override
 	public void load(NBTTagCompound tag) {
 		direction = tag.getByte("modem_direction");
-		modem.setState(tag.getByte("modem_state"));
+		modem.setState(tag.getBoolean("modem_enabled") ? WiredModem.MODEM_PERIPHERAL : 0);
 		modem.id = tag.getInteger("modem_id");
 	}
 
@@ -243,6 +255,7 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 		return null;
 	}
 
+	@SideOnly(Side.CLIENT)
 	public class ModemRenderer extends FixedRenderBlocks {
 		public IIcon[] getIcons() {
 			IIcon[] icons;
@@ -304,8 +317,9 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 			int z = z() + Facing.offsetsZForSide[dir];
 			IPeripheral peripheral = PeripheralUtil.getPeripheral(world(), x, y, z, Facing.oppositeSide[dir]);
 
-			if (peripheral == null) {
+			if (peripheral == null || peripheral instanceof ModemPeripheral) {
 				id = -1;
+				peripheral = null;
 			} else if (id <= -1) {
 				id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(world()), "computer/lastid_" + peripheral.getType() + ".txt"));
 			}
@@ -314,8 +328,8 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 		}
 
 		@Override
-		public Vec3 getPosition() {
-			return Vec3.createVectorHelper(x(), y(), z());
+		public IWorldPosition getPosition() {
+			return ModemPart.this;
 		}
 	}
 }

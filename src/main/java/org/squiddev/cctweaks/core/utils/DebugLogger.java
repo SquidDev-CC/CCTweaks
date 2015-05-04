@@ -21,7 +21,7 @@ public class DebugLogger {
 
 	public static void debug(Marker marker, String message, Object... params) {
 		if (Config.config.debug) {
-			logger.info(marker, message, params);
+			logger.info(marker, String.format(message, params));
 		}
 	}
 
@@ -39,7 +39,7 @@ public class DebugLogger {
 
 	public static void debug(String message, Object... params) {
 		if (Config.config.debug) {
-			logger.info(message, params);
+			logger.info(String.format(message, params));
 		}
 	}
 
@@ -54,7 +54,7 @@ public class DebugLogger {
 	}
 
 	public static void error(Marker marker, String message, Object... params) {
-		logger.error(marker, message, params);
+		logger.error(marker, String.format(message, params));
 	}
 
 	public static void error(Marker marker, String message, Throwable t) {
@@ -66,7 +66,7 @@ public class DebugLogger {
 	}
 
 	public static void error(String message, Object... params) {
-		logger.error(message, params);
+		logger.error(String.format(message, params));
 	}
 
 	public static void error(String message, Throwable t) {
@@ -78,7 +78,7 @@ public class DebugLogger {
 	}
 
 	public static void info(Marker marker, String message, Object... params) {
-		logger.info(marker, message, params);
+		logger.info(marker, String.format(message, params));
 	}
 
 	public static void info(Marker marker, String message, Throwable t) {
@@ -90,7 +90,7 @@ public class DebugLogger {
 	}
 
 	public static void info(String message, Object... params) {
-		logger.info(message, params);
+		logger.info(String.format(message, params));
 	}
 
 	public static void info(String message, Throwable t) {
@@ -102,7 +102,7 @@ public class DebugLogger {
 	}
 
 	public static void warn(Marker marker, String message, Object... params) {
-		logger.warn(marker, message, params);
+		logger.warn(marker, String.format(message, params));
 	}
 
 	public static void warn(Marker marker, String message, Throwable t) {
@@ -114,7 +114,7 @@ public class DebugLogger {
 	}
 
 	public static void warn(String message, Object... params) {
-		logger.warn(message, params);
+		logger.warn(String.format(message, params));
 	}
 
 	public static void warn(String message, Throwable t) {

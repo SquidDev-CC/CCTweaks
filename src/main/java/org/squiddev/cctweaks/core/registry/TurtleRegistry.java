@@ -1,9 +1,17 @@
 package org.squiddev.cctweaks.core.registry;
 
+import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.ITurtleAccess;
+import dan200.computercraft.api.turtle.ITurtleUpgrade;
+import dan200.computercraft.api.turtle.TurtleSide;
+import dan200.computercraft.shared.turtle.blocks.ITurtleTile;
 import dan200.computercraft.shared.util.InventoryUtil;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
+import org.squiddev.cctweaks.api.network.NetworkRegistry;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.api.turtle.TurtleFuelRegistry;
 
@@ -42,6 +50,39 @@ public class TurtleRegistry implements IModule {
 				}
 
 				return fuelToGive;
+			}
+		});
+
+		// Allow upgrades with a network node
+		// TODO: Bind all nodes into one like CablePart
+		NetworkRegistry.addNodeProvider(new INetworkNodeProvider() {
+			@Override
+			public INetworkNode getNode(TileEntity tile) {
+				if (tile instanceof ITurtleTile) {
+					ITurtleAccess turtle = ((ITurtleTile) tile).getAccess();
+
+					for (TurtleSide side : TurtleSide.values()) {
+						INetworkNode node = getNode(turtle, side);
+						if (node != null) return node;
+					}
+				}
+
+				return null;
+			}
+
+			@Override
+			public boolean isNode(TileEntity tile) {
+				return getNode(tile) != null;
+			}
+
+			public INetworkNode getNode(ITurtleAccess turtle, TurtleSide side) {
+				ITurtleUpgrade upgrade = turtle.getUpgrade(side);
+				if (upgrade != null && upgrade instanceof INetworkNode) return (INetworkNode) upgrade;
+
+				IPeripheral peripheral = turtle.getPeripheral(side);
+				if (peripheral != null && peripheral instanceof INetworkNode) return (INetworkNode) peripheral;
+
+				return null;
 			}
 		});
 	}

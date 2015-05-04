@@ -15,18 +15,18 @@ repositories {
 	}
 
 	maven {
-		name "FireBall API Depot"
-		url "http://dl.tsr.me/artifactory/libs-release-local"
-	}
-
-	maven {
 		name "IC2"
 		url "http://maven.ic2.player.to"
 	}
 
 	ivy {
-		name = "computercraft"
+		name = "ComputerCraft"
 		artifactPattern "http://addons-origin.cursecdn.com/files/2228/723/[module][revision].[ext]"
+	}
+
+	ivy {
+		name = "CoFHLib"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2235/558/[module]-[revision].[ext]"
 	}
 }
 
@@ -43,7 +43,7 @@ dependencies {
 	compile "codechicken:NotEnoughItems:${project.mc_version}-${project.nei_version}:dev"
 	compile "codechicken:CodeChickenCore:${project.mc_version}-${project.ccc_version}:dev"
 
-	compile "api:rf:${project.api_rf_version}"
+	compile "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev:jar"
 	compile "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
 
 	fatPackage(group: 'org.squiddev', name: 'luaj.luajc', version: '1.+') {

@@ -16,12 +16,13 @@ import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.core.network.bridge.WirelessBridgeBlock;
+import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
+import org.squiddev.cctweaks.core.network.NetworkedBlock;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.registry.Registry;
 
 /**
- * A multipart equivalent of {@link WirelessBridgeBlock}
+ * A multipart equivalent of {@link org.squiddev.cctweaks.core.network.bridge.WirelessBridgeTile}
  */
 public class WirelessBridgePart extends SidedNetworkPart {
 	public static final String NAME = CCTweaks.NAME + ":wirelessBridge";
@@ -41,7 +42,7 @@ public class WirelessBridgePart extends SidedNetworkPart {
 
 	@Override
 	public IIcon getBrokenIcon(int i) {
-		return Registry.blockWirelessBridge.getIcon(0, 0);
+		return Registry.blockNetworkedBlock.getIcon(0, 0);
 	}
 
 	@Override
@@ -76,15 +77,22 @@ public class WirelessBridgePart extends SidedNetworkPart {
 
 			if (player.isSneaking()) {
 				binding.save(stack, card);
+				tile().markDirty();
 				card.notifyPlayer(player, IDataCard.Messages.Stored);
 				return true;
 			} else if (binding.load(stack, card)) {
+				tile().markDirty();
 				card.notifyPlayer(player, IDataCard.Messages.Loaded);
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	@Override
+	public ItemStack getItem() {
+		return new ItemStack(MultipartIntegration.itemPart, 1, 0);
 	}
 
 	@Override
@@ -95,9 +103,10 @@ public class WirelessBridgePart extends SidedNetworkPart {
 
 			BridgeRenderer render = getRenderer();
 			Cuboid6 bounds = getBounds();
+			render.renderAllFaces = true;
 			render.setRenderBounds(bounds.min.x, bounds.min.y, bounds.min.z, bounds.max.x, bounds.max.y, bounds.max.z);
 			render.setWorld(world());
-			render.renderStandardBlock(Registry.blockWirelessBridge, x(), y(), z());
+			render.renderStandardBlock(Registry.blockNetworkedBlock, x(), y(), z());
 			return true;
 		}
 
@@ -125,7 +134,7 @@ public class WirelessBridgePart extends SidedNetworkPart {
 
 		@Override
 		public IIcon getBlockIconFromSide(Block block, int side) {
-			return getIconSafe(WirelessBridgeBlock.smallIcon);
+			return getIconSafe(NetworkedBlock.bridgeSmallIcon);
 		}
 
 		@Override

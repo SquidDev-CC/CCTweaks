@@ -6,8 +6,6 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
@@ -40,14 +38,14 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 *
 	 * @see #peripheralWrappersByName
 	 */
-	protected final Map<String, IPeripheral> peripheralsByName = new HashMap<String, IPeripheral>();
+	public final Map<String, IPeripheral> peripheralsByName = new HashMap<String, IPeripheral>();
 
 	/**
 	 * List of wrappers for peripherals on the remote network
 	 *
 	 * @see #peripheralsByName
 	 */
-	protected final Map<String, PeripheralAccess> peripheralWrappersByName = new HashMap<String, PeripheralAccess>();
+	public final Map<String, PeripheralAccess> peripheralWrappersByName = new HashMap<String, PeripheralAccess>();
 
 	/**
 	 * If this modem is active and can connect to peripherals
@@ -57,7 +55,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	/**
 	 * The modem to use
 	 */
-	public final BasicModemPeripheral modem = new BasicModemPeripheral(this);
+	public final BasicModemPeripheral modem = createPeripheral();
 
 	/**
 	 * The state of the modem
@@ -92,14 +90,13 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 
 	/**
 	 * Process the transmit queue
-	 *
-	 * @param start TE to broadcast from
 	 */
-	public void processQueue(TileEntity start) {
+	public void processQueue() {
 		synchronized (transmitQueue) {
 			Packet packet;
+			IWorldPosition position = getPosition();
 			while ((packet = transmitQueue.poll()) != null) {
-				NetworkHelpers.sendPacket(start.getWorldObj(), start.xCoord, start.yCoord, start.zCoord, packet);
+				NetworkHelpers.sendPacket(position.getWorld(), position.getX(), position.getY(), position.getZ(), packet);
 			}
 		}
 	}
@@ -130,28 +127,11 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 
 	/**
 	 * Find peripherals on the network
-	 *
-	 * @param start TE to search from
 	 */
-	public void findPeripherals(final TileEntity start) {
+	public void findPeripherals() {
 		synchronized (peripheralsByName) {
-			final Map<String, IPeripheral> newPeripherals = new HashMap<String, IPeripheral>();
-			new NetworkVisitor() {
-				public void visitNode(INetworkNode node, int distance) {
-					if (node != start) {
-						Map<String, IPeripheral> nodePeripherals = node.getConnectedPeripherals();
-						if (nodePeripherals != null) newPeripherals.putAll(nodePeripherals);
-					}
-				}
-			}.visitNetwork(start);
-
-			// Exclude this items peripherals from the peripheral list
-			Map<String, IPeripheral> localPeripherals = getConnectedPeripherals();
-			if (localPeripherals != null) {
-				for (String name : localPeripherals.keySet()) {
-					newPeripherals.remove(name);
-				}
-			}
+			final Map<String, IPeripheral> newPeripherals = findRemotePeripherals();
+			filterRemotePeripherals(newPeripherals);
 
 			Map<String, IPeripheral> currentPeripherals = peripheralsByName;
 			boolean attached = modem != null && modem.getComputer() != null;
@@ -178,6 +158,37 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 			}
 
 			peripheralsKnown = true;
+		}
+	}
+
+	/**
+	 * Get a list of remote peripherals
+	 *
+	 * @return The remote peripherals
+	 */
+	protected Map<String, IPeripheral> findRemotePeripherals() {
+		final Map<String, IPeripheral> newPeripherals = new HashMap<String, IPeripheral>();
+		new NetworkVisitor() {
+			public void visitNode(INetworkNode node, int distance) {
+				Map<String, IPeripheral> nodePeripherals = node.getConnectedPeripherals();
+				if (nodePeripherals != null) newPeripherals.putAll(nodePeripherals);
+			}
+		}.visitNetwork(getPosition());
+		return newPeripherals;
+	}
+
+	/**
+	 * Exclude some remote peripherals from this list
+	 *
+	 * @param peripherals The remote peripheral list to filter
+	 */
+	protected void filterRemotePeripherals(Map<String, IPeripheral> peripherals) {
+		// Exclude this items peripherals from the peripheral list
+		Map<String, IPeripheral> localPeripherals = getConnectedPeripherals();
+		if (localPeripherals != null) {
+			for (String name : localPeripherals.keySet()) {
+				peripherals.remove(name);
+			}
 		}
 	}
 
@@ -265,12 +276,23 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	}
 
 	/**
+	 * Create a new peripheral for this modem
+	 *
+	 * @return The created peripheral
+	 */
+	protected BasicModemPeripheral createPeripheral() {
+		return new BasicModemPeripheral<BasicModem>(this);
+	}
+
+	/**
 	 * Get the position of the tile
+	 *
+	 * The value of {@link IWorldPosition#getWorld()} must be an instance of {@link net.minecraft.world.World}
 	 *
 	 * @return The position of the tile
 	 * @see ModemPeripheral#getPosition()
 	 */
-	public abstract Vec3 getPosition();
+	public abstract IWorldPosition getPosition();
 
 	@Override
 	public boolean isWireless() {
@@ -284,7 +306,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 
 	@Override
 	public boolean canVisitTo(ForgeDirection to) {
-		return true;
+		return canBeVisited(to);
 	}
 
 	@Override

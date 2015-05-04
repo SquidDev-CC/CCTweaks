@@ -7,6 +7,10 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.ForgeDirection;
+import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.Packet;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,16 +20,17 @@ import java.util.Map;
  *
  * @see BasicModem
  */
-public class BasicModemPeripheral extends ModemPeripheral {
-	protected final BasicModem modem;
+public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements INetworkNode {
+	public final T modem;
 
-	public BasicModemPeripheral(BasicModem modem) {
+	public BasicModemPeripheral(T modem) {
 		this.modem = modem;
 	}
 
 	@Override
 	protected Vec3 getPosition() {
-		return modem.getPosition();
+		IWorldPosition position = modem.getPosition();
+		return Vec3.createVectorHelper(position.getX(), position.getY(), position.getZ());
 	}
 
 	@Override
@@ -133,10 +138,45 @@ public class BasicModemPeripheral extends ModemPeripheral {
 		}
 	}
 
-	private String parseString(Object[] arguments, int index) throws LuaException {
+	public static String parseString(Object[] arguments, int index) throws LuaException {
 		if ((arguments.length < index + 1) || (!(arguments[index] instanceof String))) {
 			throw new LuaException("Expected string");
 		}
 		return (String) arguments[index];
+	}
+
+	@Override
+	public boolean canBeVisited(ForgeDirection from) {
+		return modem.canBeVisited(from);
+	}
+
+	@Override
+	public boolean canVisitTo(ForgeDirection to) {
+		return modem.canVisitTo(to);
+	}
+
+	@Override
+	public Map<String, IPeripheral> getConnectedPeripherals() {
+		return modem.getConnectedPeripherals();
+	}
+
+	@Override
+	public void receivePacket(Packet packet, int distanceTravelled) {
+		modem.receivePacket(packet, distanceTravelled);
+	}
+
+	@Override
+	public void networkInvalidated() {
+		modem.networkInvalidated();
+	}
+
+	@Override
+	public Iterable<IWorldPosition> getExtraNodes() {
+		return modem.getExtraNodes();
+	}
+
+	@Override
+	public Object lock() {
+		return modem.lock();
 	}
 }

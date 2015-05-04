@@ -43,7 +43,7 @@ public class MultipartIntegration extends ModIntegrationModule implements IClien
 	public void init() {
 		itemPart.init();
 
-		Helpers.twoWayCrafting(new ItemStack(Registry.blockWirelessBridge), new ItemStack(itemPart));
+		Helpers.twoWayCrafting(new ItemStack(Registry.blockNetworkedBlock), new ItemStack(itemPart));
 
 		NetworkRegistry.addNodeProvider(new INetworkNodeProvider() {
 			@Override

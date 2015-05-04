@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.network;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
@@ -46,5 +47,12 @@ public abstract class NetworkedTile extends BaseTile implements INetworkNode {
 	@Override
 	public Object lock() {
 		return lock;
+	}
+
+	public boolean onActivated(EntityPlayer player, int side) {
+		return false;
+	}
+
+	public void onNeighborChanged() {
 	}
 }
