@@ -16,7 +16,7 @@ public class CableBlockRenderingHandler_Patch {
 
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelID, RenderBlocks renderblocks) {
 		if (modelID == ComputerCraft.Blocks.cable.blockRenderID) {
-			BlockCable cable = (BlockCable)block;
+			BlockCable cable = (BlockCable) block;
 			PeripheralType type = cable.getPeripheralType(world, x, y, z);
 
 			if ((type == PeripheralType.Cable) || (type == PeripheralType.WiredModemWithCable)) {
@@ -26,25 +26,24 @@ public class CableBlockRenderingHandler_Patch {
 				int modemDir;
 				if (type == PeripheralType.WiredModemWithCable) {
 					modemDir = cable.getDirection(world, x, y, z);
-				}
-				else {
+				} else {
 					modemDir = -1;
 				}
 				for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 					INetworkNode node;
 					if (dir.ordinal() == modemDir || ((node = NetworkRegistry.getNode(
-							world,
-							x + dir.offsetX,
-							y + dir.offsetY,
-							z + dir.offsetZ
+						world,
+						x + dir.offsetX,
+						y + dir.offsetY,
+						z + dir.offsetZ
 					)) != null && node.canBeVisited(dir.getOpposite()))) {
 						fixedRenderBlocks.setRenderBounds(
-								dir.offsetX == -1 ? 0 : dir.offsetX == 1 ? 0.625 : 0.375,
-								dir.offsetY == -1 ? 0 : dir.offsetY == 1 ? 0.625 : 0.375,
-								dir.offsetZ == -1 ? 0 : dir.offsetZ == 1 ? 0.625 : 0.375,
-								dir.offsetX == -1 ? 0.375 : dir.offsetX == 1 ? 1 : 0.625,
-								dir.offsetY == -1 ? 0.375 : dir.offsetY == 1 ? 1 : 0.625,
-								dir.offsetZ == -1 ? 0.375 : dir.offsetZ == 1 ? 1 : 0.625
+							dir.offsetX == -1 ? 0 : dir.offsetX == 1 ? 0.625 : 0.375,
+							dir.offsetY == -1 ? 0 : dir.offsetY == 1 ? 0.625 : 0.375,
+							dir.offsetZ == -1 ? 0 : dir.offsetZ == 1 ? 0.625 : 0.375,
+							dir.offsetX == -1 ? 0.375 : dir.offsetX == 1 ? 1 : 0.625,
+							dir.offsetY == -1 ? 0.375 : dir.offsetY == 1 ? 1 : 0.625,
+							dir.offsetZ == -1 ? 0.375 : dir.offsetZ == 1 ? 1 : 0.625
 						);
 						fixedRenderBlocks.renderStandardBlock(block, x, y, z);
 					}

@@ -32,8 +32,9 @@ public class InsnListSection implements Iterable<AbstractInsnNode> {
 	}
 
 	public void accept(MethodVisitor mv) {
-		for (AbstractInsnNode insn : this)
+		for (AbstractInsnNode insn : this) {
 			insn.accept(mv);
+		}
 	}
 
 	public AbstractInsnNode getFirst() {
@@ -77,19 +78,21 @@ public class InsnListSection implements Iterable<AbstractInsnNode> {
 
 	public void insertBefore(InsnList insns) {
 		int s = insns.size();
-		if (this.list.size() == 0)
+		if (this.list.size() == 0) {
 			list.insert(insns);
-		else
+		} else {
 			list.insertBefore(list.get(start), insns);
+		}
 		start += s;
 		end += s;
 	}
 
 	public void insert(InsnList insns) {
-		if (end == 0)
+		if (end == 0) {
 			list.insert(insns);
-		else
+		} else {
 			list.insert(list.get(end - 1), insns);
+		}
 	}
 
 	public void replace(InsnList insns) {
@@ -100,8 +103,9 @@ public class InsnListSection implements Iterable<AbstractInsnNode> {
 	}
 
 	public void remove() {
-		while (end != start)
+		while (end != start) {
 			remove(0);
+		}
 	}
 
 	public InsnListSection drop(int n) {
@@ -118,8 +122,9 @@ public class InsnListSection implements Iterable<AbstractInsnNode> {
 
 	public InsnListSection copy(Map<LabelNode, LabelNode> labelMap) {
 		InsnListSection copy = new InsnListSection();
-		for (AbstractInsnNode insn : this)
+		for (AbstractInsnNode insn : this) {
 			copy.add(insn.clone(labelMap));
+		}
 
 		return copy;
 	}

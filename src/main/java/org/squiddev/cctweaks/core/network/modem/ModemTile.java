@@ -1,10 +1,8 @@
 package org.squiddev.cctweaks.core.network.modem;
 
-import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
-import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
@@ -13,7 +11,6 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.NetworkedTile;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.Map;
 import java.util.Objects;
@@ -112,7 +109,7 @@ public class ModemTile extends NetworkedTile implements IPeripheralTile {
 
 	@Override
 	public void markForUpdate() {
-		if(!worldObj.isRemote) modem.refreshState();
+		if (!worldObj.isRemote) modem.refreshState();
 		super.markForUpdate();
 	}
 

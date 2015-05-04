@@ -66,7 +66,7 @@ public class NetworkedBlock extends BaseBlock<NetworkedTile> implements INetwork
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
 		super.onNeighborBlockChange(world, x, y, z, block);
-		if(world.isRemote) return;
+		if (world.isRemote) return;
 
 		NetworkedTile tile = getTile(world, x, y, z);
 		if (tile != null) tile.onNeighborChanged();
@@ -75,7 +75,7 @@ public class NetworkedBlock extends BaseBlock<NetworkedTile> implements INetwork
 	@Override
 	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
 		super.onNeighborChange(world, x, y, z, tileX, tileY, tileZ);
-		if(world instanceof World && ((World) world).isRemote) return;
+		if (world instanceof World && ((World) world).isRemote) return;
 
 		NetworkedTile tile = getTile(world, x, y, z);
 		if (tile != null) tile.onNeighborChanged();
