@@ -138,13 +138,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 				}
 			}.visitNetwork(getPosition());
 
-			// Exclude this items peripherals from the peripheral list
-			Map<String, IPeripheral> localPeripherals = getConnectedPeripherals();
-			if (localPeripherals != null) {
-				for (String name : localPeripherals.keySet()) {
-					newPeripherals.remove(name);
-				}
-			}
+			filterRemotePeripherals(newPeripherals);
 
 			Map<String, IPeripheral> currentPeripherals = peripheralsByName;
 			boolean attached = modem != null && modem.getComputer() != null;
@@ -171,6 +165,21 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 			}
 
 			peripheralsKnown = true;
+		}
+	}
+
+	/**
+	 * Exclude some remote peripherals from this list
+	 *
+	 * @param peripherals The remote peripheral list to filter
+	 */
+	protected void filterRemotePeripherals(Map<String, IPeripheral> peripherals) {
+		// Exclude this items peripherals from the peripheral list
+		Map<String, IPeripheral> localPeripherals = getConnectedPeripherals();
+		if (localPeripherals != null) {
+			for (String name : localPeripherals.keySet()) {
+				peripherals.remove(name);
+			}
 		}
 	}
 

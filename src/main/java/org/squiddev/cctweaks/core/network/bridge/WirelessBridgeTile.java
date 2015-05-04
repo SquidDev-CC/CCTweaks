@@ -45,7 +45,7 @@ public class WirelessBridgeTile extends NetworkedTile implements IPeripheralTile
 	}
 
 	@Override
-	public void onRemove() {
+	public void postRemove() {
 		binding.remove();
 	}
 

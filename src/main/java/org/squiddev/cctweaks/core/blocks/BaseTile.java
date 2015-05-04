@@ -33,14 +33,20 @@ public abstract class BaseTile extends TileEntity implements IWorldPosition {
 	}
 
 	/**
-	 * Called on chunk unload, remove, etc...
+	 * Called before the block is removed or on chunk unload
 	 */
-	public void onRemove() {
+	public void preRemove() {
+	}
+
+	/**
+	 * Called after being removed
+	 */
+	public void postRemove() {
 	}
 
 	@Override
 	public void onChunkUnload() {
-		onRemove();
+		preRemove();
 	}
 
 	/**
@@ -72,5 +78,13 @@ public abstract class BaseTile extends TileEntity implements IWorldPosition {
 				readDescription(packet.func_148857_g());
 				break;
 		}
+	}
+
+	/**
+	 * Improvement over {@link #markDirty()}
+	 */
+	public void markForUpdate() {
+		markDirty();
+		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 	}
 }

@@ -52,4 +52,7 @@ public abstract class NetworkedTile extends BaseTile implements INetworkNode {
 	public boolean onActivated(EntityPlayer player, int side) {
 		return false;
 	}
+
+	public void onNeighborChanged() {
+	}
 }

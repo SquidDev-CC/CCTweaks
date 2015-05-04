@@ -14,6 +14,7 @@ import dan200.computercraft.client.render.FixedRenderBlocks;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
+import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import dan200.computercraft.shared.util.IDAssigner;
 import dan200.computercraft.shared.util.PeripheralUtil;
@@ -155,6 +156,12 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 		}
 
 		return true;
+	}
+
+	@Override
+	public void onWorldSeparate() {
+		super.onWorldSeparate();
+		modem.modem.destroy();
 	}
 
 	/**
@@ -310,8 +317,9 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 			int z = z() + Facing.offsetsZForSide[dir];
 			IPeripheral peripheral = PeripheralUtil.getPeripheral(world(), x, y, z, Facing.oppositeSide[dir]);
 
-			if (peripheral == null) {
+			if (peripheral == null || peripheral instanceof ModemPeripheral) {
 				id = -1;
+				peripheral = null;
 			} else if (id <= -1) {
 				id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(world()), "computer/lastid_" + peripheral.getType() + ".txt"));
 			}
