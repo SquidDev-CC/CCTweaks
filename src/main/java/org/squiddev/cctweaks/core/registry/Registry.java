@@ -6,11 +6,11 @@ import org.squiddev.cctweaks.core.blocks.BaseBlock;
 import org.squiddev.cctweaks.core.integration.IndustrialCraftIntegration;
 import org.squiddev.cctweaks.core.integration.RedstoneFluxIntegration;
 import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
-import org.squiddev.cctweaks.core.items.BaseItem;
 import org.squiddev.cctweaks.core.items.ComputerUpgradeItem;
 import org.squiddev.cctweaks.core.items.DataCardItem;
 import org.squiddev.cctweaks.core.items.DebuggerItem;
 import org.squiddev.cctweaks.core.network.NetworkedBlock;
+import org.squiddev.cctweaks.core.network.bridge.WirelessBridgeTurtleUpgrade;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +21,7 @@ import java.util.Set;
 public final class Registry {
 	public static final ComputerUpgradeItem itemComputerUpgrade;
 	public static final DebuggerItem itemDebugger;
-	public static final BaseItem itemNetworkBinder;
+	public static final DataCardItem itemDataCard;
 
 	public static final BaseBlock blockNetworkedBlock;
 
@@ -34,12 +34,13 @@ public final class Registry {
 		addModule(itemComputerUpgrade = new ComputerUpgradeItem());
 		addModule(itemDebugger = new DebuggerItem());
 
-		addModule(itemNetworkBinder = new DataCardItem());
+		addModule(itemDataCard = new DataCardItem());
 		addModule(blockNetworkedBlock = new NetworkedBlock());
 
 		addModule(new MultipartIntegration());
 
 		addModule(new TurtleRegistry());
+		addModule(new WirelessBridgeTurtleUpgrade());
 		addModule(new RedstoneFluxIntegration());
 		addModule(new IndustrialCraftIntegration());
 	}

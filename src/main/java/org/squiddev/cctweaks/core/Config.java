@@ -88,6 +88,14 @@ public final class Config {
 			"Disabled turtle actions:\n(compare, compareTo, craft, detect, dig,\ndrop, equip, inspect, move, place,\nrefuel, select, suck, tool, turn)"
 		);
 
+		data.turtleWirelessBridgeId = configuration.getInt(
+			"Wireless Bridge Id",
+			TURTLE,
+			defaults.turtleWirelessBridgeId,
+			-1, Integer.MAX_VALUE,
+			"The id for the network bridge upgrade. Set to -1 to disable"
+		);
+
 		// Computer changes
 		data.enableComputerUpgrades = configuration.getBoolean(
 			"Computer upgrade",
@@ -190,6 +198,12 @@ public final class Config {
 		 * Disabled turtle verbs
 		 */
 		public String[] turtleDisabledActions = new String[0];
+
+		/**
+		 * Id for {@link org.squiddev.cctweaks.core.network.bridge.WirelessBridgeTurtleUpgrade}
+		 * TODO: Register on the wiki: http://www.computercraft.info/wiki/Turtle_Upgrade_IDs
+		 */
+		public int turtleWirelessBridgeId = 331;
 
 		/**
 		 * Enable computer upgrade
