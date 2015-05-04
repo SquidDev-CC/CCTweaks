@@ -16,6 +16,7 @@ import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
 import org.squiddev.cctweaks.core.network.NetworkedBlock;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.registry.Registry;
@@ -87,6 +88,11 @@ public class WirelessBridgePart extends SidedNetworkPart {
 		}
 
 		return false;
+	}
+
+	@Override
+	public ItemStack getItem() {
+		return new ItemStack(MultipartIntegration.itemPart, 1, 0);
 	}
 
 	@Override

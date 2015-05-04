@@ -41,6 +41,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
+	@SideOnly(Side.CLIENT)
 	private static IIcon[] icons;
 
 	public static final String NAME = CCTweaks.NAME + ":networkModem";
@@ -109,7 +110,7 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 	}
 
 	@Override
-	public ItemStack pickItem(MovingObjectPosition hit) {
+	public ItemStack getItem() {
 		return PeripheralItemFactory.create(PeripheralType.WiredModem, null, 1);
 	}
 
@@ -181,14 +182,14 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 	@Override
 	public void save(NBTTagCompound tag) {
 		tag.setByte("modem_direction", direction);
-		tag.setByte("modem_state", modem.state);
+		tag.setBoolean("modem_enabled", modem.isEnabled());
 		tag.setInteger("modem_id", modem.id);
 	}
 
 	@Override
 	public void load(NBTTagCompound tag) {
 		direction = tag.getByte("modem_direction");
-		modem.setState(tag.getByte("modem_state"));
+		modem.setState(tag.getBoolean("modem_enabled") ? WiredModem.MODEM_PERIPHERAL : 0);
 		modem.id = tag.getInteger("modem_id");
 	}
 
@@ -247,6 +248,7 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 		return null;
 	}
 
+	@SideOnly(Side.CLIENT)
 	public class ModemRenderer extends FixedRenderBlocks {
 		public IIcon[] getIcons() {
 			IIcon[] icons;

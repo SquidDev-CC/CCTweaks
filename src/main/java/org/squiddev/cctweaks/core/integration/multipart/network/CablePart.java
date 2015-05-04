@@ -213,7 +213,7 @@ public class CablePart extends AbstractPart implements INetworkNode, TSlottedPar
 	}
 
 	@Override
-	public ItemStack pickItem(MovingObjectPosition hit) {
+	public ItemStack getItem() {
 		return PeripheralItemFactory.create(PeripheralType.Cable, null, 1);
 	}
 

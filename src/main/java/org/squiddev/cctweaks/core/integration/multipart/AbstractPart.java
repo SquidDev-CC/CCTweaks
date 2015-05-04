@@ -6,12 +6,14 @@ import codechicken.multipart.*;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -53,6 +55,18 @@ public abstract class AbstractPart extends TMultiPart implements JNormalOcclusio
 		}
 
 		return boxes;
+	}
+
+	public abstract ItemStack getItem();
+
+	@Override
+	public ItemStack pickItem(MovingObjectPosition hit) {
+		return getItem();
+	}
+
+	@Override
+	public Iterable<ItemStack> getDrops() {
+		return Collections.singletonList(getItem());
 	}
 
 	@Override
