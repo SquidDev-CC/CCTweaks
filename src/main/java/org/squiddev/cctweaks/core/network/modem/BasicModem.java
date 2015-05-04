@@ -130,14 +130,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 */
 	public void findPeripherals() {
 		synchronized (peripheralsByName) {
-			final Map<String, IPeripheral> newPeripherals = new HashMap<String, IPeripheral>();
-			new NetworkVisitor() {
-				public void visitNode(INetworkNode node, int distance) {
-					Map<String, IPeripheral> nodePeripherals = node.getConnectedPeripherals();
-					if (nodePeripherals != null) newPeripherals.putAll(nodePeripherals);
-				}
-			}.visitNetwork(getPosition());
-
+			final Map<String, IPeripheral> newPeripherals = findRemotePeripherals();
 			filterRemotePeripherals(newPeripherals);
 
 			Map<String, IPeripheral> currentPeripherals = peripheralsByName;
@@ -166,6 +159,22 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 
 			peripheralsKnown = true;
 		}
+	}
+
+	/**
+	 * Get a list of remote peripherals
+	 *
+	 * @return The remote peripherals
+	 */
+	protected Map<String, IPeripheral> findRemotePeripherals() {
+		final Map<String, IPeripheral> newPeripherals = new HashMap<String, IPeripheral>();
+		new NetworkVisitor() {
+			public void visitNode(INetworkNode node, int distance) {
+				Map<String, IPeripheral> nodePeripherals = node.getConnectedPeripherals();
+				if (nodePeripherals != null) newPeripherals.putAll(nodePeripherals);
+			}
+		}.visitNetwork(getPosition());
+		return newPeripherals;
 	}
 
 	/**

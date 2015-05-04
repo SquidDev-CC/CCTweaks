@@ -47,6 +47,7 @@ public class WirelessBridgeTile extends NetworkedTile implements IPeripheralTile
 	@Override
 	public void postRemove() {
 		binding.remove();
+		modem.modem.destroy();
 	}
 
 	@Override
