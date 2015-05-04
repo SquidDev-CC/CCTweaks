@@ -103,6 +103,7 @@ public class WirelessBridgePart extends SidedNetworkPart {
 
 			BridgeRenderer render = getRenderer();
 			Cuboid6 bounds = getBounds();
+			render.renderAllFaces = true;
 			render.setRenderBounds(bounds.min.x, bounds.min.y, bounds.min.z, bounds.max.x, bounds.max.y, bounds.max.z);
 			render.setWorld(world());
 			render.renderStandardBlock(Registry.blockNetworkedBlock, x(), y(), z());
