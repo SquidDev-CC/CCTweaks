@@ -6,7 +6,7 @@ import org.squiddev.cctweaks.core.asm.patch.ClassPartialPatcher;
 import org.squiddev.cctweaks.core.asm.patch.ClassPatcher;
 import org.squiddev.cctweaks.core.asm.patch.ClassReplacer;
 import org.squiddev.cctweaks.core.asm.patch.IPatcher;
-import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
+import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 
 public class ASMTransformer implements IClassTransformer {
 	protected IPatcher[] patches = {

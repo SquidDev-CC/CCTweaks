@@ -5,6 +5,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.config.Configuration;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
 
 import java.io.File;
 import java.util.Arrays;
@@ -200,7 +201,7 @@ public final class Config {
 		public String[] turtleDisabledActions = new String[0];
 
 		/**
-		 * Id for {@link org.squiddev.cctweaks.core.network.bridge.WirelessBridgeTurtleUpgrade}
+		 * Id for {@link TurtleUpgradeWirelessBridge}
 		 * TODO: Register on the wiki: http://www.computercraft.info/wiki/Turtle_Upgrade_IDs
 		 */
 		public int turtleWirelessBridgeId = 331;
