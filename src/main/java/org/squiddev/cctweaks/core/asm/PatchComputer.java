@@ -49,13 +49,13 @@ public class PatchComputer implements Opcodes {
 						InsnListSection found = ASMMatcher.findOnce(method.instructions, new InsnListSection(jsePlatform), true);
 
 						InsnList insert = new InsnList();
-						insert.add(new MethodInsnNode(INVOKESTATIC, "org/squiddev/luaj/luajc/LuaJC", "install", "()V", false));
+						insert.add(new MethodInsnNode(INVOKESTATIC, "org/squiddev/cctweaks/core/lua/FallbackLuaJC", "install", "()V", false));
 						found.insert(insert);
 
 						changed = true;
-						DebugLogger.debug(IPatcher.MARKER, "Injected LuaJCRewrite.install() call into LuaJLuaMachine.<init>");
+						DebugLogger.debug(IPatcher.MARKER, "Injected LuaJC.install() call into LuaJLuaMachine.<init>");
 					} catch (Exception e) {
-						DebugLogger.error(IPatcher.MARKER, "Cannot inject LuaJCRewrite.install() into LuaJLuaMachine.<init>", e);
+						DebugLogger.error(IPatcher.MARKER, "Cannot inject LuaJC.install() into LuaJLuaMachine.<init>", e);
 					}
 				}
 
