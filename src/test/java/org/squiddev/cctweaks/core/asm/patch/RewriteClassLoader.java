@@ -8,12 +8,12 @@ import java.util.Set;
 /**
  * Loads classes, rewriting them
  */
-public class TestClassLoader extends ClassLoader {
+public class RewriteClassLoader extends ClassLoader {
 	public final IPatcher[] patchers;
 
 	private Set<String> loaded = new HashSet<String>();
 
-	public TestClassLoader(IPatcher[] patchers) {
+	public RewriteClassLoader(IPatcher[] patchers) {
 		this.patchers = patchers;
 	}
 
