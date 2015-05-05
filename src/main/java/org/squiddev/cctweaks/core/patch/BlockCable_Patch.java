@@ -1,26 +1,14 @@
 package org.squiddev.cctweaks.core.patch;
 
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeBlock;
-import org.squiddev.cctweaks.api.network.NetworkRegistry;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
 
 /**
  * Patches {@link dan200.computercraft.shared.peripheral.common.BlockCable#isCable(IBlockAccess, int, int, int)}
- * to use {@link NetworkRegistry#isNode(IBlockAccess, int, int, int)} and implements {@link INetworkNodeBlock}
  */
 @SuppressWarnings("unused")
-public final class BlockCable_Patch implements INetworkNodeBlock {
+public final class BlockCable_Patch {
 	public static boolean isCable(IBlockAccess world, int x, int y, int z) {
-		return NetworkRegistry.isNode(world, x, y, z);
-	}
-
-	public INetworkNode getNode(IBlockAccess world, int x, int y, int z, int meta) {
-		TileEntity entity = world.getTileEntity(x, y, z);
-		if (entity != null && entity instanceof INetworkNode) {
-			return (INetworkNode) entity;
-		}
-		return null;
+		return NetworkAPI.registry().isNode(world, x, y, z);
 	}
 }

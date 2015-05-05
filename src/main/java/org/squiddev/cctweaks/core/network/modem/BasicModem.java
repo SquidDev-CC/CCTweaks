@@ -9,9 +9,10 @@ import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.NetworkHelpers;
-import org.squiddev.cctweaks.api.network.NetworkVisitor;
+import org.squiddev.cctweaks.api.network.ISearchLoc;
 import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.core.network.NetworkHelpers;
+import org.squiddev.cctweaks.core.network.visitor.NetworkVisitorIterable;
 
 import java.util.*;
 
@@ -167,13 +168,12 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 * @return The remote peripherals
 	 */
 	protected Map<String, IPeripheral> findRemotePeripherals() {
-		final Map<String, IPeripheral> newPeripherals = new HashMap<String, IPeripheral>();
-		new NetworkVisitor() {
-			public void visitNode(INetworkNode node, int distance) {
-				Map<String, IPeripheral> nodePeripherals = node.getConnectedPeripherals();
-				if (nodePeripherals != null) newPeripherals.putAll(nodePeripherals);
-			}
-		}.visitNetwork(getPosition());
+		Map<String, IPeripheral> newPeripherals = new HashMap<String, IPeripheral>();
+		for (ISearchLoc loc : new NetworkVisitorIterable(getPosition())) {
+			Map<String, IPeripheral> nodePeripherals = loc.getNode().getConnectedPeripherals();
+			if (nodePeripherals != null) newPeripherals.putAll(nodePeripherals);
+		}
+
 		return newPeripherals;
 	}
 

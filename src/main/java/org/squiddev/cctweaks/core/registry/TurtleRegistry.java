@@ -11,7 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
-import org.squiddev.cctweaks.api.network.NetworkRegistry;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.api.turtle.TurtleFuelRegistry;
 
@@ -55,7 +55,7 @@ public class TurtleRegistry implements IModule {
 
 		// Allow upgrades with a network node
 		// TODO: Bind all nodes into one like CablePart
-		NetworkRegistry.addNodeProvider(new INetworkNodeProvider() {
+		NetworkAPI.registry().addNodeProvider(new INetworkNodeProvider() {
 			@Override
 			public INetworkNode getNode(TileEntity tile) {
 				if (tile instanceof ITurtleTile) {

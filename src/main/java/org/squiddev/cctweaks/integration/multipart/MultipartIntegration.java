@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
-import org.squiddev.cctweaks.api.network.NetworkRegistry;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.utils.Helpers;
@@ -45,7 +45,7 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 
 		Helpers.twoWayCrafting(new ItemStack(Registry.blockNetworked), new ItemStack(itemPart));
 
-		NetworkRegistry.addNodeProvider(new INetworkNodeProvider() {
+		NetworkAPI.registry().addNodeProvider(new INetworkNodeProvider() {
 			@Override
 			public INetworkNode getNode(TileEntity tile) {
 				if (tile instanceof TileMultipart) {

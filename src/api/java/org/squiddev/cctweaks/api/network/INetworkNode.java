@@ -1,8 +1,6 @@
 package org.squiddev.cctweaks.api.network;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.shared.peripheral.modem.TileCable;
-import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
@@ -55,17 +53,13 @@ public interface INetworkNode {
 	 * Called when the network is changed in some way
 	 *
 	 * This includes adding/removing nodes or changing peripherals
-	 *
-	 * @see NetworkHelpers#fireNetworkInvalidate(IBlockAccess, int, int, int)
-	 * @see NetworkHelpers#fireNetworkInvalidateAdjacent(IBlockAccess, int, int, int)
-	 * @see TileCable#networkChanged()
 	 */
 	void networkInvalidated();
 
 	/**
 	 * Get a list of extra node search locations.
 	 *
-	 * This is used by {@link NetworkVisitor} to find nodes in non-adjacent blocks
+	 * This is used by {@link INetworkVisitor} to find nodes in non-adjacent blocks
 	 *
 	 * @return Array of custom search locations, or {@code null} if none provided
 	 */

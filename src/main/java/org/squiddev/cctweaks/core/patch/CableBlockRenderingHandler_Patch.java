@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.NetworkRegistry;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
 
 public class CableBlockRenderingHandler_Patch {
 	private static FixedRenderBlocks fixedRenderBlocks = new FixedRenderBlocks();
@@ -31,7 +31,7 @@ public class CableBlockRenderingHandler_Patch {
 				}
 				for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 					INetworkNode node;
-					if (dir.ordinal() == modemDir || ((node = NetworkRegistry.getNode(
+					if (dir.ordinal() == modemDir || ((node = NetworkAPI.registry().getNode(
 						world,
 						x + dir.offsetX,
 						y + dir.offsetY,

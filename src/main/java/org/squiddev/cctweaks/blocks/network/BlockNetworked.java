@@ -18,8 +18,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeBlock;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -32,7 +30,7 @@ import java.util.List;
 /**
  * A bridge between two networks so they can communicate with each other
  */
-public class BlockNetworked extends BlockBase<TileNetworked> implements INetworkNodeBlock, IMultiBlock {
+public class BlockNetworked extends BlockBase<TileNetworked> implements IMultiBlock {
 	@SideOnly(Side.CLIENT)
 	public static IIcon bridgeIcon;
 	@SideOnly(Side.CLIENT)
@@ -181,10 +179,5 @@ public class BlockNetworked extends BlockBase<TileNetworked> implements INetwork
 			'M', PeripheralItemFactory.create(PeripheralType.WirelessModem, null, 1)
 		);
 		Helpers.twoWayCrafting(new ItemStack(this, 1, 1), PeripheralItemFactory.create(PeripheralType.WiredModem, null, 1));
-	}
-
-	@Override
-	public INetworkNode getNode(IBlockAccess world, int x, int y, int z, int meta) {
-		return getTile(world, x, y, z);
 	}
 }

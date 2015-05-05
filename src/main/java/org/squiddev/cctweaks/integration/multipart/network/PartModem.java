@@ -31,7 +31,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.NetworkHelpers;
+import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.modem.SinglePeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
