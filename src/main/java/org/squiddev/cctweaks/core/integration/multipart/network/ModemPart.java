@@ -126,6 +126,11 @@ public class ModemPart extends SidedNetworkPart implements IPeripheralTile {
 	}
 
 	@Override
+	public boolean doesTick() {
+		return true;
+	}
+
+	@Override
 	public void onNeighborChanged() {
 		if (modem.updateEnabled()) {
 			markDirty();
