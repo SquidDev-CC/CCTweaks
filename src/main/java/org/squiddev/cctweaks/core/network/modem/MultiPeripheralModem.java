@@ -19,7 +19,7 @@ import java.util.Set;
  * A peripheral that checks all 6 sides to connect to
  */
 public abstract class MultiPeripheralModem extends BasicModem {
-	protected final int[] ids;
+	public final int[] ids;
 
 	public MultiPeripheralModem() {
 		ids = new int[]{-1, -1, -1, -1, -1, -1};

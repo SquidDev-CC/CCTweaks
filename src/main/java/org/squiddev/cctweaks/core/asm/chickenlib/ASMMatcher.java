@@ -36,8 +36,9 @@ public class ASMMatcher implements Opcodes {
 	}
 
 	public static boolean insnEqual(AbstractInsnNode node1, AbstractInsnNode node2) {
-		if (node1.getOpcode() != node2.getOpcode())
+		if (node1.getOpcode() != node2.getOpcode()) {
 			return false;
+		}
 
 		switch (node2.getType()) {
 			case AbstractInsnNode.VAR_INSN:
@@ -95,20 +96,23 @@ public class ASMMatcher implements Opcodes {
 				continue;
 			}
 
-			if (!insnEqual(haystack.get(h), needle.get(n)))
+			if (!insnEqual(haystack.get(h), needle.get(n))) {
 				return null;
+			}
 			n++;
 		}
-		if (n != needle.size())
+		if (n != needle.size()) {
 			return null;
+		}
 
 		return haystack.take(h);
 	}
 
 	public static InsnListSection findOnce(InsnListSection haystack, InsnListSection needle, boolean excludeUnimportant) {
 		List<InsnListSection> list = find(haystack, needle, excludeUnimportant);
-		if (list.size() != 1)
+		if (list.size() != 1) {
 			throw new RuntimeException("Needle found " + list.size() + " times in Haystack:\n" + haystack + "\n\n" + needle);
+		}
 
 		return list.get(0);
 	}

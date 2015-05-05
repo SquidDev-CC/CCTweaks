@@ -2,15 +2,14 @@ package org.squiddev.cctweaks.core.registry;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import org.squiddev.cctweaks.core.blocks.BaseBlock;
-import org.squiddev.cctweaks.core.integration.IndustrialCraftIntegration;
-import org.squiddev.cctweaks.core.integration.RedstoneFluxIntegration;
-import org.squiddev.cctweaks.core.integration.multipart.MultipartIntegration;
-import org.squiddev.cctweaks.core.items.ComputerUpgradeItem;
-import org.squiddev.cctweaks.core.items.DataCardItem;
-import org.squiddev.cctweaks.core.items.DebuggerItem;
-import org.squiddev.cctweaks.core.network.NetworkedBlock;
-import org.squiddev.cctweaks.core.network.bridge.WirelessBridgeTurtleUpgrade;
+import org.squiddev.cctweaks.blocks.network.BlockNetworked;
+import org.squiddev.cctweaks.integration.IndustrialCraftIntegration;
+import org.squiddev.cctweaks.integration.RedstoneFluxIntegration;
+import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
+import org.squiddev.cctweaks.items.ItemComputerUpgrade;
+import org.squiddev.cctweaks.items.ItemDataCard;
+import org.squiddev.cctweaks.items.ItemDebugger;
+import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,11 +18,11 @@ import java.util.Set;
  * The proxy class
  */
 public final class Registry {
-	public static final ComputerUpgradeItem itemComputerUpgrade;
-	public static final DebuggerItem itemDebugger;
-	public static final DataCardItem itemDataCard;
+	public static final ItemComputerUpgrade itemComputerUpgrade;
+	public static final ItemDebugger itemDebugger;
+	public static final ItemDataCard itemDataCard;
 
-	public static final BaseBlock blockNetworkedBlock;
+	public static final BlockNetworked blockNetworked;
 
 	private static final Set<IModule> modules = new HashSet<IModule>();
 
@@ -31,16 +30,16 @@ public final class Registry {
 	private static boolean init = false;
 
 	static {
-		addModule(itemComputerUpgrade = new ComputerUpgradeItem());
-		addModule(itemDebugger = new DebuggerItem());
+		addModule(itemComputerUpgrade = new ItemComputerUpgrade());
+		addModule(itemDebugger = new ItemDebugger());
 
-		addModule(itemDataCard = new DataCardItem());
-		addModule(blockNetworkedBlock = new NetworkedBlock());
+		addModule(itemDataCard = new ItemDataCard());
+		addModule(blockNetworked = new BlockNetworked());
 
 		addModule(new MultipartIntegration());
 
 		addModule(new TurtleRegistry());
-		addModule(new WirelessBridgeTurtleUpgrade());
+		addModule(new TurtleUpgradeWirelessBridge());
 		addModule(new RedstoneFluxIntegration());
 		addModule(new IndustrialCraftIntegration());
 	}
