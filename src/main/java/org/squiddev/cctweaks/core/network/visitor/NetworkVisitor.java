@@ -1,11 +1,10 @@
-package org.squiddev.cctweaks.core.network;
+package org.squiddev.cctweaks.core.network.visitor;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkVisitor;
 import org.squiddev.cctweaks.api.network.ISearchLoc;
-import org.squiddev.cctweaks.core.network.visitor.NetworkVisitorIterable;
 
 import java.util.Set;
 

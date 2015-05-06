@@ -4,8 +4,8 @@ import dan200.computercraft.api.turtle.ITurtleAccess;
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IElectricItem;
 import net.minecraft.item.ItemStack;
+import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
-import org.squiddev.cctweaks.api.turtle.TurtleFuelRegistry;
 import org.squiddev.cctweaks.core.Config;
 
 /**
@@ -22,9 +22,9 @@ public class IndustrialCraftIntegration extends APIIntegration {
 
 	@Override
 	public void init() {
-		TurtleFuelRegistry.addFuelProvider(new ITurtleFuelProvider() {
+		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {
 			@Override
-			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack, int limit) {
+			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack) {
 				return Config.config.turtleEuRefuelEnable && stack.getItem() instanceof IElectricItem;
 			}
 

@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.core.registry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
+import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
 import org.squiddev.cctweaks.integration.IndustrialCraftIntegration;
 import org.squiddev.cctweaks.integration.RedstoneFluxIntegration;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
@@ -38,7 +39,7 @@ public final class Registry {
 
 		addModule(new MultipartIntegration());
 
-		addModule(new TurtleRegistry());
+		addModule(new DefaultTurtleProviders());
 		addModule(new TurtleUpgradeWirelessBridge());
 		addModule(new RedstoneFluxIntegration());
 		addModule(new IndustrialCraftIntegration());
