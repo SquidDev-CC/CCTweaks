@@ -1,4 +1,4 @@
-# CCTweaks
+# CCTweaks [![Build Status](https://travis-ci.org/SquidDev-CC/CC-Tweaks.svg?branch=master)](https://travis-ci.org/SquidDev-CC/CC-Tweaks)
 Miscellaneous things for ComputerCraft
 
 ## Features
