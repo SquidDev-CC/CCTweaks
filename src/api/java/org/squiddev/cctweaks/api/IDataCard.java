@@ -14,6 +14,7 @@ public interface IDataCard {
 	 * Variable to return if no data is stored
 	 */
 	String EMPTY = "cctweaks.data.empty";
+
 	/**
 	 * Set the current data for this stack
 	 *
