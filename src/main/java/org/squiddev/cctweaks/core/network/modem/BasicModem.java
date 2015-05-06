@@ -325,6 +325,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 * @see #peripheralWrappersByName
 	 */
 	public Map<String, IPeripheral> getPeripheralsByName() {
+		if (!peripheralsKnown) findPeripherals();
 		return peripheralsByName;
 	}
 }
