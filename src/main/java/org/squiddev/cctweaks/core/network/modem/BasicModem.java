@@ -33,12 +33,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 */
 	protected final Queue<Packet> transmitQueue = new LinkedList<Packet>();
 
-	/**
-	 * List of peripherals on the remote network
-	 *
-	 * @see #peripheralWrappersByName
-	 */
-	public final Map<String, IPeripheral> peripheralsByName = new HashMap<String, IPeripheral>();
+	private final Map<String, IPeripheral> peripheralsByName = new HashMap<String, IPeripheral>();
 
 	/**
 	 * List of wrappers for peripherals on the remote network
@@ -129,11 +124,11 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 * Find peripherals on the network
 	 */
 	public void findPeripherals() {
-		synchronized (peripheralsByName) {
+		synchronized (getPeripheralsByName()) {
 			final Map<String, IPeripheral> newPeripherals = findRemotePeripherals();
 			filterRemotePeripherals(newPeripherals);
 
-			Map<String, IPeripheral> currentPeripherals = peripheralsByName;
+			Map<String, IPeripheral> currentPeripherals = getPeripheralsByName();
 			boolean attached = modem != null && modem.getComputer() != null;
 
 			Iterator<String> it = currentPeripherals.keySet().iterator();
@@ -321,6 +316,15 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 
 	@Override
 	public Object lock() {
+		return getPeripheralsByName();
+	}
+
+	/**
+	 * List of peripherals on the remote network
+	 *
+	 * @see #peripheralWrappersByName
+	 */
+	public Map<String, IPeripheral> getPeripheralsByName() {
 		return peripheralsByName;
 	}
 }
