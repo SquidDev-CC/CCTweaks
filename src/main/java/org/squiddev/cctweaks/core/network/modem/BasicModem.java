@@ -8,10 +8,7 @@ import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.NetworkHelpers;
-import org.squiddev.cctweaks.api.network.NetworkVisitor;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.*;
 
 import java.util.*;
 
@@ -19,7 +16,7 @@ import java.util.*;
  * Basic wired modem that handles peripherals and
  * computer interaction
  */
-public abstract class BasicModem implements INetwork, INetworkNode {
+public abstract class BasicModem implements INetwork, INetworkNode, INetworkAccess {
 	public static final byte MODEM_ON = 1;
 	public static final byte MODEM_PERIPHERAL = 2;
 
@@ -124,11 +121,11 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 * Find peripherals on the network
 	 */
 	public void findPeripherals() {
-		synchronized (getPeripheralsByName()) {
+		synchronized (peripheralsByName()) {
 			final Map<String, IPeripheral> newPeripherals = findRemotePeripherals();
 			filterRemotePeripherals(newPeripherals);
 
-			Map<String, IPeripheral> currentPeripherals = getPeripheralsByName();
+			Map<String, IPeripheral> currentPeripherals = peripheralsByName();
 			boolean attached = modem != null && modem.getComputer() != null;
 
 			Iterator<String> it = currentPeripherals.keySet().iterator();
@@ -231,6 +228,17 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 			updateEnabled();
 		}
 
+		for (Map.Entry<String, IPeripheral> p : getConnectedPeripherals().entrySet()) {
+			IPeripheral peripheral = p.getValue();
+			if (peripheral instanceof INetworkedPeripheral) {
+				if (peripheralEnabled) {
+					((INetworkedPeripheral) peripheral).attachToNetwork(this, p.getKey());
+				} else {
+					((INetworkedPeripheral) peripheral).detachFromNetwork(this, p.getKey());
+				}
+			}
+		}
+
 		refreshState();
 		return peripheralEnabled;
 	}
@@ -316,7 +324,7 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 
 	@Override
 	public Object lock() {
-		return getPeripheralsByName();
+		return peripheralsByName();
 	}
 
 	/**
@@ -324,8 +332,18 @@ public abstract class BasicModem implements INetwork, INetworkNode {
 	 *
 	 * @see #peripheralWrappersByName
 	 */
-	public Map<String, IPeripheral> getPeripheralsByName() {
+	public Map<String, IPeripheral> peripheralsByName() {
 		if (!peripheralsKnown) findPeripherals();
 		return peripheralsByName;
+	}
+
+	public void destroy() {
+		for (Map.Entry<String, IPeripheral> p : getConnectedPeripherals().entrySet()) {
+			IPeripheral peripheral = p.getValue();
+			if (peripheral instanceof INetworkedPeripheral) {
+				((INetworkedPeripheral) peripheral).detachFromNetwork(this, p.getKey());
+			}
+		}
+		modem.destroy();
 	}
 }

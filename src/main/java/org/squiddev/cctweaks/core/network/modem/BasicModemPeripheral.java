@@ -68,7 +68,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 		String[] methods = super.getMethodNames();
 		switch (method - methods.length) {
 			case 0: // getNamesRemote
-				synchronized (modem.getPeripheralsByName()) {
+				synchronized (modem.peripheralsByName()) {
 					int idx = 1;
 					Map<Object, Object> table = new HashMap<Object, Object>();
 					for (String name : modem.peripheralWrappersByName.keySet()) {
@@ -121,8 +121,8 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	@Override
 	public synchronized void attach(IComputerAccess computer) {
 		super.attach(computer);
-		synchronized (modem.getPeripheralsByName()) {
-			for (Map.Entry<String, IPeripheral> peripheral : modem.getPeripheralsByName().entrySet()) {
+		synchronized (modem.peripheralsByName()) {
+			for (Map.Entry<String, IPeripheral> peripheral : modem.peripheralsByName().entrySet()) {
 				modem.attachPeripheral(peripheral.getKey(), peripheral.getValue());
 			}
 		}
@@ -131,8 +131,8 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	@Override
 	public synchronized void detach(IComputerAccess computer) {
 		super.detach(computer);
-		synchronized (modem.getPeripheralsByName()) {
-			for (String name : modem.getPeripheralsByName().keySet()) {
+		synchronized (modem.peripheralsByName()) {
+			for (String name : modem.peripheralsByName().keySet()) {
 				modem.detachPeripheral(name);
 			}
 		}

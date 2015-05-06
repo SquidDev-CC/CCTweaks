@@ -165,7 +165,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralTile {
 	@Override
 	public void onWorldSeparate() {
 		super.onWorldSeparate();
-		modem.modem.destroy();
+		modem.destroy();
 	}
 
 	/**
