@@ -10,10 +10,7 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A peripheral that checks all 6 sides to connect to
@@ -93,5 +90,18 @@ public abstract class MultiPeripheralModem extends BasicModem {
 	@Override
 	protected void filterRemotePeripherals(Map<String, IPeripheral> peripherals) {
 		// Don't filter peripherals
+	}
+
+	/**
+	 * Checks if the peripheral attachment has changed
+	 *
+	 * Simply compares IDs
+	 *
+	 * @return If peripherals have changed
+	 */
+	public boolean hasChanged() {
+		int[] ids = Arrays.copyOf(this.ids, 6);
+
+		return super.updateEnabled() || !Arrays.equals(ids, this.ids);
 	}
 }

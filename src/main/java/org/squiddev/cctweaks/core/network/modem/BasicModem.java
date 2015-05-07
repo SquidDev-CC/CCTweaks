@@ -190,10 +190,10 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 			for (IReceiver receiver : receivers.get(packet.channel)) {
 				receiver.receive(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
 			}
-			Map<String, IPeripheral> peripherals;
-			if ((peripherals = getConnectedPeripherals()) != null) {
-				for (Map.Entry<String, IPeripheral> p : peripherals.entrySet()) {
-					IPeripheral peripheral = p.getValue();
+
+			Map<String, IPeripheral> peripherals = getConnectedPeripherals();
+			if (peripherals != null) {
+				for (IPeripheral peripheral : peripherals.values()) {
 					if (peripheral instanceof INetworkedPeripheral) {
 						((INetworkedPeripheral) peripheral).receivePacket(packet, distanceTravelled);
 					}
@@ -237,8 +237,8 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 			updateEnabled();
 		}
 
-		Map<String, IPeripheral> peripherals;
-		if ((peripherals = getConnectedPeripherals()) != null) {
+		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
+		if (peripherals != null) {
 			for (Map.Entry<String, IPeripheral> p : peripherals.entrySet()) {
 				IPeripheral peripheral = p.getValue();
 				if (peripheral instanceof INetworkedPeripheral) {
@@ -326,11 +326,11 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 
 	@Override
 	public void networkInvalidated() {
-		Map<String, IPeripheral> peripherals;
-		if ((peripherals = getConnectedPeripherals()) != null) {
-			for (Map.Entry<String, IPeripheral> p : peripherals.entrySet()) {
-				if (p instanceof INetworkedPeripheral) {
-					((INetworkedPeripheral) p).networkInvalidated(this);
+		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
+		if (peripherals != null) {
+			for (IPeripheral peripheral : peripherals.values()) {
+				if (peripheral instanceof INetworkedPeripheral) {
+					((INetworkedPeripheral) peripheral).networkInvalidated(this);
 				}
 			}
 		}
@@ -372,8 +372,8 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 	}
 
 	public void destroy() {
-		Map<String, IPeripheral> peripherals;
-		if ((peripherals = getConnectedPeripherals()) != null) {
+		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
+		if (peripherals != null) {
 			for (Map.Entry<String, IPeripheral> p : peripherals.entrySet()) {
 				IPeripheral peripheral = p.getValue();
 				if (peripheral instanceof INetworkedPeripheral) {

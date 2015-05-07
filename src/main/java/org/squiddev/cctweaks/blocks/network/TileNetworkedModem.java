@@ -39,7 +39,7 @@ public class TileNetworkedModem extends TileNetworked implements IPeripheralTile
 
 	@Override
 	public void onNeighborChanged() {
-		if (modem.updateEnabled()) {
+		if (modem.hasChanged()) {
 			markForUpdate();
 			NetworkHelpers.fireNetworkInvalidate(worldObj, xCoord, yCoord, zCoord);
 		}
