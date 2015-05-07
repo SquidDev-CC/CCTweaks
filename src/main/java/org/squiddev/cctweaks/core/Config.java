@@ -150,6 +150,14 @@ public final class Config {
 			"Show debug messages"
 		);
 
+		// Is debugging
+		data.debugItems = configuration.getBoolean(
+			"debugItems",
+			MISC,
+			defaults.debugItems,
+			"Enable debug blocks/items - requires debug"
+		);
+
 		// Handle generation of HashSets, etc...
 		Set<String> disabledActions = turtleDisabledActions = new HashSet<String>();
 		for (String action : data.turtleDisabledActions) {
@@ -240,5 +248,10 @@ public final class Config {
 		 * Print debug information
 		 */
 		public boolean debug = false;
+
+		/**
+		 * Enable the debug blocks/items
+		 */
+		public boolean debugItems = false;
 	}
 }
