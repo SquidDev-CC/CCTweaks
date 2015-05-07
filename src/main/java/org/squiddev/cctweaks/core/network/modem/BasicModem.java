@@ -317,6 +317,14 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 
 	@Override
 	public void networkInvalidated() {
+		Map<String, IPeripheral> peripherals;
+		if ((peripherals = getConnectedPeripherals()) != null) {
+			for (Map.Entry<String, IPeripheral> p : peripherals.entrySet()) {
+				if (p instanceof INetworkedPeripheral) {
+					((INetworkedPeripheral) p).networkInvalidated(this);
+				}
+			}
+		}
 		peripheralsKnown = false;
 	}
 
@@ -335,9 +343,16 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 	 *
 	 * @see #peripheralWrappersByName
 	 */
+	@Override
 	public Map<String, IPeripheral> peripheralsByName() {
 		if (!peripheralsKnown) findPeripherals();
 		return peripheralsByName;
+	}
+
+	@Override
+	public void invalidateNetwork() {
+		IWorldPosition pos = getPosition();
+		NetworkHelpers.fireNetworkInvalidate(pos.getWorld(), pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	public void destroy() {

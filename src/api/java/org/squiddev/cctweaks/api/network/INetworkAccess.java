@@ -13,4 +13,10 @@ public interface INetworkAccess {
 	 * @return The map of these peripherals.
 	 */
 	Map<String, IPeripheral> peripheralsByName();
+
+	/**
+	 * Invalidates the network.
+	 * Forces peripherals to be recalculated.
+	 */
+	void invalidateNetwork();
 }
