@@ -23,4 +23,12 @@ public interface INetworkedPeripheral {
 	 * @param network The network that was invalidated.
 	 */
 	void networkInvalidated(INetworkAccess network);
+
+	/**
+	 * Called when the network receives a packet.
+	 *
+	 * @param packet			The packet received.
+	 * @param distanceTravelled The distance that packet travelled.
+	 */
+	void receivePacket(Packet packet, int distanceTravelled);
 }

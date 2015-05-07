@@ -190,6 +190,15 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 			for (IReceiver receiver : receivers.get(packet.channel)) {
 				receiver.receive(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
 			}
+			Map<String, IPeripheral> peripherals;
+			if ((peripherals = getConnectedPeripherals()) != null) {
+				for (Map.Entry<String, IPeripheral> p : peripherals.entrySet()) {
+					IPeripheral peripheral = p.getValue();
+					if (peripheral instanceof INetworkedPeripheral) {
+						((INetworkedPeripheral) peripheral).receivePacket(packet, distanceTravelled);
+					}
+				}
+			}
 		}
 	}
 
@@ -353,6 +362,13 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 	public void invalidateNetwork() {
 		IWorldPosition pos = getPosition();
 		NetworkHelpers.fireNetworkInvalidate(pos.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	@Override
+	public boolean transmitPacket(Packet packet) {
+		synchronized (transmitQueue) {
+			return transmitQueue.offer(packet);
+		}
 	}
 
 	public void destroy() {

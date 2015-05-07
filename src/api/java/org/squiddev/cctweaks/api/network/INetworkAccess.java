@@ -19,4 +19,14 @@ public interface INetworkAccess {
 	 * Forces peripherals to be recalculated.
 	 */
 	void invalidateNetwork();
+
+	/**
+	 * Broadcasts a packet on the network.
+	 * Some networks may not be capable of packet transmission.
+	 * Such as the artificial network represented by computers' sides.
+	 *
+	 * @param packet The packet to transmit.
+	 * @return Whether the network was able to transmit the packet.
+	 */
+	boolean transmitPacket(Packet packet);
 }
