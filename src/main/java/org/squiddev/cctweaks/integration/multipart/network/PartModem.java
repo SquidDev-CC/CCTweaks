@@ -122,6 +122,8 @@ public class PartModem extends PartSidedNetwork implements IPeripheralTile {
 		if (modem.modem.pollChanged()) markDirty();
 
 		modem.processQueue();
+
+		if (!modem.peripheralsKnown) modem.findPeripherals();
 	}
 
 	@Override
