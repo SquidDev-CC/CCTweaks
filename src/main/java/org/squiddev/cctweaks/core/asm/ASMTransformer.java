@@ -41,6 +41,10 @@ public class ASMTransformer implements IClassTransformer {
 			"dan200.computercraft.client.proxy.ComputerCraftProxyClient$CableBlockRenderingHandler",
 			"org.squiddev.cctweaks.core.patch.CableBlockRenderingHandler_Patch"
 		),
+		new ClassPartialPatcher(
+			"dan200.computercraft.core.apis.PeripheralAPI",
+			"org.squiddev.cctweaks.core.patch.PeripheralAPI_Patch"
+		),
 	};
 
 	@Override
