@@ -230,6 +230,10 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 	 * @return If it can connect to peripherals
 	 */
 	public boolean toggleEnabled() {
+		Map<String, IPeripheral> peripherals = null;
+		if (peripheralEnabled)
+			peripherals = getConnectedPeripherals();
+
 		if (peripheralEnabled) {
 			peripheralEnabled = false;
 		} else {
@@ -237,7 +241,9 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 			updateEnabled();
 		}
 
-		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
+		if (peripheralEnabled)
+			peripherals = getConnectedPeripherals();
+
 		if (peripherals != null) {
 			for (Map.Entry<String, IPeripheral> p : peripherals.entrySet()) {
 				IPeripheral peripheral = p.getValue();
