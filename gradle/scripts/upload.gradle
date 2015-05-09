@@ -1,6 +1,8 @@
+apply plugin: 'maven'
+
 uploadArchives {
 	repositories {
-		if (!project.hasProperty("aftpHost")) {
+		if (!project.hasProperty("ftpHost")) {
 			mavenLocal()
 		} else {
 			mavenDeployer {
@@ -35,6 +37,11 @@ uploadArchives {
 							name 'SquidDev'
 						}
 					}
+				}
+				pom*.whenConfigured { pom ->
+					pom.dependencies.removeAll({ dep ->
+						dep.groupId != "ComputerCraft" && dep.scope == "compile"
+					})
 				}
 			}
 		}
