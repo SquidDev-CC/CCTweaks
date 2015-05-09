@@ -50,7 +50,7 @@ public final class NetworkRegistry implements INetworkRegistry {
 
 	@Override
 	public INetworkNode getNode(IBlockAccess world, int x, int y, int z) {
-		return y > 0 && y < world.getHeight() ? getNode(world.getTileEntity(x, y, z)) : null;
+		return y >= 0 && y < world.getHeight() ? getNode(world.getTileEntity(x, y, z)) : null;
 	}
 
 	@Override
