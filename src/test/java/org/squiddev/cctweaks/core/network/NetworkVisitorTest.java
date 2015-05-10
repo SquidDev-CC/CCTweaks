@@ -48,6 +48,8 @@ public class NetworkVisitorTest {
 
 	@Test
 	public void testCounts() {
+		network.reset();
+
 		for (ISearchLoc loc : NetworkAPI.visitor().visitNetwork(network, 0, 0, 0)) {
 			loc.getNode().networkInvalidated();
 		}

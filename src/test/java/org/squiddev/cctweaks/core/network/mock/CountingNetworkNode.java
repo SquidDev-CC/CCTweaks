@@ -14,7 +14,6 @@ import java.util.Map;
 public class CountingNetworkNode implements INetworkNode {
 	protected final boolean[] canVisit;
 	protected int invalidated = 0;
-	protected int packets = 0;
 
 	private final Object lock = new Object();
 
@@ -43,7 +42,6 @@ public class CountingNetworkNode implements INetworkNode {
 
 	@Override
 	public void receivePacket(Packet packet, int distanceTravelled) {
-		packets++;
 	}
 
 	@Override
@@ -71,11 +69,9 @@ public class CountingNetworkNode implements INetworkNode {
 	}
 
 	/**
-	 * Get the number of packets received
-	 *
-	 * @return Packet count
+	 * Reset the invalidated count
 	 */
-	public int packets() {
-		return packets;
+	public void reset() {
+		invalidated = 0;
 	}
 }

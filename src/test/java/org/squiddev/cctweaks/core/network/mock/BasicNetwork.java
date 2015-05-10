@@ -19,11 +19,18 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockCoord
 	protected final Map<BlockCoord, KeyedNetworkNode> nodes = new HashMap<BlockCoord, KeyedNetworkNode>();
 	public final Map<String, Integer> count;
 
+	public final int width;
+	public final int height;
+
 	public BasicNetwork(TestData network) {
 		count = network.counts;
 
+
+		int width = 0;
 		for (int z = 0; z < network.map.length; z++) {
 			String row = network.map[z];
+			width = Math.max(width, row.length());
+
 			for (int x = 0; x < row.length(); x++) {
 				KeyedNetworkNode node = parse(row.charAt(x));
 				if (node != null) {
@@ -33,6 +40,9 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockCoord
 				}
 			}
 		}
+
+		this.width = width;
+		height = network.map.length;
 	}
 
 	public KeyedNetworkNode parse(char character) {
@@ -51,6 +61,12 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockCoord
 				return null;
 		}
 		return new KeyedNetworkNode(Character.toString(character));
+	}
+
+	public void reset() {
+		for (KeyedNetworkNode node : nodes.values()) {
+			node.reset();
+		}
 	}
 
 	@Override
