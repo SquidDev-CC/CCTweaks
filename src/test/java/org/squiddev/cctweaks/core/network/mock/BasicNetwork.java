@@ -12,15 +12,18 @@ import java.util.*;
 /**
  * A basic network
  */
-public class BasicNetwork implements IBlockAccess, Iterable<CountingNetworkNode> {
+public class BasicNetwork implements IBlockAccess, Iterable<KeyedNetworkNode> {
 	protected final Map<BlockCoord, TileEntity> world = new HashMap<BlockCoord, TileEntity>();
-	protected final Set<CountingNetworkNode> nodes = new HashSet<CountingNetworkNode>();
+	protected final Set<KeyedNetworkNode> nodes = new HashSet<KeyedNetworkNode>();
+	public final Map<String, Integer> count;
 
-	public BasicNetwork(String[] network) {
-		for (int x = 0; x < network.length; x++) {
-			String row = network[x];
+	public BasicNetwork(TestData network) {
+		count = network.counts;
+
+		for (int x = 0; x < network.map.length; x++) {
+			String row = network.map[x];
 			for (int z = 0; z < row.length(); z++) {
-				CountingNetworkNode node = parse(row.charAt(z));
+				KeyedNetworkNode node = parse(row.charAt(z));
 				if (node != null) {
 					world.put(new BlockCoord(x, 0, z), new NodeTile(node, x, z));
 					nodes.add(node);
@@ -29,21 +32,22 @@ public class BasicNetwork implements IBlockAccess, Iterable<CountingNetworkNode>
 		}
 	}
 
-	public CountingNetworkNode parse(char character) {
+	public KeyedNetworkNode parse(char character) {
 		switch (character) {
 			case '=':
 			case '+':
 			case '-':
 			case '|':
-				return new CountingNetworkNode();
-			case 'M':
-				return new NamedNetworkNode("Modem");
-			case 'N':
-				return new NamedNetworkNode("Node");
+				character = '-';
+				break;
+			case '>':
+				return new KeyedNetworkNode(Character.toString(character), new boolean[]{true, true, false, true, true});
+			case '<':
+				return new KeyedNetworkNode(Character.toString(character), new boolean[]{true, true, true, false, true});
 			case ' ':
 				return null;
 		}
-		throw new IllegalArgumentException("No node for " + character);
+		return new KeyedNetworkNode(Character.toString(character));
 	}
 
 	@Override
@@ -52,7 +56,7 @@ public class BasicNetwork implements IBlockAccess, Iterable<CountingNetworkNode>
 	}
 
 	@Override
-	public Iterator<CountingNetworkNode> iterator() {
+	public Iterator<KeyedNetworkNode> iterator() {
 		return nodes.iterator();
 	}
 

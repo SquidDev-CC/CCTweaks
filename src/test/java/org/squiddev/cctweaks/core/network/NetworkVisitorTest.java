@@ -1,21 +1,16 @@
 package org.squiddev.cctweaks.core.network;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.squiddev.cctweaks.api.network.ISearchLoc;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.core.network.mock.BasicNetwork;
-import org.squiddev.cctweaks.core.network.mock.CountingNetworkNode;
+import org.squiddev.cctweaks.core.network.mock.KeyedNetworkNode;
+import org.squiddev.cctweaks.core.network.mock.TestData;
 
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,34 +26,33 @@ public class NetworkVisitorTest {
 	}
 
 	@Parameterized.Parameters(name = "{0}")
-	public static List<Object[]> data() {
-		Gson gson = new Gson();
-		JsonParser parser = new JsonParser();
+	public static Object[][] data() {
+		TestData[] data = new Gson().fromJson(
+			new InputStreamReader(NetworkVisitorTest.class.getResourceAsStream("data.json")),
+			TestData[].class
+		);
 
-		JsonObject object = parser.parse(
-			new InputStreamReader(NetworkVisitorTest.class.getResourceAsStream("data.json"))
-		).getAsJsonObject();
-
-		List<Object[]> result = new ArrayList<Object[]>();
-
-		for (Map.Entry<String, JsonElement> items : object.entrySet()) {
-			result.add(new Object[]{
-				items.getKey(),
-				new BasicNetwork(gson.fromJson(items.getValue(), String[].class))
-			});
+		Object[][] result = new Object[data.length][];
+		for (int i = 0; i < data.length; i++) {
+			TestData item = data[i];
+			result[i] = new Object[]{
+				item.name,
+				new BasicNetwork(item)
+			};
 		}
 
 		return result;
 	}
 
 	@Test
-	public void testVisitOnce() {
+	public void testCounts() {
 		for (ISearchLoc loc : NetworkAPI.visitor().visitNetwork(network, 0, 0, 0)) {
 			loc.getNode().networkInvalidated();
 		}
 
-		for (CountingNetworkNode node : network) {
-			assertEquals(1, node.invalidated());
+		for (KeyedNetworkNode node : network) {
+			Integer count = network.count.get(node.key);
+			if (count != null) assertEquals(count.intValue(), node.invalidated());
 		}
 	}
 }

@@ -23,7 +23,7 @@ public class CountingNetworkNode implements INetworkNode {
 	}
 
 	protected CountingNetworkNode() {
-		this(new boolean[]{true, true, true, true, true, true, true});
+		this(new boolean[]{true, true, true, true, true});
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class CountingNetworkNode implements INetworkNode {
 
 	@Override
 	public boolean canVisitTo(ForgeDirection to) {
-		return canVisit[to.ordinal()];
+		return to.offsetY == 0 && canVisit[to.ordinal() - 2];
 	}
 
 	@Override

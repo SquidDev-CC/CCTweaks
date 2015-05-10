@@ -1,7 +1,28 @@
-{
-	"Loop": [
-		"N----N",
-		"|    |",
-		"N----N"
-	]
-}
+[
+	{
+		"name": "Visits once from multiple sides",
+		"map": [
+			"N----N",
+			"|    |",
+			"N----N"
+		],
+		"counts": {
+			"N": 1,
+			"-": 1
+		}
+	},
+	{
+		"name": "Obeys canVisitFrom",
+		"map": [
+			"+-+  ",
+			"| <>N",
+			"+-+  "
+		],
+		"counts": {
+			"-": 1,
+			"<": 1,
+			">": 0,
+			"N": 0
+		}
+	}
+]
