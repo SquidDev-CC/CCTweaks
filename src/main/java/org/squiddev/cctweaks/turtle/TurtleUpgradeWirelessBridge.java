@@ -142,12 +142,12 @@ public class TurtleUpgradeWirelessBridge implements ITurtleUpgrade, IModule {
 		 * @return The turtle peripheral
 		 */
 		@Override
-		public Map<String, IPeripheral> getConnectedPeripherals() {
+		public Map<String, IPeripheral> findConnectedPeripherals() {
 			ChunkCoordinates pos = turtle.getPosition();
 			IPeripheral peripheral = PeripheralUtil.getPeripheral(getWorld(), pos.posX, pos.posY, pos.posZ, 0);
 			if (peripheral == null) {
 				id = -1;
-				return null;
+				return Collections.emptyMap();
 			} else if (id <= -1) {
 				id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(getWorld()), "computer/lastid_" + peripheral.getType() + ".txt"));
 			}

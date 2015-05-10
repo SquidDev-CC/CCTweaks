@@ -23,12 +23,12 @@ public abstract class MultiPeripheralModem extends BasicModem {
 	}
 
 	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		if (!peripheralEnabled) return null;
+	public Map<String, IPeripheral> findConnectedPeripherals() {
+		if (!peripheralEnabled) return Collections.emptyMap();
 
 		IPeripheral[] peripherals = getPeripherals();
 
-		if (peripherals == null) return null;
+		if (peripherals == null) return Collections.emptyMap();
 
 		Map<String, IPeripheral> peripheralMap = new HashMap<String, IPeripheral>(6);
 		for (int i = 0; i < 6; i++) {
@@ -102,6 +102,6 @@ public abstract class MultiPeripheralModem extends BasicModem {
 	public boolean hasChanged() {
 		int[] ids = Arrays.copyOf(this.ids, 6);
 
-		return super.updateEnabled() || !Arrays.equals(ids, this.ids);
+		return updateEnabled() || !Arrays.equals(ids, this.ids);
 	}
 }

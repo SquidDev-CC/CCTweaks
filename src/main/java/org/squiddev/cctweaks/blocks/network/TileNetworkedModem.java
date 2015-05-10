@@ -51,7 +51,11 @@ public class TileNetworkedModem extends TileNetworked implements IPeripheralTile
 		if (worldObj.isRemote) return true;
 
 		Set<String> names = modem.getPeripheralNames();
+
+		modem.detachConnectedPeripheralsFromNetwork();
 		modem.toggleEnabled();
+		modem.attachConnectedPeripheralsToNetwork();
+
 		Set<String> newNames = modem.getPeripheralNames();
 
 		if (!Objects.equals(names, newNames)) {
