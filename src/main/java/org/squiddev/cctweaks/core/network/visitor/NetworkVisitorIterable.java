@@ -48,7 +48,7 @@ public class NetworkVisitorIterable implements Iterable<ISearchLoc> {
 	public Iterator<ISearchLoc> iterator() {
 		NetworkVisitorIterator visitor = getIterator();
 		for (IWorldPosition start : starts) {
-			visitor.enqueue(new SearchLoc(start, 1, ForgeDirection.UNKNOWN));
+			visitor.enqueue(new SearchLoc(start, 1), ForgeDirection.UNKNOWN);
 		}
 		return visitor;
 	}

@@ -36,7 +36,7 @@ public class NetworkVisitorIterator implements Iterator<ISearchLoc> {
 		// Visit surrounding nodes
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
 			if (node.canVisitTo(direction)) {
-				enqueue(SearchLoc.locationInDirection(location, direction));
+				enqueue(SearchLoc.locationInDirection(location, direction), direction.getOpposite());
 			}
 		}
 
@@ -44,7 +44,7 @@ public class NetworkVisitorIterator implements Iterator<ISearchLoc> {
 		Iterable<IWorldPosition> searches = node.getExtraNodes();
 		if (searches != null) {
 			for (IWorldPosition search : searches) {
-				enqueue(new SearchLoc(search, location.getDistance() + 1, ForgeDirection.UNKNOWN));
+				enqueue(new SearchLoc(search, location.getDistance() + 1), ForgeDirection.UNKNOWN);
 			}
 		}
 
@@ -57,10 +57,14 @@ public class NetworkVisitorIterator implements Iterator<ISearchLoc> {
 	 * This checks if it the distance isn't more than {@link #maxDistance} blocks,
 	 * if it hasn't been visited before and if it is a node
 	 *
-	 * @param location The location of the node to add
+	 * @param location  The location of the node to add
+	 * @param direction Direction to visit in
 	 */
-	public void enqueue(ISearchLoc location) {
-		if (location.getDistance() < maxDistance && visited.add(location) && location.getNode() != null) {
+	public void enqueue(ISearchLoc location, ForgeDirection direction) {
+		if (location.getDistance() < maxDistance && visited.add(location)) {
+			INetworkNode node = location.getNode();
+			if (node == null || !node.canBeVisited(direction)) return;
+
 			queue.offer(location);
 		}
 	}

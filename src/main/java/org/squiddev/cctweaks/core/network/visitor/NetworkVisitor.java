@@ -5,6 +5,7 @@ import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkVisitor;
 import org.squiddev.cctweaks.api.network.ISearchLoc;
+import org.squiddev.cctweaks.core.utils.WorldPosition;
 
 import java.util.Set;
 
@@ -14,12 +15,12 @@ import java.util.Set;
 public final class NetworkVisitor implements INetworkVisitor {
 	@Override
 	public Iterable<ISearchLoc> visitNetwork(IBlockAccess world, int x, int y, int z) {
-		return new NetworkVisitorIterable(world, x, y, z);
+		return visitNetwork(new WorldPosition(world, x, y, z));
 	}
 
 	@Override
 	public Iterable<ISearchLoc> visitNetwork(IBlockAccess world, int x, int y, int z, Set<ISearchLoc> visited) {
-		return new NetworkVisitorIterable(world, x, y, z, visited);
+		return visitNetwork(new WorldPosition(world, x, y, z), visited);
 	}
 
 	@Override
@@ -34,7 +35,7 @@ public final class NetworkVisitor implements INetworkVisitor {
 
 	@Override
 	public Iterable<ISearchLoc> visitNetwork(IWorldPosition position) {
-		return visitNetwork(position.getWorld(), position.getX(), position.getY(), position.getZ());
+		return new NetworkVisitorIterable(position);
 	}
 
 	@Override

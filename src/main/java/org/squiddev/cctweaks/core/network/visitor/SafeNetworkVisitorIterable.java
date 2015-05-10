@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.core.network.visitor;
 
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.ISearchLoc;
 
@@ -49,10 +50,10 @@ public class SafeNetworkVisitorIterable extends NetworkVisitorIterable {
 		}
 
 		@Override
-		public void enqueue(ISearchLoc location) {
+		public void enqueue(ISearchLoc location, ForgeDirection direction) {
 			IBlockAccess world = location.getWorld();
 			if (!(world instanceof World) || ((World) world).blockExists(location.getX(), location.getY(), location.getZ())) {
-				super.enqueue(location);
+				super.enqueue(location, direction);
 			}
 		}
 	}

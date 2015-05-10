@@ -13,31 +13,26 @@ import org.squiddev.cctweaks.core.utils.WorldPosition;
  */
 public final class SearchLoc extends WorldPosition implements ISearchLoc {
 	public final int distanceTravelled;
-	public final ForgeDirection side;
 
 	protected final int hash;
 
 	protected INetworkNode node = null;
 
-	public SearchLoc(IBlockAccess world, int x, int y, int z, int distanceTravelled, ForgeDirection side) {
+	public SearchLoc(IBlockAccess world, int x, int y, int z, int distanceTravelled) {
 		super(world, x, y, z);
 		this.distanceTravelled = distanceTravelled;
-		this.side = side;
 
 		// Cache the hash code as we store this in a map
-		this.hash = 31 * super.hashCode() + side.hashCode();
+		this.hash = super.hashCode();
 	}
 
-	public SearchLoc(IWorldPosition position, int distanceTravelled, ForgeDirection side) {
-		this(position.getWorld(), position.getX(), position.getY(), position.getZ(), distanceTravelled, side);
+	public SearchLoc(IWorldPosition position, int distanceTravelled) {
+		this(position.getWorld(), position.getX(), position.getY(), position.getZ(), distanceTravelled);
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		return this == o
-			|| o instanceof ISearchLoc
-			&& super.equals(o)
-			&& (!(o instanceof SearchLoc) || side == ((SearchLoc) o).side);
+		return this == o || (o instanceof ISearchLoc && super.equals(o));
 	}
 
 	@Override
@@ -47,11 +42,7 @@ public final class SearchLoc extends WorldPosition implements ISearchLoc {
 
 		if (y >= 0 && y < world.getHeight()) {
 			node = NetworkAPI.registry().getNode(world, x, y, z);
-			if (node != null && node.canBeVisited(side)) {
-				this.node = node;
-			} else {
-				node = null;
-			}
+			if (node != null) this.node = node;
 		}
 
 		return node;
@@ -68,8 +59,7 @@ public final class SearchLoc extends WorldPosition implements ISearchLoc {
 			loc.getX() + direction.offsetX,
 			loc.getY() + direction.offsetY,
 			loc.getZ() + direction.offsetZ,
-			loc.getDistance() + 1,
-			direction.getOpposite()
+			loc.getDistance() + 1
 		);
 	}
 }
