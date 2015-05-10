@@ -51,6 +51,11 @@ public class NetworkVisitorIterator implements Iterator<ISearchLoc> {
 		return location;
 	}
 
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
+	}
+
 	/**
 	 * Add a node to the queue
 	 *
