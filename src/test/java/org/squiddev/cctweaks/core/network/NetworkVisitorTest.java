@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.network;
 
+import codechicken.lib.vec.BlockCoord;
 import com.google.gson.Gson;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +12,7 @@ import org.squiddev.cctweaks.core.network.mock.KeyedNetworkNode;
 import org.squiddev.cctweaks.core.network.mock.TestData;
 
 import java.io.InputStreamReader;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -50,9 +52,11 @@ public class NetworkVisitorTest {
 			loc.getNode().networkInvalidated();
 		}
 
-		for (KeyedNetworkNode node : network) {
-			Integer count = network.count.get(node.key);
-			if (count != null) assertEquals(count.intValue(), node.invalidated());
+		for (Map.Entry<BlockCoord, KeyedNetworkNode> location : network) {
+			Integer count = network.count.get(location.getValue().key);
+			if (count != null) {
+				assertEquals("Location " + location, count.intValue(), location.getValue().invalidated());
+			}
 		}
 	}
 }

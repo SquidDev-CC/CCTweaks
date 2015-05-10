@@ -51,11 +51,6 @@ public class NetworkVisitorIterator implements Iterator<ISearchLoc> {
 		return location;
 	}
 
-	@Override
-	public void remove() {
-		throw new UnsupportedOperationException();
-	}
-
 	/**
 	 * Add a node to the queue
 	 *
@@ -66,11 +61,20 @@ public class NetworkVisitorIterator implements Iterator<ISearchLoc> {
 	 * @param direction Direction to visit in
 	 */
 	public void enqueue(ISearchLoc location, ForgeDirection direction) {
-		if (location.getDistance() < maxDistance && visited.add(location)) {
+		if (location.getDistance() < maxDistance && !visited.contains(location)) {
 			INetworkNode node = location.getNode();
-			if (node == null || !node.canBeVisited(direction)) return;
-
-			queue.offer(location);
+			if (node == null) {
+				visited.add(location);
+			} else if (node.canBeVisited(direction)) {
+				visited.add(location);
+				queue.offer(location);
+			}
 		}
+	}
+
+
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
 	}
 }

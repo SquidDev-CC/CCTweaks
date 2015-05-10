@@ -7,26 +7,29 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * A basic network
  */
-public class BasicNetwork implements IBlockAccess, Iterable<KeyedNetworkNode> {
+public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockCoord, KeyedNetworkNode>> {
 	protected final Map<BlockCoord, TileEntity> world = new HashMap<BlockCoord, TileEntity>();
-	protected final Set<KeyedNetworkNode> nodes = new HashSet<KeyedNetworkNode>();
+	protected final Map<BlockCoord, KeyedNetworkNode> nodes = new HashMap<BlockCoord, KeyedNetworkNode>();
 	public final Map<String, Integer> count;
 
 	public BasicNetwork(TestData network) {
 		count = network.counts;
 
-		for (int x = 0; x < network.map.length; x++) {
-			String row = network.map[x];
-			for (int z = 0; z < row.length(); z++) {
-				KeyedNetworkNode node = parse(row.charAt(z));
+		for (int z = 0; z < network.map.length; z++) {
+			String row = network.map[z];
+			for (int x = 0; x < row.length(); x++) {
+				KeyedNetworkNode node = parse(row.charAt(x));
 				if (node != null) {
-					world.put(new BlockCoord(x, 0, z), new NodeTile(node, x, z));
-					nodes.add(node);
+					BlockCoord coord = new BlockCoord(x, 0, z);
+					world.put(coord, new NodeTile(node, x, z));
+					nodes.put(coord, node);
 				}
 			}
 		}
@@ -56,8 +59,8 @@ public class BasicNetwork implements IBlockAccess, Iterable<KeyedNetworkNode> {
 	}
 
 	@Override
-	public Iterator<KeyedNetworkNode> iterator() {
-		return nodes.iterator();
+	public Iterator<Map.Entry<BlockCoord, KeyedNetworkNode>> iterator() {
+		return nodes.entrySet().iterator();
 	}
 
 	@Override
