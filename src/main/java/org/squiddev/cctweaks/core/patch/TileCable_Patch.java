@@ -290,7 +290,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode, INetwork
 			connectedPeripheral = null;
 			IPeripheral periph = getConnectedPeripheral();
 
-			if (periph == null && oldPeriph != null && (oldPeriph instanceof INetworkedPeripheral)) {
+			if (!Objects.equals(periph, oldPeriph) && oldPeriph != null && (oldPeriph instanceof INetworkedPeripheral)) {
 				((INetworkedPeripheral) oldPeriph).detachFromNetwork(this, oldName);
 			}
 		}
