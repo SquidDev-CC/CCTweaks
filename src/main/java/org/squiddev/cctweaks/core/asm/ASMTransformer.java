@@ -49,6 +49,7 @@ public class ASMTransformer implements IClassTransformer {
 			"openperipheral.addons.peripheralproxy.WrappedPeripheral",
 			"org.squiddev.cctweaks.core.patch.op.PeripheralProxy_Patch"
 		),
+		new PatchOpenPeripheralAdapter(),
 	};
 
 	@Override
