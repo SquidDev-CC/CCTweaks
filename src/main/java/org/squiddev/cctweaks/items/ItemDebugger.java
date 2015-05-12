@@ -88,7 +88,7 @@ public class ItemDebugger extends ItemComputerAction {
 			if (p != null) remotes.addAll(p.keySet());
 		}
 
-		if (peripheral != null || !locals.isEmpty() || !remotes.isEmpty()) {
+		if (node != null || peripheral != null || !locals.isEmpty() || !remotes.isEmpty()) {
 			player.addChatComponentMessage(
 				new ChatComponentText("Tile: " + tile.getClass().getSimpleName() + ": " + tile.getBlockType().getLocalizedName())
 					.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.LIGHT_PURPLE))

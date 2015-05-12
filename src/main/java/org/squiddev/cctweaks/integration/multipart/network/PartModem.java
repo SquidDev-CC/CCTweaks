@@ -26,7 +26,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.Packet;
@@ -209,16 +208,6 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 		direction = tag.getByte("modem_direction");
 		modem.setState(tag.getBoolean("modem_enabled") ? WiredModem.MODEM_PERIPHERAL : 0);
 		modem.id = tag.getInteger("modem_id");
-	}
-
-	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		return from.ordinal() != direction;
-	}
-
-	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return canBeVisited(to);
 	}
 
 	@Override

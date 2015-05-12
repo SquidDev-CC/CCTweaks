@@ -12,6 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.INetworkNodeHost;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
@@ -53,7 +54,8 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 					// instead and use the cable to delegate to other nodes in the multipart
 					TMultiPart part = ((TileMultipart) tile).partMap(6);
 					if (part != null) {
-						return (INetworkNode) part;
+						if (part instanceof INetworkNode) return (INetworkNode) part;
+						if (part instanceof INetworkNodeHost) return ((INetworkNodeHost) part).getNode();
 					}
 				}
 

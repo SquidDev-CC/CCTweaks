@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.blocks;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -86,5 +87,22 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	public void markForUpdate() {
 		markDirty();
 		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+	}
+
+	/**
+	 * Called when the block is activated
+	 *
+	 * @param player The player who triggered this
+	 * @param side   The side the block is activated on
+	 * @return If the event succeeded
+	 */
+	public boolean onActivated(EntityPlayer player, int side) {
+		return false;
+	}
+
+	/**
+	 * Called when a neighbor tile/block changed
+	 */
+	public void onNeighborChanged() {
 	}
 }

@@ -7,17 +7,20 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.INetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
+import org.squiddev.cctweaks.blocks.TileBase;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.modem.BasicModem;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
  * Bind networks together
  */
-public class TileNetworkedWirelessBridge extends TileNetworked implements IPeripheralHost {
+public class TileNetworkedWirelessBridge extends TileBase implements IPeripheralHost, INetworkNodeHost {
 	protected final NetworkBinding binding = new NetworkBinding(this);
 	protected final BasicModem modem = new BasicModem() {
 		@Override
@@ -27,7 +30,12 @@ public class TileNetworkedWirelessBridge extends TileNetworked implements IPerip
 
 		@Override
 		public Map<String, IPeripheral> findConnectedPeripherals() {
-			return TileNetworkedWirelessBridge.this.getConnectedPeripherals();
+			return Collections.emptyMap();
+		}
+
+		@Override
+		public Iterable<IWorldPosition> getExtraNodes() {
+			return binding.getPositions();
 		}
 	};
 
@@ -86,27 +94,12 @@ public class TileNetworkedWirelessBridge extends TileNetworked implements IPerip
 	}
 
 	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		return binding.getPositions();
-	}
-
-	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-		modem.receivePacket(packet, distanceTravelled);
-	}
-
-	@Override
-	public void networkInvalidated() {
-		modem.networkInvalidated();
-	}
-
-	@Override
-	public Object lock() {
-		return modem.lock();
-	}
-
-	@Override
 	public IPeripheral getPeripheral(int side) {
 		return modem.modem;
+	}
+
+	@Override
+	public INetworkNode getNode() {
+		return modem;
 	}
 }

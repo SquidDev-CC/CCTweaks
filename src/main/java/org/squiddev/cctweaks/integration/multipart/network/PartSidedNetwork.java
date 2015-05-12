@@ -71,12 +71,12 @@ public abstract class PartSidedNetwork extends PartBase implements INetworkNode,
 
 	@Override
 	public boolean canBeVisited(ForgeDirection from) {
-		return true;
+		return from.ordinal() != direction;
 	}
 
 	@Override
 	public boolean canVisitTo(ForgeDirection to) {
-		return true;
+		return canBeVisited(to);
 	}
 
 	@Override

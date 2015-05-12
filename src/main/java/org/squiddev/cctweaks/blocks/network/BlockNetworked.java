@@ -6,10 +6,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
-import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -20,6 +18,7 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
+import org.squiddev.cctweaks.blocks.TileBase;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.items.ItemMultiBlock;
@@ -30,7 +29,7 @@ import java.util.List;
 /**
  * A bridge between two networks so they can communicate with each other
  */
-public class BlockNetworked extends BlockBase<TileNetworked> implements IMultiBlock {
+public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	@SideOnly(Side.CLIENT)
 	public static IIcon bridgeIcon;
 	@SideOnly(Side.CLIENT)
@@ -39,7 +38,7 @@ public class BlockNetworked extends BlockBase<TileNetworked> implements IMultiBl
 	public static IIcon[] modemIcons;
 
 	public BlockNetworked() {
-		super("networkedBlock", TileNetworked.class);
+		super("networkedBlock", TileBase.class);
 	}
 
 	@Override
@@ -51,30 +50,6 @@ public class BlockNetworked extends BlockBase<TileNetworked> implements IMultiBl
 				return new TileNetworkedModem();
 		}
 		return null;
-	}
-
-	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-		TileNetworked tile = getTile(world, x, y, z);
-		return tile != null && tile.onActivated(player, side);
-	}
-
-	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-		super.onNeighborBlockChange(world, x, y, z, block);
-		if (world.isRemote) return;
-
-		TileNetworked tile = getTile(world, x, y, z);
-		if (tile != null) tile.onNeighborChanged();
-	}
-
-	@Override
-	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
-		super.onNeighborChange(world, x, y, z, tileX, tileY, tileZ);
-		if (world instanceof World && ((World) world).isRemote) return;
-
-		TileNetworked tile = getTile(world, x, y, z);
-		if (tile != null) tile.onNeighborChanged();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -131,7 +106,7 @@ public class BlockNetworked extends BlockBase<TileNetworked> implements IMultiBl
 		int meta = world.getBlockMetadata(x, y, z);
 		switch (meta) {
 			case 1: {
-				TileNetworked tile = getTile(world, x, y, z);
+				TileBase tile = getTile(world, x, y, z);
 				if (tile != null && tile instanceof TileNetworkedModem) {
 					return getModemIcon(((TileNetworkedModem) tile).modem.state);
 				}

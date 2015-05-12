@@ -6,9 +6,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.INetworkNodeHost;
 import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
-import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
+import org.squiddev.cctweaks.blocks.TileBase;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.modem.MultiPeripheralModem;
 
@@ -19,7 +21,7 @@ import java.util.Set;
 /**
  * A full block implementation of a modem
  */
-public class TileNetworkedModem extends TileNetworked implements IPeripheralHost {
+public class TileNetworkedModem extends TileBase implements IPeripheralHost, INetworkNodeHost {
 	public final MultiPeripheralModem modem = new MultiPeripheralModem() {
 		@Override
 		public IWorldPosition getPosition() {
@@ -39,9 +41,9 @@ public class TileNetworkedModem extends TileNetworked implements IPeripheralHost
 
 	@Override
 	public void onNeighborChanged() {
-		Map<String, IPeripheral> oldPeripherals = getConnectedPeripherals();
+		Map<String, IPeripheral> oldPeripherals = modem.getConnectedPeripherals();
 		if (modem.hasChanged()) {
-			Map<String, IPeripheral> newPeripherals = getConnectedPeripherals();
+			Map<String, IPeripheral> newPeripherals = modem.getConnectedPeripherals();
 			for (Map.Entry<String, IPeripheral> p : newPeripherals.entrySet()) {
 				IPeripheral newPeriph = p.getValue();
 				String newName = p.getKey();
@@ -138,27 +140,12 @@ public class TileNetworkedModem extends TileNetworked implements IPeripheralHost
 	}
 
 	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-		modem.receivePacket(packet, distanceTravelled);
-	}
-
-	@Override
-	public void networkInvalidated() {
-		modem.networkInvalidated();
-	}
-
-	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		return modem.getConnectedPeripherals();
-	}
-
-	@Override
-	public Object lock() {
-		return modem.lock();
-	}
-
-	@Override
 	public IPeripheral getPeripheral(int side) {
 		return modem.modem;
+	}
+
+	@Override
+	public INetworkNode getNode() {
+		return modem;
 	}
 }
