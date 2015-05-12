@@ -45,6 +45,10 @@ public class ASMTransformer implements IClassTransformer {
 			"dan200.computercraft.core.apis.PeripheralAPI",
 			"org.squiddev.cctweaks.core.patch.PeripheralAPI_Patch"
 		),
+		new ClassPartialPatcher(
+			"openperipheral.addons.peripheralproxy.WrappedPeripheral",
+			"org.squiddev.cctweaks.core.patch.op.PeripheralProxy_Patch"
+		),
 	};
 
 	@Override
