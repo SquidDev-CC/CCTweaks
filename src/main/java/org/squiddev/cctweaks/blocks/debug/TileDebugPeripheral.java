@@ -4,22 +4,16 @@ import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.shared.peripheral.PeripheralType;
-import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
 import net.minecraft.util.Facing;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileBase;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 /**
  * A peripheral that logs events and prints what side it comes from
  */
-public class TileDebugPeripheral extends TileBase implements IPeripheralTile {
+public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
 	private IPeripheral[] sides = new IPeripheral[6];
-
-	@Override
-	public PeripheralType getPeripheralType() {
-		return null;
-	}
 
 	@Override
 	public IPeripheral getPeripheral(int side) {
@@ -29,20 +23,6 @@ public class TileDebugPeripheral extends TileBase implements IPeripheralTile {
 
 	protected IPeripheral createPeripheral(int side) {
 		return new SidedPeripheral(side);
-	}
-
-	@Override
-	public String getLabel() {
-		return null;
-	}
-
-	@Override
-	public int getDirection() {
-		return 0;
-	}
-
-	@Override
-	public void setDirection(int paramInt) {
 	}
 
 	public static class SidedPeripheral implements IPeripheral {

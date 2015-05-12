@@ -1,8 +1,6 @@
 package org.squiddev.cctweaks.blocks.network;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.shared.peripheral.PeripheralType;
-import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,6 +8,7 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.modem.BasicModem;
 
@@ -18,7 +17,7 @@ import java.util.Map;
 /**
  * Bind networks together
  */
-public class TileNetworkedWirelessBridge extends TileNetworked implements IPeripheralTile {
+public class TileNetworkedWirelessBridge extends TileNetworked implements IPeripheralHost {
 	protected final NetworkBinding binding = new NetworkBinding(this);
 	protected final BasicModem modem = new BasicModem() {
 		@Override
@@ -107,26 +106,7 @@ public class TileNetworkedWirelessBridge extends TileNetworked implements IPerip
 	}
 
 	@Override
-	public PeripheralType getPeripheralType() {
-		return PeripheralType.WiredModem;
-	}
-
-	@Override
 	public IPeripheral getPeripheral(int side) {
 		return modem.modem;
-	}
-
-	@Override
-	public String getLabel() {
-		return null;
-	}
-
-	@Override
-	public int getDirection() {
-		return 0;
-	}
-
-	@Override
-	public void setDirection(int direction) {
 	}
 }
