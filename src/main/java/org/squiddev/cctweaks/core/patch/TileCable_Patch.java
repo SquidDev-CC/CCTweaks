@@ -145,6 +145,10 @@ public class TileCable_Patch extends TileCable implements INetworkNode, INetwork
 
 	@Override
 	public void networkInvalidated() {
+		IPeripheral peripheral = getConnectedPeripheral();
+		if (peripheral instanceof INetworkedPeripheral) {
+			((INetworkedPeripheral) peripheral).networkInvalidated(this);
+		}
 		m_peripheralsKnown = false;
 		connectedPeripheral = null;
 	}
