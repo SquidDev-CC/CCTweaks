@@ -4,7 +4,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-import org.squiddev.cctweaks.api.peripheral.INetworkedAdapter;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralEnvironments;
 import org.squiddev.cctweaks.core.asm.chickenlib.ASMMatcher;
 import org.squiddev.cctweaks.core.asm.chickenlib.InsnListSection;
 import org.squiddev.cctweaks.core.asm.patch.IPatcher;
@@ -13,7 +13,7 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
 /**
- * Add {@link org.squiddev.cctweaks.api.peripheral.INetworkedAdapter#ARG_NETWORK} to ComputerCraft's
+ * Add {@link IPeripheralEnvironments#ARG_NETWORK} to ComputerCraft's
  * environment list:
  *
  * https://github.com/OpenMods/OpenPeripheral/blob/master/src/main/java/openperipheral/interfaces/cc/ModuleComputerCraft.java#L33-L37
@@ -56,7 +56,7 @@ public class PatchOpenModule implements IPatcher {
 
 					// Add the same as before but with INetworkAccess instead
 					InsnList insert = new InsnList();
-					insert.add(new LdcInsnNode(INetworkedAdapter.ARG_NETWORK));
+					insert.add(new LdcInsnNode(IPeripheralEnvironments.ARG_NETWORK));
 					insert.add(new LdcInsnNode(Type.getType("Lorg/squiddev/cctweaks/api/network/INetworkAccess;")));
 					insert.add(new MethodInsnNode(INVOKEVIRTUAL,
 						"openperipheral/adapter/composed/MethodSelector",

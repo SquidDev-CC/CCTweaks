@@ -3,7 +3,7 @@ package org.squiddev.cctweaks.core.asm;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.*;
-import org.squiddev.cctweaks.api.peripheral.INetworkedAdapter;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralEnvironments;
 import org.squiddev.cctweaks.core.asm.chickenlib.ASMMatcher;
 import org.squiddev.cctweaks.core.asm.patch.ClassPartialPatcher;
 import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
@@ -58,7 +58,7 @@ public class PatchOpenPeripheralAdapter extends ClassPartialPatcher {
 
 							// Before that, add an additional environment
 							InsnList insert = new InsnList();
-							insert.add(new LdcInsnNode(INetworkedAdapter.ARG_NETWORK));
+							insert.add(new LdcInsnNode(IPeripheralEnvironments.ARG_NETWORK));
 							insert.add(new VarInsnNode(ALOAD, 0));
 							insert.add(new FieldInsnNode(GETFIELD, patchType, "network", "Lorg/squiddev/cctweaks/core/network/NetworkAccessDelegate;"));
 							insert.add(new MethodInsnNode(

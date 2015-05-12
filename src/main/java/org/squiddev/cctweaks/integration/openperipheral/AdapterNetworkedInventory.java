@@ -8,7 +8,7 @@ import openperipheral.api.adapter.IPeripheralAdapter;
 import openperipheral.api.adapter.method.*;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.network.INetworkAccess;
-import org.squiddev.cctweaks.api.peripheral.INetworkedAdapter;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralEnvironments;
 import org.squiddev.cctweaks.core.utils.InventoryUtils;
 
 /**
@@ -43,7 +43,7 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 	@Alias("pullItemIntoSlotRemote")
 	@ScriptCallable(returnTypes = ReturnType.NUMBER, description = "Pull an item from a slot in another inventory into a slot in this one. Returns the amount of items moved")
 	public int pullItemRemote(
-		IInventory target, @Env(INetworkedAdapter.ARG_NETWORK) INetworkAccess network,
+		IInventory target, @Env(IPeripheralEnvironments.ARG_NETWORK) INetworkAccess network,
 		@Arg(name = "remoteName", description = "The name of the remote inventory") String remote,
 		@Arg(name = "slot", description = "The slot in the OTHER inventory that you're pulling from") int fromSlot,
 		@Optionals @Arg(name = "maxAmount", description = "The maximum amount of items you want to pull") Integer maxAmount,
@@ -76,7 +76,7 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 	@Alias("pushItemIntoSlotRemote")
 	@ScriptCallable(returnTypes = ReturnType.NUMBER, description = "Push an item from the current inventory into slot on the other one. Returns the amount of items moved")
 	public int pushItemRemote(
-		IInventory target, @Env(INetworkedAdapter.ARG_NETWORK) INetworkAccess network,
+		IInventory target, @Env(IPeripheralEnvironments.ARG_NETWORK) INetworkAccess network,
 		@Arg(name = "remoteName", description = "The name of the remote inventory") String remote,
 		@Arg(name = "slot", description = "The slot in the current inventory that you're pushing from") int fromSlot,
 		@Optionals @Arg(name = "maxAmount", description = "The maximum amount of items you want to push") Integer maxAmount,
