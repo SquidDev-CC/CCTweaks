@@ -13,4 +13,15 @@ public interface IPeripheralHelpers {
 	 * @return The base peripheral
 	 */
 	IPeripheral getBasePeripheral(IPeripheral peripheral);
+
+	/**
+	 * Gets the target peripheral for this peripheral.
+	 *
+	 * If it does not implement {@link IPeripheralTargeted} then it will attempt to find
+	 * the parent peripheral using {@link IPeripheralProxy} and start the search again.
+	 *
+	 * @param peripheral The peripheral to find
+	 * @return The target or the last peripheral we found
+	 */
+	Object getTarget(IPeripheral peripheral);
 }
