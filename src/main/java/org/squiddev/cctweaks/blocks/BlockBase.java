@@ -92,4 +92,8 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 	@Override
 	public void init() {
 	}
+
+	@Override
+	public void postInit() {
+	}
 }

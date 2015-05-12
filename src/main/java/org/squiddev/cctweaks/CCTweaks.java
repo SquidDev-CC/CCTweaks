@@ -3,6 +3,7 @@ package org.squiddev.cctweaks;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.creativetab.CreativeTabs;
@@ -34,5 +35,10 @@ public class CCTweaks {
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		Registry.init();
+	}
+
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+		Registry.postInit();
 	}
 }

@@ -14,11 +14,7 @@ public class RedstoneFluxIntegration extends APIIntegration {
 	public RedstoneFluxIntegration() {
 		super("CoFHAPI|energy");
 	}
-
-	@Override
-	public void preInit() {
-	}
-
+	
 	@Override
 	public void init() {
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {

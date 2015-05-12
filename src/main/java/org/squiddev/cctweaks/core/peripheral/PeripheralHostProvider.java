@@ -6,21 +6,12 @@ import dan200.computercraft.api.peripheral.IPeripheralProvider;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
-import org.squiddev.cctweaks.core.registry.IModule;
+import org.squiddev.cctweaks.core.registry.Module;
 
 /**
  * Adds support for {@link org.squiddev.cctweaks.api.peripheral.IPeripheralHost}
  */
-public class PeripheralHostProvider implements IModule, IPeripheralProvider {
-	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public void preInit() {
-	}
-
+public class PeripheralHostProvider extends Module implements IPeripheralProvider {
 	@Override
 	public void init() {
 		ComputerCraftAPI.registerPeripheralProvider(this);

@@ -20,4 +20,9 @@ public interface IModule {
 	 * @see cpw.mods.fml.common.Mod.EventHandler
 	 */
 	void init();
+
+	/**
+	 * @see cpw.mods.fml.common.Mod.EventHandler
+	 */
+	void postInit();
 }
