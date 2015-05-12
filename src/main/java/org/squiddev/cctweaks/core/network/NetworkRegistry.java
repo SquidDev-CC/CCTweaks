@@ -4,6 +4,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.INetworkNodeHost;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
 import org.squiddev.cctweaks.api.network.INetworkRegistry;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -30,7 +31,8 @@ public final class NetworkRegistry implements INetworkRegistry {
 	public boolean isNode(TileEntity tile) {
 		if (tile == null) return false;
 
-		if (tile instanceof INetworkNode) return true;
+		if (tile instanceof INetworkNode || tile instanceof INetworkNodeHost) return true;
+
 		for (INetworkNodeProvider provider : providers) {
 			try {
 				if (provider.isNode(tile)) return true;
@@ -57,9 +59,8 @@ public final class NetworkRegistry implements INetworkRegistry {
 	public INetworkNode getNode(TileEntity tile) {
 		if (tile == null) return null;
 
-		if (tile instanceof INetworkNode) {
-			return (INetworkNode) tile;
-		}
+		if (tile instanceof INetworkNode) return (INetworkNode) tile;
+		if (tile instanceof INetworkNodeHost) return ((INetworkNodeHost) tile).getNode();
 
 		for (INetworkNodeProvider provider : providers) {
 			try {

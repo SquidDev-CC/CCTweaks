@@ -12,7 +12,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
-import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.item.ItemStack;
@@ -20,12 +19,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PartModemWithCableIntermediate extends PartCable implements IPeripheralTile {
+public class PartModemWithCableIntermediate extends PartCable implements IPeripheralHost {
 	public static final String NAME = CCTweaks.NAME + ":networkModemCable";
 
 	private final PartModem modem;
@@ -159,27 +159,7 @@ public class PartModemWithCableIntermediate extends PartCable implements IPeriph
 	}
 
 	@Override
-	public PeripheralType getPeripheralType() {
-		return modem.getPeripheralType();
-	}
-
-	@Override
 	public IPeripheral getPeripheral(int side) {
 		return modem.getPeripheral(side);
-	}
-
-	@Override
-	public String getLabel() {
-		return modem.getLabel();
-	}
-
-	@Override
-	public int getDirection() {
-		return modem.getDirection();
-	}
-
-	@Override
-	public void setDirection(int direction) {
-		modem.setDirection(direction);
 	}
 }
