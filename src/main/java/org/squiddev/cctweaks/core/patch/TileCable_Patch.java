@@ -16,10 +16,11 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
+import org.squiddev.cctweaks.core.network.NetworkHelpers;
 
 import java.util.*;
 
-import static org.squiddev.cctweaks.api.network.NetworkHelpers.canConnect;
+import static org.squiddev.cctweaks.core.network.NetworkHelpers.canConnect;
 
 @SuppressWarnings("all")
 @MergeVisitor.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
@@ -167,19 +168,15 @@ public class TileCable_Patch extends TileCable implements INetworkNode, INetwork
 
 		final TileCable_Patch origin = this;
 		synchronized (m_peripheralsByName) {
-			final Map<String, IPeripheral> newPeripheralsByName = new HashMap<String, IPeripheral>();
+			Map<String, IPeripheral> newPeripheralsByName = new HashMap<String, IPeripheral>();
 			if (getPeripheralType() == PeripheralType.WiredModemWithCable) {
-				new NetworkVisitor() {
-					@MergeVisitor.Rewrite
-					boolean ANNOTATION;
-
-					public void visitNode(INetworkNode node, int distance) {
-						if (node != origin) {
-							Map<String, IPeripheral> peripherals = node.getConnectedPeripherals();
-							if (peripherals != null) newPeripheralsByName.putAll(peripherals);
-						}
+				for (ISearchLoc loc : NetworkAPI.visitor().visitNetwork(this)) {
+					INetworkNode node = loc.getNode();
+					if (node != origin) {
+						Map<String, IPeripheral> peripherals = node.getConnectedPeripherals();
+						if (peripherals != null) newPeripheralsByName.putAll(peripherals);
 					}
-				}.visitNetwork(this);
+				}
 			}
 
 			Iterator it = m_peripheralsByName.keySet().iterator();

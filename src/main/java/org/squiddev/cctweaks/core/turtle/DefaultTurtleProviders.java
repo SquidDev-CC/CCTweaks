@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.registry;
+package org.squiddev.cctweaks.core.turtle;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.ITurtleAccess;
@@ -9,16 +9,17 @@ import dan200.computercraft.shared.util.InventoryUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
-import org.squiddev.cctweaks.api.network.NetworkRegistry;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
-import org.squiddev.cctweaks.api.turtle.TurtleFuelRegistry;
+import org.squiddev.cctweaks.core.registry.IModule;
 
 /**
  * Registers turtle related things
  */
-public class TurtleRegistry implements IModule {
+public class DefaultTurtleProviders implements IModule {
 	@Override
 	public boolean canLoad() {
 		return true;
@@ -30,9 +31,9 @@ public class TurtleRegistry implements IModule {
 
 	public void init() {
 		// Add default furnace fuel provider
-		TurtleFuelRegistry.addFuelProvider(new ITurtleFuelProvider() {
+		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {
 			@Override
-			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack, int limit) {
+			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack) {
 				return TileEntityFurnace.isItemFuel(stack);
 			}
 
@@ -55,7 +56,7 @@ public class TurtleRegistry implements IModule {
 
 		// Allow upgrades with a network node
 		// TODO: Bind all nodes into one like CablePart
-		NetworkRegistry.addNodeProvider(new INetworkNodeProvider() {
+		NetworkAPI.registry().addNodeProvider(new INetworkNodeProvider() {
 			@Override
 			public INetworkNode getNode(TileEntity tile) {
 				if (tile instanceof ITurtleTile) {

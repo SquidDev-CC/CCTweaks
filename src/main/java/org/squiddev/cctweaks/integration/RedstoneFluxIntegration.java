@@ -3,8 +3,8 @@ package org.squiddev.cctweaks.integration;
 import cofh.api.energy.IEnergyContainerItem;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import net.minecraft.item.ItemStack;
+import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
-import org.squiddev.cctweaks.api.turtle.TurtleFuelRegistry;
 import org.squiddev.cctweaks.core.Config;
 
 /**
@@ -21,9 +21,9 @@ public class RedstoneFluxIntegration extends APIIntegration {
 
 	@Override
 	public void init() {
-		TurtleFuelRegistry.addFuelProvider(new ITurtleFuelProvider() {
+		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {
 			@Override
-			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack, int limit) {
+			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack) {
 				return Config.config.turtleFluxRefuelEnable && stack.getItem() instanceof IEnergyContainerItem;
 			}
 

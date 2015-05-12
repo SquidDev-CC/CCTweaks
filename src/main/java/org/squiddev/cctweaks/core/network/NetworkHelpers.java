@@ -1,8 +1,13 @@
-package org.squiddev.cctweaks.api.network;
+package org.squiddev.cctweaks.core.network;
 
 import net.minecraft.util.Facing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.ISearchLoc;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
+import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.core.network.visitor.NetworkVisitorIterable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,15 +15,7 @@ import java.util.Set;
 /**
  * Helper methods on networks
  */
-public class NetworkHelpers {
-	private static final NetworkVisitor invalidateVisitor = new NetworkVisitor() {
-		public void visitNode(INetworkNode node, int distance) {
-			synchronized (node.lock()) {
-				node.networkInvalidated();
-			}
-		}
-	};
-
+public final class NetworkHelpers {
 	/**
 	 * Fire {@link INetworkNode#networkInvalidated()} on current and adjacent nodes
 	 *
@@ -28,18 +25,22 @@ public class NetworkHelpers {
 	 * @param z     The Z position of the node
 	 */
 	public static void fireNetworkInvalidateAdjacent(IBlockAccess world, int x, int y, int z) {
-		Set<NetworkVisitor.SearchLoc> visited = new HashSet<NetworkVisitor.SearchLoc>();
+		Set<ISearchLoc> visited = new HashSet<ISearchLoc>();
 
-		invalidateVisitor.visitNetwork(world, x, y, z, visited);
+		for (ISearchLoc loc : new NetworkVisitorIterable(world, x, y, z, visited)) {
+			loc.getNode().networkInvalidated();
+		}
 
 		for (int dir = 0; dir < 6; dir++) {
-			invalidateVisitor.visitNetwork(
+			for (ISearchLoc loc : new NetworkVisitorIterable(
 				world,
 				Facing.offsetsXForSide[dir] + x,
 				Facing.offsetsYForSide[dir] + y,
 				Facing.offsetsZForSide[dir] + z,
 				visited
-			);
+			)) {
+				loc.getNode().networkInvalidated();
+			}
 		}
 	}
 
@@ -52,7 +53,9 @@ public class NetworkHelpers {
 	 * @param z     The Z position of the node
 	 */
 	public static void fireNetworkInvalidate(IBlockAccess world, int x, int y, int z) {
-		invalidateVisitor.visitNetwork(world, x, y, z);
+		for (ISearchLoc loc : new NetworkVisitorIterable(world, x, y, z)) {
+			loc.getNode().networkInvalidated();
+		}
 	}
 
 	/**
@@ -70,7 +73,7 @@ public class NetworkHelpers {
 		y += direction.offsetY;
 		z += direction.offsetZ;
 
-		INetworkNode node = NetworkRegistry.getNode(world, x, y, z);
+		INetworkNode node = NetworkAPI.registry().getNode(world, x, y, z);
 		return node != null && node.canBeVisited(direction.getOpposite());
 	}
 
@@ -83,12 +86,9 @@ public class NetworkHelpers {
 	 * @param z      The Z position of the node
 	 * @param packet Packet to send
 	 */
-	public static void sendPacket(IBlockAccess world, int x, int y, int z, final Packet packet) {
-		new NetworkVisitor() {
-			@Override
-			protected void visitNode(INetworkNode node, int distance) {
-				node.receivePacket(packet, distance);
-			}
-		}.visitNetwork(world, x, y, z);
+	public static void sendPacket(IBlockAccess world, int x, int y, int z, Packet packet) {
+		for (ISearchLoc loc : new NetworkVisitorIterable(world, x, y, z)) {
+			loc.getNode().receivePacket(packet, loc.getDistance());
+		}
 	}
 }

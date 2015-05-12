@@ -3,7 +3,10 @@ package org.squiddev.cctweaks.api.network;
 import net.minecraft.tileentity.TileEntity;
 
 /**
- * Register a custom provider for network nodes
+ * Provide a custom way to get a node.
+ *
+ * This can be used for blocks that do not implement {@link INetworkNode}. They should be registered
+ * with {@link INetworkRegistry#addNodeProvider(INetworkNodeProvider)}.
  */
 public interface INetworkNodeProvider {
 	/**
