@@ -9,6 +9,7 @@ import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
 import org.squiddev.cctweaks.integration.IndustrialCraftIntegration;
 import org.squiddev.cctweaks.integration.RedstoneFluxIntegration;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
+import org.squiddev.cctweaks.integration.openperipheral.OpenPeripheralIntegration;
 import org.squiddev.cctweaks.items.ItemComputerUpgrade;
 import org.squiddev.cctweaks.items.ItemDataCard;
 import org.squiddev.cctweaks.items.ItemDebugger;
@@ -43,6 +44,7 @@ public final class Registry {
 		addModule(new BlockDebug());
 
 		addModule(new MultipartIntegration());
+		addModule(new OpenPeripheralIntegration());
 
 		addModule(new PeripheralHostProvider());
 
