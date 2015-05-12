@@ -13,7 +13,6 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.client.render.FixedRenderBlocks;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
-import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import dan200.computercraft.shared.util.IDAssigner;
 import dan200.computercraft.shared.util.PeripheralUtil;
@@ -310,7 +309,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 			int z = z() + Facing.offsetsZForSide[dir];
 			IPeripheral peripheral = PeripheralUtil.getPeripheral(world(), x, y, z, Facing.oppositeSide[dir]);
 
-			if (peripheral == null || peripheral instanceof ModemPeripheral) {
+			if (peripheral == null) {
 				id = -1;
 				peripheral = null;
 			} else if (id <= -1) {
