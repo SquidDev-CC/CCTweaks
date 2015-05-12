@@ -22,18 +22,18 @@ public abstract class ItemComputerAction extends ItemBase {
 		}
 
 		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile == null) return false;
 
-		// Ensure tile is Computer Tile
-		if (tile == null || !(tile instanceof TileComputerBase)) {
-			return false;
-		}
-
-		// Allow custom Turtle Actions
-		boolean result = false;
-		if (tile instanceof TileTurtle) {
-			result = upgradeTurtle(stack, player, world, x, y, z, (TileTurtle) tile);
+		boolean result;
+		if (tile instanceof TileComputerBase) {
+			// Allow custom Turtle Actions
+			if (tile instanceof TileTurtle) {
+				result = upgradeTurtle(stack, player, (TileTurtle) tile, side);
+			} else {
+				result = upgradeComputer(stack, player, (TileComputerBase) tile, side);
+			}
 		} else {
-			result = upgradeComputer(stack, player, world, x, y, z, (TileComputerBase) tile);
+			result = itemUse(stack, player, tile, side);
 		}
 
 		if (result) {
@@ -45,9 +45,16 @@ public abstract class ItemComputerAction extends ItemBase {
 		return result;
 	}
 
-	protected abstract boolean upgradeComputer(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, TileComputerBase computerTile);
+	protected abstract boolean upgradeComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side);
 
-	protected boolean upgradeTurtle(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, TileTurtle computerTile) {
-		return upgradeComputer(stack, player, world, x, y, z, computerTile);
+	protected boolean upgradeTurtle(ItemStack stack, EntityPlayer player, TileTurtle computerTile, int side) {
+		return upgradeComputer(stack, player, computerTile, side);
+	}
+
+	/**
+	 * Custom action on other tile types
+	 */
+	protected boolean itemUse(ItemStack stack, EntityPlayer player, TileEntity tile, int side) {
+		return false;
 	}
 }

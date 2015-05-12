@@ -213,12 +213,12 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 
 	@Override
 	public boolean canBeVisited(ForgeDirection from) {
-		return from.getOpposite().ordinal() != direction;
+		return from.ordinal() != direction;
 	}
 
 	@Override
 	public boolean canVisitTo(ForgeDirection to) {
-		return to.ordinal() != direction;
+		return canBeVisited(to);
 	}
 
 	@Override
