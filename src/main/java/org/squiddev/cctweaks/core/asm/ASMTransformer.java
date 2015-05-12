@@ -9,7 +9,7 @@ import org.squiddev.cctweaks.core.asm.patch.IPatcher;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 
 public class ASMTransformer implements IClassTransformer {
-	protected IPatcher[] patches = {
+	protected final IPatcher[] patches = {
 		new ClassPatcher("org.luaj.vm2.lib.DebugLib"),
 		new ClassPatcher("org.luaj.vm2.lib.StringLib"),
 		new ClassReplacer(
@@ -50,6 +50,7 @@ public class ASMTransformer implements IClassTransformer {
 			"org.squiddev.cctweaks.core.patch.op.PeripheralProxy_Patch"
 		),
 		new PatchOpenPeripheralAdapter(),
+		new PatchOpenModule(),
 	};
 
 	@Override

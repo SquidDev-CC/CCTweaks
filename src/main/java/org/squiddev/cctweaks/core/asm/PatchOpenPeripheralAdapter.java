@@ -25,7 +25,6 @@ import static org.objectweb.asm.Opcodes.*;
  */
 public class PatchOpenPeripheralAdapter extends ClassPartialPatcher {
 	public static final String METHOD_CALL = "Lopenperipheral/adapter/IMethodCall;";
-	public static final String NETWORK_ACCESS = "Lorg/squiddev/cctweaks/api/network/INetworkAccess;";
 
 	public PatchOpenPeripheralAdapter() {
 		super("openperipheral.interfaces.cc.wrappers.AdapterPeripheral", "org.squiddev.cctweaks.core.patch.op.AdapterPeripheral_Patch");
