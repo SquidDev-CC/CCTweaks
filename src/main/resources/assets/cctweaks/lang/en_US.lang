@@ -5,6 +5,10 @@ item.cctweaks.dataCard.name=Data Card
 tile.cctweaks.networkedBlock.wirelessBridge.name=Wireless Bridge
 tile.cctweaks.networkedBlock.wiredModem.name=Wired Modem
 
+tile.cctweaks.debugBlock.peripheral.name=Debug Peripheral
+tile.cctweaks.debugBlock.networkedPeripheral.name=Debug NetworkedPeripheral
+tile.cctweaks.debugBlock.node.name=Debug Node
+
 gui.tooltip.cctweaks.computerUpgrade.normal=Normal to Advanced
 gui.tooltip.cctweaks.data.empty=Empty
 gui.tooltip.cctweaks.data.networkBinding=Network Binding

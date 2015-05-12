@@ -122,6 +122,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralTile {
 		if (modem.modem.pollChanged()) markDirty();
 
 		modem.processQueue();
+
 		if (!modem.peripheralsKnown) modem.findPeripherals();
 	}
 
@@ -132,7 +133,9 @@ public class PartModem extends PartSidedNetwork implements IPeripheralTile {
 
 	@Override
 	public void onNeighborChanged() {
+		Map<String, IPeripheral> peripherals = modem.getConnectedPeripherals();
 		if (modem.updateEnabled()) {
+			modem.detachConnectedPeripheralsFromNetwork(peripherals);
 			markDirty();
 			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
 		}
@@ -144,7 +147,11 @@ public class PartModem extends PartSidedNetwork implements IPeripheralTile {
 		if (world().isRemote) return true;
 
 		String name = modem.getPeripheralName();
+
+		modem.detachConnectedPeripheralsFromNetwork();
 		modem.toggleEnabled();
+		modem.attachConnectedPeripheralsToNetwork();
+
 		String newName = modem.getPeripheralName();
 
 		if (!Objects.equal(name, newName)) {
@@ -166,7 +173,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralTile {
 	@Override
 	public void onWorldSeparate() {
 		super.onWorldSeparate();
-		modem.modem.destroy();
+		modem.destroy();
 	}
 
 	/**

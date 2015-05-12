@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.core.registry;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import org.squiddev.cctweaks.blocks.debug.BlockDebug;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.integration.IndustrialCraftIntegration;
 import org.squiddev.cctweaks.integration.RedstoneFluxIntegration;
@@ -36,6 +37,8 @@ public final class Registry {
 		addModule(itemDataCard = new ItemDataCard());
 		addModule(blockNetworked = new BlockNetworked());
 
+		addModule(new BlockDebug());
+
 		addModule(new MultipartIntegration());
 
 		addModule(new TurtleRegistry());
@@ -59,6 +62,7 @@ public final class Registry {
 
 
 	public static void preInit() {
+		if(preInit) throw new IllegalStateException("Attempting to preInit twice");
 		preInit = true;
 		for (IModule module : modules) {
 			if (module.canLoad()) module.preInit();
@@ -66,6 +70,9 @@ public final class Registry {
 	}
 
 	public static void init() {
+		if(!preInit) throw new IllegalStateException("Cannot init before preInit");
+		if(init) throw new IllegalStateException("Attempting to init twice");
+
 		init = true;
 		for (IModule module : modules) {
 			if (module.canLoad()) module.init();

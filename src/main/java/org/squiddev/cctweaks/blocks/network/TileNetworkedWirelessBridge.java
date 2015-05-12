@@ -27,7 +27,7 @@ public class TileNetworkedWirelessBridge extends TileNetworked implements IPerip
 		}
 
 		@Override
-		public Map<String, IPeripheral> getConnectedPeripherals() {
+		public Map<String, IPeripheral> findConnectedPeripherals() {
 			return TileNetworkedWirelessBridge.this.getConnectedPeripherals();
 		}
 	};

@@ -8,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.network.NetworkHelpers;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.modem.MultiPeripheralModem;
@@ -39,7 +40,27 @@ public class TileNetworkedModem extends TileNetworked implements IPeripheralTile
 
 	@Override
 	public void onNeighborChanged() {
-		if (modem.updateEnabled()) {
+		Map<String, IPeripheral> oldPeripherals = getConnectedPeripherals();
+		if (modem.hasChanged()) {
+			Map<String, IPeripheral> newPeripherals = getConnectedPeripherals();
+			for (Map.Entry<String, IPeripheral> p : newPeripherals.entrySet()) {
+				IPeripheral newPeriph = p.getValue();
+				String newName = p.getKey();
+				IPeripheral oldPeriph = oldPeripherals.get(newName);
+				if (!newPeriph.equals(oldPeriph) && newPeriph instanceof INetworkedPeripheral) {
+					((INetworkedPeripheral) newPeriph).attachToNetwork(modem, newName);
+				}
+			}
+
+			for (Map.Entry<String, IPeripheral> p : oldPeripherals.entrySet()) {
+				IPeripheral oldPeriph = p.getValue();
+				String oldName = p.getKey();
+				IPeripheral newPeriph = newPeripherals.get(oldName);
+				if (!oldPeriph.equals(newPeriph) && oldPeriph instanceof INetworkedPeripheral) {
+					((INetworkedPeripheral) oldPeriph).detachFromNetwork(modem, oldName);
+				}
+			}
+
 			markForUpdate();
 			NetworkHelpers.fireNetworkInvalidate(worldObj, xCoord, yCoord, zCoord);
 		}
@@ -51,7 +72,11 @@ public class TileNetworkedModem extends TileNetworked implements IPeripheralTile
 		if (worldObj.isRemote) return true;
 
 		Set<String> names = modem.getPeripheralNames();
+
+		modem.detachConnectedPeripheralsFromNetwork();
 		modem.toggleEnabled();
+		modem.attachConnectedPeripheralsToNetwork();
+
 		Set<String> newNames = modem.getPeripheralNames();
 
 		if (!Objects.equals(names, newNames)) {
