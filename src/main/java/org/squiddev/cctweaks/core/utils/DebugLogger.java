@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -12,6 +13,14 @@ import org.squiddev.cctweaks.core.Config;
  */
 public class DebugLogger {
 	private static final Logger logger = LogManager.getLogger(CCTweaks.ID);
+
+	public static void trace(String message) {
+		try {
+			throw new RuntimeException();
+		} catch (RuntimeException e) {
+			debug(message + "\n\tat " + StringUtils.join(Thread.currentThread().getStackTrace(), "\n\tat "));
+		}
+	}
 
 	public static void debug(Marker marker, String message) {
 		if (Config.config.debug) {

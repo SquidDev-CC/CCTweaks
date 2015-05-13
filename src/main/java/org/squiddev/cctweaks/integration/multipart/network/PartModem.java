@@ -12,9 +12,7 @@ import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.client.render.FixedRenderBlocks;
 import dan200.computercraft.shared.peripheral.PeripheralType;
-import dan200.computercraft.shared.peripheral.common.IPeripheralTile;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
-import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import dan200.computercraft.shared.util.IDAssigner;
 import dan200.computercraft.shared.util.PeripheralUtil;
@@ -28,10 +26,10 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.modem.SinglePeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
@@ -41,7 +39,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class PartModem extends PartSidedNetwork implements IPeripheralTile {
+public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	@SideOnly(Side.CLIENT)
 	private static IIcon[] icons;
 
@@ -213,16 +211,6 @@ public class PartModem extends PartSidedNetwork implements IPeripheralTile {
 	}
 
 	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		return from.getOpposite().ordinal() != direction;
-	}
-
-	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return to.ordinal() != direction;
-	}
-
-	@Override
 	public Map<String, IPeripheral> getConnectedPeripherals() {
 		return modem.getConnectedPeripherals();
 	}
@@ -243,27 +231,8 @@ public class PartModem extends PartSidedNetwork implements IPeripheralTile {
 	}
 
 	@Override
-	public int getDirection() {
-		return direction;
-	}
-
-	@Override
-	public void setDirection(int direction) {
-	}
-
-	@Override
-	public PeripheralType getPeripheralType() {
-		return PeripheralType.WiredModem;
-	}
-
-	@Override
 	public IPeripheral getPeripheral(int side) {
 		if (side == direction) return modem.modem;
-		return null;
-	}
-
-	@Override
-	public String getLabel() {
 		return null;
 	}
 
@@ -329,7 +298,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralTile {
 			int z = z() + Facing.offsetsZForSide[dir];
 			IPeripheral peripheral = PeripheralUtil.getPeripheral(world(), x, y, z, Facing.oppositeSide[dir]);
 
-			if (peripheral == null || peripheral instanceof ModemPeripheral) {
+			if (peripheral == null) {
 				id = -1;
 				peripheral = null;
 			} else if (id <= -1) {

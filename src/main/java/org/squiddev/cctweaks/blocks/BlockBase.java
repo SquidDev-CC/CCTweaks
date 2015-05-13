@@ -4,6 +4,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -51,6 +52,30 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 		super.breakBlock(world, x, y, z, block, damage);
 
 		if (tile != null) tile.postRemove();
+	}
+
+	@Override
+	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+		TileBase tile = getTile(world, x, y, z);
+		return tile != null && tile.onActivated(player, side);
+	}
+
+	@Override
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+		super.onNeighborBlockChange(world, x, y, z, block);
+		if (world.isRemote) return;
+
+		TileBase tile = getTile(world, x, y, z);
+		if (tile != null) tile.onNeighborChanged();
+	}
+
+	@Override
+	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
+		super.onNeighborChange(world, x, y, z, tileX, tileY, tileZ);
+		if (world instanceof World && ((World) world).isRemote) return;
+
+		TileBase tile = getTile(world, x, y, z);
+		if (tile != null) tile.onNeighborChanged();
 	}
 
 	@Override

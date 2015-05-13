@@ -33,7 +33,11 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		super("computerUpgrade");
 	}
 
-	protected boolean upgradeComputer(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, TileComputerBase computerTile) {
+	@Override
+	protected boolean upgradeComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side) {
+		int x = computerTile.xCoord, y = computerTile.yCoord, z = computerTile.zCoord;
+		World world = computerTile.getWorldObj();
+
 		// Check we can copy the tile and it is a normal computer
 		if (computerTile.getFamily() != ComputerFamily.Normal || ComputerAccessor.tileCopy == null) {
 			return false;
@@ -65,7 +69,11 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		return true;
 	}
 
-	protected boolean upgradeTurtle(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, TileTurtle computerTile) {
+	@Override
+	protected boolean upgradeTurtle(ItemStack stack, EntityPlayer player, TileTurtle computerTile, int side) {
+		int x = computerTile.xCoord, y = computerTile.yCoord, z = computerTile.zCoord;
+		World world = computerTile.getWorldObj();
+
 		// Ensure it is a normal computer
 		if (computerTile.getFamily() != ComputerFamily.Normal) {
 			return false;

@@ -2,7 +2,6 @@ package org.squiddev.cctweaks.core.network.modem;
 
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import dan200.computercraft.shared.util.IDAssigner;
 import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.util.Facing;
@@ -76,7 +75,7 @@ public abstract class MultiPeripheralModem extends BasicModem {
 				Facing.oppositeSide[dir]
 			);
 
-			if (peripheral == null || peripheral instanceof ModemPeripheral) {
+			if (peripheral == null || (peripheral instanceof BasicModemPeripheral && ((BasicModemPeripheral) peripheral).modem instanceof MultiPeripheralModem)) {
 				ids[dir] = -1;
 				peripherals[dir] = null;
 			} else if (ids[dir] <= -1) {

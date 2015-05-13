@@ -7,10 +7,9 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.INetworkNodeHost;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,7 @@ import java.util.Map;
  *
  * @see BasicModem
  */
-public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements INetworkNode {
+public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements INetworkNodeHost {
 	public final T modem;
 
 	public BasicModemPeripheral(T modem) {
@@ -146,37 +145,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	}
 
 	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		return modem.canBeVisited(from);
-	}
-
-	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return modem.canVisitTo(to);
-	}
-
-	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		return modem.getConnectedPeripherals();
-	}
-
-	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-		modem.receivePacket(packet, distanceTravelled);
-	}
-
-	@Override
-	public void networkInvalidated() {
-		modem.networkInvalidated();
-	}
-
-	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		return modem.getExtraNodes();
-	}
-
-	@Override
-	public Object lock() {
-		return modem.lock();
+	public INetworkNode getNode() {
+		return modem;
 	}
 }
