@@ -42,7 +42,6 @@ import java.util.Set;
  * Various inventory code taken from OpenModsLib because I am lazy
  */
 public class InventoryUtils {
-
 	public static boolean areItemAndTagEqual(final ItemStack stackA, ItemStack stackB) {
 		return stackA.isItemEqual(stackB) && ItemStack.areItemStackTagsEqual(stackA, stackB);
 	}
@@ -138,37 +137,37 @@ public class InventoryUtils {
 	 * doMove, it'll create a dummy inventory and its calculations on that
 	 * instead
 	 *
-	 * @param fromInventory the inventory the item is coming from
-	 * @param fromSlot      the slot the item is coming from
-	 * @param toInventory   the inventory you want the item to be put into. can be BC pipe
-	 *                      or IInventory
-	 * @param intoSlot      the target slot. Pass -1 for any slot
+	 * @param fromInventory The inventory the item is coming from
+	 * @param fromSlot      The slot the item is coming from
+	 * @param fromDirection The direction to remove from. Pass {@link ForgeDirection#UNKNOWN} if not applicable.
+	 * @param toInventory   The inventory you want the item to be put into
+	 * @param toSlot        The target slot. Pass -1 for any slot
+	 * @param toDirection   The direction to insert into. Pass {@link ForgeDirection#UNKNOWN} if not applicable
 	 * @param maxAmount     The maximum amount you wish to pass
-	 * @param direction     The direction of the move. Pass UNKNOWN if not applicable
 	 * @return The amount of items moved
 	 */
-	public static int moveItemInto(IInventory fromInventory, int fromSlot, IInventory toInventory, int intoSlot, int maxAmount, ForgeDirection direction) {
-		fromInventory = InventoryUtils.getInventory(fromInventory);
-
+	public static int moveItemInto(
+		IInventory fromInventory, int fromSlot, ForgeDirection fromDirection,
+		IInventory toInventory, int toSlot, ForgeDirection toDirection,
+		int maxAmount
+	) {
 		ItemStack sourceStack = fromInventory.getStackInSlot(fromSlot);
 		if (sourceStack == null || maxAmount <= 0) return 0;
 
-		if (fromInventory instanceof ISidedInventory
-			&& !((ISidedInventory) fromInventory).canExtractItem(fromSlot, sourceStack, direction.ordinal())) {
+		// Check if this is an ISidedInventory.
+		final boolean isSidedInventory = fromInventory instanceof ISidedInventory && fromDirection != ForgeDirection.UNKNOWN;
+		if (isSidedInventory && !((ISidedInventory) fromInventory).canExtractItem(fromSlot, sourceStack, fromDirection.ordinal())) {
 			return 0;
 		}
 
 		final int amountToMove = Math.min(sourceStack.stackSize, maxAmount);
-		ItemStack insertedStack = InventoryUtils.copyAndChange(sourceStack, amountToMove);
+		ItemStack insertedStack = copyAndChange(sourceStack, amountToMove);
 
-		IInventory targetInventory = InventoryUtils.getInventory(toInventory);
-		ForgeDirection side = direction.getOpposite();
-		// try insert the item into the target inventory. this'll reduce the
-		// stackSize of our stack
-		insertItemIntoInventory(targetInventory, insertedStack, side, intoSlot);
+		// try insert the item into the target inventory. This will reduce the stackSize of our stack
+		insertItemIntoInventory(toInventory, insertedStack, toDirection, toSlot);
 		int inserted = amountToMove - insertedStack.stackSize;
 
-		InventoryUtils.removeFromSlot(fromInventory, fromSlot, inserted);
+		removeFromSlot(fromInventory, fromSlot, inserted);
 
 		return inserted;
 	}
@@ -195,7 +194,7 @@ public class InventoryUtils {
 				return true;
 			} else {
 				if (targetInventory.isItemValidForSlot(slot, stack) &&
-					InventoryUtils.areMergeCandidates(stack, targetStack)) {
+					areMergeCandidates(stack, targetStack)) {
 					int space = targetStack.getMaxStackSize() - targetStack.stackSize;
 					int mergeAmount = Math.min(space, stack.stackSize);
 					ItemStack copy = targetStack.copy();

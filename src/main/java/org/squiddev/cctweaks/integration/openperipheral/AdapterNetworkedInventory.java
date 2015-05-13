@@ -38,8 +38,6 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 		return null;
 	}
 
-	public static final INetworkAccess network = null;
-
 	@Alias("pullItemIntoSlotRemote")
 	@ScriptCallable(returnTypes = ReturnType.NUMBER, description = "Pull an item from a slot in another inventory into a slot in this one. Returns the amount of items moved")
 	public int pullItemRemote(
@@ -47,7 +45,9 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 		@Arg(name = "remoteName", description = "The name of the remote inventory") String remote,
 		@Arg(name = "slot", description = "The slot in the OTHER inventory that you're pulling from") int fromSlot,
 		@Optionals @Arg(name = "maxAmount", description = "The maximum amount of items you want to pull") Integer maxAmount,
-		@Arg(name = "intoSlot", description = "The slot in the current inventory that you want to pull into") Integer intoSlot
+		@Arg(name = "direction", description = "The direction to pull from the OTHER inventory") ForgeDirection fromDirection,
+		@Arg(name = "intoSlot", description = "The slot in the current inventory that you want to pull into") Integer intoSlot,
+		@Arg(name = "direction", description = "The direction to push into the current inventory") ForgeDirection intoDirection
 	) {
 		Preconditions.checkNotNull(network, "Cannot find the network");
 
@@ -55,8 +55,11 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 		final IInventory thisInventory = Preconditions.checkNotNull(InventoryUtils.getInventory(target), "Inventory not found");
 
 		if (otherInventory == target) return 0;
+
 		if (maxAmount == null) maxAmount = 64;
 		if (intoSlot == null) intoSlot = 0;
+		if (fromDirection == null) fromDirection = ForgeDirection.UNKNOWN;
+		if (intoDirection == null) intoDirection = ForgeDirection.UNKNOWN;
 
 		fromSlot -= 1;
 		intoSlot -= 1;
@@ -64,7 +67,7 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 		checkSlotId(otherInventory, fromSlot, "input");
 		checkSlotId(thisInventory, intoSlot, "output");
 
-		final int amount = InventoryUtils.moveItemInto(otherInventory, fromSlot, thisInventory, intoSlot, maxAmount, ForgeDirection.UNKNOWN);
+		final int amount = InventoryUtils.moveItemInto(otherInventory, fromSlot, fromDirection, thisInventory, intoSlot, intoDirection, maxAmount);
 		if (amount > 0) {
 			thisInventory.markDirty();
 			otherInventory.markDirty();
@@ -80,17 +83,21 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 		@Arg(name = "remoteName", description = "The name of the remote inventory") String remote,
 		@Arg(name = "slot", description = "The slot in the current inventory that you're pushing from") int fromSlot,
 		@Optionals @Arg(name = "maxAmount", description = "The maximum amount of items you want to push") Integer maxAmount,
-		@Arg(name = "intoSlot", description = "The slot in the other inventory that you want to push into") Integer intoSlot
+		@Arg(name = "direction", description = "The direction to push into the current inventory") ForgeDirection fromDirection,
+		@Arg(name = "intoSlot", description = "The slot in the other inventory that you want to push into") Integer intoSlot,
+		@Arg(name = "slot", description = "The slot in the other inventory that you're pulling from") ForgeDirection intoDirection
 	) {
 		Preconditions.checkNotNull(network, "Cannot find the network");
 
-		final IInventory otherInventory = getInventory(network, remote);
-		Preconditions.checkNotNull(otherInventory, "Other inventory not found");
-		final IInventory thisInventory = InventoryUtils.getInventory(target);
+		final IInventory otherInventory = Preconditions.checkNotNull(getInventory(network, remote), "Other inventory not found");
+		final IInventory thisInventory = Preconditions.checkNotNull(InventoryUtils.getInventory(target), "Inventory not found");
 
 		if (otherInventory == target) return 0;
+
 		if (maxAmount == null) maxAmount = 64;
 		if (intoSlot == null) intoSlot = 0;
+		if (fromDirection == null) fromDirection = ForgeDirection.UNKNOWN;
+		if (intoDirection == null) intoDirection = ForgeDirection.UNKNOWN;
 
 		fromSlot -= 1;
 		intoSlot -= 1;
@@ -98,7 +105,7 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 		checkSlotId(thisInventory, fromSlot, "input");
 		checkSlotId(otherInventory, intoSlot, "output");
 
-		int amount = InventoryUtils.moveItemInto(thisInventory, fromSlot, otherInventory, intoSlot, maxAmount, ForgeDirection.UNKNOWN);
+		int amount = InventoryUtils.moveItemInto(thisInventory, fromSlot, fromDirection, otherInventory, intoSlot, intoDirection, maxAmount);
 		if (amount > 0) {
 			thisInventory.markDirty();
 			otherInventory.markDirty();
