@@ -43,4 +43,8 @@ public abstract class ItemBase extends Item implements IModule {
 	@Override
 	public void init() {
 	}
+
+	@Override
+	public void postInit() {
+	}
 }

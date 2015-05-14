@@ -1,9 +1,12 @@
 package org.squiddev.cctweaks.core.asm.patch;
 
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * Abstract class for rewriting classes
@@ -73,5 +76,24 @@ public abstract class ClassRewriter implements IPatcher {
 	 */
 	public boolean matches(String className) {
 		return className.startsWith(this.className);
+	}
+
+	/**
+	 * Dump the bytecode for this class.
+	 *
+	 * Example: {@code return dumpClass(writer.toByteArray());}
+	 *
+	 * @param bytes The bytes of this class
+	 * @return The bytes of this class (enable easier returning)
+	 */
+	public static byte[] dumpClass(byte[] bytes) {
+		ClassReader reader = new ClassReader(bytes);
+		StringWriter writer = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(writer);
+
+		reader.accept(new TraceClassVisitor(printWriter), 0);
+		DebugLogger.debug(writer.toString());
+
+		return bytes;
 	}
 }

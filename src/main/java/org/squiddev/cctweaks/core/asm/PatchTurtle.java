@@ -2,12 +2,14 @@ package org.squiddev.cctweaks.core.asm;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.squiddev.cctweaks.core.Config;
 
-public class PatchTurtle implements Opcodes {
+import static org.objectweb.asm.Opcodes.ARETURN;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+
+public class PatchTurtle {
 	/**
 	 * Disable a particular turtle command
 	 */

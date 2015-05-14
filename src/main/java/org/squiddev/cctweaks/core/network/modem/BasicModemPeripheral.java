@@ -107,10 +107,8 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 
 				// Get the peripheral and call it
 				PeripheralAccess access = modem.peripheralWrappersByName.get(remoteName);
-				if (access != null) {
-					return access.callMethod(context, methodName, methodArgs);
-				}
-				return null;
+				if (access == null) throw new LuaException("No peripheral: " + remoteName);
+				return access.callMethod(context, methodName, methodArgs);
 			}
 		}
 
