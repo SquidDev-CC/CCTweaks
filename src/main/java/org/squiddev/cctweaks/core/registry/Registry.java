@@ -9,6 +9,7 @@ import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
 import org.squiddev.cctweaks.integration.IndustrialCraftIntegration;
 import org.squiddev.cctweaks.integration.RedstoneFluxIntegration;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
+import org.squiddev.cctweaks.integration.openperipheral.OpenPeripheralIntegration;
 import org.squiddev.cctweaks.items.ItemComputerUpgrade;
 import org.squiddev.cctweaks.items.ItemDataCard;
 import org.squiddev.cctweaks.items.ItemDebugger;
@@ -31,6 +32,7 @@ public final class Registry {
 
 	private static boolean preInit = false;
 	private static boolean init = false;
+	private static boolean postInit = false;
 
 	static {
 		addModule(itemComputerUpgrade = new ItemComputerUpgrade());
@@ -42,6 +44,7 @@ public final class Registry {
 		addModule(new BlockDebug());
 
 		addModule(new MultipartIntegration());
+		addModule(new OpenPeripheralIntegration());
 
 		addModule(new PeripheralHostProvider());
 
@@ -60,7 +63,10 @@ public final class Registry {
 
 		if (preInit && module.canLoad()) {
 			module.preInit();
-			if (init) module.init();
+			if (init) {
+				module.init();
+				if (postInit) module.postInit();
+			}
 		}
 	}
 
@@ -80,6 +86,17 @@ public final class Registry {
 		init = true;
 		for (IModule module : modules) {
 			if (module.canLoad()) module.init();
+		}
+	}
+
+	public static void postInit() {
+		if (!preInit) throw new IllegalStateException("Cannot init before preInit");
+		if (!init) throw new IllegalStateException("Cannot postInit before init");
+		if (postInit) throw new IllegalStateException("Attempting to postInit twice");
+
+		postInit = true;
+		for (IModule module : modules) {
+			if (module.canLoad()) module.postInit();
 		}
 	}
 
@@ -106,6 +123,11 @@ public final class Registry {
 		@Override
 		public void init() {
 			base.init();
+		}
+
+		@Override
+		public void postInit() {
+			base.postInit();
 		}
 	}
 

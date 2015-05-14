@@ -15,21 +15,12 @@ import org.squiddev.cctweaks.api.network.INetworkNodeHost;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
-import org.squiddev.cctweaks.core.registry.IModule;
+import org.squiddev.cctweaks.core.registry.Module;
 
 /**
  * Registers turtle related things
  */
-public class DefaultTurtleProviders implements IModule {
-	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public void preInit() {
-	}
-
+public class DefaultTurtleProviders extends Module {
 	public void init() {
 		// Add default furnace fuel provider
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {

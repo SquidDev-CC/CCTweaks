@@ -17,10 +17,6 @@ public class IndustrialCraftIntegration extends APIIntegration {
 	}
 
 	@Override
-	public void preInit() {
-	}
-
-	@Override
 	public void init() {
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {
 			@Override

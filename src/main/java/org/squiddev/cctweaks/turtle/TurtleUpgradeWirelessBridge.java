@@ -23,7 +23,7 @@ import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
-import org.squiddev.cctweaks.core.registry.IModule;
+import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
 
 import java.io.File;
@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * Turtle upgrade for the {@link TileNetworkedWirelessBridge} tile
  */
-public class TurtleUpgradeWirelessBridge implements ITurtleUpgrade, IModule {
+public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrade {
 	@Override
 	public int getUpgradeID() {
 		return Config.config.turtleWirelessBridgeId;
@@ -93,10 +93,6 @@ public class TurtleUpgradeWirelessBridge implements ITurtleUpgrade, IModule {
 	@Override
 	public boolean canLoad() {
 		return Config.config.turtleWirelessBridgeId > -1;
-	}
-
-	@Override
-	public void preInit() {
 	}
 
 	@Override

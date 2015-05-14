@@ -19,6 +19,11 @@ repositories {
 		url "http://maven.ic2.player.to"
 	}
 
+	maven {
+		name "OpenMods"
+		url "http://repo.openmods.info/artifactory/openmods"
+	}
+
 	ivy {
 		name = "ComputerCraft"
 		artifactPattern "http://addons-origin.cursecdn.com/files/2228/723/[module][revision].[ext]"
@@ -45,6 +50,7 @@ dependencies {
 
 	compile "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev:jar"
 	compile "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
+	compile "openperipheral:OpenPeripheralCore-API:${project.op_version}"
 
 	fatPackage(group: 'org.squiddev', name: 'luaj.luajc', version: '1.+') {
 		// We provide a custom LuaJ source with ComputerCraft
