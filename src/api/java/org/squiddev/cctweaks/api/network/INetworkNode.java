@@ -1,38 +1,14 @@
 package org.squiddev.cctweaks.api.network;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
-import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.api.IWorldPosition;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Defines a node on the network
  */
 public interface INetworkNode {
-	/**
-	 * If this node can be visited whilst scanning.
-	 * If you return false, nodes after this one will not be scanned
-	 *
-	 * You must fire a block update if this is changed, otherwise
-	 * other blocks may not notice this
-	 *
-	 * @param from The direction the node is being visited from. Might be UNKNOWN
-	 * @return If this node can be visited
-	 */
-	boolean canBeVisited(ForgeDirection from);
-
-	/**
-	 * If the network can visit nodes that may be found one block away in a particular direction.
-	 *
-	 * The visitor will determine if the adjacent block can be visited from this direction.
-	 * No need for this method to try to determine if the adjacent block wants to be visited.
-	 *
-	 * @param to The direction of the block that may be visited
-	 * @return If this node doesn't block connection in the direction.
-	 */
-	boolean canVisitTo(ForgeDirection to);
-
 	/**
 	 * Get connected peripherals this node provides
 	 *
@@ -50,20 +26,12 @@ public interface INetworkNode {
 	void receivePacket(Packet packet, int distanceTravelled);
 
 	/**
-	 * Called when the network is changed in some way
+	 * Called when the peripheral map on the network changes.
 	 *
-	 * This includes adding/removing nodes or changing peripherals
+	 * @param oldPeripherals A map representing the peripheral
+	 *                          map before the network changed
 	 */
-	void networkInvalidated();
-
-	/**
-	 * Get a list of extra node search locations.
-	 *
-	 * This is used by {@link INetworkVisitor} to find nodes in non-adjacent blocks
-	 *
-	 * @return Array of custom search locations, or {@code null} if none provided
-	 */
-	Iterable<IWorldPosition> getExtraNodes();
+	void networkInvalidated(Map<String, IPeripheral> oldPeripherals);
 
 	/**
 	 * Object to synchronise on whilst calling {@link #networkInvalidated}
@@ -71,4 +39,30 @@ public interface INetworkNode {
 	 * @return The object to synchronise on
 	 */
 	Object lock();
+
+	/**
+	 * Get network nodes that this node attaches to the network.
+	 *
+	 * You must manually return in-world nodes that are adjacent.
+	 * These will not be found for you.
+	 *
+	 * While a node is being removed, it still needs to provide
+	 * a set of nodes with this method, in order to determine
+	 * what it is being detached from.
+	 *
+	 * @return All nodes this node connects to.
+	 */
+	Set<INetworkNode> getConnectedNodes();
+
+	/**
+	 * Called when the network is detached from this node.
+	 */
+	void detachFromNetwork();
+
+	/**
+	 * Called when the network controller assimilates this node.
+	 *
+	 * @param networkController The network this node is being added to.
+	 */
+	void attachToNetwork(INetworkController networkController);
 }
