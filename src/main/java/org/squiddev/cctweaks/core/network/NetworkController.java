@@ -182,8 +182,8 @@ public class NetworkController implements INetworkController {
 			Queue<INetworkNode> toVisit = new LinkedList<INetworkNode>();
 			toVisit.offer(startingNode);
 
-			while (!toVisit.isEmpty()) {
-				INetworkNode node = toVisit.remove();
+			INetworkNode node;
+			while ((node = toVisit.poll()) != null) {
 				if (!continueScanning(node)) {
 					return Optional.absent();
 				}
