@@ -34,13 +34,6 @@ public interface INetworkNode {
 	void networkInvalidated(Map<String, IPeripheral> oldPeripherals);
 
 	/**
-	 * Object to synchronise on
-	 *
-	 * @return The object to synchronise on
-	 */
-	Object lock();
-
-	/**
 	 * Get network nodes that this node attaches to the network.
 	 *
 	 * @return All nodes this node connects to.
