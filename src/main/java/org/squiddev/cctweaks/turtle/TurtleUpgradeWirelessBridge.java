@@ -17,6 +17,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
 import org.squiddev.cctweaks.core.Config;
@@ -29,6 +30,7 @@ import org.squiddev.cctweaks.core.registry.Registry;
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Turtle upgrade for the {@link TileNetworkedWirelessBridge} tile
@@ -83,7 +85,6 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 				TurtleModemPeripheral modemPeripheral = (TurtleModemPeripheral) peripheral;
 
 				TurtleModem modem = modemPeripheral.modem;
-				if (!modem.peripheralsKnown) modem.findPeripherals();
 				modem.processQueue();
 				if (modemPeripheral.pollChanged()) modem.save();
 			}
@@ -138,7 +139,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 		 * @return The turtle peripheral
 		 */
 		@Override
-		public Map<String, IPeripheral> findConnectedPeripherals() {
+		public Map<String, IPeripheral> getConnectedPeripherals() {
 			ChunkCoordinates pos = turtle.getPosition();
 			IPeripheral peripheral = PeripheralUtil.getPeripheral(getWorld(), pos.posX, pos.posY, pos.posZ, 0);
 			if (peripheral == null) {
@@ -157,12 +158,13 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 		}
 
 		@Override
-		public boolean canBeVisited(ForgeDirection from) {
-			return from == ForgeDirection.UNKNOWN;
+		public boolean canConnect(ForgeDirection side) {
+			return side == ForgeDirection.UNKNOWN;
 		}
 
 		@Override
-		public Iterable<IWorldPosition> getExtraNodes() {
+		public Set<INetworkNode> getConnectedNodes() {
+			// TODO: Fix me! Bindings should be providing nodes, not positions
 			return binding.getPositions();
 		}
 

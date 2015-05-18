@@ -8,13 +8,11 @@ import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkController;
+import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Basic wired modem that handles peripherals and
@@ -242,6 +240,11 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode {
 	@Override
 	public INetworkController getAttachedNetwork() {
 		return networkController;
+	}
+
+	@Override
+	public Set<INetworkNode> getConnectedNodes() {
+		return Collections.emptySet();
 	}
 
 	public void destroy() {

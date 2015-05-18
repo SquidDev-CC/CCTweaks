@@ -22,7 +22,7 @@ public abstract class MultiPeripheralModem extends BasicModem {
 	}
 
 	@Override
-	public Map<String, IPeripheral> findConnectedPeripherals() {
+	public Map<String, IPeripheral> getConnectedPeripherals() {
 		if (!peripheralEnabled) return Collections.emptyMap();
 
 		IPeripheral[] peripherals = getPeripherals();
@@ -84,11 +84,6 @@ public abstract class MultiPeripheralModem extends BasicModem {
 		}
 
 		return peripherals;
-	}
-
-	@Override
-	protected void filterRemotePeripherals(Map<String, IPeripheral> peripherals) {
-		// Don't filter peripherals
 	}
 
 	/**
