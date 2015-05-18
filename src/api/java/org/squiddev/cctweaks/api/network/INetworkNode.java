@@ -34,7 +34,7 @@ public interface INetworkNode {
 	void networkInvalidated(Map<String, IPeripheral> oldPeripherals);
 
 	/**
-	 * Object to synchronise on whilst calling {@link #networkInvalidated}
+	 * Object to synchronise on
 	 *
 	 * @return The object to synchronise on
 	 */
@@ -42,13 +42,6 @@ public interface INetworkNode {
 
 	/**
 	 * Get network nodes that this node attaches to the network.
-	 *
-	 * You must manually return in-world nodes that are adjacent.
-	 * These will not be found for you.
-	 *
-	 * While a node is being removed, it still needs to provide
-	 * a set of nodes with this method, in order to determine
-	 * what it is being detached from.
 	 *
 	 * @return All nodes this node connects to.
 	 */
@@ -65,4 +58,11 @@ public interface INetworkNode {
 	 * @param networkController The network this node is being added to.
 	 */
 	void attachToNetwork(INetworkController networkController);
+
+	/**
+	 * Should return the network this node was last attached to.
+	 *
+	 * @return The network this node is attached to.
+	 */
+	INetworkController getAttachedNetwork();
 }
