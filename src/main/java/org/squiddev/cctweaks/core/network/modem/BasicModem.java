@@ -5,20 +5,22 @@ import com.google.common.collect.SetMultimap;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
-import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.*;
-import org.squiddev.cctweaks.core.network.NetworkHelpers;
-import org.squiddev.cctweaks.core.network.visitor.NetworkVisitorIterable;
+import org.squiddev.cctweaks.api.network.INetworkController;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.Packet;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Basic wired modem that handles peripherals and
  * computer interaction
  */
-public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetworkAccess {
+public abstract class BasicModem implements INetwork, IWorldNetworkNode {
 	public static final byte MODEM_ON = 1;
 	public static final byte MODEM_PERIPHERAL = 2;
 
@@ -34,8 +36,6 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 
 	/**
 	 * List of wrappers for peripherals on the remote network
-	 *
-	 * @see #peripheralsByName
 	 */
 	public final Map<String, PeripheralAccess> peripheralWrappersByName = new HashMap<String, PeripheralAccess>();
 
@@ -55,9 +55,9 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	public byte state;
 
 	/**
-	 * Peripherals attached to this modem
+	 * The network this modem is attached to.
 	 */
-	private Map<String, IPeripheral> connectedPeripherals;
+	INetworkController networkController;
 
 	@Override
 	public void addReceiver(IReceiver receiver) {
@@ -88,7 +88,7 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 			Packet packet;
 			IWorldPosition position = getPosition();
 			while ((packet = transmitQueue.poll()) != null) {
-				NetworkHelpers.sendPacket(position.getWorld(), position.getX(), position.getY(), position.getZ(), packet);
+				networkController.transmitPacket(this, packet);
 			}
 		}
 	}
@@ -115,72 +115,6 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	public void detachPeripheral(String name) {
 		PeripheralAccess wrapper = peripheralWrappersByName.remove(name);
 		if (wrapper != null) wrapper.detach();
-	}
-
-	/**
-	 * Find peripherals on the network
-	 */
-	public void findPeripherals() {
-		synchronized (peripheralsByName) {
-			final Map<String, IPeripheral> newPeripherals = findRemotePeripherals();
-			filterRemotePeripherals(newPeripherals);
-
-			Map<String, IPeripheral> currentPeripherals = peripheralsByName;
-			boolean attached = modem != null && modem.getComputer() != null;
-
-			Iterator<String> it = currentPeripherals.keySet().iterator();
-			while (it.hasNext()) {
-				String name = it.next();
-				if (!newPeripherals.containsKey(name)) {
-					it.remove();
-					detachPeripheral(name);
-				}
-
-			}
-
-			for (String name : newPeripherals.keySet()) {
-				if (!currentPeripherals.containsKey(name)) {
-					IPeripheral peripheral = newPeripherals.get(name);
-					if (peripheral != null) {
-						currentPeripherals.put(name, peripheral);
-
-						if (attached) attachPeripheral(name, peripheral);
-					}
-				}
-			}
-
-			peripheralsKnown = true;
-		}
-	}
-
-	/**
-	 * Get a list of remote peripherals
-	 *
-	 * @return The remote peripherals
-	 */
-	protected Map<String, IPeripheral> findRemotePeripherals() {
-		Map<String, IPeripheral> newPeripherals = new HashMap<String, IPeripheral>();
-		for (ISearchLoc loc : new NetworkVisitorIterable(getPosition())) {
-			Map<String, IPeripheral> nodePeripherals = loc.getNode().getConnectedPeripherals();
-			if (nodePeripherals != null) newPeripherals.putAll(nodePeripherals);
-		}
-
-		return newPeripherals;
-	}
-
-	/**
-	 * Exclude some remote peripherals from this list
-	 *
-	 * @param peripherals The remote peripheral list to filter
-	 */
-	protected void filterRemotePeripherals(Map<String, IPeripheral> peripherals) {
-		// Exclude this items peripherals from the peripheral list
-		Map<String, IPeripheral> localPeripherals = getConnectedPeripherals();
-		if (localPeripherals != null) {
-			for (String name : localPeripherals.keySet()) {
-				peripherals.remove(name);
-			}
-		}
 	}
 
 	@Override
@@ -220,7 +154,6 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	 * @return If it can connect to peripherals
 	 */
 	public boolean toggleEnabled() {
-		clearConnectedPeripherals();
 		if (peripheralEnabled) {
 			peripheralEnabled = false;
 		} else {
@@ -232,33 +165,6 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 		return peripheralEnabled;
 	}
 
-	public void attachConnectedPeripheralsToNetwork() {
-		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
-		if (peripherals != null) {
-			for (Map.Entry<String, IPeripheral> p : peripherals.entrySet()) {
-				IPeripheral peripheral = p.getValue();
-				if (peripheral instanceof INetworkedPeripheral) {
-					((INetworkedPeripheral) peripheral).attachToNetwork(this, p.getKey());
-				}
-			}
-		}
-	}
-
-	public void detachConnectedPeripheralsFromNetwork() {
-		detachConnectedPeripheralsFromNetwork(getConnectedPeripherals());
-	}
-
-	public void detachConnectedPeripheralsFromNetwork(Map<String, IPeripheral> peripherals) {
-		if (peripherals != null) {
-			for (Map.Entry<String, IPeripheral> p : peripherals.entrySet()) {
-				IPeripheral peripheral = p.getValue();
-				if (peripheral instanceof INetworkedPeripheral) {
-					((INetworkedPeripheral) peripheral).detachFromNetwork(this, p.getKey());
-				}
-			}
-		}
-	}
-
 	/**
 	 * Scans for peripherals and disabled if none found
 	 *
@@ -266,8 +172,6 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	 */
 	public boolean updateEnabled() {
 		if (!peripheralEnabled) return false;
-
-		clearConnectedPeripherals();
 
 		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
 		if (peripherals == null || peripherals.size() == 0) {
@@ -305,102 +209,43 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 		return new BasicModemPeripheral<BasicModem>(this);
 	}
 
-	/**
-	 * Find connected peripherals.
-	 * Called by getConnectedPeripherals, which caches the result of this.
-	 * Should not return null.
-	 * Returning null will result in getConnectedPeripherals calling this repeatedly
-	 * Instead, return {@link Collections#emptyMap()}
-	 *
-	 * @return Peripherals connected via this modem.
-	 */
-	public abstract Map<String, IPeripheral> findConnectedPeripherals();
-
 	@Override
 	public boolean isWireless() {
 		return false;
 	}
 
 	@Override
-	public boolean canBeVisited(ForgeDirection from) {
+	public boolean canConnect(ForgeDirection from) {
 		return true;
 	}
 
 	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return canBeVisited(to);
-	}
-
-	@Override
-	public void networkInvalidated() {
-		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
-		if (peripherals != null) {
-			for (IPeripheral peripheral : peripherals.values()) {
-				if (peripheral instanceof INetworkedPeripheral) {
-					((INetworkedPeripheral) peripheral).networkInvalidated(this);
-				}
+	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals) {
+		for (Map.Entry<String, PeripheralAccess> wrapper : peripheralWrappersByName.entrySet()) {
+			if (!networkController.getPeripheralsOnNetwork().containsKey(wrapper.getKey())) {
+				// Wrapper removed
+				detachPeripheral(wrapper.getKey());
 			}
 		}
-		peripheralsKnown = false;
-		clearConnectedPeripherals();
 	}
 
 	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		return null;
+	public void detachFromNetwork() {
+		this.networkController = null;
 	}
 
 	@Override
-	public Object lock() {
-		return peripheralsByName();
-	}
-
-	/**
-	 * List of peripherals on the remote network
-	 *
-	 * @see #peripheralWrappersByName
-	 */
-	@Override
-	public Map<String, IPeripheral> peripheralsByName() {
-		if (!peripheralsKnown) findPeripherals();
-		return peripheralsByName;
+	public void attachToNetwork(INetworkController networkController) {
+		this.networkController = networkController;
 	}
 
 	@Override
-	public void invalidateNetwork() {
-		IWorldPosition pos = getPosition();
-		NetworkHelpers.fireNetworkInvalidate(pos.getWorld(), pos.getX(), pos.getY(), pos.getZ());
-	}
-
-	@Override
-	public boolean transmitPacket(Packet packet) {
-		synchronized (transmitQueue) {
-			return transmitQueue.offer(packet);
-		}
-	}
-
-	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		if (connectedPeripherals == null) {
-			connectedPeripherals = findConnectedPeripherals();
-		}
-		return connectedPeripherals;
+	public INetworkController getAttachedNetwork() {
+		return networkController;
 	}
 
 	public void destroy() {
-		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
-		if (peripherals != null) {
-			for (Map.Entry<String, IPeripheral> p : peripherals.entrySet()) {
-				IPeripheral peripheral = p.getValue();
-				if (peripheral instanceof INetworkedPeripheral) {
-					((INetworkedPeripheral) peripheral).detachFromNetwork(this, p.getKey());
-				}
-			}
-		}
+		networkController.removeNode(this);
 		modem.destroy();
-	}
-
-	public void clearConnectedPeripherals() {
-		connectedPeripherals = null;
 	}
 }
