@@ -23,7 +23,7 @@ public interface INetworkNode {
 	 * @param packet            The packet to send
 	 * @param distanceTravelled Distance traveled by the packet
 	 */
-	void receivePacket(Packet packet, int distanceTravelled);
+	void receivePacket(Packet packet, double distanceTravelled);
 
 	/**
 	 * Called when the peripheral map on the network changes.
