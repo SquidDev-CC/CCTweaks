@@ -24,15 +24,6 @@ public interface INetworkController {
 	void formConnection(INetworkNode existingNode, INetworkNode newNode);
 
 	/**
-	 * Call this when a node is added to the world and needs to join the network.
-	 * For example, a cable being placed.
-	 * The network will assimilate the node and its newly connected networks.
-	 *
-	 * @param node The node being added.
-	 */
-	void addNode(INetworkNode node);
-
-	/**
 	 * Nodes call this when a connection between two nodes is broken.
 	 * For example, a cover being placed between two cables.
 	 * The network will reevaluate nodes and create a severed network if necessary.

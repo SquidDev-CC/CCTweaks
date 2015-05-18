@@ -85,17 +85,6 @@ public class NetworkController implements INetworkController {
 	}
 
 	@Override
-	public void addNode(INetworkNode node) {
-		if (network.contains(node)) {
-			// Network already contains new node.
-			// No change. Assimilation unnecessary.
-			return;
-		}
-		assimilateNode(node);
-		invalidateNetwork();
-	}
-
-	@Override
 	public void breakConnection(final SingleTypeUnorderedPair<INetworkNode> connection) {
 		if (!networkConnections.contains(connection)) {
 			throw new IllegalArgumentException("Connection does not exist");
