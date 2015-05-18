@@ -15,15 +15,5 @@ public final class NetworkAPI {
 		return REGISTRY;
 	}
 
-	/**
-	 * Get the network visitor instance
-	 *
-	 * @return The network visitor
-	 */
-	public static INetworkVisitor visitor() {
-		return VISITOR;
-	}
-
 	private static final INetworkRegistry REGISTRY = CCTweaksAPI.instance().networkRegistry();
-	private static final INetworkVisitor VISITOR = CCTweaksAPI.instance().networkVisitor();
 }

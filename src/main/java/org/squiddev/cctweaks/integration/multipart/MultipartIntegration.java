@@ -11,10 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeHost;
-import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
-import org.squiddev.cctweaks.api.network.NetworkAPI;
+import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.registry.Registry;
@@ -48,14 +45,14 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 
 		NetworkAPI.registry().addNodeProvider(new INetworkNodeProvider() {
 			@Override
-			public INetworkNode getNode(TileEntity tile) {
+			public IWorldNetworkNode getNode(TileEntity tile) {
 				if (tile instanceof TileMultipart) {
 					// Cables reside in the central slot so we can just fetch that
 					// instead and use the cable to delegate to other nodes in the multipart
 					TMultiPart part = ((TileMultipart) tile).partMap(6);
 					if (part != null) {
-						if (part instanceof INetworkNode) return (INetworkNode) part;
-						if (part instanceof INetworkNodeHost) return ((INetworkNodeHost) part).getNode();
+						if (part instanceof IWorldNetworkNode) return (IWorldNetworkNode) part;
+						if (part instanceof IWorldNetworkNodeHost) return ((IWorldNetworkNodeHost) part).getNode();
 					}
 				}
 

@@ -7,11 +7,11 @@ package org.squiddev.cctweaks.api.network;
  * you can implement this interface instead. This is supported for TileEntities, multiparts
  * and on {@link dan200.computercraft.api.turtle.ITurtleUpgrade}
  */
-public interface INetworkNodeHost {
+public interface IWorldNetworkNodeHost {
 	/**
 	 * Get this host's node. This should NEVER be null.
 	 *
 	 * @return The node this object holds
 	 */
-	INetworkNode getNode();
+	IWorldNetworkNode getNode();
 }

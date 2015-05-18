@@ -15,7 +15,7 @@ public interface INetworkNodeProvider {
 	 * @param tile The entity to get the node for
 	 * @return The node or {@code null} if it cannot be converted
 	 */
-	INetworkNode getNode(TileEntity tile);
+	IWorldNetworkNode getNode(TileEntity tile);
 
 	/**
 	 * Checks if this TileEntity is a network node
