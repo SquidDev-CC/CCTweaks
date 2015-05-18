@@ -7,7 +7,7 @@ import net.minecraft.util.ChatComponentTranslation;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeHost;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileBase;
@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * A full block implementation of a modem
  */
-public class TileNetworkedModem extends TileBase implements IPeripheralHost, INetworkNodeHost {
+public class TileNetworkedModem extends TileBase implements IPeripheralHost, IWorldNetworkNodeHost {
 	public final MultiPeripheralModem modem = new MultiPeripheralModem() {
 		@Override
 		public IWorldPosition getPosition() {

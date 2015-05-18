@@ -18,7 +18,7 @@ import java.util.*;
  * Basic wired modem that handles peripherals and
  * computer interaction
  */
-public abstract class BasicModem implements INetwork, INetworkNode, INetworkAccess {
+public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetworkAccess {
 	public static final byte MODEM_ON = 1;
 	public static final byte MODEM_PERIPHERAL = 2;
 
@@ -31,8 +31,6 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 	 * Set of messages to transmit across the network
 	 */
 	protected final Queue<Packet> transmitQueue = new LinkedList<Packet>();
-
-	private final Map<String, IPeripheral> peripheralsByName = new HashMap<String, IPeripheral>();
 
 	/**
 	 * List of wrappers for peripherals on the remote network
@@ -55,11 +53,6 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 	 * The state of the modem
 	 */
 	public byte state;
-
-	/**
-	 * If this modem has gone looking for peripherals yet
-	 */
-	public boolean peripheralsKnown = false;
 
 	/**
 	 * Peripherals attached to this modem
@@ -191,19 +184,10 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 	}
 
 	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
+	public void receivePacket(INetworkController network, Packet packet, double distanceTravelled) {
 		synchronized (receivers) {
 			for (IReceiver receiver : receivers.get(packet.channel)) {
 				receiver.receive(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
-			}
-
-			Map<String, IPeripheral> peripherals = getConnectedPeripherals();
-			if (peripherals != null) {
-				for (IPeripheral peripheral : peripherals.values()) {
-					if (peripheral instanceof INetworkedPeripheral) {
-						((INetworkedPeripheral) peripheral).receivePacket(packet, distanceTravelled);
-					}
-				}
 			}
 		}
 	}
@@ -320,16 +304,6 @@ public abstract class BasicModem implements INetwork, INetworkNode, INetworkAcce
 	protected BasicModemPeripheral createPeripheral() {
 		return new BasicModemPeripheral<BasicModem>(this);
 	}
-
-	/**
-	 * Get the position of the tile
-	 *
-	 * The value of {@link IWorldPosition#getWorld()} must be an instance of {@link net.minecraft.world.World}
-	 *
-	 * @return The position of the tile
-	 * @see ModemPeripheral#getPosition()
-	 */
-	public abstract IWorldPosition getPosition();
 
 	/**
 	 * Find connected peripherals.

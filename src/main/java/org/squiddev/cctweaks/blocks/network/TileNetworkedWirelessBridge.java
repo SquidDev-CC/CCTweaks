@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeHost;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileBase;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Bind networks together
  */
-public class TileNetworkedWirelessBridge extends TileBase implements IPeripheralHost, INetworkNodeHost {
+public class TileNetworkedWirelessBridge extends TileBase implements IPeripheralHost, IWorldNetworkNodeHost {
 	protected final NetworkBinding binding = new NetworkBinding(this);
 	protected final BasicModem modem = new BasicModem() {
 		@Override
