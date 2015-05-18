@@ -3,8 +3,11 @@ package org.squiddev.cctweaks.core.network;
 import com.google.common.base.Optional;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
+import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.Packet;
 
 import java.util.*;
 
@@ -158,6 +161,49 @@ public class NetworkController implements INetworkController {
 	@Override
 	public Set<SingleTypeUnorderedPair<INetworkNode>> getNodeConnections() {
 		return networkConnections;
+	}
+
+	@Override
+	public void transmitPacket(INetworkNode node, Packet packet) {
+		transmitPacket(node, packet, 0);
+	}
+
+	private void transmitPacket(INetworkNode startingNode, Packet packet, double i) {
+		Set<INetworkNode> received = new HashSet<INetworkNode>(network.size());
+		Queue<UnorderedPair<Double, INetworkNode>> transmitTo = new LinkedList<UnorderedPair<Double, INetworkNode>>();
+		transmitTo.offer(new UnorderedPair<Double, INetworkNode>(i, startingNode));
+
+		UnorderedPair<Double, INetworkNode> nodePair;
+		while ((nodePair = transmitTo.poll()) != null) {
+			INetworkNode node = nodePair.y;
+			if (received.contains(node)) {
+				continue;
+			}
+			received.add(node);
+			if (node.equals(startingNode)) {
+				// Starting node shouldn't receive its own packet.
+				continue;
+			}
+
+			node.receivePacket(packet, nodePair.x);
+			for (SingleTypeUnorderedPair<INetworkNode> pair : networkConnections) {
+				if (pair.contains(node)) {
+					INetworkNode other = pair.other(node);
+					double distance = nodePair.x;
+					if (node instanceof IWorldNetworkNode && other instanceof IWorldNetworkNode) {
+						IWorldNetworkNode worldNode = (IWorldNetworkNode) node;
+						IWorldNetworkNode otherNode = (IWorldNetworkNode) other;
+
+						int dx = Math.abs(worldNode.getPosition().getX() - otherNode.getPosition().getX());
+						int dy = Math.abs(worldNode.getPosition().getY() - otherNode.getPosition().getY());
+						int dz = Math.abs(worldNode.getPosition().getZ() - otherNode.getPosition().getZ());
+
+						distance += Math.sqrt(dx * dx + dy * dy * dz * dz);
+					}
+					transmitTo.offer(new UnorderedPair<Double, INetworkNode>(distance, other));
+				}
+			}
+		}
 	}
 
 	private abstract class NetworkScanner {

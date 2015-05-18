@@ -67,4 +67,12 @@ public interface INetworkController {
 	 * @return All the pairs of nodes that are connected.
 	 */
 	Set<SingleTypeUnorderedPair<INetworkNode>> getNodeConnections();
+
+	/**
+	 * Transmits a packet on the network.
+	 *
+	 * @param node The node emitting the packet.
+	 * @param packet The packet being transmitted.
+	 */
+	void transmitPacket(INetworkNode node, Packet packet);
 }
