@@ -1,16 +1,9 @@
 package org.squiddev.cctweaks.core.network;
 
-import net.minecraft.util.Facing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.ISearchLoc;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
-import org.squiddev.cctweaks.api.network.Packet;
-import org.squiddev.cctweaks.core.network.visitor.NetworkVisitorIterable;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Helper methods on networks
@@ -31,7 +24,7 @@ public final class NetworkHelpers {
 		y += direction.offsetY;
 		z += direction.offsetZ;
 
-		INetworkNode node = NetworkAPI.registry().getNode(world, x, y, z);
-		return node != null && node.canBeVisited(direction.getOpposite());
+		IWorldNetworkNode node = NetworkAPI.registry().getNode(world, x, y, z);
+		return node != null && node.canConnect(direction.getOpposite());
 	}
 }
