@@ -24,6 +24,9 @@ public class UnorderedPair<X, Y> {
 	 */
 	@Override
 	public boolean equals(Object other) {
+		if (other == this) {
+			return true;
+		}
 		if (other instanceof UnorderedPair) {
 			UnorderedPair pair = (UnorderedPair) other;
 			if (x.equals(pair.x) && y.equals(pair.y)) {
