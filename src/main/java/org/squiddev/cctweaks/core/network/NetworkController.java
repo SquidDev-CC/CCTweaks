@@ -92,7 +92,7 @@ public class NetworkController implements INetworkController {
 
 		networkConnections.remove(connection);
 
-		Optional<NetworkController> xNetwork = new CancelOnFindScanner(connection.y).startScan(connection.x);
+		Optional<NetworkController> xNetwork = new CancelOnFindScanner(connection.y).scan(connection.x);
 
 		if (!xNetwork.isPresent()) {
 			// Scan was cancelled for finding y.
@@ -100,7 +100,7 @@ public class NetworkController implements INetworkController {
 			return;
 		}
 
-		NetworkController yNetwork = new NeverCancelScanner().startScan(connection.y).get();
+		NetworkController yNetwork = new NeverCancelScanner().scan(connection.y).get();
 
 		xNetwork.get().attachNodes();
 		yNetwork.attachNodes();
@@ -128,7 +128,7 @@ public class NetworkController implements INetworkController {
 				}
 			}
 
-			NetworkController newNetwork = new NeverCancelScanner().startScan(startingNode).get();
+			NetworkController newNetwork = new NeverCancelScanner().scan(startingNode).get();
 			newNetwork.attachNodes();
 
 			newNetworks.add(newNetwork);
@@ -167,16 +167,16 @@ public class NetworkController implements INetworkController {
 		 * @param node The node being scanned.
 		 * @return If the scan should continue.
 		 */
-		public abstract boolean scanNode(INetworkNode node);
+		public abstract boolean continueScanning(INetworkNode node);
 
 		/**
 		 * Scan a network from a starting node.
 		 *
 		 * @param startingNode The node to start from.
 		 * @return {@link Optional#of(Object)} the scanned network,
-		 * or {@link Optional#absent()} if {@link #scanNode(INetworkNode)} returned false.
+		 * or {@link Optional#absent()} if {@link #continueScanning(INetworkNode)} returned false.
 		 */
-		public Optional<NetworkController> startScan(INetworkNode startingNode) {
+		public Optional<NetworkController> scan(INetworkNode startingNode) {
 			Set<SingleTypeUnorderedPair<INetworkNode>> newNetworkConnections = new HashSet<SingleTypeUnorderedPair<INetworkNode>>();
 			Set<INetworkNode> newNetwork = new HashSet<INetworkNode>();
 			Queue<INetworkNode> toVisit = new LinkedList<INetworkNode>();
@@ -184,7 +184,7 @@ public class NetworkController implements INetworkController {
 
 			while (!toVisit.isEmpty()) {
 				INetworkNode node = toVisit.remove();
-				if (!scanNode(node)) {
+				if (!continueScanning(node)) {
 					return Optional.absent();
 				}
 				newNetwork.add(node);
@@ -209,14 +209,14 @@ public class NetworkController implements INetworkController {
 		}
 
 		@Override
-		public boolean scanNode(INetworkNode node) {
+		public boolean continueScanning(INetworkNode node) {
 			return !this.node.equals(node);
 		}
 	}
 
 	private class NeverCancelScanner extends NetworkScanner {
 		@Override
-		public boolean scanNode(INetworkNode node) {
+		public boolean continueScanning(INetworkNode node) {
 			return true;
 		}
 	}
