@@ -12,7 +12,7 @@ public interface INetworkAccess {
 	 * Gets all peripherals on the network mapped by their names.
 	 * @return The map of these peripherals.
 	 */
-	Map<String, IPeripheral> peripheralsByName();
+	Map<String, IPeripheral> getPeripheralsOnNetwork();
 
 	/**
 	 * Invalidates the network.

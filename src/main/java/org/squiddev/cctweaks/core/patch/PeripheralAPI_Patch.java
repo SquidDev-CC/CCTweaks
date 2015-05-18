@@ -61,7 +61,7 @@ public class PeripheralAPI_Patch extends PeripheralAPI {
 		}
 
 		@Override
-		public Map<String, IPeripheral> peripheralsByName() {
+		public Map<String, IPeripheral> getPeripheralsOnNetwork() {
 			Map<String, IPeripheral> peripheralMap = new HashMap<String, IPeripheral>();
 			for (int i = 0; i < 6; ++i) {
 				if (m_peripherals[i] != null) {

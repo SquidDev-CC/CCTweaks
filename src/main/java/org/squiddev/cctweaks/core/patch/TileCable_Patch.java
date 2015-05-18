@@ -24,7 +24,7 @@ import static org.squiddev.cctweaks.core.network.NetworkHelpers.canConnect;
 
 @SuppressWarnings("all")
 @MergeVisitor.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
-public class TileCable_Patch extends TileCable implements INetworkNode, INetworkAccess {
+public class TileCable_Patch extends TileCable implements INetworkNode, INetworkAccess, INetworkAccess {
 	public static final double MIN = 0.375;
 	public static final double MAX = 1 - MIN;
 
@@ -321,7 +321,7 @@ public class TileCable_Patch extends TileCable implements INetworkNode, INetwork
 	}
 
 	@Override
-	public Map<String, IPeripheral> peripheralsByName() {
+	public Map<String, IPeripheral> getPeripheralsOnNetwork() {
 		return Collections.unmodifiableMap(m_peripheralsByName);
 	}
 
