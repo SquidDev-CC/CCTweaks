@@ -8,7 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 
 public class CableBlockRenderingHandler_Patch {
@@ -30,13 +30,13 @@ public class CableBlockRenderingHandler_Patch {
 					modemDir = -1;
 				}
 				for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-					INetworkNode node;
+					IWorldNetworkNode node;
 					if (dir.ordinal() == modemDir || ((node = NetworkAPI.registry().getNode(
 						world,
 						x + dir.offsetX,
 						y + dir.offsetY,
 						z + dir.offsetZ
-					)) != null && node.canBeVisited(dir.getOpposite()))) {
+					)) != null && node.canConnect(dir.getOpposite()))) {
 						fixedRenderBlocks.setRenderBounds(
 							dir.offsetX == -1 ? 0 : dir.offsetX == 1 ? 0.625 : 0.375,
 							dir.offsetY == -1 ? 0 : dir.offsetY == 1 ? 0.625 : 0.375,
