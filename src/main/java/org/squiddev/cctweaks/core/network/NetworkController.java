@@ -185,7 +185,7 @@ public class NetworkController implements INetworkController {
 				continue;
 			}
 
-			node.receivePacket(packet, nodePair.x);
+			node.receivePacket(this, packet, nodePair.x);
 			for (SingleTypeUnorderedPair<INetworkNode> pair : networkConnections) {
 				if (pair.contains(node)) {
 					INetworkNode other = pair.other(node);

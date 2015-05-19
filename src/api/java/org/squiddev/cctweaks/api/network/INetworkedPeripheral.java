@@ -36,5 +36,5 @@ public interface INetworkedPeripheral {
 	 * @param packet			The packet received.
 	 * @param distanceTravelled The distance that packet travelled.
 	 */
-	void receivePacket(INetworkAccess network, Packet packet, int distanceTravelled);
+	void receivePacket(INetworkAccess network, Packet packet, double distanceTravelled);
 }

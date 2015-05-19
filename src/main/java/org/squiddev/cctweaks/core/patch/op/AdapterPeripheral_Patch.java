@@ -1,11 +1,14 @@
 package org.squiddev.cctweaks.core.patch.op;
 
+import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.network.INetworkAccess;
 import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
 import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
 import org.squiddev.cctweaks.core.network.NetworkAccessDelegate;
+
+import java.util.Map;
 
 /**
  * Before changing anything check with
@@ -47,10 +50,10 @@ public class AdapterPeripheral_Patch implements IPeripheralTargeted, INetworkedP
 	}
 
 	@Override
-	public void networkInvalidated(INetworkAccess network) {
+	public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals) {
 	}
 
 	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
+	public void receivePacket(INetworkAccess network, Packet packet, double distanceTravelled) {
 	}
 }
