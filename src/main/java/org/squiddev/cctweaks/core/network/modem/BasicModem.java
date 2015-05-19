@@ -7,10 +7,7 @@ import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkController;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.*;
 
 import java.util.*;
 
@@ -18,7 +15,7 @@ import java.util.*;
  * Basic wired modem that handles peripherals and
  * computer interaction
  */
-public abstract class BasicModem implements INetwork, IWorldNetworkNode {
+public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetworkAccess {
 	public static final byte MODEM_ON = 1;
 	public static final byte MODEM_PERIPHERAL = 2;
 
@@ -250,5 +247,21 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode {
 	public void destroy() {
 		networkController.removeNode(this);
 		modem.destroy();
+	}
+
+	@Override
+	public Map<String, IPeripheral> getPeripheralsOnNetwork() {
+		return networkController.getPeripheralsOnNetwork();
+	}
+
+	@Override
+	public void invalidateNetwork() {
+		networkController.invalidateNetwork();
+	}
+
+	@Override
+	public boolean transmitPacket(Packet packet) {
+		networkController.transmitPacket(this, packet);
+		return true;
 	}
 }

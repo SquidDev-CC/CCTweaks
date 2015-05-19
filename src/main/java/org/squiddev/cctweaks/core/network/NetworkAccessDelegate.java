@@ -16,11 +16,11 @@ public class NetworkAccessDelegate implements INetworkAccess {
 	protected final Set<INetworkAccess> networks = new HashSet<INetworkAccess>();
 
 	@Override
-	public Map<String, IPeripheral> peripheralsByName() {
+	public Map<String, IPeripheral> getPeripheralsOnNetwork() {
 		// We can't cache this at all as we can't receive network changed events
 		Map<String, IPeripheral> peripherals = new HashMap<String, IPeripheral>();
 		for (INetworkAccess network : networks) {
-			peripherals.putAll(network.peripheralsByName());
+			peripherals.putAll(network.getPeripheralsOnNetwork());
 		}
 		return peripherals;
 	}

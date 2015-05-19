@@ -84,7 +84,7 @@ public class ItemDebugger extends ItemComputerAction {
 		}
 
 		if (tile instanceof INetworkAccess) {
-			Map<String, IPeripheral> p = ((INetworkAccess) tile).peripheralsByName();
+			Map<String, IPeripheral> p = ((INetworkAccess) tile).getPeripheralsOnNetwork();
 			if (p != null) remotes.addAll(p.keySet());
 		}
 
