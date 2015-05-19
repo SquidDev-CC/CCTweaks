@@ -28,9 +28,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
-import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.modem.SinglePeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -90,7 +89,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 		super.harvest(hit, player);
 
 		if (!world.isRemote) {
-			NetworkHelpers.fireNetworkInvalidateAdjacent(world, x, y, z);
+			modem.destroy();
 		}
 	}
 
@@ -120,8 +119,6 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 		if (modem.modem.pollChanged()) markDirty();
 
 		modem.processQueue();
-
-		if (!modem.peripheralsKnown) modem.findPeripherals();
 	}
 
 	@Override
@@ -133,9 +130,8 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	public void onNeighborChanged() {
 		Map<String, IPeripheral> peripherals = modem.getConnectedPeripherals();
 		if (modem.updateEnabled()) {
-			modem.detachConnectedPeripheralsFromNetwork(peripherals);
 			markDirty();
-			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
+			modem.getAttachedNetwork().invalidateNetwork();
 		}
 	}
 
@@ -146,9 +142,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 
 		String name = modem.getPeripheralName();
 
-		modem.detachConnectedPeripheralsFromNetwork();
 		modem.toggleEnabled();
-		modem.attachConnectedPeripheralsToNetwork();
 
 		String newName = modem.getPeripheralName();
 
@@ -161,7 +155,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
 			}
 
-			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
+			modem.getAttachedNetwork().invalidateNetwork();
 			markDirty();
 		}
 
@@ -211,29 +205,14 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	}
 
 	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		return modem.getConnectedPeripherals();
-	}
-
-	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-		modem.receivePacket(packet, distanceTravelled);
-	}
-
-	@Override
-	public void networkInvalidated() {
-		modem.networkInvalidated();
-	}
-
-	@Override
-	public Object lock() {
-		return modem.lock();
-	}
-
-	@Override
 	public IPeripheral getPeripheral(int side) {
 		if (side == direction) return modem.modem;
 		return null;
+	}
+
+	@Override
+	public IWorldNetworkNode getNode() {
+		return modem;
 	}
 
 	@SideOnly(Side.CLIENT)

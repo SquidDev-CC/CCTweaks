@@ -8,6 +8,7 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileBase;
@@ -16,6 +17,7 @@ import org.squiddev.cctweaks.core.network.modem.BasicModem;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Bind networks together
@@ -29,12 +31,13 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 		}
 
 		@Override
-		public Map<String, IPeripheral> findConnectedPeripherals() {
+		public Map<String, IPeripheral> getConnectedPeripherals() {
 			return Collections.emptyMap();
 		}
 
 		@Override
-		public Iterable<IWorldPosition> getExtraNodes() {
+		public Set<INetworkNode> getConnectedNodes() {
+			// TODO: Fix me! Bindings should return nodes, not positions.
 			return binding.getPositions();
 		}
 	};
@@ -54,7 +57,7 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 	@Override
 	public void postRemove() {
 		binding.remove();
-		modem.modem.destroy();
+		modem.destroy();
 	}
 
 	@Override
@@ -90,7 +93,6 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 		if (worldObj.isRemote) return;
 
 		modem.processQueue();
-		if (!modem.peripheralsKnown) modem.findPeripherals();
 	}
 
 	@Override
@@ -99,7 +101,7 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 	}
 
 	@Override
-	public INetworkNode getNode() {
+	public IWorldNetworkNode getNode() {
 		return modem;
 	}
 }

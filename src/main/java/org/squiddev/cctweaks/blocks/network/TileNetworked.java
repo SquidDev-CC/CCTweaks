@@ -4,25 +4,24 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.blocks.TileBase;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Abstract TE to prevent having to override every item
  */
-public abstract class TileNetworked extends TileBase implements INetworkNode {
-	private Object lock = new Object();
+public abstract class TileNetworked extends TileBase implements IWorldNetworkNode {
+	private INetworkController networkController;
 
 	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		return true;
-	}
-
-	@Override
-	public boolean canVisitTo(ForgeDirection to) {
+	public boolean canConnect(ForgeDirection from) {
 		return true;
 	}
 
@@ -32,21 +31,36 @@ public abstract class TileNetworked extends TileBase implements INetworkNode {
 	}
 
 	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
+	public void receivePacket(INetworkController network, Packet packet, double distanceTravelled) {
 	}
 
 	@Override
-	public void networkInvalidated() {
+	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals) {
 	}
 
 	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		return null;
+	public Set<INetworkNode> getConnectedNodes() {
+		return Collections.emptySet();
 	}
 
 	@Override
-	public Object lock() {
-		return lock;
+	public void detachFromNetwork() {
+		networkController = null;
+	}
+
+	@Override
+	public void attachToNetwork(INetworkController networkController) {
+		this.networkController = networkController;
+	}
+
+	@Override
+	public INetworkController getAttachedNetwork() {
+		return networkController;
+	}
+
+	@Override
+	public IWorldPosition getPosition() {
+		return this;
 	}
 
 	public boolean onActivated(EntityPlayer player, int side) {

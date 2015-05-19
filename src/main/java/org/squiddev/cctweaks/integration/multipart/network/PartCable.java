@@ -27,9 +27,10 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
+import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.PartBase;
@@ -37,7 +38,7 @@ import org.squiddev.cctweaks.integration.multipart.PartBase;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class PartCable extends PartBase implements INetworkNode, TSlottedPart, ISidedHollowConnect {
+public class PartCable extends PartBase implements IWorldNetworkNode, TSlottedPart, ISidedHollowConnect {
 	public static final String NAME = CCTweaks.NAME + ":networkCable";
 	private static IIcon[] icons;
 
@@ -67,19 +68,21 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 	 */
 	private int cableConnection = 0;
 
+	/**
+	 * Attached network
+	 */
+	private INetworkController networkController;
+
 	@SideOnly(Side.CLIENT)
 	private CableRenderer render;
 
 	@SideOnly(Side.CLIENT)
 	public CableRenderer getRender() {
-		CableRenderer draw = render;
-		if (draw == null) {
-			draw = render = new CableRenderer();
+		if (render == null) {
+			render = new CableRenderer();
 		}
-		return draw;
+		return render;
 	}
-
-	private final Object lock = new Object();
 
 	private boolean active = true;
 
@@ -140,12 +143,12 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 		double zMax = MAX;
 
 		if (tile() != null) {
-			if (canConnect(ForgeDirection.WEST)) xMin = 0.0D;
-			if (canConnect(ForgeDirection.EAST)) xMax = 1.0D;
-			if (canConnect(ForgeDirection.DOWN)) yMin = 0.0D;
-			if (canConnect(ForgeDirection.UP)) yMax = 1.0D;
-			if (canConnect(ForgeDirection.NORTH)) zMin = 0.0D;
-			if (canConnect(ForgeDirection.SOUTH)) zMax = 1.0D;
+			if (shouldConnect(ForgeDirection.WEST)) xMin = 0.0D;
+			if (shouldConnect(ForgeDirection.EAST)) xMax = 1.0D;
+			if (shouldConnect(ForgeDirection.DOWN)) yMin = 0.0D;
+			if (shouldConnect(ForgeDirection.UP)) yMax = 1.0D;
+			if (shouldConnect(ForgeDirection.NORTH)) zMin = 0.0D;
+			if (shouldConnect(ForgeDirection.SOUTH)) zMax = 1.0D;
 		}
 
 		return new Cuboid6(xMin, yMin, zMin, xMax, yMax, zMax);
@@ -157,22 +160,22 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 		parts.add(new IndexedCuboid6(ForgeDirection.UNKNOWN, new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX)));
 
 		if (tile() != null) {
-			if (canConnect(ForgeDirection.WEST)) {
+			if (shouldConnect(ForgeDirection.WEST)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.WEST, new Cuboid6(0, MIN, MIN, MIN, MAX, MAX)));
 			}
-			if (canConnect(ForgeDirection.EAST)) {
+			if (shouldConnect(ForgeDirection.EAST)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.EAST, new Cuboid6(MAX, MIN, MIN, 1, MAX, MAX)));
 			}
-			if (canConnect(ForgeDirection.DOWN)) {
+			if (shouldConnect(ForgeDirection.DOWN)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.DOWN, new Cuboid6(MIN, 0, MIN, MAX, MIN, MAX)));
 			}
-			if (canConnect(ForgeDirection.UP)) {
+			if (shouldConnect(ForgeDirection.UP)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.UP, new Cuboid6(MIN, MAX, MIN, MAX, 1, MAX)));
 			}
-			if (canConnect(ForgeDirection.NORTH)) {
+			if (shouldConnect(ForgeDirection.NORTH)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.NORTH, new Cuboid6(MIN, MIN, 0, MAX, MAX, MIN)));
 			}
-			if (canConnect(ForgeDirection.SOUTH)) {
+			if (shouldConnect(ForgeDirection.SOUTH)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.SOUTH, new Cuboid6(MIN, MIN, MAX, MAX, MAX, 1)));
 			}
 		}
@@ -191,7 +194,7 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 		active = false;
 
 		if (!world.isRemote) {
-			NetworkHelpers.fireNetworkInvalidateAdjacent(world, x, y, z);
+			networkController.removeNode(this);
 		}
 	}
 
@@ -223,7 +226,6 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 		// This is because it may block a connection or release a new one
 		if (tile() != null) {
 			if (!world().isRemote && rebuildConnections()) {
-				NetworkHelpers.fireNetworkInvalidateAdjacent(world(), x(), y(), z());
 				sendDescUpdate();
 			}
 		}
@@ -245,13 +247,13 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 	}
 
 	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		return active && canConnectCached(cableConnection, from);
+	public IWorldPosition getPosition() {
+		return this;
 	}
 
 	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return active && canConnectCached(cableConnection, to);
+	public boolean canConnect(ForgeDirection side) {
+		return active && canConnectCached(cableConnection, side);
 	}
 
 	/**
@@ -289,8 +291,12 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 	 * @param side The side to connect to
 	 * @return If a connection can occur
 	 */
-	protected boolean canConnect(ForgeDirection side) {
-		return canConnectCached(cableConnection, side) && NetworkHelpers.canConnect(world(), x(), y(), z(), side);
+	protected boolean shouldConnect(ForgeDirection side) {
+		return shouldConnect(side, cableConnection);
+	}
+
+	protected boolean shouldConnect(ForgeDirection side, int connection) {
+		return canConnectCached(connection, side) && NetworkHelpers.canConnect(world(), x(), y(), z(), side);
 	}
 
 	/**
@@ -302,10 +308,12 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 	protected boolean rebuildConnections() {
 		// Always allow from ForgeDirection.UNKNOWN
 		int internal = 1 << 6, cable = 1 << 6;
+		int oldInternal = 0;
 
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
 			int flag = 1 << direction.ordinal();
 
+			if (shouldConnect(direction)) oldInternal |= flag;
 			if (canConnectInternally(direction)) internal |= flag;
 			if (canCableExtendInDirection(direction)) cable |= flag;
 		}
@@ -314,6 +322,21 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 
 		internalConnection = internal;
 		cableConnection = cable;
+
+		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+			boolean shouldConnect = shouldConnect(direction);
+			if (shouldConnect != shouldConnect(direction, oldInternal) && networkController != null) {
+				int x = x() + direction.offsetX;
+				int y = y() + direction.offsetY;
+				int z = z() + direction.offsetZ;
+				IWorldNetworkNode node = CCTweaksAPI.instance().networkRegistry().getNode(world(), x, y, z);
+				if (shouldConnect) {
+					networkController.formConnection(this, node);
+				} else if (node != null) {
+					networkController.breakConnection(new SingleTypeUnorderedPair<INetworkNode>(this, node));
+				}
+			}
+		}
 
 		return changed;
 	}
@@ -342,48 +365,38 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 
 	@Override
 	public Map<String, IPeripheral> getConnectedPeripherals() {
-		Map<String, IPeripheral> peripherals = new HashMap<String, IPeripheral>();
-
-		for (TMultiPart part : tile().jPartList()) {
-			if (part instanceof INetworkNode && part != this) {
-				Map<String, IPeripheral> nodePeripherals = ((INetworkNode) part).getConnectedPeripherals();
-				if (nodePeripherals != null) peripherals.putAll(nodePeripherals);
-			}
-		}
-
-		return peripherals;
+		return Collections.emptyMap();
 	}
 
 	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-		for (TMultiPart part : tile().jPartList()) {
-			if (part instanceof INetworkNode && part != this) {
-				((INetworkNode) part).receivePacket(packet, distanceTravelled);
-			}
-		}
+	public void receivePacket(INetworkController networkController, Packet packet, double distanceTravelled) {
 	}
 
 	@Override
-	public void networkInvalidated() {
-		for (TMultiPart part : tile().jPartList()) {
-			if (part instanceof INetworkNode && part != this) {
-				((INetworkNode) part).networkInvalidated();
-			}
-		}
+	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals) {
 	}
 
 	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		Set<IWorldPosition> nodes = new HashSet<IWorldPosition>();
+	public Set<INetworkNode> getConnectedNodes() {
+		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
 
 		for (TMultiPart part : tile().jPartList()) {
-			if (part instanceof INetworkNode && part != this) {
-				Iterable<IWorldPosition> extras = ((INetworkNode) part).getExtraNodes();
-				if (extras != null) {
-					for (IWorldPosition extra : extras) {
-						nodes.add(extra);
-					}
+			if (part != this) {
+				if (part instanceof INetworkNode) {
+					nodes.add((INetworkNode) part);
+				} else if (part instanceof IWorldNetworkNodeHost) {
+					nodes.add(((IWorldNetworkNodeHost) part).getNode());
 				}
+			}
+		}
+
+		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+			if (shouldConnect(direction)) {
+				int x = x() + direction.offsetX;
+				int y = y() + direction.offsetY;
+				int z = z() + direction.offsetZ;
+				IWorldNetworkNode node = CCTweaksAPI.instance().networkRegistry().getNode(world(), x, y, z);
+				nodes.add(node);
 			}
 		}
 
@@ -391,8 +404,18 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 	}
 
 	@Override
-	public Object lock() {
-		return lock;
+	public void detachFromNetwork() {
+		networkController = null;
+	}
+
+	@Override
+	public void attachToNetwork(INetworkController networkController) {
+		this.networkController = networkController;
+	}
+
+	@Override
+	public INetworkController getAttachedNetwork() {
+		return networkController;
 	}
 
 	public class CableRenderer extends FixedRenderBlocks {
@@ -527,7 +550,7 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 
 		/**
 		 * Tests to see if there is something to connect to, either in the
-		 * same block space or using {@link #canConnect(ForgeDirection)}
+		 * same block space or using {@link #shouldConnect(ForgeDirection)}
 		 *
 		 * @param side The side to check
 		 * @return If we should appear to connect on that side.

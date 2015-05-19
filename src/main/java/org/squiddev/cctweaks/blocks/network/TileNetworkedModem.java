@@ -6,15 +6,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
-import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileBase;
-import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.modem.MultiPeripheralModem;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -36,34 +33,13 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, IWo
 		if (modem.modem.pollChanged()) markForUpdate();
 
 		modem.processQueue();
-		if (!modem.peripheralsKnown) modem.findPeripherals();
 	}
 
 	@Override
 	public void onNeighborChanged() {
-		Map<String, IPeripheral> oldPeripherals = modem.getConnectedPeripherals();
 		if (modem.hasChanged()) {
-			Map<String, IPeripheral> newPeripherals = modem.getConnectedPeripherals();
-			for (Map.Entry<String, IPeripheral> p : newPeripherals.entrySet()) {
-				IPeripheral newPeriph = p.getValue();
-				String newName = p.getKey();
-				IPeripheral oldPeriph = oldPeripherals.get(newName);
-				if (!newPeriph.equals(oldPeriph) && newPeriph instanceof INetworkedPeripheral) {
-					((INetworkedPeripheral) newPeriph).attachToNetwork(modem, newName);
-				}
-			}
-
-			for (Map.Entry<String, IPeripheral> p : oldPeripherals.entrySet()) {
-				IPeripheral oldPeriph = p.getValue();
-				String oldName = p.getKey();
-				IPeripheral newPeriph = newPeripherals.get(oldName);
-				if (!oldPeriph.equals(newPeriph) && oldPeriph instanceof INetworkedPeripheral) {
-					((INetworkedPeripheral) oldPeriph).detachFromNetwork(modem, oldName);
-				}
-			}
-
+			modem.getAttachedNetwork().invalidateNetwork();
 			markForUpdate();
-			NetworkHelpers.fireNetworkInvalidate(worldObj, xCoord, yCoord, zCoord);
 		}
 	}
 
@@ -74,9 +50,7 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, IWo
 
 		Set<String> names = modem.getPeripheralNames();
 
-		modem.detachConnectedPeripheralsFromNetwork();
 		modem.toggleEnabled();
-		modem.attachConnectedPeripheralsToNetwork();
 
 		Set<String> newNames = modem.getPeripheralNames();
 
@@ -89,7 +63,7 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, IWo
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", StringUtils.join(newNames, ", ")));
 			}
 
-			NetworkHelpers.fireNetworkInvalidate(worldObj, xCoord, yCoord, zCoord);
+			modem.getAttachedNetwork().invalidateNetwork();
 			markForUpdate();
 		}
 
@@ -116,8 +90,7 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, IWo
 
 	@Override
 	public void postRemove() {
-		NetworkHelpers.fireNetworkInvalidateAdjacent(worldObj, xCoord, yCoord, zCoord);
-		modem.modem.destroy();
+		modem.destroy();
 	}
 
 	@Override
@@ -145,7 +118,7 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, IWo
 	}
 
 	@Override
-	public INetworkNode getNode() {
+	public IWorldNetworkNode getNode() {
 		return modem;
 	}
 }

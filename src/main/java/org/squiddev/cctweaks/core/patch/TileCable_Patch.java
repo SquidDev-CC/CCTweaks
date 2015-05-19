@@ -22,6 +22,7 @@ import java.util.*;
 
 import static org.squiddev.cctweaks.core.network.NetworkHelpers.canConnect;
 
+// TODO: Redo this whole class to delegate to a modem object
 @SuppressWarnings("all")
 @MergeVisitor.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
 public class TileCable_Patch extends TileCable implements INetworkNode, INetworkAccess {

@@ -1,12 +1,13 @@
 package org.squiddev.cctweaks.core.network.mock;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
-import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A network node that counts how many times an event occured
@@ -15,7 +16,7 @@ public class CountingNetworkNode implements INetworkNode {
 	protected final boolean[] canVisit;
 	protected int invalidated = 0;
 
-	private final Object lock = new Object();
+	private INetworkController networkController;
 
 	public CountingNetworkNode(boolean[] canVisit) {
 		this.canVisit = canVisit;
@@ -26,37 +27,37 @@ public class CountingNetworkNode implements INetworkNode {
 	}
 
 	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		return canVisitTo(from);
-	}
-
-	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return to.offsetY == 0 && canVisit[to.ordinal() - 2];
-	}
-
-	@Override
 	public Map<String, IPeripheral> getConnectedPeripherals() {
 		return null;
 	}
 
 	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
+	public void receivePacket(INetworkController networkController, Packet packet, double distanceTravelled) {
 	}
 
 	@Override
-	public void networkInvalidated() {
+	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals) {
 		invalidated++;
 	}
 
 	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		return null;
+	public Set<INetworkNode> getConnectedNodes() {
+		return Collections.emptySet();
 	}
 
 	@Override
-	public Object lock() {
-		return lock;
+	public void detachFromNetwork() {
+		networkController = null;
+	}
+
+	@Override
+	public void attachToNetwork(INetworkController networkController) {
+		this.networkController = networkController;
+	}
+
+	@Override
+	public INetworkController getAttachedNetwork() {
+		return networkController;
 	}
 
 	/**

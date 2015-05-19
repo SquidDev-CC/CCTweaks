@@ -12,6 +12,7 @@ import java.util.Map;
 /**
  * A TileEntity that delegates to other nodes
  */
+// TODO: I have no idea what to do to fix this class, needs IWorldNetworkNode
 public class NodeTile extends TileEntity implements INetworkNode {
 	public final INetworkNode delegate;
 
