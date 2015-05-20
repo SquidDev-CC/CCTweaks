@@ -296,7 +296,10 @@ public class PartCable extends PartBase implements IWorldNetworkNode, TSlottedPa
 	}
 
 	protected boolean shouldConnect(ForgeDirection side, int connection) {
-		return canConnectCached(connection, side) && NetworkHelpers.canConnect(world(), x(), y(), z(), side);
+		int x = x() + side.offsetX;
+		int y = y() + side.offsetY;
+		int z = z() + side.offsetZ;
+		return canConnectCached(connection, side) && NetworkHelpers.canConnect(world(), x, y, z, side.getOpposite());
 	}
 
 	/**
