@@ -229,6 +229,20 @@ public class PartCable extends PartBase implements IWorldNetworkNode, TSlottedPa
 				sendDescUpdate();
 			}
 		}
+
+		for (TMultiPart existingPart : tile().jPartList()) {
+			INetworkNode node = existingPart instanceof INetworkNode ? (INetworkNode) existingPart
+					: existingPart instanceof IWorldNetworkNodeHost ? ((IWorldNetworkNodeHost) existingPart).getNode()
+					: null;
+			if (node != null) {
+				// If the connection already exists,
+				// the controller just won't do anything.
+				// No harm doing it for each part,
+				// and this is the best way to make sure
+				// a connection is formed on newly added nodes.
+				networkController.formConnection(this, node);
+			}
+		}
 	}
 
 	@Override
