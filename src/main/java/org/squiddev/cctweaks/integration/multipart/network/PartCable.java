@@ -307,13 +307,12 @@ public class PartCable extends PartBase implements IWorldNetworkNode, TSlottedPa
 	 */
 	protected boolean rebuildConnections() {
 		// Always allow from ForgeDirection.UNKNOWN
-		int internal = 1 << 6, cable = 1 << 6;
-		int oldInternal = 0;
+		int internal = 1 << 6, cable = 1 << 6, oldShouldConnect = 0;
 
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
 			int flag = 1 << direction.ordinal();
 
-			if (shouldConnect(direction)) oldInternal |= flag;
+			if (shouldConnect(direction)) oldShouldConnect |= flag;
 			if (canConnectInternally(direction)) internal |= flag;
 			if (canCableExtendInDirection(direction)) cable |= flag;
 		}
@@ -325,7 +324,7 @@ public class PartCable extends PartBase implements IWorldNetworkNode, TSlottedPa
 
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
 			boolean shouldConnect = shouldConnect(direction);
-			if (shouldConnect != shouldConnect(direction, oldInternal) && networkController != null) {
+			if (shouldConnect != shouldConnect(direction, oldShouldConnect) && networkController != null) {
 				int x = x() + direction.offsetX;
 				int y = y() + direction.offsetY;
 				int z = z() + direction.offsetZ;
