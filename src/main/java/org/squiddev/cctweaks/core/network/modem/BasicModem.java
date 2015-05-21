@@ -303,6 +303,28 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	}
 
 	protected void setPeripheralEnabled(boolean peripheralEnabled) {
+		Map<String, IPeripheral> oldPeripherals = getConnectedPeripherals();
+
 		this.peripheralEnabled = peripheralEnabled;
+
+		Map<String, IPeripheral> newPeripherals = getConnectedPeripherals();
+
+		for (Map.Entry<String, IPeripheral> entry : oldPeripherals.entrySet()) {
+			String key = entry.getKey();
+			IPeripheral value = entry.getValue();
+
+			if (!newPeripherals.containsKey(key) && value instanceof INetworkedPeripheral) {
+				((INetworkedPeripheral) value).detachFromNetwork(this, key);
+			}
+		}
+
+		for (Map.Entry<String, IPeripheral> entry : newPeripherals.entrySet()) {
+			String key = entry.getKey();
+			IPeripheral value = entry.getValue();
+
+			if (!oldPeripherals.containsKey(key) && value instanceof INetworkedPeripheral) {
+				((INetworkedPeripheral) value).attachToNetwork(this, key);
+			}
+		}
 	}
 }
