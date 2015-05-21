@@ -148,7 +148,7 @@ public class PartWirelessBridge extends PartSidedNetwork implements IWorldNetwor
 	}
 
 	@Override
-	public void receivePacket(INetworkController network, Packet packet, double distanceTravelled) {
+	public void receivePacket(Packet packet, double distanceTravelled) {
 	}
 
 	@Override

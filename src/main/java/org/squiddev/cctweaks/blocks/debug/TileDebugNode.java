@@ -1,8 +1,6 @@
 package org.squiddev.cctweaks.blocks.debug;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
-import org.squiddev.cctweaks.api.network.INetworkController;
-import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.blocks.network.TileNetworked;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -14,7 +12,7 @@ import java.util.Map;
  */
 public class TileDebugNode extends TileNetworked {
 	@Override
-	public void receivePacket(INetworkController networkController, Packet packet, double distanceTravelled) {
+	public void receivePacket(Packet packet, double distanceTravelled) {
 		DebugLogger.debug("Received packet from " + distanceTravelled + " blocks away");
 	}
 

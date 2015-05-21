@@ -385,7 +385,7 @@ public class PartCable extends PartBase implements IWorldNetworkNode, TSlottedPa
 	}
 
 	@Override
-	public void receivePacket(INetworkController networkController, Packet packet, double distanceTravelled) {
+	public void receivePacket(Packet packet, double distanceTravelled) {
 	}
 
 	@Override
