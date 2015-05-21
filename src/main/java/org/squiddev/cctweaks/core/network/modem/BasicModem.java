@@ -34,10 +34,7 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	 */
 	public final Map<String, PeripheralAccess> peripheralWrappersByName = new HashMap<String, PeripheralAccess>();
 
-	/**
-	 * If this modem is active and can connect to peripherals
-	 */
-	protected boolean peripheralEnabled = false;
+	private boolean peripheralEnabled = false;
 
 	/**
 	 * The modem to use
@@ -139,7 +136,7 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	 */
 	public void setState(byte state) {
 		this.state = state;
-		peripheralEnabled = (state & MODEM_PERIPHERAL) == MODEM_PERIPHERAL;
+		setPeripheralEnabled((state & MODEM_PERIPHERAL) == MODEM_PERIPHERAL);
 	}
 
 	/**
@@ -149,7 +146,7 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	 * @see #MODEM_PERIPHERAL
 	 */
 	public void refreshState() {
-		state = (byte) ((modem.isActive() ? MODEM_ON : 0) | (peripheralEnabled ? MODEM_PERIPHERAL : 0));
+		state = (byte) ((modem.isActive() ? MODEM_ON : 0) | (isPeripheralEnabled() ? MODEM_PERIPHERAL : 0));
 	}
 
 	/**
@@ -158,15 +155,15 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	 * @return If it can connect to peripherals
 	 */
 	public boolean toggleEnabled() {
-		if (peripheralEnabled) {
-			peripheralEnabled = false;
+		if (isPeripheralEnabled()) {
+			setPeripheralEnabled(false);
 		} else {
-			peripheralEnabled = true;
+			setPeripheralEnabled(true);
 			updateEnabled();
 		}
 
 		refreshState();
-		return peripheralEnabled;
+		return isPeripheralEnabled();
 	}
 
 	/**
@@ -175,11 +172,11 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	 * @return If the connection state changed
 	 */
 	public boolean updateEnabled() {
-		if (!peripheralEnabled) return false;
+		if (!isPeripheralEnabled()) return false;
 
 		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
 		if (peripherals == null || peripherals.size() == 0) {
-			peripheralEnabled = false;
+			setPeripheralEnabled(false);
 			return true;
 		}
 
@@ -192,7 +189,7 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	 * @return If it can connect to peripherals
 	 */
 	public boolean isEnabled() {
-		return peripheralEnabled;
+		return isPeripheralEnabled();
 	}
 
 	/**
@@ -296,5 +293,16 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	public boolean transmitPacket(Packet packet) {
 		networkController.transmitPacket(this, packet);
 		return true;
+	}
+
+	/**
+	 * If this modem is active and can connect to peripherals
+	 */
+	protected boolean isPeripheralEnabled() {
+		return peripheralEnabled;
+	}
+
+	protected void setPeripheralEnabled(boolean peripheralEnabled) {
+		this.peripheralEnabled = peripheralEnabled;
 	}
 }
