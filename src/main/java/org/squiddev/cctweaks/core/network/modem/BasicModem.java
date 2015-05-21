@@ -119,6 +119,15 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 				receiver.receive(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
 			}
 		}
+
+		for (Map.Entry<String, IPeripheral> entry : this.getConnectedPeripherals().entrySet()) {
+			String key = entry.getKey();
+			IPeripheral value = entry.getValue();
+
+			if (value instanceof INetworkedPeripheral) {
+				((INetworkedPeripheral) value).receivePacket(this, packet, distanceTravelled);
+			}
+		}
 	}
 
 	/**
@@ -222,16 +231,40 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 				detachPeripheral(wrapper.getKey());
 			}
 		}
+
+		for (Map.Entry<String, IPeripheral> entry : this.getConnectedPeripherals().entrySet()) {
+			IPeripheral value = entry.getValue();
+
+			if (value instanceof INetworkedPeripheral) {
+				((INetworkedPeripheral) value).networkInvalidated(this, oldPeripherals);
+			}
+		}
 	}
 
 	@Override
 	public void detachFromNetwork() {
+		for (Map.Entry<String, IPeripheral> entry : this.getConnectedPeripherals().entrySet()) {
+			String key = entry.getKey();
+			IPeripheral value = entry.getValue();
+
+			if (value instanceof INetworkedPeripheral) {
+				((INetworkedPeripheral) value).detachFromNetwork(this, key);
+			}
+		}
 		this.networkController = null;
 	}
 
 	@Override
 	public void attachToNetwork(INetworkController networkController) {
 		this.networkController = networkController;
+		for (Map.Entry<String, IPeripheral> entry : this.getConnectedPeripherals().entrySet()) {
+			String key = entry.getKey();
+			IPeripheral value = entry.getValue();
+
+			if (value instanceof INetworkedPeripheral) {
+				((INetworkedPeripheral) value).attachToNetwork(this, key);
+			}
+		}
 	}
 
 	@Override
