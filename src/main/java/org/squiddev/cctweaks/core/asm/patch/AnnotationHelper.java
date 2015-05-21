@@ -18,6 +18,7 @@ public class AnnotationHelper {
 	public final static String STUB = Type.getDescriptor(Stub.class);
 	public final static String REWRITE = Type.getDescriptor(Rewrite.class);
 	public final static String RENAME = Type.getDescriptor(Rename.class);
+	public final static String REMOVE = Type.getDescriptor(Remove.class);
 
 	/**
 	 * We use a field called {@code ANNOTATION} to store data about the class itself

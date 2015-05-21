@@ -5,6 +5,7 @@ import org.objectweb.asm.commons.RemappingClassAdapter;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.squiddev.cctweaks.core.Config;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -98,7 +99,13 @@ public class MergeVisitor extends ClassVisitor {
 
 			// Visit fields
 			for (FieldNode field : node.fields) {
-				if (!hasAnnotation(field.invisibleAnnotations, STUB) && !field.name.equals(ANNOTATION)) {
+				if (field.name.equals(ANNOTATION)) continue;
+
+				if (hasAnnotation(field.invisibleAnnotations, STUB)) {
+					this.access.put(field.name, field.access);
+				} else if (hasAnnotation(field.invisibleAnnotations, REMOVE) && Config.config.strictMode) {
+					visited.add(getMap(this.memberNames, field.name, field.name));
+				} else {
 					List<String> renameTo = getAnnotationValue(getAnnotation(field.invisibleAnnotations, RENAME), "to");
 					if (renameTo == null) {
 						field.accept(this);
@@ -108,8 +115,6 @@ public class MergeVisitor extends ClassVisitor {
 							field.accept(this);
 						}
 					}
-				} else {
-					this.access.put(field.name, field.access);
 				}
 			}
 
@@ -125,19 +130,23 @@ public class MergeVisitor extends ClassVisitor {
 
 			// Visit methods
 			for (MethodNode method : node.methods) {
-				if (!method.name.equals("<init>") && !method.name.equals("<cinit>")) {
-					if (!hasAnnotation(method.invisibleAnnotations, STUB)) {
-						List<String> renameFrom = getAnnotationValue(getAnnotation(method.invisibleAnnotations, RENAME), "to");
-						if (renameFrom == null) {
-							method.accept(this);
-						} else {
-							for (String to : renameFrom) {
-								method.name = to;
-								method.accept(this);
-							}
-						}
+				if (method.name.equals("<init>") || method.name.equals("<cinit>")) continue;
+				;
+
+				if (hasAnnotation(method.invisibleAnnotations, STUB)) {
+					this.access.put(method.name + "(" + context.mapMethodDesc(method.desc) + ")", method.access);
+				} else if (hasAnnotation(method.invisibleAnnotations, REMOVE) && Config.config.strictMode) {
+					String description = "(" + context.mapMethodDesc(method.desc) + ")";
+					visited.add(getMap(this.memberNames, method.name + description, method.name) + description);
+				} else {
+					List<String> renameFrom = getAnnotationValue(getAnnotation(method.invisibleAnnotations, RENAME), "to");
+					if (renameFrom == null) {
+						method.accept(this);
 					} else {
-						this.access.put(method.name + "(" + context.mapMethodDesc(method.desc) + ")", method.access);
+						for (String to : renameFrom) {
+							method.name = to;
+							method.accept(this);
+						}
 					}
 				}
 			}
@@ -265,5 +274,15 @@ public class MergeVisitor extends ClassVisitor {
 		 * List of types to map to from or method this to
 		 */
 		String[] to() default "";
+	}
+
+	/**
+	 * Strip this method whilst running in strict mode
+	 *
+	 * @see org.squiddev.cctweaks.core.Config.ConfigData#strictMode
+	 */
+	@Target({ElementType.FIELD, ElementType.METHOD})
+	@Retention(RetentionPolicy.CLASS)
+	public @interface Remove {
 	}
 }

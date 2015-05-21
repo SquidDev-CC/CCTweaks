@@ -162,7 +162,15 @@ public final class Config {
 			"deprecatedWarnings",
 			MISC,
 			defaults.deprecatedWarnings,
-			"Print a stacktrace to the console when a deprecated method is called"
+			"Print a stacktrace to the console \nwhen a deprecated method is called"
+		);
+
+		data.strictMode = configuration.getBoolean(
+			"strictMode",
+			MISC,
+			defaults.strictMode,
+			"Run the transformer under strict mode\n" +
+			"This removes unused fields and methods \nto ensure that everything is correctly handled"
 		);
 
 		// Handle generation of HashSets, etc...
@@ -263,7 +271,17 @@ public final class Config {
 
 		/**
 		 * Throw exceptions on calling deprecated methods
+		 *
+		 * Only for development/testing
 		 */
 		public boolean deprecatedWarnings = false;
+
+		/**
+		 * Run the transformer under strict mode.
+		 * This removes unused fields and methods to ensure that everything is covered
+		 *
+		 * Only for development/testing
+		 */
+		public boolean strictMode = false;
 	}
 }
