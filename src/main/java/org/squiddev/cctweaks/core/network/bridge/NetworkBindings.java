@@ -1,8 +1,6 @@
 package org.squiddev.cctweaks.core.network.bridge;
 
-import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.ISearchLoc;
-import org.squiddev.cctweaks.core.network.visitor.SafeNetworkVisitorIterable;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 
 import java.util.*;
 
@@ -11,39 +9,40 @@ import java.util.*;
  */
 public final class NetworkBindings {
 	public static final String BINDING_NAME = "cctweaks.data.networkBinding";
-	private static final Map<UUID, Collection<IWorldPosition>> networks = new HashMap<UUID, Collection<IWorldPosition>>();
+	private static final Map<UUID, Set<IWorldNetworkNode>> networks = new HashMap<UUID, Set<IWorldNetworkNode>>();
 
-	public static Iterable<IWorldPosition> getPositions(UUID id) {
+	public static Set<IWorldNetworkNode> getNodes(UUID id) {
 		if (id == null) return null;
 
 		return networks.get(id);
 	}
 
-	public static void addPosition(UUID id, IWorldPosition position) {
+	public static void addNode(UUID id, IWorldNetworkNode node) {
 		if (id == null) return;
 
-		Collection<IWorldPosition> positions = networks.get(id);
-		if (positions == null) {
-			positions = new HashSet<IWorldPosition>();
-			networks.put(id, positions);
+		Set<IWorldNetworkNode> nodes = networks.get(id);
+		if (nodes == null) {
+			nodes = new HashSet<IWorldNetworkNode>();
+			networks.put(id, nodes);
 		}
 
-		if (positions.add(position)) {
-			for (ISearchLoc loc : new SafeNetworkVisitorIterable(position)) {
-				loc.getNode().networkInvalidated();
+		if (nodes.add(node)) {
+			for (IWorldNetworkNode n : nodes) {
+				if (!n.equals(node)) {
+					n.getAttachedNetwork().formConnection(n, node);
+				}
 			}
 		}
 	}
 
-	public static void removePosition(UUID id, IWorldPosition position) {
+	public static void removeNode(UUID id, IWorldNetworkNode node) {
 		if (id == null) return;
 
-		Collection<IWorldPosition> positions = networks.get(id);
+		Set<IWorldNetworkNode> nodes = networks.get(id);
 
-		if (positions != null && positions.remove(position)) {
-			for (ISearchLoc loc : new SafeNetworkVisitorIterable(positions)) {
-				loc.getNode().networkInvalidated();
-			}
+		if (nodes != null) {
+			node.getAttachedNetwork().removeNode(node);
+			nodes.remove(node);
 		}
 	}
 }

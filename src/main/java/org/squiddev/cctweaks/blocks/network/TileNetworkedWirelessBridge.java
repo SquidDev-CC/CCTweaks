@@ -23,7 +23,6 @@ import java.util.Set;
  * Bind networks together
  */
 public class TileNetworkedWirelessBridge extends TileBase implements IPeripheralHost, IWorldNetworkNodeHost {
-	protected final NetworkBinding binding = new NetworkBinding(this);
 	protected final BasicModem modem = new BasicModem() {
 		@Override
 		public IWorldPosition getPosition() {
@@ -37,10 +36,10 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 
 		@Override
 		public Set<INetworkNode> getConnectedNodes() {
-			// TODO: Fix me! Bindings should return nodes, not positions.
-			return binding.getPositions();
+			return Collections.<INetworkNode>unmodifiableSet(binding.getNodes());
 		}
 	};
+	protected final NetworkBinding binding = new NetworkBinding(modem);
 
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {

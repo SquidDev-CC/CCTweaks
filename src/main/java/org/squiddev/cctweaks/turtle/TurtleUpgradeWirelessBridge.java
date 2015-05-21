@@ -164,8 +164,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 
 		@Override
 		public Set<INetworkNode> getConnectedNodes() {
-			// TODO: Fix me! Bindings should be providing nodes, not positions
-			return binding.getPositions();
+			return Collections.<INetworkNode>unmodifiableSet(binding.getNodes());
 		}
 
 		@Override

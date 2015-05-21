@@ -157,8 +157,7 @@ public class PartWirelessBridge extends PartSidedNetwork implements IWorldNetwor
 
 	@Override
 	public Set<INetworkNode> getConnectedNodes() {
-		// TODO: Change bind getter
-		return binding.getPositions();
+		return Collections.<INetworkNode>unmodifiableSet(binding.getNodes());
 	}
 
 	@Override

@@ -3,8 +3,9 @@ package org.squiddev.cctweaks.core.network.bridge;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.api.IDataCard;
-import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -15,24 +16,24 @@ public class NetworkBinding {
 	protected static final String LSB = "bound_id_lsb";
 
 	protected UUID id = UUID.randomUUID();
-	protected IWorldPosition position;
+	protected IWorldNetworkNode node;
 
-	public NetworkBinding(IWorldPosition position) {
-		this.position = position;
+	public NetworkBinding(IWorldNetworkNode node) {
+		this.node = node;
 	}
 
 	/**
 	 * Add the position to the bindings
 	 */
 	public void add() {
-		if (position.getWorld() != null) NetworkBindings.addPosition(id, position);
+		if (node.getPosition().getWorld() != null) NetworkBindings.addNode(id, node);
 	}
 
 	/**
 	 * Remove the position from the bindings
 	 */
 	public void remove() {
-		if (position.getWorld() != null) NetworkBindings.removePosition(id, position);
+		if (node.getPosition().getWorld() != null) NetworkBindings.removeNode(id, node);
 	}
 
 	/**
@@ -40,8 +41,8 @@ public class NetworkBinding {
 	 *
 	 * @return The positions for this binding
 	 */
-	public Iterable<IWorldPosition> getPositions() {
-		return NetworkBindings.getPositions(id);
+	public Set<IWorldNetworkNode> getNodes() {
+		return NetworkBindings.getNodes(id);
 	}
 
 	public void setId(UUID newId) {
