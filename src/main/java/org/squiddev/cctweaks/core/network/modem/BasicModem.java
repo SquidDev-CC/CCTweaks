@@ -172,7 +172,7 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	 * @return If the connection state changed
 	 */
 	public boolean updateEnabled() {
-		if (!isPeripheralEnabled()) return false;
+		if (!peripheralEnabled) return false;
 
 		Map<String, IPeripheral> peripherals = getConnectedPeripherals();
 		if (peripherals == null || peripherals.size() == 0) {

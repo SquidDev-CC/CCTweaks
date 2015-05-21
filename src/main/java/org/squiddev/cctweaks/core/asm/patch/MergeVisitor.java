@@ -101,10 +101,10 @@ public class MergeVisitor extends ClassVisitor {
 			for (FieldNode field : node.fields) {
 				if (field.name.equals(ANNOTATION)) continue;
 
-				if (hasAnnotation(field.invisibleAnnotations, STUB)) {
-					this.access.put(field.name, field.access);
-				} else if (hasAnnotation(field.invisibleAnnotations, REMOVE) && Config.config.strictMode) {
+				if (hasAnnotation(field.invisibleAnnotations, REMOVE) && Config.config.strictMode) {
 					visited.add(getMap(this.memberNames, field.name, field.name));
+				} else if (hasAnnotation(field.invisibleAnnotations, STUB)) {
+					this.access.put(field.name, field.access);
 				} else {
 					List<String> renameTo = getAnnotationValue(getAnnotation(field.invisibleAnnotations, RENAME), "to");
 					if (renameTo == null) {
@@ -131,13 +131,12 @@ public class MergeVisitor extends ClassVisitor {
 			// Visit methods
 			for (MethodNode method : node.methods) {
 				if (method.name.equals("<init>") || method.name.equals("<cinit>")) continue;
-				;
 
-				if (hasAnnotation(method.invisibleAnnotations, STUB)) {
-					this.access.put(method.name + "(" + context.mapMethodDesc(method.desc) + ")", method.access);
-				} else if (hasAnnotation(method.invisibleAnnotations, REMOVE) && Config.config.strictMode) {
+				if (hasAnnotation(method.invisibleAnnotations, REMOVE) && Config.config.strictMode) {
 					String description = "(" + context.mapMethodDesc(method.desc) + ")";
 					visited.add(getMap(this.memberNames, method.name + description, method.name) + description);
+				} else if (hasAnnotation(method.invisibleAnnotations, STUB)) {
+					this.access.put(method.name + "(" + context.mapMethodDesc(method.desc) + ")", method.access);
 				} else {
 					List<String> renameFrom = getAnnotationValue(getAnnotation(method.invisibleAnnotations, RENAME), "to");
 					if (renameFrom == null) {
