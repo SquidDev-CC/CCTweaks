@@ -303,6 +303,10 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	}
 
 	protected void setPeripheralEnabled(boolean peripheralEnabled) {
+		if (peripheralEnabled == this.peripheralEnabled) {
+			return;
+		}
+
 		Map<String, IPeripheral> oldPeripherals = getConnectedPeripherals();
 
 		this.peripheralEnabled = peripheralEnabled;
