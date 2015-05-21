@@ -14,6 +14,12 @@ import org.squiddev.cctweaks.core.Config;
 public class DebugLogger {
 	private static final Logger logger = LogManager.getLogger(CCTweaks.ID);
 
+	public static void deprecated(String message) {
+		if (Config.config.deprecatedWarnings) {
+			trace("Deprecated " + message);
+		}
+	}
+
 	public static void trace(String message) {
 		try {
 			throw new RuntimeException();

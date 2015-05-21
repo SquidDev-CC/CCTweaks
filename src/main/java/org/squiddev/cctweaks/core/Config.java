@@ -158,6 +158,13 @@ public final class Config {
 			"Enable debug blocks/items - requires debug"
 		);
 
+		data.deprecatedWarnings = configuration.getBoolean(
+			"deprecatedWarnings",
+			MISC,
+			defaults.deprecatedWarnings,
+			"Print a stacktrace to the console when a deprecated method is called"
+		);
+
 		// Handle generation of HashSets, etc...
 		Set<String> disabledActions = turtleDisabledActions = new HashSet<String>();
 		for (String action : data.turtleDisabledActions) {
@@ -253,5 +260,10 @@ public final class Config {
 		 * Enable the debug blocks/items
 		 */
 		public boolean debugItems = false;
+
+		/**
+		 * Throw exceptions on calling deprecated methods
+		 */
+		public boolean deprecatedWarnings = false;
 	}
 }

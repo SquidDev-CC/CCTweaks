@@ -110,7 +110,7 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	}
 
 	@Override
-	public void receivePacket(INetworkController network, Packet packet, double distanceTravelled) {
+	public void receivePacket(Packet packet, double distanceTravelled) {
 		synchronized (receivers) {
 			for (IReceiver receiver : receivers.get(packet.channel)) {
 				receiver.receive(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
