@@ -14,8 +14,6 @@ import dan200.computercraft.client.render.FixedRenderBlocks;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
-import dan200.computercraft.shared.util.IDAssigner;
-import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -30,11 +28,10 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
-import org.squiddev.cctweaks.core.network.modem.SinglePeripheralModem;
+import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -268,28 +265,15 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 		}
 	}
 
-	public class WiredModem extends SinglePeripheralModem {
-		@Override
-		public IPeripheral getPeripheral() {
-			int dir = direction;
-			int x = x() + Facing.offsetsXForSide[dir];
-			int y = y() + Facing.offsetsYForSide[dir];
-			int z = z() + Facing.offsetsZForSide[dir];
-			IPeripheral peripheral = PeripheralUtil.getPeripheral(world(), x, y, z, Facing.oppositeSide[dir]);
-
-			if (peripheral == null) {
-				id = -1;
-				peripheral = null;
-			} else if (id <= -1) {
-				id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(world()), "computer/lastid_" + peripheral.getType() + ".txt"));
-			}
-
-			return peripheral;
-		}
-
+	public class WiredModem extends DirectionalPeripheralModem {
 		@Override
 		public IWorldPosition getPosition() {
 			return PartModem.this;
+		}
+
+		@Override
+		public int getDirection() {
+			return direction;
 		}
 	}
 }
