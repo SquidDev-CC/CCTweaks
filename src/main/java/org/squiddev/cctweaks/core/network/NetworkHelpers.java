@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.core.network;
 
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
+import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 
@@ -26,5 +27,8 @@ public final class NetworkHelpers {
 
 		IWorldNetworkNode node = NetworkAPI.registry().getNode(world, x, y, z);
 		return node != null && node.canConnect(direction.getOpposite());
+	}
+	public static boolean canConnect(IWorldPosition pos, ForgeDirection direction) {
+		return canConnect(pos.getWorld(), pos.getX(), pos.getY(), pos.getZ(), direction);
 	}
 }
