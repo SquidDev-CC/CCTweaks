@@ -35,6 +35,8 @@ public interface INetworkNode {
 
 	/**
 	 * Get network nodes that this node attaches to the network.
+	 * Is only called when the set might have changed,
+	 * so no need to worry about caching.
 	 *
 	 * @return All nodes this node connects to.
 	 */
