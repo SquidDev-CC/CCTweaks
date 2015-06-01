@@ -20,6 +20,7 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
+import org.squiddev.cctweaks.core.network.cable.SingleModemCable;
 import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -41,6 +42,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	private boolean m_peripheralAccessAllowed;
 
 	protected DirectionalPeripheralModem modem;
+	protected SingleModemCable cable;
 
 	/**
 	 * The patcher doesn't enable constructors (yet) so we lazy load the modem
@@ -62,12 +64,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 				@Override
 				public boolean canConnect(ForgeDirection from) {
-					// Can't be visited by other nodes if it is destroyed
-					if (m_destroyed) return false;
-
-					// Or has no cable or is the side it is facing
-					PeripheralType type = getPeripheralType();
-					return type == PeripheralType.Cable || (type == PeripheralType.WiredModemWithCable && from.ordinal() != getDirection());
+					return true;
 				}
 
 				@Override
@@ -88,11 +85,39 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		return modem;
 	}
 
+	public SingleModemCable getCable() {
+		if (cable == null) {
+			return cable = new SingleModemCable() {
+				@Override
+				public DirectionalPeripheralModem getModem() {
+					return getModem();
+				}
+
+				@Override
+				public IWorldPosition getPosition() {
+					return TileCable_Patch.this;
+				}
+
+				@Override
+				public boolean canConnect(ForgeDirection direction) {
+					// Can't be visited by other nodes if it is destroyed
+					if (m_destroyed) return false;
+
+					// Or has no cable or is the side it is facing
+					PeripheralType type = getPeripheralType();
+					return type == PeripheralType.Cable || (type == PeripheralType.WiredModemWithCable && direction.ordinal() != getDirection());
+				}
+			};
+		}
+		return cable;
+	}
+
 	@Override
 	public void destroy() {
 		if (!m_destroyed) {
 			m_destroyed = true;
 			getModem().destroy();
+			getCable().removeFromWorld();
 		}
 	}
 
@@ -129,6 +154,8 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 					if (periphName != null) {
 						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", periphName));
 					}
+
+					getModem().getAttachedNetwork().invalidateNetwork();
 					return true;
 				}
 			} else {
