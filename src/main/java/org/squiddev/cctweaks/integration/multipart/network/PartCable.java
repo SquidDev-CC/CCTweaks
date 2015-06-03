@@ -52,7 +52,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	 */
 	private ForgeDirection connectionTestSide = ForgeDirection.UNKNOWN;
 
-	private CableWithInternalSidedParts cable = new CableImpl();
+	protected CableWithInternalSidedParts cable = new CableImpl();
 
 	@SideOnly(Side.CLIENT)
 	private CableRenderer render;
@@ -208,6 +208,15 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	}
 
 	@Override
+	public void onNeighborChanged() {
+		if (tile() != null) {
+			if (!world().isRemote && cable.updateConnections()) {
+				sendDescUpdate();
+			}
+		}
+	}
+
+	@Override
 	public void onWorldJoin() {
 		cable.updateConnections();
 	}
@@ -255,7 +264,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 		return cable;
 	}
 
-	private class CableImpl extends CableWithInternalSidedParts {
+	protected class CableImpl extends CableWithInternalSidedParts {
 		@Override
 		public Set<INetworkNode> getConnectedNodes() {
 			Set<INetworkNode> nodes = new HashSet<INetworkNode>();
