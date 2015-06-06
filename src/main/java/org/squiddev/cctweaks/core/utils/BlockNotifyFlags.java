@@ -4,7 +4,7 @@ package org.squiddev.cctweaks.core.utils;
  * Provides constants for the types of block notifications possible in
  * World.setBlock()
  *
- * @author: bspkrs
+ * @author bspkrs
  */
 public class BlockNotifyFlags {
 

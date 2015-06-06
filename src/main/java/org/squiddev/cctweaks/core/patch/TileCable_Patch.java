@@ -52,6 +52,9 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	public DirectionalPeripheralModem getModem() {
 		if (modem == null) {
 			return modem = new DirectionalPeripheralModem() {
+				@MergeVisitor.Rewrite
+				protected boolean ANNOTATION;
+
 				@Override
 				public int getDirection() {
 					return TileCable_Patch.this.getDirection();
@@ -88,6 +91,9 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	public SingleModemCable getCable() {
 		if (cable == null) {
 			return cable = new SingleModemCable() {
+				@MergeVisitor.Rewrite
+				protected boolean ANNOTATION;
+
 				@Override
 				public DirectionalPeripheralModem getModem() {
 					return getModem();
