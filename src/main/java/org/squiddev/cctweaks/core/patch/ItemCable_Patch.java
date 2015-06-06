@@ -52,9 +52,6 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 
 		// We can always place in an air block or a cable block that doesn't have a modem already.
 		if (block.isAir(world, x, y, z) && nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)) {
-			// Fire a network invalidate event on placement as the block is air, so the event isn't fired
-			if (!world.isRemote) NetworkHelpers.fireNetworkInvalidate(world, x, y, z);
-
 			return true;
 		}
 		if (block == ComputerCraft.Blocks.cable) {
@@ -74,20 +71,9 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 		Vector3 hit = new Vector3(hitX, hitY, hitZ);
 		double d = getHitDepth(hit, side);
 
-		if (
-			(d < 1 && place(stack, player, world, pos, side, hit))
-				|| nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)
-				|| place(stack, player, world, pos.offset(side), side, hit)
-			) {
-
-			// We can't tell if nativePlace placed it in this block or the adjacent block
-			// so just invalidate everything
-			if (!world.isRemote) NetworkHelpers.fireNetworkInvalidateAdjacent(world, x, y, z);
-
-			return true;
-		}
-
-		return false;
+		return 	(d < 1 && place(stack, player, world, pos, side, hit))
+			|| nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)
+			|| place(stack, player, world, pos.offset(side), side, hit);
 	}
 
 	/**
