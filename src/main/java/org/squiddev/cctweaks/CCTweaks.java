@@ -1,10 +1,13 @@
 package org.squiddev.cctweaks;
 
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.creativetab.CreativeTabs;
 import org.squiddev.cctweaks.core.Config;
@@ -28,6 +31,7 @@ public class CCTweaks {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		Config.init(event.getSuggestedConfigurationFile());
+		FMLCommonHandler.instance().bus().register(new CCTweaksEventHandler());
 
 		Registry.preInit();
 	}
@@ -40,5 +44,14 @@ public class CCTweaks {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		Registry.postInit();
+	}
+
+	public static final class CCTweaksEventHandler {
+		@SubscribeEvent
+		public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
+			if (eventArgs.modID.equals(CCTweaks.ID)) {
+				Config.sync();
+			}
+		}
 	}
 }

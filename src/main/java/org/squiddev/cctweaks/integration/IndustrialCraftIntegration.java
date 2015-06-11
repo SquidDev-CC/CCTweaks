@@ -21,12 +21,12 @@ public class IndustrialCraftIntegration extends APIIntegration {
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {
 			@Override
 			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack) {
-				return Config.config.turtleEuRefuelEnable && stack.getItem() instanceof IElectricItem;
+				return Config.Turtle.euRefuelAmount > 0 && stack.getItem() instanceof IElectricItem;
 			}
 
 			@Override
 			public int refuel(ITurtleAccess turtle, ItemStack stack, int limit) {
-				int euAmount = Config.config.turtleEuRefuelAmount;
+				int euAmount = Config.Turtle.euRefuelAmount;
 
 				// Avoid over refueling
 				int maxRefuel = turtle.getFuelLimit() - turtle.getFuelLevel();

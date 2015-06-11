@@ -36,7 +36,12 @@ repositories {
 }
 
 configurations {
-	fatPackage
+	shade
+	compile.extendsFrom shade
+
+	packaged
+	compile.extendsFrom packaged
+
 	deployerJars
 }
 
@@ -52,17 +57,21 @@ dependencies {
 	compile "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
 	compile "openperipheral:OpenPeripheralCore-API:${project.op_version}"
 
-	fatPackage(group: 'org.squiddev', name: 'luaj.luajc', version: '1.0.1') {
+	shade('org.squiddev:luaj.luajc:1.0.1') {
 		// We provide a custom LuaJ source with ComputerCraft
 		exclude group: 'org.ow2.asm'
 		exclude group: 'org.luaj'
+	}
+	packaged('org.squiddev:ConfigGen:1.0-SNAPSHOT') {
+		exclude group: 'net.minecraftforge'
 	}
 
 	testCompile group: "junit", name: "junit", version: "4.+"
 
 	deployerJars "org.apache.maven.wagon:wagon-ftp:2.2"
 }
-sourceSets.main.compileClasspath += [configurations.fatPackage]
+/*sourceSets.main.compileClasspath += [configurations.fatPackage, configurations.packaged]
 
-idea.module.scopes.PROVIDED.plus += [configurations.fatPackage]
-eclipse.classpath.plusConfigurations += [configurations.fatPackage]
+idea.module.scopes.PROVIDED.plus += [configurations.fatPackage, configurations.packaged]
+eclipse.classpath.plusConfigurations += [configurations.fatPackage, configurations.packaged]
+*/

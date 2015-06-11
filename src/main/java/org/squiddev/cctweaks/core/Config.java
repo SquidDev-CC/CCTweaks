@@ -1,257 +1,152 @@
 package org.squiddev.cctweaks.core;
 
-import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.config.Configuration;
-import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
+import org.squiddev.configgen.DefaultBoolean;
+import org.squiddev.configgen.DefaultInt;
+import org.squiddev.configgen.OnSync;
+import org.squiddev.configgen.Range;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+@org.squiddev.configgen.Config(languagePrefix = "gui.config.cctweaks.")
 public final class Config {
-	public static final String LANGUAGE_ROOT = "config.cctweaks.";
-	private static final String MISC = "misc";
-	private static final String COMPUTER = "computer";
-	private static final String TURTLE = "turtle";
-	public static final String[] CATEGORIES = {TURTLE, COMPUTER, MISC};
-
 	public static Configuration configuration;
-	public static final ConfigData defaults = new ConfigData();
-	public static ConfigData config = new ConfigData();
-
-	/**
-	 * List of disabled turtle actions
-	 */
 	public static Set<String> turtleDisabledActions;
-
-	/**
-	 * Allowed global variables
-	 */
 	public static Set<String> globalWhitelist;
 
 	public static void init(File file) {
-		configuration = new Configuration(file);
-		configuration.load();
-
-		sync();
-
-		FMLCommonHandler.instance().bus().register(new Object() {
-			@SubscribeEvent
-			public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-				if (eventArgs.modID.equals(CCTweaks.ID)) {
-					Config.sync();
-				}
-			}
-		});
+		ConfigLoader.init(file);
 	}
 
 	public static void sync() {
-		ConfigData data = config = new ConfigData();
-		ConfigData defaults = Config.defaults;
+		ConfigLoader.sync();
+	}
 
-		// Turtle changes
-		data.turtleFluxRefuelEnable = configuration.getBoolean(
-			"Flux refuel",
-			TURTLE,
-			defaults.turtleFluxRefuelEnable,
-			"Enable refuel from Redstone Flux items"
-		);
-		data.turtleFluxRefuelAmount = configuration.getInt(
-			"Flux refuel amount",
-			TURTLE,
-			data.turtleFluxRefuelAmount,
-			1, Integer.MAX_VALUE,
-			"Amount of RF required for one refuel point"
-		);
-
-		data.turtleEuRefuelEnable = configuration.getBoolean(
-			"EU refuel",
-			TURTLE,
-			defaults.turtleEuRefuelEnable,
-			"Enable refuel from IC2 batteries"
-		);
-		data.turtleEuRefuelAmount = configuration.getInt(
-			"EU refuel amount",
-			TURTLE,
-			data.turtleEuRefuelAmount,
-			1, Integer.MAX_VALUE,
-			"Amount of Eu required for one refuel point"
-		);
-
-		data.turtleDisabledActions = configuration.getStringList(
-			"Disabled turtle actions",
-			TURTLE,
-			defaults.turtleDisabledActions,
-			"Disabled turtle actions:\n(compare, compareTo, craft, detect, dig,\ndrop, equip, inspect, move, place,\nrefuel, select, suck, tool, turn)"
-		);
-
-		data.turtleWirelessBridgeId = configuration.getInt(
-			"Wireless Bridge Id",
-			TURTLE,
-			defaults.turtleWirelessBridgeId,
-			-1, Integer.MAX_VALUE,
-			"The id for the network bridge upgrade. Set to -1 to disable"
-		);
-
-		// Computer changes
-		data.enableComputerUpgrades = configuration.getBoolean(
-			"Computer upgrade",
-			COMPUTER,
-			defaults.enableComputerUpgrades,
-			"Enable upgrading computers"
-		);
-
-		data.enableDebugWand = configuration.getBoolean(
-			"Debug wand",
-			COMPUTER,
-			defaults.enableDebugWand,
-			"Enable the debug wand"
-		);
-
-		data.globalWhitelist = configuration.getStringList(
-			"Whitelisted Globals",
-			COMPUTER,
-			defaults.globalWhitelist,
-			"Globals to whitelist (are not set to nil).\nThis is NOT recommended for servers, use at your own risk"
-		);
-
-		data.computerThreadTimeout = configuration.getInt(
-			"Computer timeout",
-			COMPUTER,
-			(int) defaults.computerThreadTimeout,
-			1, Integer.MAX_VALUE,
-			"Time in milliseconds before 'Too long without yielding' error\nYou cannot shutdown/reboot the computer during this time.\nUse "
-		);
-
-		data.luaJC = configuration.getBoolean(
-			"LuaJC",
-			COMPUTER,
-			defaults.luaJC,
-			"Compile Lua bytecode to Java bytecode"
-		);
-
-		data.luaJCVerify = configuration.getBoolean(
-			"Verify LuaJC",
-			COMPUTER,
-			defaults.luaJCVerify,
-			"Verify LuaJC sources on generation.\nThis will slow down compilation.\n" +
-				"If you have errors, please turn this and debug and\nsend it with the bug report."
-		);
-
-		// Is debugging
-		data.debug = configuration.getBoolean(
-			"debug",
-			MISC,
-			defaults.debug,
-			"Show debug messages"
-		);
-
-		// Is debugging
-		data.debugItems = configuration.getBoolean(
-			"debugItems",
-			MISC,
-			defaults.debugItems,
-			"Enable debug blocks/items - requires debug"
-		);
+	@OnSync
+	public static void onSync() {
+		configuration = ConfigLoader.getConfiguration();
 
 		// Handle generation of HashSets, etc...
 		Set<String> disabledActions = turtleDisabledActions = new HashSet<String>();
-		for (String action : data.turtleDisabledActions) {
+		for (String action : Turtle.disabledActions) {
 			disabledActions.add("dan200.computercraft.shared.turtle.core.turtle" + action.toLowerCase() + "command");
 		}
 
-		globalWhitelist = new HashSet<String>(Arrays.asList(data.globalWhitelist));
-
-		// Setup categories
-		configuration.setCategoryComment(COMPUTER, "Computer changes");
-		configuration.setCategoryRequiresMcRestart(COMPUTER, true);
-
-		configuration.setCategoryComment(TURTLE, "Turtle tweaks");
-		configuration.setCategoryRequiresMcRestart(TURTLE, true);
-
-		configuration.setCategoryComment(MISC, "The lonely config category");
-
-		for (String categoryName : CATEGORIES) {
-			configuration.setCategoryLanguageKey(categoryName, LANGUAGE_ROOT + categoryName);
-		}
-
-		configuration.save();
+		globalWhitelist = new HashSet<String>(Arrays.asList(Computer.globalWhitelist));
 	}
 
-	public static final class ConfigData {
+	public static final class Computer {
 		/**
-		 * Enable RF refueling
+		 * Enable upgrading computers
 		 */
-		public boolean turtleFluxRefuelEnable = true;
+		@DefaultBoolean(true)
+		public static boolean computerUpgradeEnabled;
 
 		/**
-		 * RF refuel amount
+		 * Enable crafting the computer upgrade
+		 *
+		 * Requires computerUpgradeEnabled
 		 */
-		public int turtleFluxRefuelAmount = 100;
+		@DefaultBoolean(true)
+		public static boolean computerUpgradeCrafting;
 
 		/**
-		 * Enable EU refueling
+		 * Enable using the debug wand
 		 */
-		public boolean turtleEuRefuelEnable = true;
+		@DefaultBoolean(true)
+		public static boolean debugWandEnabled;
 
 		/**
-		 * EU refuel amount
+		 * Globals to whitelist (are not set to nil).
+		 * This is NOT recommended for servers, use at your own risk
 		 */
-		public int turtleEuRefuelAmount = turtleFluxRefuelAmount / 4;
+		public static String[] globalWhitelist;
 
 		/**
-		 * Disabled turtle verbs
+		 * Time in milliseconds before 'Too long without yielding' errors.
+		 * You cannot shutdown/reboot the computer during this time.
+		 * Use carefully.
 		 */
-		public String[] turtleDisabledActions = new String[0];
+		@DefaultInt(5000)
+		@Range(min = 0)
+		public static int computerThreadTimeout;
 
 		/**
-		 * Id for {@link TurtleUpgradeWirelessBridge}
+		 * Compile Lua bytecode to Java bytecode
+		 */
+		@DefaultBoolean(false)
+		public static boolean luaJC;
+
+		/**
+		 * Verify LuaJC sources on generation.
+		 * This will slow down compilation.
+		 * If you have errors, please turn this and debug on and
+		 * send it with the bug report.
+		 */
+		@DefaultBoolean(false)
+		public static boolean luaJCVerify;
+	}
+
+	public static final class Turtle {
+		/**
+		 * Amount of RF required for one refuel point
+		 * Set to 0 to disable"
+		 */
+		@DefaultInt(100)
+		@Range(min = 0)
+		public static int fluxRefuelAmount;
+
+		/**
+		 * Amount of Eu required for one refuel point
+		 * Set to 0 to disable
+		 */
+		@DefaultInt(25)
+		@Range(min = 0)
+		public static int euRefuelAmount;
+
+		/**
+		 * Disabled turtle actions:
+		 * (compare, compareTo, craft, detect, dig,
+		 * drop, equip, inspect, move, place,
+		 * refuel, select, suck, tool, turn)
+		 */
+		public static String[] disabledActions;
+
+		/**
 		 * TODO: Register on the wiki: http://www.computercraft.info/wiki/Turtle_Upgrade_IDs
 		 */
-		public int turtleWirelessBridgeId = 331;
+		public static final int UPGRADE_START = 331;
 
 		/**
-		 * Enable computer upgrade
+		 * Enable the wireless bridge upgrade
 		 */
-		public boolean enableComputerUpgrades = true;
+		@DefaultBoolean(true)
+		public static boolean wirelessBridgeEnabled;
 
 		/**
-		 * Enable debug want
+		 * The id for the network bridge upgrade.
 		 */
-		public boolean enableDebugWand = false;
+		@DefaultInt(UPGRADE_START)
+		@Range(min = 1)
+		public static int wirelessBridgeId;
+	}
+
+	public static final class Testing {
+		/**
+		 * Show debug messages.
+		 * If you hit a bug, enable this, rerun and send the log
+		 */
+		@DefaultBoolean(false)
+		public static boolean debug;
 
 		/**
-		 * Global whitelist
+		 * Enable debug blocks/items.
+		 * Only use for testing.
 		 */
-		public String[] globalWhitelist = new String[0];
-
-		/**
-		 * Thread timeout for computers
-		 */
-		public long computerThreadTimeout = 5000L;
-
-		/**
-		 * Use LuaJC compiler
-		 */
-		public boolean luaJC = false;
-
-		/**
-		 * Verify classes on generation
-		 */
-		public boolean luaJCVerify = false;
-
-		/**
-		 * Print debug information
-		 */
-		public boolean debug = false;
-
-		/**
-		 * Enable the debug blocks/items
-		 */
-		public boolean debugItems = false;
+		@DefaultBoolean(false)
+		public static boolean debugItems;
 	}
 }

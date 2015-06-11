@@ -41,7 +41,7 @@ jar {
 	}
 
 	// Package all the org.squiddev dependencies into one file
-	from configurations.fatPackage
+	from configurations.shade
 		.findAll { it.getAbsolutePath().contains("org.squiddev") }
 		.collect { it.isDirectory() ? it : zipTree(it) }
 

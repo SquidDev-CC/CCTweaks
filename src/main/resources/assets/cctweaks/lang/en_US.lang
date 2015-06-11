@@ -17,6 +17,22 @@ chat.cctweaks.data.messages.Loaded=Settings loaded
 chat.cctweaks.data.messages.Stored=Settings stored
 chat.cctweaks.data.messages.Cleared=Settings cleared
 
-config.cctweaks.turtle=Turtle
-config.cctweaks.computer=Computer
-config.cctweaks.misc=Misc
+gui.config.cctweaks.Computer=Computer
+gui.config.cctweaks.Computer.computerUpgradeEnabled=Enable Computer Upgrade
+gui.config.cctweaks.Computer.computerUpgradeCrafting=Computer Upgrade Crafting
+gui.config.cctweaks.Computer.debugWand=Enable Debug Wand
+gui.config.cctweaks.Computer.globalWhitelist=Global Whitelist
+gui.config.cctweaks.Computer.computerThreadTimeout=Computer Thread Timeout
+gui.config.cctweaks.Computer.luaJC=LuaJC
+gui.config.cctweaks.Computer.luaJCVerify=Verify LuaJC
+
+gui.config.cctweaks.Turtle=Turtle
+gui.config.cctweaks.Turtle.fluxRefuelAmount=RF Refuel Amount
+gui.config.cctweaks.Turtle.euRefuelAmount=EU Refuel Amount
+gui.config.cctweaks.Turtle.disabledActions=Disabled actions
+gui.config.cctweaks.Turtle.wirelessBridgeEnabled=Wireless Bridge Enabled
+gui.config.cctweaks.Turtle.wirelessBridgeId=Wireless Bridge Id
+
+gui.config.cctweaks.Testing=Testing
+gui.config.cctweaks.Testing.debug=Debug logging
+gui.config.cctweaks.Testing.debugItems=Debug items

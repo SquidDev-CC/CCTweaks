@@ -19,7 +19,7 @@ public class PatchComputer implements Opcodes {
 	 */
 	public static byte[] patchLuaMachine(byte[] bytes) {
 		Set<String> whitelist = Config.globalWhitelist;
-		boolean luaJC = Config.config.luaJC;
+		boolean luaJC = Config.Computer.luaJC;
 
 		// Don't process if not needed
 		if (whitelist.size() == 0 && !luaJC) return bytes;
@@ -117,8 +117,8 @@ public class PatchComputer implements Opcodes {
 		Patch the Lua Thead with a new timeout length
 	 */
 	public static byte[] patchLuaThread(byte[] bytes) {
-		long timeout = Config.defaults.computerThreadTimeout;
-		long targetTimeout = Config.config.computerThreadTimeout;
+		long timeout = 5000L;
+		long targetTimeout = Config.Computer.computerThreadTimeout;
 
 		// If the timeouts are the same then continue
 		if (targetTimeout == timeout) return bytes;
