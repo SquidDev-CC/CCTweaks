@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -8,6 +9,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.creativetab.CreativeTabs;
 import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.Events;
 import org.squiddev.cctweaks.core.registry.Registry;
 
 @Mod(modid = CCTweaks.ID, name = CCTweaks.NAME, version = CCTweaks.VERSION, dependencies = CCTweaks.DEPENDENCIES, guiFactory = CCTweaks.GUI_FACTORY)
@@ -28,6 +30,7 @@ public class CCTweaks {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		Config.init(event.getSuggestedConfigurationFile());
+		FMLCommonHandler.instance().bus().register(new Events());
 
 		Registry.preInit();
 	}

@@ -1,10 +1,6 @@
 package org.squiddev.cctweaks.core;
 
-import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.config.Configuration;
-import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
 
 import java.io.File;
@@ -38,15 +34,6 @@ public final class Config {
 		configuration.load();
 
 		sync();
-
-		FMLCommonHandler.instance().bus().register(new Object() {
-			@SubscribeEvent
-			public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-				if (eventArgs.modID.equals(CCTweaks.ID)) {
-					Config.sync();
-				}
-			}
-		});
 	}
 
 	public static void sync() {
