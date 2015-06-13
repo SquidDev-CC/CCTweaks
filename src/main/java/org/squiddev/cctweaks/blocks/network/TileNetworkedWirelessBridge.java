@@ -4,7 +4,6 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
@@ -54,15 +53,16 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 	}
 
 	@Override
-	public void postRemove() {
-		binding.remove();
-		modem.destroy();
+	public void create() {
+		super.create();
+		binding.add();
 	}
 
 	@Override
-	public void setWorldObj(World world) {
-		super.setWorldObj(world);
-		binding.add();
+	public void destroy() {
+		super.destroy();
+		binding.remove();
+		modem.destroy();
 	}
 
 	@Override

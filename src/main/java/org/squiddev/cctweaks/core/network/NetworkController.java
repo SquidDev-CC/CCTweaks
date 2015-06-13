@@ -16,6 +16,11 @@ public class NetworkController implements INetworkController {
 	public Set<SingleTypeUnorderedPair<INetworkNode>> networkConnections;
 	public Map<String, IPeripheral> peripheralsOnNetwork = new HashMap<String, IPeripheral>();
 
+	public NetworkController(INetworkNode node) {
+		this(new HashSet<INetworkNode>(), new HashSet<SingleTypeUnorderedPair<INetworkNode>>(), new HashMap<String, IPeripheral>());
+		assimilateNode(node);
+	}
+
 	public NetworkController(Set<INetworkNode> network, Set<SingleTypeUnorderedPair<INetworkNode>> networkConnections, Map<String, IPeripheral> peripheralsOnNetwork) {
 		if (network == null) {
 			throw new NullPointerException("Severed network can't be null");
@@ -71,6 +76,7 @@ public class NetworkController implements INetworkController {
 
 	@Override
 	public void formConnection(INetworkNode existingNode, INetworkNode newNode) {
+		if (existingNode == newNode) throw new IllegalArgumentException("Cannot connect a node to itself");
 		if (!network.contains(existingNode)) {
 			throw new IllegalArgumentException("Existing node must be on the network");
 		}
@@ -123,7 +129,7 @@ public class NetworkController implements INetworkController {
 
 		List<NetworkController> newNetworks = new ArrayList<NetworkController>(connectingNodes.size());
 
-	starting_nodes:
+		starting_nodes:
 		for (INetworkNode startingNode : connectingNodes) {
 			for (NetworkController controller : newNetworks) {
 				if (controller.network.contains(startingNode)) {

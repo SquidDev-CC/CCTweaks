@@ -49,23 +49,24 @@ public abstract class BasicCable implements IWorldNetworkNode {
 
 				IWorldNetworkNode node = NetworkAPI.registry().getNode(getPosition().getWorld(), x, y, z);
 				if (node != null && node.canConnect(dir.getOpposite())) {
-					connMap |=  1 << dir.ordinal();
+					connMap |= 1 << dir.ordinal();
 				}
 			}
 		}
 	}
 
 	// Public ops
-
 	public boolean updateConnections() {
 		Set<INetworkNode> newNodes = getConnectedNodes();
 
-		for (INetworkNode newNode : Sets.difference(newNodes, attachedNodes)) {
-			networkController.formConnection(this, newNode);
-		}
+		if (networkController != null) {
+			for (INetworkNode newNode : Sets.difference(newNodes, attachedNodes)) {
+				networkController.formConnection(this, newNode);
+			}
 
-		for (INetworkNode removedNode : Sets.difference(attachedNodes, newNodes)) {
-			networkController.breakConnection(new SingleTypeUnorderedPair<INetworkNode>(this, removedNode));
+			for (INetworkNode removedNode : Sets.difference(attachedNodes, newNodes)) {
+				networkController.breakConnection(new SingleTypeUnorderedPair<INetworkNode>(this, removedNode));
+			}
 		}
 
 		updateConnectionMap();

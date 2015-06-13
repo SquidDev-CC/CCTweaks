@@ -34,20 +34,27 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	}
 
 	/**
-	 * Called before the block is removed or on chunk unload
+	 * Called when the TileEntity is validated
 	 */
-	public void preRemove() {
+	public void create() {
 	}
 
 	/**
-	 * Called after being removed
+	 * Called when the TileEntity is destroyed
 	 */
-	public void postRemove() {
+	public void destroy() {
 	}
 
 	@Override
 	public void onChunkUnload() {
-		preRemove();
+		super.onChunkUnload();
+		destroy();
+	}
+
+	@Override
+	public void invalidate() {
+		super.invalidate();
+		destroy();
 	}
 
 	/**

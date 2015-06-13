@@ -43,6 +43,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	protected DirectionalPeripheralModem modem;
 	protected SingleModemCable cable;
+	protected NBTTagCompound tagCache;
 
 	/**
 	 * The patcher doesn't enable constructors (yet) so we lazy load the modem
@@ -174,15 +175,28 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
+		if (worldObj == null) {
+			tagCache = tag;
+		} else {
+			readLazyNBT(tag);
+		}
+	}
+
+	protected void readLazyNBT(NBTTagCompound tag) {
 		getModem().setState(tag.getBoolean("peripheralAccess") ? BasicModem.MODEM_PERIPHERAL : 0);
 		modem.id = tag.getInteger("peripheralID");
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbttagcompound) {
-		super.writeToNBT(nbttagcompound);
-		nbttagcompound.setBoolean("peripheralAccess", modem.isEnabled());
-		nbttagcompound.setInteger("peripheralID", modem.id);
+	public void writeToNBT(NBTTagCompound tag) {
+		super.writeToNBT(tag);
+		if (tagCache != null) {
+			tag.setBoolean("peripheralAccess", tag.getBoolean("peripheralAccess"));
+			tag.setInteger("peripheralID", tag.getInteger("peripheralID"));
+		} else {
+			tag.setBoolean("peripheralAccess", modem.isEnabled());
+			tag.setInteger("peripheralID", modem.id);
+		}
 	}
 
 	@Override
