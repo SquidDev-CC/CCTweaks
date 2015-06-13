@@ -3,14 +3,14 @@ package org.squiddev.cctweaks.integration.openperipheral;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.adapter.IPeripheralAdapterRegistry;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
-import org.squiddev.cctweaks.integration.APIIntegration;
+import org.squiddev.cctweaks.integration.ModIntegration;
 
 /**
  * OpenPeripheral integration
  */
-public class OpenPeripheralIntegration extends APIIntegration {
+public class OpenPeripheralIntegration extends ModIntegration {
 	public OpenPeripheralIntegration() {
-		super("OpenPeripheralApi");
+		super("OpenPeripheral");
 	}
 
 	@Override

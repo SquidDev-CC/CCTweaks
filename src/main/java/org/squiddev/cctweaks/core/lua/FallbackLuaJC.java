@@ -35,8 +35,8 @@ public class FallbackLuaJC extends LuaJC {
 			return loader.load(p, className, name);
 		} catch (RuntimeException e) {
 			DebugLogger.error(
-				"Could not compile " + name, ". Falling back to normal Lua.\n"
-					+ "Please report this at https://github.com/SquidDev/luaj.luajc/issues",
+				"Could not compile " + name + ". Falling back to normal Lua.\n"
+					+ "Please report this at https://github.com/SquidDev/luaj.luajc/issues along with the following exception",
 				e
 			);
 			return new LuaClosure(p, env);

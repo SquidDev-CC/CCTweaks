@@ -52,7 +52,7 @@ dependencies {
 	compile "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
 	compile "openperipheral:OpenPeripheralCore-API:${project.op_version}"
 
-	fatPackage(group: 'org.squiddev', name: 'luaj.luajc', version: '1.+') {
+	fatPackage(group: 'org.squiddev', name: 'luaj.luajc', version: '1.0.1') {
 		// We provide a custom LuaJ source with ComputerCraft
 		exclude group: 'org.ow2.asm'
 		exclude group: 'org.luaj'

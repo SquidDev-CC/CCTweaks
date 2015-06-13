@@ -21,7 +21,7 @@ public final class NetworkRegistry implements INetworkRegistry {
 
 	@Override
 	public boolean isNode(IBlockAccess world, int x, int y, int z) {
-		return y >= 0 && y < world.getHeight() && isNode(world.getTileEntity(x, y, z));
+		return y >= 0 && isNode(world.getTileEntity(x, y, z));
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public final class NetworkRegistry implements INetworkRegistry {
 
 	@Override
 	public IWorldNetworkNode getNode(IBlockAccess world, int x, int y, int z) {
-		return y >= 0 && y < world.getHeight() ? getNode(world.getTileEntity(x, y, z)) : null;
+		return y >= 0 ? getNode(world.getTileEntity(x, y, z)) : null;
 	}
 
 	@Override
