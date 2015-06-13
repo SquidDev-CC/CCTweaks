@@ -40,7 +40,7 @@ public final class SearchLoc extends WorldPosition implements ISearchLoc {
 		INetworkNode node = this.node;
 		if (node != null) return node;
 
-		if (y >= 0 && y < world.getHeight()) {
+		if (y >= 0) {
 			node = NetworkAPI.registry().getNode(world, x, y, z);
 			if (node != null) this.node = node;
 		}
