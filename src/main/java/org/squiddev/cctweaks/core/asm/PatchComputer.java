@@ -5,10 +5,9 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.asm.chickenlib.ASMMatcher;
-import org.squiddev.cctweaks.core.asm.chickenlib.InsnListSection;
-import org.squiddev.cctweaks.core.asm.patch.IPatcher;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.patcher.InsnListSection;
+import org.squiddev.patcher.search.Searcher;
 
 import java.util.List;
 import java.util.Set;
@@ -46,16 +45,16 @@ public class PatchComputer implements Opcodes {
 					jsePlatform.add(new FieldInsnNode(PUTFIELD, "dan200/computercraft/core/lua/LuaJLuaMachine", "m_globals", "Lorg/luaj/vm2/LuaValue;"));
 
 					try {
-						InsnListSection found = ASMMatcher.findOnce(method.instructions, new InsnListSection(jsePlatform), true);
+						InsnListSection found = Searcher.findOnce(method.instructions, new InsnListSection(jsePlatform));
 
 						InsnList insert = new InsnList();
 						insert.add(new MethodInsnNode(INVOKESTATIC, "org/squiddev/cctweaks/core/lua/FallbackLuaJC", "install", "()V", false));
 						found.insert(insert);
 
 						changed = true;
-						DebugLogger.debug(IPatcher.MARKER, "Injected LuaJC.install() call into LuaJLuaMachine.<init>");
+						DebugLogger.debug("Injected LuaJC.install() call into LuaJLuaMachine.<init>");
 					} catch (Exception e) {
-						DebugLogger.error(IPatcher.MARKER, "Cannot inject LuaJC.install() into LuaJLuaMachine.<init>", e);
+						DebugLogger.error("Cannot inject LuaJC.install() into LuaJLuaMachine.<init>", e);
 					}
 				}
 
@@ -77,7 +76,7 @@ public class PatchComputer implements Opcodes {
 					removeBlacklist.add(new MethodInsnNode(INVOKEVIRTUAL, "org/luaj/vm2/LuaValue", "set", "(Ljava/lang/String;Lorg/luaj/vm2/LuaValue;)V", false));
 
 					try {
-						List<InsnListSection> found = ASMMatcher.find(method.instructions, new InsnListSection(removeBlacklist), true);
+						List<InsnListSection> found = Searcher.find(method.instructions, new InsnListSection(removeBlacklist));
 
 						int offset = 0;
 						int offsetChange = removeBlacklist.size();
@@ -96,9 +95,9 @@ public class PatchComputer implements Opcodes {
 							}
 						}
 
-						DebugLogger.debug(IPatcher.MARKER, "Injected whitelisted globals into LuaJLuaMachine.<init>");
+						DebugLogger.debug("Injected whitelisted globals into LuaJLuaMachine.<init>");
 					} catch (Exception e) {
-						DebugLogger.error(IPatcher.MARKER, "Cannot inject whitelisted globals into LuaJLuaMachine.<init>", e);
+						DebugLogger.error("Cannot inject whitelisted globals into LuaJLuaMachine.<init>", e);
 					}
 				}
 			}
@@ -136,12 +135,12 @@ public class PatchComputer implements Opcodes {
 				finding.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Thread", "join", "(J)V", false));
 
 				try {
-					InsnListSection found = ASMMatcher.findOnce(method.instructions, new InsnListSection(finding), true);
+					InsnListSection found = Searcher.findOnce(method.instructions, new InsnListSection(finding));
 					((LdcInsnNode) found.get(1)).cst = targetTimeout;
 
-					DebugLogger.debug(IPatcher.MARKER, "Inject timeout into ComputerThread.Run");
+					DebugLogger.debug("Inject timeout into ComputerThread.Run");
 				} catch (Exception e) {
-					DebugLogger.error(IPatcher.MARKER, "Cannot inject timeout into ComputerThread.Run", e);
+					DebugLogger.error("Cannot inject timeout into ComputerThread.Run", e);
 				}
 			}
 		}

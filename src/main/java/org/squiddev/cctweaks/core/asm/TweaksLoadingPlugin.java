@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 
-@IFMLLoadingPlugin.TransformerExclusions({"org.squiddev.cctweaks.core.asm.", "org.squiddev.cctweaks.core.Config"})
+@IFMLLoadingPlugin.TransformerExclusions({"org.squiddev.cctweaks.core.asm.", "org.squiddev.cctweaks.core.Config", "org.squiddev.patcher"})
 @IFMLLoadingPlugin.MCVersion("${mc_version}")
 public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
 	public static File minecraftDir;

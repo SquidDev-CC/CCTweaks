@@ -1,15 +1,14 @@
 package org.squiddev.cctweaks.core.asm;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralEnvironments;
-import org.squiddev.cctweaks.core.asm.chickenlib.ASMMatcher;
-import org.squiddev.cctweaks.core.asm.chickenlib.InsnListSection;
-import org.squiddev.cctweaks.core.asm.patch.IPatcher;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.patcher.InsnListSection;
+import org.squiddev.patcher.search.Searcher;
+import org.squiddev.patcher.transformer.IPatcher;
 
+import static org.objectweb.asm.Opcodes.ASM5;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
 /**
@@ -27,14 +26,16 @@ public class PatchOpenModule implements IPatcher {
 	}
 
 	@Override
-	public byte[] patch(String className, byte[] bytes) {
-		try {
-			ClassNode classNode = new ClassNode();
-			new ClassReader(bytes).accept(classNode, ClassReader.EXPAND_FRAMES);
+	public ClassVisitor patch(String className, final ClassVisitor delegate) throws Exception {
+		final ClassNode classNode = new ClassNode();
+		return new ClassVisitor(ASM5, classNode) {
+			@Override
+			public void visitEnd() {
+				super.visitEnd();
 
-			boolean changed = false;
-			for (MethodNode method : classNode.methods) {
-				if (method.name.equals("<clinit>")) {
+				boolean changed = false;
+				for (MethodNode method : classNode.methods) {
+					if (method.name.equals("<clinit>")) {
 					/*
 						LDC "computer"
 					    LDC Ldan200/computercraft/api/peripheral/IComputerAccess;.class
@@ -42,46 +43,39 @@ public class PatchOpenModule implements IPatcher {
 					        (Ljava/lang/String;Ljava/lang/Class;)Lopenperipheral/adapter/composed/MethodSelector;
 					 */
 
-					InsnList addComputer = new InsnList();
-					addComputer.add(new LdcInsnNode("computer"));
-					addComputer.add(new LdcInsnNode(Type.getType("Ldan200/computercraft/api/peripheral/IComputerAccess;")));
-					addComputer.add(new MethodInsnNode(INVOKEVIRTUAL,
-						"openperipheral/adapter/composed/MethodSelector",
-						"addProvidedEnv",
-						"(Ljava/lang/String;Ljava/lang/Class;)Lopenperipheral/adapter/composed/MethodSelector;",
-						false
-					));
+						InsnList addComputer = new InsnList();
+						addComputer.add(new LdcInsnNode("computer"));
+						addComputer.add(new LdcInsnNode(Type.getType("Ldan200/computercraft/api/peripheral/IComputerAccess;")));
+						addComputer.add(new MethodInsnNode(INVOKEVIRTUAL,
+							"openperipheral/adapter/composed/MethodSelector",
+							"addProvidedEnv",
+							"(Ljava/lang/String;Ljava/lang/Class;)Lopenperipheral/adapter/composed/MethodSelector;",
+							false
+						));
 
-					InsnListSection found = ASMMatcher.findOnce(method.instructions, new InsnListSection(addComputer), true);
+						InsnListSection found = Searcher.findOnce(method.instructions, new InsnListSection(addComputer));
 
-					// Add the same as before but with INetworkAccess instead
-					InsnList insert = new InsnList();
-					insert.add(new LdcInsnNode(IPeripheralEnvironments.ARG_NETWORK));
-					insert.add(new LdcInsnNode(Type.getType("Lorg/squiddev/cctweaks/api/network/INetworkAccess;")));
-					insert.add(new MethodInsnNode(INVOKEVIRTUAL,
-						"openperipheral/adapter/composed/MethodSelector",
-						"addProvidedEnv",
-						"(Ljava/lang/String;Ljava/lang/Class;)Lopenperipheral/adapter/composed/MethodSelector;",
-						false
-					));
+						// Add the same as before but with INetworkAccess instead
+						InsnList insert = new InsnList();
+						insert.add(new LdcInsnNode(IPeripheralEnvironments.ARG_NETWORK));
+						insert.add(new LdcInsnNode(Type.getType("Lorg/squiddev/cctweaks/api/network/INetworkAccess;")));
+						insert.add(new MethodInsnNode(INVOKEVIRTUAL,
+							"openperipheral/adapter/composed/MethodSelector",
+							"addProvidedEnv",
+							"(Ljava/lang/String;Ljava/lang/Class;)Lopenperipheral/adapter/composed/MethodSelector;",
+							false
+						));
 
-					found.insert(insert);
+						found.insert(insert);
 
-					changed = true;
-					break;
+						changed = true;
+						break;
+					}
 				}
+
+				if (!changed) throw new RuntimeException("Cannot find <clinit> method");
+				classNode.accept(delegate);
 			}
-
-			if (!changed) throw new RuntimeException("Cannot find <clinit> method");
-
-			DebugLogger.debug(MARKER, "Injected custom " + className);
-
-			ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-			classNode.accept(writer);
-			return writer.toByteArray();
-		} catch (Exception e) {
-			DebugLogger.error(MARKER, "Cannot replace " + className + ", falling back to default", e);
-			return bytes;
-		}
+		};
 	}
 }

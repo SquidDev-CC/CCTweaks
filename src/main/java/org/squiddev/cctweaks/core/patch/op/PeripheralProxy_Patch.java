@@ -5,7 +5,7 @@ import org.squiddev.cctweaks.api.network.INetworkAccess;
 import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralProxy;
-import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
+import org.squiddev.patcher.visitors.MergeVisitor;
 
 /**
  * PeripheralProxy rewrite with INetworkedPeripheral support
