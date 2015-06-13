@@ -4,6 +4,7 @@ import cpw.mods.fml.common.Loader;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
+import org.squiddev.patcher.Logger;
 import org.squiddev.patcher.transformer.*;
 
 public class ASMTransformer implements IClassTransformer {
@@ -22,7 +23,6 @@ public class ASMTransformer implements IClassTransformer {
 
 	public ASMTransformer() {
 		add(new Object[]{
-
 			new ClassReplaceSource("org.luaj.vm2.lib.DebugLib"),
 			new ClassReplaceSource("org.luaj.vm2.lib.StringLib"),
 			new ClassReplacer(
@@ -64,7 +64,26 @@ public class ASMTransformer implements IClassTransformer {
 			),
 			new PatchOpenPeripheralAdapter(),
 			new PatchOpenModule(),
+			new DisableTurtleCommand(),
 		});
+
+		// Patch the logger instance
+		Logger.instance = new Logger() {
+			@Override
+			public void doDebug(String message) {
+				DebugLogger.debug(message);
+			}
+
+			@Override
+			public void doError(String message, Throwable e) {
+				DebugLogger.error(message, e);
+			}
+
+			@Override
+			public void doWarn(String message) {
+				DebugLogger.warn(message);
+			}
+		};
 	}
 
 	@Override
@@ -73,8 +92,6 @@ public class ASMTransformer implements IClassTransformer {
 			bytes = PatchComputer.patchLuaMachine(bytes);
 		} else if (className.equals("dan200.computercraft.core.computer.ComputerThread$1")) {
 			bytes = PatchComputer.patchLuaThread(bytes);
-		} else if (className.startsWith("dan200.computercraft.shared.turtle.core.Turtle") && className.endsWith("Command")) {
-			bytes = PatchTurtle.disableTurtleCommand(className, bytes);
 		}
 
 		try {

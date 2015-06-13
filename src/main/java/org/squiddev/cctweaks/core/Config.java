@@ -32,7 +32,7 @@ public final class Config {
 		// Handle generation of HashSets, etc...
 		Set<String> disabledActions = turtleDisabledActions = new HashSet<String>();
 		for (String action : Turtle.disabledActions) {
-			disabledActions.add("dan200.computercraft.shared.turtle.core.turtle" + action.toLowerCase() + "command");
+			disabledActions.add(action.toLowerCase());
 		}
 
 		globalWhitelist = new HashSet<String>(Arrays.asList(Computer.globalWhitelist));

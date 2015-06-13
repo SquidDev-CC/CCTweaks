@@ -4,6 +4,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralEnvironments;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.patcher.transformer.ClassMerger;
@@ -38,6 +39,7 @@ public class PatchOpenPeripheralAdapter implements IPatcher {
 				CLASS_NAME,
 				"org.squiddev.cctweaks.core.patch.op.AdapterPeripheral_Patch"
 			).patch(className, delegate),
+			new VarInsnNode(ALOAD, 0),
 			new MethodInsnNode(
 				INVOKEINTERFACE,
 				"openperipheral/adapter/IMethodCall",
@@ -46,8 +48,6 @@ public class PatchOpenPeripheralAdapter implements IPatcher {
 				true
 			)
 		) {
-			boolean success = false;
-
 			@Override
 			public void handle(InsnList nodes, MethodVisitor visitor) {
 				visitor.visitLdcInsn(IPeripheralEnvironments.ARG_NETWORK);
@@ -62,17 +62,7 @@ public class PatchOpenPeripheralAdapter implements IPatcher {
 				);
 
 				DebugLogger.debug("Added additional environments into " + CLASS_NAME);
-				success = true;
 			}
-
-			@Override
-			public void visitEnd() {
-				super.visitEnd();
-
-				if (!success) {
-					DebugLogger.error("Cannot inject additional environments into " + CLASS_NAME);
-				}
-			}
-		};
+		}.once().onMethod("call").mustFind();
 	}
 }

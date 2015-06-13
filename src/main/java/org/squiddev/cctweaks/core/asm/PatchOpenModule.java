@@ -1,14 +1,15 @@
 package org.squiddev.cctweaks.core.asm;
 
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralEnvironments;
-import org.squiddev.patcher.InsnListSection;
-import org.squiddev.patcher.search.Searcher;
 import org.squiddev.patcher.transformer.IPatcher;
+import org.squiddev.patcher.visitors.FindingVisitor;
 
-import static org.objectweb.asm.Opcodes.ASM5;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
 /**
@@ -27,55 +28,28 @@ public class PatchOpenModule implements IPatcher {
 
 	@Override
 	public ClassVisitor patch(String className, final ClassVisitor delegate) throws Exception {
-		final ClassNode classNode = new ClassNode();
-		return new ClassVisitor(ASM5, classNode) {
+		return new FindingVisitor(
+			delegate,
+			new LdcInsnNode("computer"),
+			new LdcInsnNode(Type.getType("Ldan200/computercraft/api/peripheral/IComputerAccess;")),
+			new MethodInsnNode(INVOKEVIRTUAL,
+				"openperipheral/adapter/composed/MethodSelector",
+				"addProvidedEnv",
+				"(Ljava/lang/String;Ljava/lang/Class;)Lopenperipheral/adapter/composed/MethodSelector;",
+				false
+			)
+		) {
 			@Override
-			public void visitEnd() {
-				super.visitEnd();
-
-				boolean changed = false;
-				for (MethodNode method : classNode.methods) {
-					if (method.name.equals("<clinit>")) {
-					/*
-						LDC "computer"
-					    LDC Ldan200/computercraft/api/peripheral/IComputerAccess;.class
-					    INVOKEVIRTUAL openperipheral/adapter/composed/MethodSelector.addProvidedEnv
-					        (Ljava/lang/String;Ljava/lang/Class;)Lopenperipheral/adapter/composed/MethodSelector;
-					 */
-
-						InsnList addComputer = new InsnList();
-						addComputer.add(new LdcInsnNode("computer"));
-						addComputer.add(new LdcInsnNode(Type.getType("Ldan200/computercraft/api/peripheral/IComputerAccess;")));
-						addComputer.add(new MethodInsnNode(INVOKEVIRTUAL,
-							"openperipheral/adapter/composed/MethodSelector",
-							"addProvidedEnv",
-							"(Ljava/lang/String;Ljava/lang/Class;)Lopenperipheral/adapter/composed/MethodSelector;",
-							false
-						));
-
-						InsnListSection found = Searcher.findOnce(method.instructions, new InsnListSection(addComputer));
-
-						// Add the same as before but with INetworkAccess instead
-						InsnList insert = new InsnList();
-						insert.add(new LdcInsnNode(IPeripheralEnvironments.ARG_NETWORK));
-						insert.add(new LdcInsnNode(Type.getType("Lorg/squiddev/cctweaks/api/network/INetworkAccess;")));
-						insert.add(new MethodInsnNode(INVOKEVIRTUAL,
-							"openperipheral/adapter/composed/MethodSelector",
-							"addProvidedEnv",
-							"(Ljava/lang/String;Ljava/lang/Class;)Lopenperipheral/adapter/composed/MethodSelector;",
-							false
-						));
-
-						found.insert(insert);
-
-						changed = true;
-						break;
-					}
-				}
-
-				if (!changed) throw new RuntimeException("Cannot find <clinit> method");
-				classNode.accept(delegate);
+			public void handle(InsnList nodes, MethodVisitor visitor) {
+				visitor.visitLdcInsn(IPeripheralEnvironments.ARG_NETWORK);
+				visitor.visitLdcInsn(Type.getType("Lorg/squiddev/cctweaks/api/network/INetworkAccess;"));
+				visitor.visitMethodInsn(INVOKEVIRTUAL,
+					"openperipheral/adapter/composed/MethodSelector",
+					"addProvidedEnv",
+					"(Ljava/lang/String;Ljava/lang/Class;)Lopenperipheral/adapter/composed/MethodSelector;",
+					false
+				);
 			}
-		};
+		}.onMethod("<clinit>").once().mustFind();
 	}
 }
