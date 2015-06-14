@@ -17,6 +17,31 @@ chat.cctweaks.data.messages.Loaded=Settings loaded
 chat.cctweaks.data.messages.Stored=Settings stored
 chat.cctweaks.data.messages.Cleared=Settings cleared
 
-config.cctweaks.turtle=Turtle
-config.cctweaks.computer=Computer
-config.cctweaks.misc=Misc
+gui.config.cctweaks.computer=Computer
+gui.config.cctweaks.computer.computerUpgradeEnabled=Computer Upgrade Enabled
+gui.config.cctweaks.computer.computerUpgradeCrafting=Computer Upgrade Crafting
+gui.config.cctweaks.computer.debugWandEnabled=Debug Wand Enabled
+gui.config.cctweaks.computer.globalWhitelist=Global Whitelist
+gui.config.cctweaks.computer.computerThreadTimeout=Computer Thread Timeout
+gui.config.cctweaks.computer.luaJC=LuaJC
+gui.config.cctweaks.computer.luaJCVerify=Verify LuaJC
+
+gui.config.cctweaks.turtle=Turtle
+gui.config.cctweaks.turtle.fluxRefuelAmount=RF Refuel Amount
+gui.config.cctweaks.turtle.euRefuelAmount=EU Refuel Amount
+gui.config.cctweaks.turtle.disabledActions=Disabled actions
+
+gui.config.cctweaks.network=Network
+gui.config.cctweaks.network.wirelessBridgeEnabled=Wireless Bridge Enabled
+gui.config.cctweaks.network.wirelessBridgeCrafting=Wireless Bridge Crafting
+gui.config.cctweaks.network.wirelessBridgeTurtleEnabled=Wireless Bridge Turtle Enabled
+gui.config.cctweaks.network.wirelessBridgeTurtleId=Wireless Bridge Turtle Upgrade Id
+gui.config.cctweaks.network.fullBlockModemCrafting=Modem Block Crafting
+
+gui.config.cctweaks.integration=Integration
+gui.config.cctweaks.integration.openPeripheralInventories=OpenPeripheral Inventories
+gui.config.cctweaks.integration.cbMultipart=ChickenBones Multipart
+
+gui.config.cctweaks.testing=Testing
+gui.config.cctweaks.testing.debug=Debug logging
+gui.config.cctweaks.testing.debugItems=Debug items

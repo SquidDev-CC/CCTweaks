@@ -15,8 +15,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
-import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
+import org.squiddev.patcher.visitors.MergeVisitor;
 
 import java.util.*;
 

@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.core.network.bridge;
 
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.ISearchLoc;
+import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.network.visitor.SafeNetworkVisitorIterable;
 
 import java.util.*;
@@ -14,13 +15,13 @@ public final class NetworkBindings {
 	private static final Map<UUID, Collection<IWorldPosition>> networks = new HashMap<UUID, Collection<IWorldPosition>>();
 
 	public static Iterable<IWorldPosition> getPositions(UUID id) {
-		if (id == null) return null;
+		if (id == null || !Config.Network.wirelessBridgeEnabled) return null;
 
 		return networks.get(id);
 	}
 
 	public static void addPosition(UUID id, IWorldPosition position) {
-		if (id == null) return;
+		if (id == null || !Config.Network.wirelessBridgeEnabled) return;
 
 		Collection<IWorldPosition> positions = networks.get(id);
 		if (positions == null) {

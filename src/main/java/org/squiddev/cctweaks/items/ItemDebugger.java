@@ -12,6 +12,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.DebugLib;
@@ -33,7 +34,12 @@ public class ItemDebugger extends ItemComputerAction {
 	}
 
 	@Override
-	protected boolean upgradeComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side) {
+	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+		return Config.Computer.debugWandEnabled && super.onItemUseFirst(stack, player, world, x, y, z, side, hitX, hitY, hitZ);
+	}
+
+	@Override
+	protected boolean useComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side) {
 		ServerComputer serverComputer = computerTile.getServerComputer();
 		if (serverComputer == null) return false;
 
@@ -64,7 +70,7 @@ public class ItemDebugger extends ItemComputerAction {
 	}
 
 	@Override
-	protected boolean itemUse(ItemStack stack, EntityPlayer player, TileEntity tile, int side) {
+	protected boolean useGeneric(ItemStack stack, EntityPlayer player, TileEntity tile, int side) {
 		Set<String> locals = new HashSet<String>();
 		Set<String> remotes = new HashSet<String>();
 		IPeripheral peripheral;
@@ -101,11 +107,6 @@ public class ItemDebugger extends ItemComputerAction {
 		}
 
 		return false;
-	}
-
-	@Override
-	public boolean canLoad() {
-		return Config.config.enableDebugWand;
 	}
 
 	public static IChatComponent headerChat(String header, String message) {

@@ -16,10 +16,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.integration.multipart.network.PartCable;
 import org.squiddev.cctweaks.integration.multipart.network.PartModem;
+import org.squiddev.patcher.visitors.MergeVisitor;
 
 /**
  * Patch class for adding cables into multipart blocks

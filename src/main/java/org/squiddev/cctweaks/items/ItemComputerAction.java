@@ -28,12 +28,12 @@ public abstract class ItemComputerAction extends ItemBase {
 		if (tile instanceof TileComputerBase) {
 			// Allow custom Turtle Actions
 			if (tile instanceof TileTurtle) {
-				result = upgradeTurtle(stack, player, (TileTurtle) tile, side);
+				result = useTurtle(stack, player, (TileTurtle) tile, side);
 			} else {
-				result = upgradeComputer(stack, player, (TileComputerBase) tile, side);
+				result = useComputer(stack, player, (TileComputerBase) tile, side);
 			}
 		} else {
-			result = itemUse(stack, player, tile, side);
+			result = useGeneric(stack, player, tile, side);
 		}
 
 		if (result) {
@@ -45,16 +45,16 @@ public abstract class ItemComputerAction extends ItemBase {
 		return result;
 	}
 
-	protected abstract boolean upgradeComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side);
+	protected abstract boolean useComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side);
 
-	protected boolean upgradeTurtle(ItemStack stack, EntityPlayer player, TileTurtle computerTile, int side) {
-		return upgradeComputer(stack, player, computerTile, side);
+	protected boolean useTurtle(ItemStack stack, EntityPlayer player, TileTurtle computerTile, int side) {
+		return useComputer(stack, player, computerTile, side);
 	}
 
 	/**
 	 * Custom action on other tile types
 	 */
-	protected boolean itemUse(ItemStack stack, EntityPlayer player, TileEntity tile, int side) {
+	protected boolean useGeneric(ItemStack stack, EntityPlayer player, TileEntity tile, int side) {
 		return false;
 	}
 }

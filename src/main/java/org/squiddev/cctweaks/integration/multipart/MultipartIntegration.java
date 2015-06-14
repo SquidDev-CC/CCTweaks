@@ -16,6 +16,7 @@ import org.squiddev.cctweaks.api.network.INetworkNodeHost;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
+import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.utils.Helpers;
@@ -34,6 +35,11 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 	}
 
 	@Override
+	public boolean canLoad() {
+		return Config.Integration.cbMultipart && super.canLoad();
+	}
+
+	@Override
 	public void preInit() {
 		new RegisterBlockPart().init();
 		itemPart = new ItemPart();
@@ -44,7 +50,9 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 	public void init() {
 		itemPart.init();
 
-		Helpers.twoWayCrafting(new ItemStack(Registry.blockNetworked), new ItemStack(itemPart));
+		if (Config.Network.wirelessBridgeCrafting) {
+			Helpers.twoWayCrafting(new ItemStack(Registry.blockNetworked), new ItemStack(itemPart));
+		}
 
 		NetworkAPI.registry().addNodeProvider(new INetworkNodeProvider() {
 			@Override

@@ -9,7 +9,7 @@ import org.squiddev.cctweaks.core.Config;
 
 /**
  * Facade to the basic logger, which also forces debug calls
- * if {@link Config.ConfigData#debug} is enabled
+ * if {@link org.squiddev.cctweaks.core.Config.Testing#debug} is enabled
  */
 public class DebugLogger {
 	private static final Logger logger = LogManager.getLogger(CCTweaks.ID);
@@ -23,37 +23,37 @@ public class DebugLogger {
 	}
 
 	public static void debug(Marker marker, String message) {
-		if (Config.config.debug) {
+		if (Config.Testing.debug) {
 			logger.info(marker, message);
 		}
 	}
 
 	public static void debug(Marker marker, String message, Object... params) {
-		if (Config.config.debug) {
+		if (Config.Testing.debug) {
 			logger.info(marker, String.format(message, params));
 		}
 	}
 
 	public static void debug(Marker marker, String message, Throwable t) {
-		if (Config.config.debug) {
+		if (Config.Testing.debug) {
 			logger.info(marker, message, t);
 		}
 	}
 
 	public static void debug(String message) {
-		if (Config.config.debug) {
+		if (Config.Testing.debug) {
 			logger.info(message);
 		}
 	}
 
 	public static void debug(String message, Object... params) {
-		if (Config.config.debug) {
+		if (Config.Testing.debug) {
 			logger.info(String.format(message, params));
 		}
 	}
 
 	public static void debug(String message, Throwable t) {
-		if (Config.config.debug) {
+		if (Config.Testing.debug) {
 			logger.info(message, t);
 		}
 	}
