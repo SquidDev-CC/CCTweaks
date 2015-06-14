@@ -72,6 +72,8 @@ public class PartWirelessBridge extends PartSidedNetwork {
 
 	@Override
 	public boolean activate(EntityPlayer player, MovingObjectPosition hit, ItemStack item) {
+		if (world().isRemote) return true;
+
 		ItemStack stack = player.getHeldItem();
 		if (stack != null && stack.getItem() instanceof IDataCard) {
 			IDataCard card = (IDataCard) stack.getItem();
