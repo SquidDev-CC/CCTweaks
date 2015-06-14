@@ -3,7 +3,6 @@ package org.squiddev.cctweaks.core.asm;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.patcher.transformer.IPatcher;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -52,7 +51,6 @@ public class DisableTurtleCommand implements IPatcher {
 
 			visitFieldInsn(GETSTATIC, "org/squiddev/cctweaks/core/Config", "turtleDisabledActions", "Ljava/util/Set;");
 			visitLdcInsn(className.substring(PREFIX.length(), className.length() - SUFFIX.length()).toLowerCase());
-			DebugLogger.debug("Method is " + className.substring(PREFIX.length(), className.length() - SUFFIX.length()).toLowerCase());
 			visitMethodInsn(INVOKEINTERFACE, "java/util/Set", "contains", "(Ljava/lang/Object;)Z", true);
 			visitJumpInsn(IFEQ, continueLabel);
 

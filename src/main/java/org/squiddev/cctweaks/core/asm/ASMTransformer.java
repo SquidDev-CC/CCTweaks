@@ -10,14 +10,10 @@ import org.squiddev.patcher.transformer.*;
 public class ASMTransformer implements IClassTransformer {
 	protected final TransformationChain patches = new TransformationChain();
 
-	protected void add(Object patcher) {
-		if (patcher instanceof IPatcher) patches.add((IPatcher) patcher);
-		if (patcher instanceof ISource) patches.add((ISource) patcher);
-	}
-
 	protected void add(Object[] patchers) {
 		for (Object patcher : patchers) {
-			add(patcher);
+			if (patcher instanceof IPatcher) patches.add((IPatcher) patcher);
+			if (patcher instanceof ISource) patches.add((ISource) patcher);
 		}
 	}
 
@@ -65,6 +61,9 @@ public class ASMTransformer implements IClassTransformer {
 			new PatchOpenPeripheralAdapter(),
 			new PatchOpenModule(),
 			new DisableTurtleCommand(),
+			new CustomTimeout(),
+			new InjectLuaJC(),
+			new WhitelistGlobals(),
 		});
 
 		// Patch the logger instance
@@ -88,12 +87,6 @@ public class ASMTransformer implements IClassTransformer {
 
 	@Override
 	public byte[] transform(String className, String s2, byte[] bytes) {
-		if (className.equals("dan200.computercraft.core.lua.LuaJLuaMachine")) {
-			bytes = PatchComputer.patchLuaMachine(bytes);
-		} else if (className.equals("dan200.computercraft.core.computer.ComputerThread$1")) {
-			bytes = PatchComputer.patchLuaThread(bytes);
-		}
-
 		try {
 			return patches.transform(className, bytes);
 		} catch (Exception e) {
