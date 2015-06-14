@@ -48,7 +48,7 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, INe
 				IPeripheral newPeriph = p.getValue();
 				String newName = p.getKey();
 				IPeripheral oldPeriph = oldPeripherals.get(newName);
-				if (!newPeriph.equals(oldPeriph) && newPeriph instanceof INetworkedPeripheral) {
+				if (oldPeriph == null || (!newPeriph.equals(oldPeriph) && newPeriph instanceof INetworkedPeripheral)) {
 					((INetworkedPeripheral) newPeriph).attachToNetwork(modem, newName);
 				}
 			}
@@ -57,7 +57,7 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, INe
 				IPeripheral oldPeriph = p.getValue();
 				String oldName = p.getKey();
 				IPeripheral newPeriph = newPeripherals.get(oldName);
-				if (!oldPeriph.equals(newPeriph) && oldPeriph instanceof INetworkedPeripheral) {
+				if (newPeriph == null || (!oldPeriph.equals(newPeriph) && oldPeriph instanceof INetworkedPeripheral)) {
 					((INetworkedPeripheral) oldPeriph).detachFromNetwork(modem, oldName);
 				}
 			}
