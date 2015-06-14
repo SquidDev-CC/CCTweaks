@@ -36,7 +36,7 @@ import java.util.Map;
 public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrade {
 	@Override
 	public int getUpgradeID() {
-		return Config.Turtle.wirelessBridgeId;
+		return Config.Network.wirelessBridgeTurtleId;
 	}
 
 	@Override
@@ -51,12 +51,12 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 
 	@Override
 	public ItemStack getCraftingItem() {
-		return Config.Turtle.wirelessBridgeEnabled ? new ItemStack(Registry.blockNetworked, 0) : null;
+		return Config.Network.wirelessBridgeTurtleEnabled ? new ItemStack(Registry.blockNetworked, 0) : null;
 	}
 
 	@Override
 	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
-		return Config.Turtle.wirelessBridgeEnabled ? new TurtleModem(turtle, side).modem : null;
+		return Config.Network.wirelessBridgeTurtleEnabled ? new TurtleModem(turtle, side).modem : null;
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 	 */
 	@Override
 	public void update(ITurtleAccess turtle, TurtleSide side) {
-		if (Config.Turtle.wirelessBridgeEnabled && !turtle.getWorld().isRemote) {
+		if (Config.Network.wirelessBridgeTurtleEnabled && !turtle.getWorld().isRemote) {
 			IPeripheral peripheral = turtle.getPeripheral(side);
 			if (peripheral != null && peripheral instanceof TurtleModemPeripheral) {
 				TurtleModemPeripheral modemPeripheral = (TurtleModemPeripheral) peripheral;
@@ -193,6 +193,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			binding = new NetworkBinding(modem);
 		}
 
+		@Override
 		public String[] getMethodNames() {
 			String[] methods = super.getMethodNames();
 			String[] newMethods = new String[methods.length + 3];

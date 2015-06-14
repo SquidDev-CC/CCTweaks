@@ -33,6 +33,11 @@ public final class Config {
 		}
 
 		globalWhitelist = new HashSet<String>(Arrays.asList(Computer.globalWhitelist));
+
+		Computer.computerUpgradeCrafting &= Computer.computerUpgradeEnabled;
+
+		Network.wirelessBridgeCrafting &= Network.wirelessBridgeEnabled;
+		Network.wirelessBridgeTurtleEnabled &= Network.wirelessBridgeEnabled;
 	}
 
 	/**
@@ -121,26 +126,6 @@ public final class Config {
 		 */
 		@RequiresRestart(mc = false, world = true)
 		public static String[] disabledActions;
-
-		/**
-		 * TODO: Register on the wiki: http://www.computercraft.info/wiki/Turtle_Upgrade_IDs
-		 */
-		public static final int UPGRADE_START = 331;
-
-		/**
-		 * Enable the wireless bridge upgrade.
-		 */
-		@DefaultBoolean(true)
-		@RequiresRestart
-		public static boolean wirelessBridgeEnabled;
-
-		/**
-		 * The id for the network bridge upgrade.
-		 */
-		@DefaultInt(UPGRADE_START)
-		@Range(min = 1)
-		@RequiresRestart
-		public static int wirelessBridgeId;
 	}
 
 	/**
@@ -164,6 +149,25 @@ public final class Config {
 		public static boolean wirelessBridgeCrafting;
 
 		/**
+		 * Enable the Wireless Bridge upgrade for turtles.
+		 * Requires wirelessBridgeEnabled.
+		 */
+		@DefaultBoolean(true)
+		@RequiresRestart
+		public static boolean wirelessBridgeTurtleEnabled;
+
+		// TODO: Register on the wiki: http://www.computercraft.info/wiki/Turtle_Upgrade_IDs
+		// TODO: Group wireless bridge into separate category. Maybe?
+		/**
+		 * The turtle id for the Wireless Bridge upgrade.
+		 * Requires wirelessBridgeTurtleEnabled.
+		 */
+		@DefaultInt(331)
+		@Range(min = 1)
+		@RequiresRestart
+		public static int wirelessBridgeTurtleId;
+
+		/**
 		 * Enable the crafting of full block modems.
 		 *
 		 * If you disable, existing ones will still function,
@@ -177,13 +181,13 @@ public final class Config {
 	/**
 	 * Integration with other mods.
 	 */
+	@RequiresRestart
 	public static final class Integration {
 		/**
 		 * Allows pushing items from one inventory
 		 * to another inventory on the network.
 		 */
 		@DefaultBoolean(true)
-		@RequiresRestart
 		public static boolean openPeripheralInventories;
 
 		/**
@@ -191,7 +195,6 @@ public final class Config {
 		 * (aka ForgeMultipart) integration.
 		 */
 		@DefaultBoolean(true)
-		@RequiresRestart
 		public static boolean cbMultipart;
 	}
 

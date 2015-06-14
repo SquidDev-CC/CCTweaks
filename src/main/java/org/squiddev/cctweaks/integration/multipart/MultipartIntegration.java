@@ -50,7 +50,7 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 	public void init() {
 		itemPart.init();
 
-		if (Config.Network.wirelessBridgeEnabled && Config.Network.wirelessBridgeCrafting) {
+		if (Config.Network.wirelessBridgeCrafting) {
 			Helpers.twoWayCrafting(new ItemStack(Registry.blockNetworked), new ItemStack(itemPart));
 		}
 
