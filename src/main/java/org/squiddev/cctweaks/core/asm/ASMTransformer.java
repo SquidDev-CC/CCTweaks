@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.core.asm;
 
 import cpw.mods.fml.common.Loader;
 import net.minecraft.launchwrapper.IClassTransformer;
+import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.patcher.Logger;
@@ -43,7 +44,7 @@ public class ASMTransformer implements IClassTransformer {
 				 */
 				@Override
 				public boolean matches(String className) {
-					return super.matches(className) && Loader.isModLoaded(MultipartIntegration.NAME);
+					return super.matches(className) && Loader.isModLoaded(MultipartIntegration.NAME) && Config.Integration.cbMultipart;
 				}
 			},
 			new ClassMerger(

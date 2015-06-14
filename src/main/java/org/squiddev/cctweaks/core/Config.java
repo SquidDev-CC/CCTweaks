@@ -1,10 +1,7 @@
 package org.squiddev.cctweaks.core;
 
 import net.minecraftforge.common.config.Configuration;
-import org.squiddev.configgen.DefaultBoolean;
-import org.squiddev.configgen.DefaultInt;
-import org.squiddev.configgen.OnSync;
-import org.squiddev.configgen.Range;
+import org.squiddev.configgen.*;
 
 import java.io.File;
 import java.util.Arrays;
@@ -38,31 +35,35 @@ public final class Config {
 		globalWhitelist = new HashSet<String>(Arrays.asList(Computer.globalWhitelist));
 	}
 
+	/**
+	 * Computer tweaks and items.
+	 */
 	public static final class Computer {
 		/**
-		 * Enable upgrading computers
+		 * Enable upgrading computers.
 		 */
 		@DefaultBoolean(true)
 		public static boolean computerUpgradeEnabled;
 
 		/**
-		 * Enable crafting the computer upgrade
-		 *
-		 * Requires computerUpgradeEnabled
+		 * Enable crafting the computer upgrade.
+		 * Requires computerUpgradeEnabled.
 		 */
 		@DefaultBoolean(true)
+		@RequiresRestart
 		public static boolean computerUpgradeCrafting;
 
 		/**
-		 * Enable using the debug wand
+		 * Enable using the debug wand.
 		 */
 		@DefaultBoolean(true)
 		public static boolean debugWandEnabled;
 
 		/**
 		 * Globals to whitelist (are not set to nil).
-		 * This is NOT recommended for servers, use at your own risk
+		 * This is NOT recommended for servers, use at your own risk.
 		 */
+		@RequiresRestart(mc = false, world = true)
 		public static String[] globalWhitelist;
 
 		/**
@@ -78,6 +79,7 @@ public final class Config {
 		 * Compile Lua bytecode to Java bytecode
 		 */
 		@DefaultBoolean(false)
+		@RequiresRestart(mc = false, world = true)
 		public static boolean luaJC;
 
 		/**
@@ -85,23 +87,27 @@ public final class Config {
 		 * This will slow down compilation.
 		 * If you have errors, please turn this and debug on and
 		 * send it with the bug report.
+		 * TODO: Get this working again
 		 */
-		@DefaultBoolean(false)
-		public static boolean luaJCVerify;
+		// @DefaultBoolean(false)
+		// public static boolean luaJCVerify;
 	}
 
+	/**
+	 * Turtle tweaks and items.
+	 */
 	public static final class Turtle {
 		/**
 		 * Amount of RF required for one refuel point
-		 * Set to 0 to disable"
+		 * Set to 0 to disable.
 		 */
 		@DefaultInt(100)
 		@Range(min = 0)
 		public static int fluxRefuelAmount;
 
 		/**
-		 * Amount of Eu required for one refuel point
-		 * Set to 0 to disable
+		 * Amount of Eu required for one refuel point.
+		 * Set to 0 to disable.
 		 */
 		@DefaultInt(25)
 		@Range(min = 0)
@@ -111,8 +117,9 @@ public final class Config {
 		 * Disabled turtle actions:
 		 * (compare, compareTo, craft, detect, dig,
 		 * drop, equip, inspect, move, place,
-		 * refuel, select, suck, tool, turn)
+		 * refuel, select, suck, tool, turn).
 		 */
+		@RequiresRestart(mc = false, world = true)
 		public static String[] disabledActions;
 
 		/**
@@ -121,9 +128,10 @@ public final class Config {
 		public static final int UPGRADE_START = 331;
 
 		/**
-		 * Enable the wireless bridge upgrade
+		 * Enable the wireless bridge upgrade.
 		 */
 		@DefaultBoolean(true)
+		@RequiresRestart
 		public static boolean wirelessBridgeEnabled;
 
 		/**
@@ -131,9 +139,66 @@ public final class Config {
 		 */
 		@DefaultInt(UPGRADE_START)
 		@Range(min = 1)
+		@RequiresRestart
 		public static int wirelessBridgeId;
 	}
 
+	/**
+	 * Additional network functionality.
+	 */
+	public static final class Network {
+		/**
+		 * The wireless bridge allows you to connect
+		 * wired networks across dimensions.
+		 */
+		@DefaultBoolean(true)
+		@RequiresRestart(mc = false, world = true)
+		public static boolean wirelessBridgeEnabled;
+
+		/**
+		 * Enable the crafting of Wireless Bridges.
+		 * Requires wirelessBridgeEnabled.
+		 */
+		@DefaultBoolean(true)
+		@RequiresRestart
+		public static boolean wirelessBridgeCrafting;
+
+		/**
+		 * Enable the crafting of full block modems.
+		 *
+		 * If you disable, existing ones will still function,
+		 * and you can obtain them from creative.
+		 */
+		@DefaultBoolean(true)
+		@RequiresRestart
+		public static boolean fullBlockModemCrafting;
+	}
+
+	/**
+	 * Integration with other mods.
+	 */
+	public static final class Integration {
+		/**
+		 * Allows pushing items from one inventory
+		 * to another inventory on the network.
+		 */
+		@DefaultBoolean(true)
+		@RequiresRestart
+		public static boolean openPeripheralInventories;
+
+		/**
+		 * Enable ChickenBones Multipart
+		 * (aka ForgeMultipart) integration.
+		 */
+		@DefaultBoolean(true)
+		@RequiresRestart
+		public static boolean cbMultipart;
+	}
+
+	/**
+	 * Only used when testing and developing the mod.
+	 * Nothing to see here, move along...
+	 */
 	public static final class Testing {
 		/**
 		 * Show debug messages.

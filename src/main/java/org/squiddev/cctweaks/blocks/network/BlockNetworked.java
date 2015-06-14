@@ -19,6 +19,7 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.blocks.TileBase;
+import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.items.ItemMultiBlock;
@@ -143,16 +144,21 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	public void init() {
 		super.init();
 
-		Helpers.alternateCrafting(new ItemStack(this, 1, 0), 'C', 'M',
-			"GMG",
-			"CDC",
-			"GMG",
+		if (Config.Network.wirelessBridgeEnabled && Config.Network.wirelessBridgeCrafting) {
+			Helpers.alternateCrafting(new ItemStack(this, 1, 0), 'C', 'M',
+				"GMG",
+				"CDC",
+				"GMG",
 
-			'G', Items.gold_ingot,
-			'D', Items.diamond,
-			'C', PeripheralItemFactory.create(PeripheralType.Cable, null, 1),
-			'M', PeripheralItemFactory.create(PeripheralType.WirelessModem, null, 1)
-		);
-		Helpers.twoWayCrafting(new ItemStack(this, 1, 1), PeripheralItemFactory.create(PeripheralType.WiredModem, null, 1));
+				'G', Items.gold_ingot,
+				'D', Items.diamond,
+				'C', PeripheralItemFactory.create(PeripheralType.Cable, null, 1),
+				'M', PeripheralItemFactory.create(PeripheralType.WirelessModem, null, 1)
+			);
+		}
+
+		if (Config.Network.fullBlockModemCrafting) {
+			Helpers.twoWayCrafting(new ItemStack(this, 1, 1), PeripheralItemFactory.create(PeripheralType.WiredModem, null, 1));
+		}
 	}
 }
