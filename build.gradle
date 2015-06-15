@@ -36,7 +36,8 @@ jar {
 	manifest {
 		attributes(
 			'FMLCorePlugin': 'org.squiddev.cctweaks.core.asm.TweaksLoadingPlugin',
-			'FMLCorePluginContainsFMLMod': 'true'
+			'FMLCorePluginContainsFMLMod': 'true',
+			'FMLAT': 'CCTweaks_at.cfg',
 		)
 	}
 

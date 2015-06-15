@@ -13,6 +13,7 @@ import org.squiddev.cctweaks.integration.openperipheral.OpenPeripheralIntegratio
 import org.squiddev.cctweaks.items.ItemComputerUpgrade;
 import org.squiddev.cctweaks.items.ItemDataCard;
 import org.squiddev.cctweaks.items.ItemDebugger;
+import org.squiddev.cctweaks.items.ItemToolHost;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
 
 import java.util.HashSet;
@@ -25,6 +26,7 @@ public final class Registry {
 	public static final ItemComputerUpgrade itemComputerUpgrade;
 	public static final ItemDebugger itemDebugger;
 	public static final ItemDataCard itemDataCard;
+	public static final ItemToolHost itemToolHost;
 
 	public static final BlockNetworked blockNetworked;
 
@@ -37,6 +39,7 @@ public final class Registry {
 	static {
 		addModule(itemComputerUpgrade = new ItemComputerUpgrade());
 		addModule(itemDebugger = new ItemDebugger());
+		addModule(itemToolHost = new ItemToolHost());
 
 		addModule(itemDataCard = new ItemDataCard());
 		addModule(blockNetworked = new BlockNetworked());
@@ -147,3 +150,4 @@ public final class Registry {
 		}
 	}
 }
+

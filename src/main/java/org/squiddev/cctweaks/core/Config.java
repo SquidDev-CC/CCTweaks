@@ -126,6 +126,40 @@ public final class Config {
 		 */
 		@RequiresRestart(mc = false, world = true)
 		public static String[] disabledActions;
+
+		/**
+		 * Various tool host options
+		 */
+		public static class ToolHost {
+			/**
+			 * Enable the Tool Host
+			 */
+			@DefaultBoolean(true)
+			public static boolean enabled;
+
+			/**
+			 * Enable crafting the Tool Host
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart
+			public static boolean crafting;
+
+			/**
+			 * Upgrade Id
+			 */
+			@DefaultInt(332)
+			@RequiresRestart
+			@Range(min = 0)
+			public static int upgradeId;
+
+			/**
+			 * The dig speed factor for tool hosts.
+			 * 20 is about normal player speed.
+			 */
+			@DefaultInt(10)
+			@Range(min = 1)
+			public static int digFactor;
+		}
 	}
 
 	/**
