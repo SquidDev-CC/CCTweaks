@@ -19,7 +19,7 @@ public class GuiConfigCCTweaks extends GuiConfig {
 	private static List<IConfigElement> getConfigElements() {
 		ArrayList<IConfigElement> elements = new ArrayList<IConfigElement>();
 		for (String category : Config.configuration.getCategoryNames()) {
-			elements.add(new ConfigElement(Config.configuration.getCategory(category)));
+			if (!category.contains(".")) elements.add(new ConfigElement(Config.configuration.getCategory(category)));
 		}
 		return elements;
 	}
