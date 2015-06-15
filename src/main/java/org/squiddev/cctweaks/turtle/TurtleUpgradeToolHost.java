@@ -4,6 +4,8 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.MinecraftForgeClient;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.Registry;
@@ -44,7 +46,7 @@ public class TurtleUpgradeToolHost implements ITurtleUpgrade {
 
 	@Override
 	public TurtleCommandResult useTool(ITurtleAccess turtle, TurtleSide side, TurtleVerb verb, int direction) {
-		if (!Config.Turtle.ToolHost.enabled) return TurtleCommandResult.failure("Disabled");
+		if (!Config.Turtle.ToolHost.enabled) return null;
 
 		switch (verb) {
 			case Attack:
@@ -53,7 +55,7 @@ public class TurtleUpgradeToolHost implements ITurtleUpgrade {
 				return getPlayer(turtle).dig(direction);
 		}
 
-		return TurtleCommandResult.failure("Unknown " + verb);
+		return null;
 	}
 
 	public static ItemStack getItem(ITurtleAccess turtle) {
@@ -72,10 +74,16 @@ public class TurtleUpgradeToolHost implements ITurtleUpgrade {
 		IIcon icon;
 
 		// Sometimes the turtle is null (if in the inventory).
-		// Also, we should only render if the icon is an item - not a block
-		if (turtle != null && (item = getItem(turtle)) != null && item.getItemSpriteNumber() == 1 && (icon = item.getItem().getIcon(item, 0)) != null) {
+		// Also, we should only render if the icon is an item - not a block and if there isn't a custom renderer
+		if (
+			turtle != null && (item = getItem(turtle)) != null &&
+				MinecraftForgeClient.getItemRenderer(item, IItemRenderer.ItemRenderType.INVENTORY) == null &&
+				!item.getItem().requiresMultipleRenderPasses() &&
+				item.getItemSpriteNumber() == 1 && (icon = item.getItem().getIcon(item, 0)) != null
+			) {
 			return icon;
 		}
+
 		return Registry.itemToolHost.getIconFromDamage(0);
 	}
 

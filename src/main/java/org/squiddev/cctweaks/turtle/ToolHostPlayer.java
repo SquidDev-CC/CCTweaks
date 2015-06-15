@@ -146,22 +146,15 @@ public class ToolHostPlayer extends TurtlePlayer {
 	 */
 	public void updateInformation(int direction) {
 		ChunkCoordinates position = turtle.getPosition();
-		posX = position.posX + 0.5 + 0.48 * Facing.offsetsXForSide[direction];
-		posY = position.posY + 0.5 + 0.48 * Facing.offsetsYForSide[direction];
-		posZ = position.posZ + 0.5 + 0.48 * Facing.offsetsYForSide[direction];
 
-		if (direction > 2) {
-			rotationYaw = DirectionUtil.toYawAngle(direction);
-			rotationPitch = 0.0F;
-		} else {
-			rotationYaw = DirectionUtil.toYawAngle(turtle.getDirection());
-			rotationPitch = DirectionUtil.toPitchAngle(direction);
-		}
+		setPositionAndRotation(
+			position.posX + 0.5 + 0.51 * Facing.offsetsXForSide[direction],
+			position.posY - 1.1 + 0.51 * Facing.offsetsYForSide[direction],
+			position.posZ + 0.5 + 0.51 * Facing.offsetsZForSide[direction],
+			direction > 2 ? DirectionUtil.toYawAngle(direction) : DirectionUtil.toYawAngle(turtle.getDirection()),
+			direction > 2 ? 0 : DirectionUtil.toPitchAngle(direction)
+		);
 
-		prevPosX = posX;
-		prevPosY = posY;
-		prevPosZ = posZ;
-		prevRotationYaw = rotationYaw;
-		prevRotationPitch = rotationPitch;
+		ySize = -1.1f;
 	}
 }
