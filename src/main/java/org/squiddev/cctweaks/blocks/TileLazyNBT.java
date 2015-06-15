@@ -27,8 +27,10 @@ public abstract class TileLazyNBT extends TileBase {
 	public abstract Iterable<String> getFields();
 
 	private void onFirstTick() {
-		readLazyNBT(lazyTag);
-		lazyTag = null;
+		if (lazyTag != null) {
+			readLazyNBT(lazyTag);
+			lazyTag = null;
+		}
 	}
 
 	@Override

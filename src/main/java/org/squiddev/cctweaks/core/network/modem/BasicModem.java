@@ -8,14 +8,18 @@ import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
+import org.squiddev.cctweaks.core.network.AbstractNode;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Basic wired modem that handles peripherals and
  * computer interaction
  */
-public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetworkAccess {
+public abstract class BasicModem extends AbstractNode implements INetwork, IWorldNetworkNode, INetworkAccess {
 	public static final byte MODEM_ON = 1;
 	public static final byte MODEM_PERIPHERAL = 2;
 
@@ -45,11 +49,6 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 	 * The state of the modem
 	 */
 	public byte state;
-
-	/**
-	 * The network this modem is attached to.
-	 */
-	INetworkController networkController;
 
 	@Override
 	public void addReceiver(IReceiver receiver) {
@@ -248,12 +247,12 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 				((INetworkedPeripheral) value).detachFromNetwork(this, key);
 			}
 		}
-		this.networkController = null;
+		super.detachFromNetwork();
 	}
 
 	@Override
 	public void attachToNetwork(INetworkController networkController) {
-		this.networkController = networkController;
+		super.attachToNetwork(networkController);
 		for (Map.Entry<String, IPeripheral> entry : this.getConnectedPeripherals().entrySet()) {
 			String key = entry.getKey();
 			IPeripheral value = entry.getValue();
@@ -264,18 +263,8 @@ public abstract class BasicModem implements INetwork, IWorldNetworkNode, INetwor
 		}
 	}
 
-	@Override
-	public INetworkController getAttachedNetwork() {
-		return networkController;
-	}
-
-	@Override
-	public Set<INetworkNode> getConnectedNodes() {
-		return Collections.emptySet();
-	}
-
 	public void destroy() {
-		networkController.removeNode(this);
+		if (networkController != null) networkController.removeNode(this);
 		modem.destroy();
 	}
 

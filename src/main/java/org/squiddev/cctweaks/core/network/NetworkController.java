@@ -117,6 +117,8 @@ public class NetworkController implements INetworkController {
 
 	@Override
 	public void removeNode(INetworkNode removedNode) {
+		removedNode.detachFromNetwork();
+
 		List<INetworkNode> connectingNodes = new ArrayList<INetworkNode>();
 		Iterator<SingleTypeUnorderedPair<INetworkNode>> i = networkConnections.iterator();
 		while (i.hasNext()) {
@@ -126,6 +128,7 @@ public class NetworkController implements INetworkController {
 				connectingNodes.add(pair.other(removedNode));
 			}
 		}
+		network.remove(removedNode);
 
 		List<NetworkController> newNetworks = new ArrayList<NetworkController>(connectingNodes.size());
 
@@ -239,12 +242,13 @@ public class NetworkController implements INetworkController {
 				if (!continueScanning(node)) {
 					return Optional.absent();
 				}
-				newNetwork.add(node);
 
-				for (SingleTypeUnorderedPair<INetworkNode> pair : networkConnections) {
-					if (pair.contains(node)) {
-						toVisit.offer(pair.other(node));
-						newNetworkConnections.add(pair);
+				if (newNetwork.add(node)) {
+					for (SingleTypeUnorderedPair<INetworkNode> pair : networkConnections) {
+						if (pair.contains(node)) {
+							toVisit.offer(pair.other(node));
+							newNetworkConnections.add(pair);
+						}
 					}
 				}
 			}

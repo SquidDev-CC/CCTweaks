@@ -33,7 +33,7 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 			return Collections.emptyMap();
 		}
 
-		@Override
+		// TODO: Get this working
 		public Set<INetworkNode> getConnectedNodes() {
 			return Collections.<INetworkNode>unmodifiableSet(binding.getNodes());
 		}

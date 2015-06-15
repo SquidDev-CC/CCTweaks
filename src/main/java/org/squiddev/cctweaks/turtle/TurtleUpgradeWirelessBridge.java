@@ -157,7 +157,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			return side == ForgeDirection.UNKNOWN;
 		}
 
-		@Override
+		// TODO: Get this working
 		public Set<INetworkNode> getConnectedNodes() {
 			return Collections.<INetworkNode>unmodifiableSet(binding.getNodes());
 		}

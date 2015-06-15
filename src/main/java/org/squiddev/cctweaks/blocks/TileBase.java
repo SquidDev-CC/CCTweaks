@@ -46,15 +46,26 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	}
 
 	@Override
+	public void validate() {
+		if (worldObj == null || !worldObj.isRemote) {
+			create();
+		}
+	}
+
+	@Override
 	public void onChunkUnload() {
 		super.onChunkUnload();
-		destroy();
+		if (worldObj == null || !worldObj.isRemote) {
+			destroy();
+		}
 	}
 
 	@Override
 	public void invalidate() {
 		super.invalidate();
-		destroy();
+		if (worldObj == null || !worldObj.isRemote) {
+			destroy();
+		}
 	}
 
 	/**

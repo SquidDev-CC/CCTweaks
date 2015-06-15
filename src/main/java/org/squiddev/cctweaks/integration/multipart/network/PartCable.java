@@ -165,12 +165,10 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	@Override
 	public void harvest(MovingObjectPosition hit, EntityPlayer player) {
 		World world = world();
-		int x = x(), y = y(), z = z();
-
 		super.harvest(hit, player);
 
 		if (!world.isRemote) {
-			cable.removeFromWorld();
+			cable.destroy();
 		}
 	}
 

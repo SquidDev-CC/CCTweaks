@@ -48,6 +48,7 @@ public class PartWirelessBridge extends PartSidedNetwork implements IWorldNetwor
 		this.direction = (byte) direction;
 	}
 
+	@Override
 	public String getType() {
 		return NAME;
 	}
@@ -157,7 +158,7 @@ public class PartWirelessBridge extends PartSidedNetwork implements IWorldNetwor
 	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals) {
 	}
 
-	@Override
+	// TODO: Get this working
 	public Set<INetworkNode> getConnectedNodes() {
 		return Collections.<INetworkNode>unmodifiableSet(binding.getNodes());
 	}

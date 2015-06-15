@@ -2,11 +2,16 @@ package org.squiddev.cctweaks.core.asm;
 
 import cpw.mods.fml.common.Loader;
 import net.minecraft.launchwrapper.IClassTransformer;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.patcher.Logger;
 import org.squiddev.patcher.transformer.*;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class ASMTransformer implements IClassTransformer {
 	protected final TransformationChain patches = new TransformationChain();
@@ -95,5 +100,11 @@ public class ASMTransformer implements IClassTransformer {
 			DebugLogger.error("Cannot patch " + className + ", falling back to default", e);
 			return bytes;
 		}
+	}
+
+	public void dump(String className, byte[] bytes) {
+		StringWriter writer = new StringWriter();
+		new ClassReader(bytes).accept(new TraceClassVisitor(new PrintWriter(writer)), 0);
+		DebugLogger.debug("Dump for " + className + "\n" + writer.toString());
 	}
 }

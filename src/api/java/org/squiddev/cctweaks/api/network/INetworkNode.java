@@ -3,7 +3,6 @@ package org.squiddev.cctweaks.api.network;
 import dan200.computercraft.api.peripheral.IPeripheral;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Defines a node on the network
@@ -32,15 +31,6 @@ public interface INetworkNode {
 	 *                          map before the network changed
 	 */
 	void networkInvalidated(Map<String, IPeripheral> oldPeripherals);
-
-	/**
-	 * Get network nodes that this node attaches to the network.
-	 * Is only called when the set might have changed,
-	 * so no need to worry about caching.
-	 *
-	 * @return All nodes this node connects to.
-	 */
-	Set<INetworkNode> getConnectedNodes();
 
 	/**
 	 * Called when the network is detached from this node.

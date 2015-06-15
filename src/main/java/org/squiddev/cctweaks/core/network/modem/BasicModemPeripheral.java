@@ -47,6 +47,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 		return other instanceof BasicModemPeripheral && ((BasicModemPeripheral) other).modem.equals(this.modem);
 	}
 
+	@Override
 	public String[] getMethodNames() {
 		String[] methods = super.getMethodNames();
 		String[] newMethods = new String[methods.length + 5];

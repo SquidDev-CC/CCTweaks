@@ -8,7 +8,6 @@ import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.core.FmlEvents;
-import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 /**
@@ -52,21 +51,23 @@ public final class NetworkHelpers {
 				IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(
 					position.getWorld(),
 					position.getX() + direction.offsetX,
-					position.getY() + direction.offsetZ,
-					position.getY() + direction.offsetZ
+					position.getY() + direction.offsetY,
+					position.getZ() + direction.offsetZ
 				);
 
 				if (neighbour != null && neighbour.canConnect(direction.getOpposite()) && neighbour.getAttachedNetwork() != null) {
 					INetworkController network = neighbour.getAttachedNetwork();
 					network.formConnection(neighbour, node);
-					DebugLogger.debug("Joining " + neighbour + " and " + node);
+					DebugLogger.debug(node + "Connecting to " + node.getAttachedNetwork() + " from " + neighbour);
+				} else if (neighbour != null) {
+					DebugLogger.debug(node + " Node has no network " + neighbour);
 				}
 			}
 		}
 
 		if (node.getAttachedNetwork() == null) {
 			joinNewNetwork(node);
-			DebugLogger.debug("No others, creating new for " + node);
+			DebugLogger.debug(node + " Creating new network");
 		}
 	}
 

@@ -19,6 +19,7 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.network.cable.SingleModemCable;
 import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
@@ -43,7 +44,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	protected DirectionalPeripheralModem modem;
 	protected SingleModemCable cable;
-	protected NBTTagCompound tagCache;
+	protected NBTTagCompound lazyTag;
 
 	/**
 	 * The patcher doesn't enable constructors (yet) so we lazy load the modem
@@ -97,7 +98,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 				@Override
 				public DirectionalPeripheralModem getModem() {
-					return getModem();
+					return TileCable_Patch.this.getModem();
 				}
 
 				@Override
@@ -121,10 +122,39 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Override
 	public void destroy() {
+		// TODO: Maybe on invalidate instead?
 		if (!m_destroyed) {
 			m_destroyed = true;
 			getModem().destroy();
-			getCable().removeFromWorld();
+			getCable().destroy();
+		}
+		super.destroy();
+	}
+
+	@Override
+	public void onChunkUnload() {
+		super.onChunkUnload();
+		destroy();
+	}
+
+	@Override
+	public void validate() {
+		// TODO: This is also called when being destroyed
+		super.validate();
+		if (!worldObj.isRemote) {
+			FmlEvents.schedule(new Runnable() {
+				@MergeVisitor.Rewrite
+				protected boolean ANNOTATION;
+
+				@Override
+				public void run() {
+					getCable().connect();
+					if (lazyTag != null) {
+						readLazyNBT(lazyTag);
+						lazyTag = null;
+					}
+				}
+			});
 		}
 	}
 
@@ -133,6 +163,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		// Update the neighbour first as this might break the type
 		nativeOnNeighbourChange();
 
+		// TODO: Break the modem if we change
 		if (getPeripheralType() == PeripheralType.WiredModemWithCable) {
 			if (getModem().updateEnabled()) {
 				modem.getAttachedNetwork().invalidateNetwork();
@@ -151,9 +182,10 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		if ((getPeripheralType() == PeripheralType.WiredModemWithCable) && (!player.isSneaking())) {
 			if (!worldObj.isRemote) {
 
-				String oldPeriphName = getConnectedPeripheralName();
+				String oldPeriphName = getModem().getPeripheralName();
 				getModem().toggleEnabled();
-				String periphName = getConnectedPeripheralName();
+				String periphName = getModem().getPeripheralName();
+
 				if (!Objects.equals(periphName, oldPeriphName)) {
 					if (oldPeriphName != null) {
 						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", oldPeriphName));
@@ -176,7 +208,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
 		if (worldObj == null) {
-			tagCache = tag;
+			lazyTag = tag;
 		} else {
 			readLazyNBT(tag);
 		}
@@ -190,7 +222,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
-		if (tagCache != null) {
+		if (lazyTag != null) {
 			tag.setBoolean("peripheralAccess", tag.getBoolean("peripheralAccess"));
 			tag.setInteger("peripheralID", tag.getInteger("peripheralID"));
 		} else {
@@ -295,6 +327,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		getModem().toggleEnabled();
 	}
 
+	@Override
 	@Deprecated
 	public String getConnectedPeripheralName() {
 		return getModem().getPeripheralName();
@@ -346,7 +379,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 					dir = dir == -1 || dir == 4 ? 4 : -2;
 				}
 				if (canConnect(world, x, y, z, ForgeDirection.UP) || canConnect(world, x, y, z, ForgeDirection.DOWN)) {
-					dir = dir == -1 || dir == 0 ? dir = 0 : -2;
+					dir = dir == -1 || dir == 0 ? 0 : -2;
 				}
 				if (canConnect(world, x, y, z, ForgeDirection.NORTH) || canConnect(world, x, y, z, ForgeDirection.SOUTH)) {
 					dir = dir == -1 || dir == 2 ? 2 : -2;
@@ -363,7 +396,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Override
 	public IWorldNetworkNode getNode() {
-		return getModem();
+		return getCable();
 	}
 
 	@Override
