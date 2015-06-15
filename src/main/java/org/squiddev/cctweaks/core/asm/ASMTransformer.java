@@ -65,6 +65,7 @@ public class ASMTransformer implements IClassTransformer {
 			new CustomTimeout(),
 			new InjectLuaJC(),
 			new WhitelistGlobals(),
+			new PatchTurtleRenderer(),
 		});
 
 		// Patch the logger instance

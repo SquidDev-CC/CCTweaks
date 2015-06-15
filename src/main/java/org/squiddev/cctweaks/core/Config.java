@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @org.squiddev.configgen.Config(languagePrefix = "gui.config.cctweaks.")
+/**
+ * The main config class
+ */
 public final class Config {
 	public static Configuration configuration;
 	public static Set<String> turtleDisabledActions;
@@ -117,6 +120,12 @@ public final class Config {
 		@DefaultInt(25)
 		@Range(min = 0)
 		public static int euRefuelAmount;
+
+		/**
+		 * Fun actions for turtle names
+		 */
+		@DefaultBoolean(true)
+		public static boolean funNames;
 
 		/**
 		 * Disabled turtle actions:

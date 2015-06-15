@@ -43,18 +43,24 @@ public class DebugLogger {
 	public static void debug(String message) {
 		if (Config.Testing.debug) {
 			logger.info(message);
+		} else {
+			logger.debug(message);
 		}
 	}
 
 	public static void debug(String message, Object... params) {
 		if (Config.Testing.debug) {
 			logger.info(String.format(message, params));
+		} else {
+			logger.debug(String.format(message, params));
 		}
 	}
 
 	public static void debug(String message, Throwable t) {
 		if (Config.Testing.debug) {
 			logger.info(message, t);
+		} else {
+			logger.debug(message, t);
 		}
 	}
 
