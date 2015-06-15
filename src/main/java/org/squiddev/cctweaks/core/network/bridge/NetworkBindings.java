@@ -15,13 +15,13 @@ public final class NetworkBindings {
 	private static final Map<UUID, Collection<IWorldPosition>> networks = new HashMap<UUID, Collection<IWorldPosition>>();
 
 	public static Iterable<IWorldPosition> getPositions(UUID id) {
-		if (id == null || !Config.Network.wirelessBridgeEnabled) return null;
+		if (id == null || !Config.Network.WirelessBridge.enabled) return null;
 
 		return networks.get(id);
 	}
 
 	public static void addPosition(UUID id, IWorldPosition position) {
-		if (id == null || !Config.Network.wirelessBridgeEnabled) return;
+		if (id == null || !Config.Network.WirelessBridge.enabled) return;
 
 		Collection<IWorldPosition> positions = networks.get(id);
 		if (positions == null) {

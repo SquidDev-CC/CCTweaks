@@ -36,8 +36,8 @@ public final class Config {
 
 		Computer.computerUpgradeCrafting &= Computer.computerUpgradeEnabled;
 
-		Network.wirelessBridgeCrafting &= Network.wirelessBridgeEnabled;
-		Network.wirelessBridgeTurtleEnabled &= Network.wirelessBridgeEnabled;
+		Network.WirelessBridge.crafting &= Network.WirelessBridge.enabled;
+		Network.WirelessBridge.turtleEnabled &= Network.WirelessBridge.enabled;
 	}
 
 	/**
@@ -170,36 +170,37 @@ public final class Config {
 		 * The wireless bridge allows you to connect
 		 * wired networks across dimensions.
 		 */
-		@DefaultBoolean(true)
-		@RequiresRestart(mc = false, world = true)
-		public static boolean wirelessBridgeEnabled;
+		public static class WirelessBridge {
+			/**
+			 * Enable the wireless bridge
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart(mc = false, world = true)
+			public static boolean enabled;
 
-		/**
-		 * Enable the crafting of Wireless Bridges.
-		 * Requires wirelessBridgeEnabled.
-		 */
-		@DefaultBoolean(true)
-		@RequiresRestart
-		public static boolean wirelessBridgeCrafting;
+			/**
+			 * Enable the crafting of Wireless Bridges.
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart
+			public static boolean crafting;
 
-		/**
-		 * Enable the Wireless Bridge upgrade for turtles.
-		 * Requires wirelessBridgeEnabled.
-		 */
-		@DefaultBoolean(true)
-		@RequiresRestart
-		public static boolean wirelessBridgeTurtleEnabled;
+			/**
+			 * Enable the Wireless Bridge upgrade for turtles.
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart
+			public static boolean turtleEnabled;
 
-		// TODO: Register on the wiki: http://www.computercraft.info/wiki/Turtle_Upgrade_IDs
-		// TODO: Group wireless bridge into separate category. Maybe?
-		/**
-		 * The turtle id for the Wireless Bridge upgrade.
-		 * Requires wirelessBridgeTurtleEnabled.
-		 */
-		@DefaultInt(331)
-		@Range(min = 1)
-		@RequiresRestart
-		public static int wirelessBridgeTurtleId;
+			// TODO: Register on the wiki: http://www.computercraft.info/wiki/Turtle_Upgrade_IDs
+			/**
+			 * The turtle upgrade Id
+			 */
+			@DefaultInt(331)
+			@Range(min = 1)
+			@RequiresRestart
+			public static int turtleId;
+		}
 
 		/**
 		 * Enable the crafting of full block modems.

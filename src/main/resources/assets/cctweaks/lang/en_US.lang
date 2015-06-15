@@ -42,11 +42,13 @@ gui.config.cctweaks.turtle.toolhost.upgradeId=Upgrade ID
 gui.config.cctweaks.turtle.toolhost.digFactor=Dig speed factor
 
 gui.config.cctweaks.network=Network
-gui.config.cctweaks.network.wirelessBridgeEnabled=Wireless Bridge Enabled
-gui.config.cctweaks.network.wirelessBridgeCrafting=Wireless Bridge Crafting
-gui.config.cctweaks.network.wirelessBridgeTurtleEnabled=Wireless Bridge Turtle Enabled
-gui.config.cctweaks.network.wirelessBridgeTurtleId=Wireless Bridge Turtle Upgrade Id
 gui.config.cctweaks.network.fullBlockModemCrafting=Modem Block Crafting
+
+gui.config.cctweaks.network.wirelessbridge=Wireless Bridge
+gui.config.cctweaks.network.wirelessbridge.enabled=Enabled
+gui.config.cctweaks.network.wirelessbridge.crafting=Crafting
+gui.config.cctweaks.network.wirelessbridge.turtleEnabled=Turtle Enabled
+gui.config.cctweaks.network.wirelessbridge.turtleId=Turtle Upgrade Id
 
 gui.config.cctweaks.integration=Integration
 gui.config.cctweaks.integration.openPeripheralInventories=OpenPeripheral Inventories

@@ -144,7 +144,7 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	public void init() {
 		super.init();
 
-		if (Config.Network.wirelessBridgeCrafting) {
+		if (Config.Network.WirelessBridge.crafting) {
 			Helpers.alternateCrafting(new ItemStack(this, 1, 0), 'C', 'M',
 				"GMG",
 				"CDC",
