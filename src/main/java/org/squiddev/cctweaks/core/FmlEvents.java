@@ -11,10 +11,10 @@ import java.util.Queue;
 /**
  * This handles various events
  */
-public final class Events {
-	private static Events instance;
+public final class FmlEvents {
+	private static FmlEvents instance;
 
-	public Events() {
+	public FmlEvents() {
 		if (instance == null) {
 			instance = this;
 		} else {

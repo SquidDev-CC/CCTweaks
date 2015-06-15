@@ -72,6 +72,8 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 	}
 
 	public boolean onActivated(ItemStack stack, IDataCard card, EntityPlayer player) {
+		if (worldObj.isRemote) return true;
+
 		if (player.isSneaking()) {
 			binding.save(stack, card);
 			markDirty(); // Mark dirty to ensure the UUID is stored

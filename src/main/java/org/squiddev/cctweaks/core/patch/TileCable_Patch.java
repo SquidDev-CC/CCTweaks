@@ -19,11 +19,11 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.Packet;
-import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
 import org.squiddev.cctweaks.core.network.cable.SingleModemCable;
 import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.patcher.visitors.MergeVisitor;
 
 import java.util.Objects;
 
@@ -240,27 +240,27 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		getModem().transmit(channel, replyChannel, payload, range, xPos, yPos, zPos, senderObject);
 	}
 
-	@MergeVisitor.Remove
+	@Deprecated
 	private void attachPeripheral(String name, IPeripheral peripheral) {
 		getModem().attachPeripheral(name, peripheral);
 	}
 
-	@MergeVisitor.Remove
+	@Deprecated
 	private void detachPeripheral(String name) {
 		getModem().detachPeripheral(name);
 	}
 
-	@MergeVisitor.Remove
+	@Deprecated
 	private String getTypeRemote(String remoteName) {
 		return null;
 	}
 
-	@MergeVisitor.Remove
+	@Deprecated
 	private String[] getMethodNamesRemote(String remoteName) {
 		return null;
 	}
 
-	@MergeVisitor.Remove
+	@Deprecated
 	private Object[] callMethodRemote(String remoteName, ILuaContext context, String method, Object[] arguments) {
 		return null;
 	}
@@ -272,17 +272,17 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		}
 	}
 
-	@MergeVisitor.Remove
+	@Deprecated
 	private void dispatchPacket(Packet packet) {
 		getModem().transmitPacket(packet);
 	}
 
-	@MergeVisitor.Remove
+	@Deprecated
 	private void receivePacket(Packet packet, int distanceTravelled) {
 		getModem().receivePacket(packet, distanceTravelled);
 	}
 
-	@MergeVisitor.Remove
+	@Deprecated
 	private void findPeripherals() {
 		// TODO: Do we need to do something?
 		DebugLogger.deprecated("Handled by BasicModem");
@@ -295,12 +295,12 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		getModem().toggleEnabled();
 	}
 
-	@MergeVisitor.Remove
+	@Deprecated
 	public String getConnectedPeripheralName() {
 		return getModem().getPeripheralName();
 	}
 
-	@MergeVisitor.Remove
+	@Deprecated
 	private IPeripheral getConnectedPeripheral() {
 		return getModem().isEnabled() ? modem.getPeripheral() : null;
 	}

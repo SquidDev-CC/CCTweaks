@@ -1,6 +1,7 @@
 item.cctweaks.computerUpgrade.name=Computer Upgrade
 item.cctweaks.debugger.name=Debug Wand
 item.cctweaks.dataCard.name=Data Card
+item.cctweaks.toolHost.name=Tool Host
 
 tile.cctweaks.networkedBlock.wirelessBridge.name=Wireless Bridge
 tile.cctweaks.networkedBlock.wiredModem.name=Wired Modem
@@ -17,6 +18,43 @@ chat.cctweaks.data.messages.Loaded=Settings loaded
 chat.cctweaks.data.messages.Stored=Settings stored
 chat.cctweaks.data.messages.Cleared=Settings cleared
 
-config.cctweaks.turtle=Turtle
-config.cctweaks.computer=Computer
-config.cctweaks.misc=Misc
+turtle.cctweaks.wirelessBridge.adjective=Networked
+turtle.cctweaks.toolHost.adjective=Ambidextrous
+
+gui.config.cctweaks.computer=Computer
+gui.config.cctweaks.computer.computerUpgradeEnabled=Computer Upgrade Enabled
+gui.config.cctweaks.computer.computerUpgradeCrafting=Computer Upgrade Crafting
+gui.config.cctweaks.computer.debugWandEnabled=Debug Wand Enabled
+gui.config.cctweaks.computer.globalWhitelist=Global Whitelist
+gui.config.cctweaks.computer.computerThreadTimeout=Computer Thread Timeout
+gui.config.cctweaks.computer.luaJC=LuaJC
+gui.config.cctweaks.computer.luaJCVerify=Verify LuaJC
+
+gui.config.cctweaks.turtle=Turtle
+gui.config.cctweaks.turtle.fluxRefuelAmount=RF Refuel Amount
+gui.config.cctweaks.turtle.euRefuelAmount=EU Refuel Amount
+gui.config.cctweaks.turtle.disabledActions=Disabled actions
+gui.config.cctweaks.turtle.funNames=Fun names
+
+gui.config.cctweaks.turtle.toolhost=Toolhost
+gui.config.cctweaks.turtle.toolhost.enabled=Enabled
+gui.config.cctweaks.turtle.toolhost.crafting=Enable crafting
+gui.config.cctweaks.turtle.toolhost.upgradeId=Upgrade ID
+gui.config.cctweaks.turtle.toolhost.digFactor=Dig speed factor
+
+gui.config.cctweaks.network=Network
+gui.config.cctweaks.network.fullBlockModemCrafting=Modem Block Crafting
+
+gui.config.cctweaks.network.wirelessbridge=Wireless Bridge
+gui.config.cctweaks.network.wirelessbridge.enabled=Enabled
+gui.config.cctweaks.network.wirelessbridge.crafting=Crafting
+gui.config.cctweaks.network.wirelessbridge.turtleEnabled=Turtle Enabled
+gui.config.cctweaks.network.wirelessbridge.turtleId=Turtle Upgrade Id
+
+gui.config.cctweaks.integration=Integration
+gui.config.cctweaks.integration.openPeripheralInventories=OpenPeripheral Inventories
+gui.config.cctweaks.integration.cbMultipart=ChickenBones Multipart
+
+gui.config.cctweaks.testing=Testing
+gui.config.cctweaks.testing.debug=Debug logging
+gui.config.cctweaks.testing.debugItems=Debug items

@@ -7,7 +7,8 @@ import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
-import org.squiddev.cctweaks.core.Events;
+import org.squiddev.cctweaks.core.FmlEvents;
+import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 /**
@@ -87,7 +88,7 @@ public final class NetworkHelpers {
 	 * @param node The node to schedule
 	 */
 	public static void scheduleJoin(final IWorldNetworkNode node) {
-		Events.schedule(new Runnable() {
+		FmlEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
 				joinOrCreateNetwork(node);

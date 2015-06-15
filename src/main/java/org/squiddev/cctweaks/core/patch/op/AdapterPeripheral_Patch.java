@@ -5,8 +5,8 @@ import org.squiddev.cctweaks.api.network.INetworkAccess;
 import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
-import org.squiddev.cctweaks.core.asm.patch.MergeVisitor;
 import org.squiddev.cctweaks.core.network.NetworkAccessDelegate;
+import org.squiddev.patcher.visitors.MergeVisitor;
 
 import java.util.Map;
 

@@ -34,7 +34,12 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 	}
 
 	@Override
-	protected boolean upgradeComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side) {
+	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+		return Config.Computer.computerUpgradeEnabled && super.onItemUseFirst(stack, player, world, x, y, z, side, hitX, hitY, hitZ);
+	}
+
+	@Override
+	protected boolean useComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side) {
 		int x = computerTile.xCoord, y = computerTile.yCoord, z = computerTile.zCoord;
 		World world = computerTile.getWorldObj();
 
@@ -70,7 +75,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 	}
 
 	@Override
-	protected boolean upgradeTurtle(ItemStack stack, EntityPlayer player, TileTurtle computerTile, int side) {
+	protected boolean useTurtle(ItemStack stack, EntityPlayer player, TileTurtle computerTile, int side) {
 		int x = computerTile.xCoord, y = computerTile.yCoord, z = computerTile.zCoord;
 		World world = computerTile.getWorldObj();
 
@@ -113,17 +118,17 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 	}
 
 	@Override
-	public boolean canLoad() {
-		return Config.config.enableComputerUpgrades;
-	}
-
-	@Override
 	public void init() {
 		super.init();
-		RecipeSorter.register(CCTweaks.RESOURCE_DOMAIN + ":computer_upgrade_crafting", CraftingComputerUpgrade.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+		if (!Config.Computer.computerUpgradeEnabled) return;
 
 		ItemStack stack = new ItemStack(this);
-		GameRegistry.addRecipe(stack, "GGG", "GSG", "GSG", 'G', Items.gold_ingot, 'S', Blocks.stone);
+		if (Config.Computer.computerUpgradeCrafting) {
+			GameRegistry.addRecipe(stack, "GGG", "GSG", "GSG", 'G', Items.gold_ingot, 'S', Blocks.stone);
+		}
+
+
+		RecipeSorter.register(CCTweaks.RESOURCE_DOMAIN + ":computer_upgrade_crafting", CraftingComputerUpgrade.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		GameRegistry.addRecipe(new CraftingComputerUpgrade());
 
 		// Add some impostor recipes for NEI. We just use CC's default ones

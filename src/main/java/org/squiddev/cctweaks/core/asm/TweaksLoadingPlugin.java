@@ -4,14 +4,27 @@ import com.google.common.eventbus.EventBus;
 import cpw.mods.fml.common.DummyModContainer;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.ModMetadata;
+import cpw.mods.fml.relauncher.FMLInjectionData;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.core.Config;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 
-@IFMLLoadingPlugin.TransformerExclusions("org.squiddev.cctweaks.core.asm.")
+@IFMLLoadingPlugin.TransformerExclusions({"org.squiddev.cctweaks.core.asm.", "org.squiddev.cctweaks.core.Config", "org.squiddev.patcher"})
 @IFMLLoadingPlugin.MCVersion("${mc_version}")
 public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
+	public static File minecraftDir;
+
+	public TweaksLoadingPlugin() {
+		if (minecraftDir != null) {
+			minecraftDir = (File) FMLInjectionData.data()[6];
+			Config.init(new File(new File(minecraftDir, "config"), CCTweaks.ID + ".cfg"));
+		}
+	}
+
 	@Override
 	public String[] getASMTransformerClass() {
 		return new String[]{ASMTransformer.class.getName()};

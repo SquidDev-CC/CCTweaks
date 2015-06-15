@@ -36,12 +36,13 @@ jar {
 	manifest {
 		attributes(
 			'FMLCorePlugin': 'org.squiddev.cctweaks.core.asm.TweaksLoadingPlugin',
-			'FMLCorePluginContainsFMLMod': 'true'
+			'FMLCorePluginContainsFMLMod': 'true',
+			'FMLAT': 'CCTweaks_at.cfg',
 		)
 	}
 
 	// Package all the org.squiddev dependencies into one file
-	from configurations.fatPackage
+	from configurations.shade
 		.findAll { it.getAbsolutePath().contains("org.squiddev") }
 		.collect { it.isDirectory() ? it : zipTree(it) }
 

@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.network.bridge;
 
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.core.Config;
 
 import java.util.*;
 
@@ -12,13 +13,12 @@ public final class NetworkBindings {
 	private static final Map<UUID, Set<IWorldNetworkNode>> networks = new HashMap<UUID, Set<IWorldNetworkNode>>();
 
 	public static Set<IWorldNetworkNode> getNodes(UUID id) {
-		if (id == null) return null;
-
+		if (id == null || !Config.Network.WirelessBridge.enabled) return null;
 		return networks.get(id);
 	}
 
 	public static void addNode(UUID id, IWorldNetworkNode node) {
-		if (id == null) return;
+		if (id == null || !Config.Network.WirelessBridge.enabled) return;
 
 		Set<IWorldNetworkNode> nodes = networks.get(id);
 		if (nodes == null) {

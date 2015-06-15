@@ -14,18 +14,18 @@ public class RedstoneFluxIntegration extends APIIntegration {
 	public RedstoneFluxIntegration() {
 		super("CoFHAPI|energy");
 	}
-	
+
 	@Override
 	public void init() {
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {
 			@Override
 			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack) {
-				return Config.config.turtleFluxRefuelEnable && stack.getItem() instanceof IEnergyContainerItem;
+				return Config.Turtle.fluxRefuelAmount > 0 && stack.getItem() instanceof IEnergyContainerItem;
 			}
 
 			@Override
 			public int refuel(ITurtleAccess turtle, ItemStack stack, int limit) {
-				int fluxAmount = Config.config.turtleFluxRefuelAmount;
+				int fluxAmount = Config.Turtle.fluxRefuelAmount;
 
 				// Avoid over refueling
 				int maxRefuel = turtle.getFuelLimit() - turtle.getFuelLevel();

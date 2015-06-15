@@ -1,274 +1,272 @@
 package org.squiddev.cctweaks.core;
 
 import net.minecraftforge.common.config.Configuration;
-import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
+import org.squiddev.configgen.*;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * The main config class
+ */
+@org.squiddev.configgen.Config(languagePrefix = "gui.config.cctweaks.")
 public final class Config {
-	public static final String LANGUAGE_ROOT = "config.cctweaks.";
-	private static final String MISC = "misc";
-	private static final String COMPUTER = "computer";
-	private static final String TURTLE = "turtle";
-	public static final String[] CATEGORIES = {TURTLE, COMPUTER, MISC};
-
 	public static Configuration configuration;
-	public static final ConfigData defaults = new ConfigData();
-	public static ConfigData config = new ConfigData();
-
-	/**
-	 * List of disabled turtle actions
-	 */
 	public static Set<String> turtleDisabledActions;
-
-	/**
-	 * Allowed global variables
-	 */
 	public static Set<String> globalWhitelist;
 
 	public static void init(File file) {
-		configuration = new Configuration(file);
-		configuration.load();
-
-		sync();
+		ConfigLoader.init(file);
 	}
 
 	public static void sync() {
-		ConfigData data = config = new ConfigData();
-		ConfigData defaults = Config.defaults;
+		ConfigLoader.sync();
+	}
 
-		// Turtle changes
-		data.turtleFluxRefuelEnable = configuration.getBoolean(
-			"Flux refuel",
-			TURTLE,
-			defaults.turtleFluxRefuelEnable,
-			"Enable refuel from Redstone Flux items"
-		);
-		data.turtleFluxRefuelAmount = configuration.getInt(
-			"Flux refuel amount",
-			TURTLE,
-			data.turtleFluxRefuelAmount,
-			1, Integer.MAX_VALUE,
-			"Amount of RF required for one refuel point"
-		);
-
-		data.turtleEuRefuelEnable = configuration.getBoolean(
-			"EU refuel",
-			TURTLE,
-			defaults.turtleEuRefuelEnable,
-			"Enable refuel from IC2 batteries"
-		);
-		data.turtleEuRefuelAmount = configuration.getInt(
-			"EU refuel amount",
-			TURTLE,
-			data.turtleEuRefuelAmount,
-			1, Integer.MAX_VALUE,
-			"Amount of Eu required for one refuel point"
-		);
-
-		data.turtleDisabledActions = configuration.getStringList(
-			"Disabled turtle actions",
-			TURTLE,
-			defaults.turtleDisabledActions,
-			"Disabled turtle actions:\n(compare, compareTo, craft, detect, dig,\ndrop, equip, inspect, move, place,\nrefuel, select, suck, tool, turn)"
-		);
-
-		data.turtleWirelessBridgeId = configuration.getInt(
-			"Wireless Bridge Id",
-			TURTLE,
-			defaults.turtleWirelessBridgeId,
-			-1, Integer.MAX_VALUE,
-			"The id for the network bridge upgrade. Set to -1 to disable"
-		);
-
-		// Computer changes
-		data.enableComputerUpgrades = configuration.getBoolean(
-			"Computer upgrade",
-			COMPUTER,
-			defaults.enableComputerUpgrades,
-			"Enable upgrading computers"
-		);
-
-		data.enableDebugWand = configuration.getBoolean(
-			"Debug wand",
-			COMPUTER,
-			defaults.enableDebugWand,
-			"Enable the debug wand"
-		);
-
-		data.globalWhitelist = configuration.getStringList(
-			"Whitelisted Globals",
-			COMPUTER,
-			defaults.globalWhitelist,
-			"Globals to whitelist (are not set to nil).\nThis is NOT recommended for servers, use at your own risk"
-		);
-
-		data.computerThreadTimeout = configuration.getInt(
-			"Computer timeout",
-			COMPUTER,
-			(int) defaults.computerThreadTimeout,
-			1, Integer.MAX_VALUE,
-			"Time in milliseconds before 'Too long without yielding' error\nYou cannot shutdown/reboot the computer during this time.\nUse "
-		);
-
-		data.luaJC = configuration.getBoolean(
-			"LuaJC",
-			COMPUTER,
-			defaults.luaJC,
-			"Compile Lua bytecode to Java bytecode"
-		);
-
-		data.luaJCVerify = configuration.getBoolean(
-			"Verify LuaJC",
-			COMPUTER,
-			defaults.luaJCVerify,
-			"Verify LuaJC sources on generation.\nThis will slow down compilation.\n" +
-				"If you have errors, please turn this and debug and\nsend it with the bug report."
-		);
-
-		// Is debugging
-		data.debug = configuration.getBoolean(
-			"debug",
-			MISC,
-			defaults.debug,
-			"Show debug messages"
-		);
-
-		// Is debugging
-		data.debugItems = configuration.getBoolean(
-			"debugItems",
-			MISC,
-			defaults.debugItems,
-			"Enable debug blocks/items - requires debug"
-		);
-
-		data.deprecatedWarnings = configuration.getBoolean(
-			"deprecatedWarnings",
-			MISC,
-			defaults.deprecatedWarnings,
-			"Print a stacktrace to the console \nwhen a deprecated method is called"
-		);
-
-		data.strictMode = configuration.getBoolean(
-			"strictMode",
-			MISC,
-			defaults.strictMode,
-			"Run the transformer under strict mode\n" +
-			"This removes unused fields and methods \nto ensure that everything is correctly handled"
-		);
+	@OnSync
+	public static void onSync() {
+		configuration = ConfigLoader.getConfiguration();
 
 		// Handle generation of HashSets, etc...
 		Set<String> disabledActions = turtleDisabledActions = new HashSet<String>();
-		for (String action : data.turtleDisabledActions) {
-			disabledActions.add("dan200.computercraft.shared.turtle.core.turtle" + action.toLowerCase() + "command");
+		for (String action : Turtle.disabledActions) {
+			disabledActions.add(action.toLowerCase());
 		}
 
-		globalWhitelist = new HashSet<String>(Arrays.asList(data.globalWhitelist));
+		globalWhitelist = new HashSet<String>(Arrays.asList(Computer.globalWhitelist));
 
-		// Setup categories
-		configuration.setCategoryComment(COMPUTER, "Computer changes");
-		configuration.setCategoryRequiresMcRestart(COMPUTER, true);
+		Computer.computerUpgradeCrafting &= Computer.computerUpgradeEnabled;
 
-		configuration.setCategoryComment(TURTLE, "Turtle tweaks");
-		configuration.setCategoryRequiresMcRestart(TURTLE, true);
-
-		configuration.setCategoryComment(MISC, "The lonely config category");
-
-		for (String categoryName : CATEGORIES) {
-			configuration.setCategoryLanguageKey(categoryName, LANGUAGE_ROOT + categoryName);
-		}
-
-		configuration.save();
+		Network.WirelessBridge.crafting &= Network.WirelessBridge.enabled;
+		Network.WirelessBridge.turtleEnabled &= Network.WirelessBridge.enabled;
 	}
 
-	public static final class ConfigData {
+	/**
+	 * Computer tweaks and items.
+	 */
+	public static final class Computer {
 		/**
-		 * Enable RF refueling
+		 * Enable upgrading computers.
 		 */
-		public boolean turtleFluxRefuelEnable = true;
+		@DefaultBoolean(true)
+		public static boolean computerUpgradeEnabled;
 
 		/**
-		 * RF refuel amount
+		 * Enable crafting the computer upgrade.
+		 * Requires computerUpgradeEnabled.
 		 */
-		public int turtleFluxRefuelAmount = 100;
+		@DefaultBoolean(true)
+		@RequiresRestart
+		public static boolean computerUpgradeCrafting;
 
 		/**
-		 * Enable EU refueling
+		 * Enable using the debug wand.
 		 */
-		public boolean turtleEuRefuelEnable = true;
+		@DefaultBoolean(true)
+		public static boolean debugWandEnabled;
 
 		/**
-		 * EU refuel amount
+		 * Globals to whitelist (are not set to nil).
+		 * This is NOT recommended for servers, use at your own risk.
 		 */
-		public int turtleEuRefuelAmount = turtleFluxRefuelAmount / 4;
+		@RequiresRestart(mc = false, world = true)
+		public static String[] globalWhitelist;
 
 		/**
-		 * Disabled turtle verbs
+		 * Time in milliseconds before 'Too long without yielding' errors.
+		 * You cannot shutdown/reboot the computer during this time.
+		 * Use carefully.
 		 */
-		public String[] turtleDisabledActions = new String[0];
+		@DefaultInt(5000)
+		@Range(min = 0)
+		public static int computerThreadTimeout;
 
 		/**
-		 * Id for {@link TurtleUpgradeWirelessBridge}
-		 * TODO: Register on the wiki: http://www.computercraft.info/wiki/Turtle_Upgrade_IDs
+		 * Compile Lua bytecode to Java bytecode
 		 */
-		public int turtleWirelessBridgeId = 331;
+		@DefaultBoolean(false)
+		@RequiresRestart(mc = false, world = true)
+		public static boolean luaJC;
 
 		/**
-		 * Enable computer upgrade
+		 * Verify LuaJC sources on generation.
+		 * This will slow down compilation.
+		 * If you have errors, please turn this and debug on and
+		 * send it with the bug report.
+		 * TODO: Get this working again
 		 */
-		public boolean enableComputerUpgrades = true;
+		// @DefaultBoolean(false)
+		// public static boolean luaJCVerify;
+	}
+
+	/**
+	 * Turtle tweaks and items.
+	 */
+	public static final class Turtle {
+		/**
+		 * Amount of RF required for one refuel point
+		 * Set to 0 to disable.
+		 */
+		@DefaultInt(100)
+		@Range(min = 0)
+		public static int fluxRefuelAmount;
 
 		/**
-		 * Enable debug want
+		 * Amount of Eu required for one refuel point.
+		 * Set to 0 to disable.
 		 */
-		public boolean enableDebugWand = false;
+		@DefaultInt(25)
+		@Range(min = 0)
+		public static int euRefuelAmount;
 
 		/**
-		 * Global whitelist
+		 * Fun actions for turtle names
 		 */
-		public String[] globalWhitelist = new String[0];
+		@DefaultBoolean(true)
+		public static boolean funNames;
 
 		/**
-		 * Thread timeout for computers
+		 * Disabled turtle actions:
+		 * (compare, compareTo, craft, detect, dig,
+		 * drop, equip, inspect, move, place,
+		 * refuel, select, suck, tool, turn).
 		 */
-		public long computerThreadTimeout = 5000L;
+		@RequiresRestart(mc = false, world = true)
+		public static String[] disabledActions;
 
 		/**
-		 * Use LuaJC compiler
+		 * Various tool host options
 		 */
-		public boolean luaJC = false;
+		public static class ToolHost {
+			/**
+			 * Enable the Tool Host
+			 */
+			@DefaultBoolean(true)
+			public static boolean enabled;
+
+			/**
+			 * Enable crafting the Tool Host
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart
+			public static boolean crafting;
+
+			/**
+			 * Upgrade Id
+			 */
+			@DefaultInt(332)
+			@RequiresRestart
+			@Range(min = 0)
+			public static int upgradeId;
+
+			/**
+			 * The dig speed factor for tool hosts.
+			 * 20 is about normal player speed.
+			 */
+			@DefaultInt(10)
+			@Range(min = 1)
+			public static int digFactor;
+		}
+	}
+
+	/**
+	 * Additional network functionality.
+	 */
+	public static final class Network {
+		/**
+		 * The wireless bridge allows you to connect
+		 * wired networks across dimensions.
+		 */
+		public static class WirelessBridge {
+			/**
+			 * Enable the wireless bridge
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart(mc = false, world = true)
+			public static boolean enabled;
+
+			/**
+			 * Enable the crafting of Wireless Bridges.
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart
+			public static boolean crafting;
+
+			/**
+			 * Enable the Wireless Bridge upgrade for turtles.
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart
+			public static boolean turtleEnabled;
+
+			// TODO: Register on the wiki: http://www.computercraft.info/wiki/Turtle_Upgrade_IDs
+			/**
+			 * The turtle upgrade Id
+			 */
+			@DefaultInt(331)
+			@Range(min = 1)
+			@RequiresRestart
+			public static int turtleId;
+		}
 
 		/**
-		 * Verify classes on generation
+		 * Enable the crafting of full block modems.
+		 *
+		 * If you disable, existing ones will still function,
+		 * and you can obtain them from creative.
 		 */
-		public boolean luaJCVerify = false;
+		@DefaultBoolean(true)
+		@RequiresRestart
+		public static boolean fullBlockModemCrafting;
+	}
+
+	/**
+	 * Integration with other mods.
+	 */
+	@RequiresRestart
+	public static final class Integration {
+		/**
+		 * Allows pushing items from one inventory
+		 * to another inventory on the network.
+		 */
+		@DefaultBoolean(true)
+		public static boolean openPeripheralInventories;
 
 		/**
-		 * Print debug information
+		 * Enable ChickenBones Multipart
+		 * (aka ForgeMultipart) integration.
 		 */
-		public boolean debug = false;
+		@DefaultBoolean(true)
+		public static boolean cbMultipart;
+	}
+
+	/**
+	 * Only used when testing and developing the mod.
+	 * Nothing to see here, move along...
+	 */
+	public static final class Testing {
+		/**
+		 * Show debug messages.
+		 * If you hit a bug, enable this, rerun and send the log
+		 */
+		@DefaultBoolean(false)
+		public static boolean debug;
 
 		/**
-		 * Enable the debug blocks/items
+		 * Enable debug blocks/items.
+		 * Only use for testing.
 		 */
-		public boolean debugItems = false;
+		@DefaultBoolean(false)
+		public static boolean debugItems;
 
 		/**
 		 * Throw exceptions on calling deprecated methods
 		 *
 		 * Only for development/testing
 		 */
-		public boolean deprecatedWarnings = false;
-
-		/**
-		 * Run the transformer under strict mode.
-		 * This removes unused fields and methods to ensure that everything is covered
-		 *
-		 * Only for development/testing
-		 */
-		public boolean strictMode = false;
+		@DefaultBoolean(false)
+		public static boolean deprecatedWarnings;
 	}
 }

@@ -105,6 +105,6 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 
 	@Override
 	public boolean canLoad() {
-		return Config.config.debug && Config.config.debugItems;
+		return Config.Testing.debugItems;
 	}
 }

@@ -2,7 +2,7 @@ package org.squiddev.cctweaks.blocks;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import org.squiddev.cctweaks.core.Events;
+import org.squiddev.cctweaks.core.FmlEvents;
 
 /**
  * A tile entity that lazy loads NBT
@@ -34,7 +34,7 @@ public abstract class TileLazyNBT extends TileBase {
 	@Override
 	public void create() {
 		super.create();
-		Events.schedule(new Runnable() {
+		FmlEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
 				onFirstTick();
