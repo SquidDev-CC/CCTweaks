@@ -15,6 +15,12 @@ public abstract class SingleModemCable extends CableWithInternalSidedParts {
 	}
 
 	@Override
+	public void connect() {
+		super.connect();
+		getAttachedNetwork().formConnection(this, getModem());
+	}
+
+	@Override
 	public Set<INetworkNode> getConnectedNodes() {
 		Set<INetworkNode> nodes = super.getConnectedNodes();
 		nodes.add(getModem());

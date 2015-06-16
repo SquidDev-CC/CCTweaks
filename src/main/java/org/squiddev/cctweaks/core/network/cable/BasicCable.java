@@ -50,6 +50,7 @@ public abstract class BasicCable extends AbstractWorldNode {
 		}*/
 
 		updateConnectionMap();
+		// TODO: Maybe we should check if the connection map changes instead.
 		return !attachedNodes.equals(attachedNodes = newNodes);
 	}
 

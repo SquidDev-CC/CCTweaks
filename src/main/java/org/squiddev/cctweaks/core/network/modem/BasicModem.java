@@ -322,6 +322,6 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	@Override
 	public String toString() {
 		IWorldPosition position = getPosition();
-		return super.toString() + String.format("%s, %s, %s)", position.getX(), position.getY(), position.getZ());
+		return super.toString() + String.format(" (%s, %s, %s)", position.getX(), position.getY(), position.getZ());
 	}
 }

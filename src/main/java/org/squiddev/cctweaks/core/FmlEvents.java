@@ -25,7 +25,9 @@ public final class FmlEvents {
 	private final Queue<Runnable> scheduledQueue = new LinkedList<Runnable>();
 
 	private void add(Runnable runnable) {
-		scheduledQueue.add(runnable);
+		synchronized (scheduledQueue) {
+			scheduledQueue.add(runnable);
+		}
 	}
 
 	public static void schedule(Runnable runnable) {
@@ -35,8 +37,11 @@ public final class FmlEvents {
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.START) {
-			for (Runnable scheduled : scheduledQueue) {
-				scheduled.run();
+			synchronized (scheduledQueue) {
+				Runnable scheduled;
+				while ((scheduled = scheduledQueue.poll()) != null) {
+					scheduled.run();
+				}
 			}
 		}
 	}

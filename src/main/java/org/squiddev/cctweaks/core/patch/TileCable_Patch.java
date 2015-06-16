@@ -53,7 +53,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	 */
 	public DirectionalPeripheralModem getModem() {
 		if (modem == null) {
-			DirectionalPeripheralModem modem = this.modem = new DirectionalPeripheralModem() {
+			return modem = new DirectionalPeripheralModem() {
 				@MergeVisitor.Rewrite
 				protected boolean ANNOTATION;
 
@@ -86,8 +86,6 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 					return super.isPeripheralEnabled() && getPeripheralType() == PeripheralType.WiredModemWithCable;
 				}
 			};
-			m_modem = modem.modem;
-			return modem;
 		}
 		return modem;
 	}
