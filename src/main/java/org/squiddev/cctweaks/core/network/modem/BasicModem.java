@@ -77,7 +77,6 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	public void processQueue() {
 		synchronized (transmitQueue) {
 			Packet packet;
-			IWorldPosition position = getPosition();
 			while ((packet = transmitQueue.poll()) != null) {
 				networkController.transmitPacket(this, packet);
 			}
@@ -117,7 +116,6 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 		}
 
 		for (Map.Entry<String, IPeripheral> entry : this.getConnectedPeripherals().entrySet()) {
-			String key = entry.getKey();
 			IPeripheral value = entry.getValue();
 
 			if (value instanceof INetworkedPeripheral) {
@@ -319,5 +317,11 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 				((INetworkedPeripheral) value).attachToNetwork(this, key);
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		IWorldPosition position = getPosition();
+		return super.toString() + String.format("%s, %s, %s)", position.getX(), position.getY(), position.getZ());
 	}
 }

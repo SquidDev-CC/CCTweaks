@@ -1,8 +1,6 @@
 package org.squiddev.cctweaks.core.network.cable;
 
-import com.google.common.collect.Sets;
 import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
@@ -40,21 +38,25 @@ public abstract class BasicCable extends AbstractWorldNode {
 	 * @return If the connections changed
 	 */
 	public boolean updateConnections() {
-		// TODO: This should be called in connect as well
 		Set<INetworkNode> newNodes = getConnectedNodes();
 
-		if (networkController != null) {
-			for (INetworkNode newNode : Sets.difference(newNodes, attachedNodes)) {
-				networkController.formConnection(this, newNode);
-			}
-
-			for (INetworkNode removedNode : Sets.difference(attachedNodes, newNodes)) {
-				networkController.breakConnection(new SingleTypeUnorderedPair<INetworkNode>(this, removedNode));
-			}
+		// FIXME: Don't think these should be called.
+		/*for (INetworkNode newNode : Sets.difference(newNodes, attachedNodes)) {
+			networkController.formConnection(this, newNode);
 		}
+
+		for (INetworkNode removedNode : Sets.difference(attachedNodes, newNodes)) {
+			networkController.breakConnection(new SingleTypeUnorderedPair<INetworkNode>(this, removedNode));
+		}*/
 
 		updateConnectionMap();
 		return !attachedNodes.equals(attachedNodes = newNodes);
+	}
+
+	@Override
+	public void connect() {
+		super.connect();
+		updateConnections();
 	}
 
 	public int getConnectionMap() {

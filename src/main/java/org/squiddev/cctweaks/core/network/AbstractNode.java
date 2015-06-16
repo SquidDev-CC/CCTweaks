@@ -4,6 +4,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.Collections;
 import java.util.Map;
@@ -36,6 +37,7 @@ public abstract class AbstractNode implements INetworkNode {
 			throw new IllegalStateException("Not connected to network");
 		}
 
+		DebugLogger.debug(this + " detaching from " + networkController);
 		networkController = null;
 	}
 
@@ -48,10 +50,17 @@ public abstract class AbstractNode implements INetworkNode {
 		}
 
 		this.networkController = networkController;
+		DebugLogger.debug(this + " connecting to " + networkController);
 	}
 
 	@Override
 	public INetworkController getAttachedNetwork() {
 		return networkController;
+	}
+
+	@Override
+	public String toString() {
+		String name = getClass().getName();
+		return name.substring(name.lastIndexOf('.') + 1) + "@" + Integer.toHexString(this.hashCode());
 	}
 }

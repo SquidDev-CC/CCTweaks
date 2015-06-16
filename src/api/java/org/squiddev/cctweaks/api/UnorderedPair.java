@@ -45,4 +45,9 @@ public class UnorderedPair<X, Y> {
 	public int hashCode() {
 		return x.hashCode() ^ y.hashCode();
 	}
+
+	@Override
+	public String toString() {
+		return String.format("<%s, %s>", x, y);
+	}
 }

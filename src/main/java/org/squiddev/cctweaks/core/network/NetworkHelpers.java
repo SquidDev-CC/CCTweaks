@@ -10,6 +10,9 @@ import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Helper methods on networks
  */
@@ -38,14 +41,18 @@ public final class NetworkHelpers {
 	}
 
 	/**
-	 * Scans surrounding nodes and attaches to them if possible
+	 * Get adjacent nodes that can be connected to
 	 *
-	 * @param node The node to scan with
+	 * Checks the current node can connect, and adjacent node can be connected to
+	 * in that direction
+	 *
+	 * @param node The current node
+	 * @return The adjacent nodes
 	 */
-	public static void joinOrCreateNetwork(IWorldNetworkNode node) {
-		if (node.getAttachedNetwork() != null) return;
-
+	public static Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node) {
+		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
 		IWorldPosition position = node.getPosition();
+
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
 			if (node.canConnect(direction)) {
 				IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(
@@ -55,13 +62,40 @@ public final class NetworkHelpers {
 					position.getZ() + direction.offsetZ
 				);
 
-				if (neighbour != null && neighbour.canConnect(direction.getOpposite()) && neighbour.getAttachedNetwork() != null) {
-					INetworkController network = neighbour.getAttachedNetwork();
-					network.formConnection(neighbour, node);
-					DebugLogger.debug(node + "Connecting to " + node.getAttachedNetwork() + " from " + neighbour);
-				} else if (neighbour != null) {
-					DebugLogger.debug(node + " Node has no network " + neighbour);
+				if (neighbour != null && neighbour.canConnect(direction.getOpposite())) {
+					nodes.add(neighbour);
 				}
+			}
+		}
+
+		return nodes;
+	}
+
+	/**
+	 * Connect to adjacent nodes, or create a network.
+	 *
+	 * Uses {@link #getAdjacentNodes(IWorldNetworkNode)} and {@link #joinOrCreateNetwork(IWorldNetworkNode)}
+	 *
+	 * @param node The node to scan with
+	 */
+	public static void joinOrCreateNetwork(IWorldNetworkNode node) {
+		joinOrCreateNetwork(node, getAdjacentNodes(node));
+	}
+
+	/**
+	 * Attempt to connect to any node, or create a network if it cannot
+	 *
+	 * @param node        The node to scan with
+	 * @param connections The nodes that can connect
+	 */
+	public static void joinOrCreateNetwork(INetworkNode node, Set<INetworkNode> connections) {
+		if (node.getAttachedNetwork() != null) return;
+
+		for (INetworkNode neighbour : connections) {
+			if (neighbour.getAttachedNetwork() != null) {
+				INetworkController network = neighbour.getAttachedNetwork();
+				network.formConnection(neighbour, node);
+				DebugLogger.debug(node + " Connecting to " + node.getAttachedNetwork() + " from " + neighbour);
 			}
 		}
 
