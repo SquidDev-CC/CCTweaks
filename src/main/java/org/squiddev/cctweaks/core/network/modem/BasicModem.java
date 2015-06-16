@@ -10,10 +10,7 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.network.AbstractNode;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Basic wired modem that handles peripherals and
@@ -219,14 +216,27 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 
 	@Override
 	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals) {
-		for (Map.Entry<String, PeripheralAccess> wrapper : peripheralWrappersByName.entrySet()) {
-			if (!networkController.getPeripheralsOnNetwork().containsKey(wrapper.getKey())) {
+		// Clone to prevent modification errors
+		Set<String> peripheralNames = new HashSet<String>(peripheralWrappersByName.keySet());
+		for (String wrapper : peripheralNames) {
+			if (!networkController.getPeripheralsOnNetwork().containsKey(wrapper)) {
 				// Wrapper removed
-				detachPeripheral(wrapper.getKey());
+				detachPeripheral(wrapper);
 			}
 		}
 
-		for (Map.Entry<String, IPeripheral> entry : this.getConnectedPeripherals().entrySet()) {
+		if (modem != null && modem.getComputer() != null) {
+			for (String name : networkController.getPeripheralsOnNetwork().keySet()) {
+				if (!peripheralWrappersByName.containsKey(name)) {
+					IPeripheral peripheral = networkController.getPeripheralsOnNetwork().get(name);
+					if (peripheral != null) {
+						attachPeripheral(name, peripheral);
+					}
+				}
+			}
+		}
+
+		for (Map.Entry<String, IPeripheral> entry : getConnectedPeripherals().entrySet()) {
 			IPeripheral value = entry.getValue();
 
 			if (value instanceof INetworkedPeripheral) {
@@ -237,7 +247,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 
 	@Override
 	public void detachFromNetwork() {
-		for (Map.Entry<String, IPeripheral> entry : this.getConnectedPeripherals().entrySet()) {
+		for (Map.Entry<String, IPeripheral> entry : getConnectedPeripherals().entrySet()) {
 			String key = entry.getKey();
 			IPeripheral value = entry.getValue();
 
@@ -322,6 +332,6 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	@Override
 	public String toString() {
 		IWorldPosition position = getPosition();
-		return super.toString() + String.format(" (%s, %s, %s)", position.getX(), position.getY(), position.getZ());
+		return "Modem: " + super.toString() + String.format(" (%s, %s, %s)", position.getX(), position.getY(), position.getZ());
 	}
 }

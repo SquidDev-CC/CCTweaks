@@ -68,4 +68,9 @@ public abstract class BasicCable extends AbstractWorldNode {
 		int flag = 1 << dir.ordinal();
 		return (connMap & flag) == flag;
 	}
+
+	@Override
+	public String toString() {
+		return "Cable:" + super.toString();
+	}
 }
