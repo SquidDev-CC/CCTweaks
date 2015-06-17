@@ -26,7 +26,7 @@ public class NetworkTest {
 	 * I'm scared of infinite loops
 	 */
 	@Rule
-	public Timeout globalTimeout = Timeout.seconds(2);
+	public Timeout globalTimeout = Timeout.seconds(5);
 
 	@Test
 	public void basicActions() {

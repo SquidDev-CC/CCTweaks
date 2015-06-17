@@ -83,7 +83,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 				@Override
 				protected boolean isPeripheralEnabled() {
-					return super.isPeripheralEnabled() && getPeripheralType() == PeripheralType.WiredModemWithCable;
+					return super.isPeripheralEnabled() && !m_destroyed && getPeripheralType() == PeripheralType.WiredModemWithCable;
 				}
 			};
 		}

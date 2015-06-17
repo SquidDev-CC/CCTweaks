@@ -3,7 +3,10 @@ package org.squiddev.cctweaks.core.network.bridge;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.api.IDataCard;
-import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.core.network.AbstractWorldNode;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.Set;
 import java.util.UUID;
@@ -11,38 +14,36 @@ import java.util.UUID;
 /**
  * An implementation for {@link NetworkBindings} that saves the id to NBT
  */
-public class NetworkBinding {
-	protected static final String MSB = "bound_id_msb";
-	protected static final String LSB = "bound_id_lsb";
+public class NetworkBinding extends AbstractWorldNode {
+	public static final String MSB = "bound_id_msb";
+	public static final String LSB = "bound_id_lsb";
 
 	protected UUID id = UUID.randomUUID();
-	protected IWorldNetworkNode node;
+	protected final IWorldPosition position;
 
-	public NetworkBinding(IWorldNetworkNode node) {
-		this.node = node;
+	public NetworkBinding(IWorldPosition position) {
+		this.position = position;
 	}
 
 	/**
 	 * Add the position to the bindings
 	 */
 	public void add() {
-		if (node.getPosition().getWorld() != null) NetworkBindings.addNode(id, node);
+		if (getPosition().getWorld() != null) NetworkBindings.addNode(id, this);
 	}
 
 	/**
 	 * Remove the position from the bindings
 	 */
 	public void remove() {
-		if (node.getPosition().getWorld() != null) NetworkBindings.removeNode(id, node);
+		NetworkBindings.removeNode(id, this);
 	}
 
-	/**
-	 * Get all bound positions for this binding
-	 *
-	 * @return The positions for this binding
-	 */
-	public Set<IWorldNetworkNode> getNodes() {
-		return NetworkBindings.getNodes(id);
+	@Override
+	public Set<INetworkNode> getConnectedNodes() {
+		Set<INetworkNode> nodes = super.getConnectedNodes();
+		nodes.addAll(NetworkBindings.getNodes(id));
+		return nodes;
 	}
 
 	public void setId(UUID newId) {
@@ -70,9 +71,11 @@ public class NetworkBinding {
 	public boolean load(NBTTagCompound tag) {
 		if (tag.hasKey(MSB) && tag.hasKey(LSB)) {
 			UUID newId = new UUID(tag.getLong(MSB), tag.getLong(LSB));
+			DebugLogger.debug("Loading " + newId);
 			if (!newId.equals(id)) setId(newId);
 			return true;
 		}
+		DebugLogger.debug("Cannot load");
 
 		return false;
 	}
@@ -100,5 +103,10 @@ public class NetworkBinding {
 	 */
 	public boolean load(ItemStack stack, IDataCard card) {
 		return card.getType(stack).equals(NetworkBindings.BINDING_NAME) && load(card.getData(stack));
+	}
+
+	@Override
+	public IWorldPosition getPosition() {
+		return position;
 	}
 }

@@ -1,48 +1,51 @@
 package org.squiddev.cctweaks.core.network.bridge;
 
+import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.SetMultimap;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Stores list of network bindings
  */
 public final class NetworkBindings {
 	public static final String BINDING_NAME = "cctweaks.data.networkBinding";
-	private static final Map<UUID, Set<IWorldNetworkNode>> networks = new HashMap<UUID, Set<IWorldNetworkNode>>();
+	private static final SetMultimap<UUID, IWorldNetworkNode> networks = MultimapBuilder.hashKeys().hashSetValues().build();
 
 	public static Set<IWorldNetworkNode> getNodes(UUID id) {
-		if (id == null || !Config.Network.WirelessBridge.enabled) return null;
+		DebugLogger.debug("Getting nodes");
+		if (id == null || !Config.Network.WirelessBridge.enabled) return Collections.emptySet();
+		DebugLogger.debug("Getting " + id);
 		return networks.get(id);
 	}
 
 	public static void addNode(UUID id, IWorldNetworkNode node) {
+		DebugLogger.debug("Preparing to add");
 		if (id == null || !Config.Network.WirelessBridge.enabled) return;
 
 		Set<IWorldNetworkNode> nodes = networks.get(id);
-		if (nodes == null) {
-			nodes = new HashSet<IWorldNetworkNode>();
-			networks.put(id, nodes);
-		}
-
+		DebugLogger.debug("Adding " + id);
 		if (nodes.add(node)) {
 			for (IWorldNetworkNode n : nodes) {
 				if (!n.equals(node)) {
-					n.getAttachedNetwork().formConnection(n, node);
+					if (n.getAttachedNetwork() != null) n.getAttachedNetwork().formConnection(n, node);
 				}
 			}
 		}
 	}
 
 	public static void removeNode(UUID id, IWorldNetworkNode node) {
+		DebugLogger.debug("Preparing to remove");
 		if (id == null) return;
 
-		Set<IWorldNetworkNode> nodes = networks.get(id);
-
-		if (nodes != null) {
-			node.getAttachedNetwork().removeNode(node);
-			nodes.remove(node);
+		DebugLogger.debug("Removing " + id);
+		if (networks.remove(id, node)) {
+			if (node.getAttachedNetwork() != null) node.getAttachedNetwork().removeNode(node);
 		}
 	}
 }

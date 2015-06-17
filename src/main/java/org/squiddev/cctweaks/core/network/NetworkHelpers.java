@@ -8,7 +8,6 @@ import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.core.FmlEvents;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -74,7 +73,7 @@ public final class NetworkHelpers {
 	/**
 	 * Connect to adjacent nodes, or create a network.
 	 *
-	 * Uses {@link #getAdjacentNodes(IWorldNetworkNode)} and {@link #joinOrCreateNetwork(IWorldNetworkNode)}
+	 * Uses {@link #getAdjacentNodes(IWorldNetworkNode)} and {@link #joinOrCreateNetwork(INetworkNode, Set)}
 	 *
 	 * @param node The node to scan with
 	 */
@@ -88,20 +87,18 @@ public final class NetworkHelpers {
 	 * @param node        The node to scan with
 	 * @param connections The nodes that can connect
 	 */
-	public static void joinOrCreateNetwork(INetworkNode node, Set<INetworkNode> connections) {
+	public static void joinOrCreateNetwork(INetworkNode node, Set<? extends INetworkNode> connections) {
 		if (node.getAttachedNetwork() != null) return;
 
 		for (INetworkNode neighbour : connections) {
 			if (neighbour.getAttachedNetwork() != null) {
 				INetworkController network = neighbour.getAttachedNetwork();
 				network.formConnection(neighbour, node);
-				DebugLogger.debug(node + " Connecting to " + node.getAttachedNetwork() + " from " + neighbour);
 			}
 		}
 
 		if (node.getAttachedNetwork() == null) {
 			joinNewNetwork(node);
-			DebugLogger.debug(node + " Creating new network");
 		}
 	}
 

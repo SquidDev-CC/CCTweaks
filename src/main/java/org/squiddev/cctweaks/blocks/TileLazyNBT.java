@@ -26,20 +26,16 @@ public abstract class TileLazyNBT extends TileBase {
 	 */
 	public abstract Iterable<String> getFields();
 
-	private void onFirstTick() {
-		if (lazyTag != null) {
-			readLazyNBT(lazyTag);
-			lazyTag = null;
-		}
-	}
-
 	@Override
 	public void create() {
 		super.create();
 		FmlEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
-				onFirstTick();
+				if (lazyTag != null) {
+					readLazyNBT(lazyTag);
+					lazyTag = null;
+				}
 			}
 		});
 	}

@@ -17,7 +17,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
 import org.squiddev.cctweaks.core.Config;
@@ -30,7 +29,6 @@ import org.squiddev.cctweaks.core.registry.Registry;
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Turtle upgrade for the {@link TileNetworkedWirelessBridge} tile
@@ -155,11 +153,6 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 		@Override
 		public boolean canConnect(ForgeDirection side) {
 			return side == ForgeDirection.UNKNOWN;
-		}
-
-		// TODO: Get this working
-		public Set<INetworkNode> getConnectedNodes() {
-			return Collections.<INetworkNode>unmodifiableSet(binding.getNodes());
 		}
 
 		@Override

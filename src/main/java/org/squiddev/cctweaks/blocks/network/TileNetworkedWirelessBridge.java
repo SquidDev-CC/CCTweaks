@@ -9,11 +9,15 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralHidden;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
-import org.squiddev.cctweaks.blocks.TileBase;
+import org.squiddev.cctweaks.blocks.TileLazyNBT;
+import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.modem.BasicModem;
+import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +25,7 @@ import java.util.Set;
 /**
  * Bind networks together
  */
-public class TileNetworkedWirelessBridge extends TileBase implements IPeripheralHost, IWorldNetworkNodeHost {
+public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeripheralHost, IWorldNetworkNodeHost {
 	protected final BasicModem modem = new BasicModem() {
 		@Override
 		public IWorldPosition getPosition() {
@@ -33,18 +37,33 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 			return Collections.emptyMap();
 		}
 
-		// TODO: Get this working
+		@Override
+		protected BasicModemPeripheral createPeripheral() {
+			return new WirelessBridgePeripheral(this);
+		}
+
+	};
+
+	protected static class WirelessBridgePeripheral extends BasicModemPeripheral<BasicModem> implements IPeripheralHidden {
+		public WirelessBridgePeripheral(BasicModem modem) {
+			super(modem);
+		}
+	}
+
+	protected final NetworkBinding binding = new NetworkBinding(this) {
+		@Override
 		public Set<INetworkNode> getConnectedNodes() {
-			return Collections.<INetworkNode>unmodifiableSet(binding.getNodes());
+			Set<INetworkNode> nodes = super.getConnectedNodes();
+			nodes.add(modem);
+			return nodes;
+		}
+
+		@Override
+		public void connect() {
+			super.connect();
+			getAttachedNetwork().formConnection(this, modem);
 		}
 	};
-	protected final NetworkBinding binding = new NetworkBinding(modem);
-
-	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		super.readFromNBT(tag);
-		binding.load(tag);
-	}
 
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
@@ -53,9 +72,24 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 	}
 
 	@Override
+	public void readLazyNBT(NBTTagCompound tag) {
+		binding.load(tag);
+	}
+
+	@Override
+	public Iterable<String> getFields() {
+		return Arrays.asList(NetworkBinding.LSB, NetworkBinding.MSB);
+	}
+
+	@Override
 	public void create() {
 		super.create();
-		binding.add();
+		FmlEvents.schedule(new Runnable() {
+			@Override
+			public void run() {
+				binding.connect();
+			}
+		});
 	}
 
 	@Override

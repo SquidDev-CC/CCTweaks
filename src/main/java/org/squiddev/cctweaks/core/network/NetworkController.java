@@ -8,7 +8,6 @@ import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.*;
 
@@ -83,7 +82,6 @@ public class NetworkController implements INetworkController {
 		}
 
 		SingleTypeUnorderedPair<INetworkNode> connection = new SingleTypeUnorderedPair<INetworkNode>(existingNode, newNode);
-		DebugLogger.debug("Connecting " + connection);
 		networkConnections.add(connection);
 
 		if (network.contains(newNode)) {

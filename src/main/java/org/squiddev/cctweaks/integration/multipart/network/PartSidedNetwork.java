@@ -17,7 +17,6 @@ import java.util.Collections;
  * This takes the size/drawing style of a modem
  */
 public abstract class PartSidedNetwork extends PartBase implements IWorldNetworkNodeHost, TSlottedPart {
-	private final Object lock = new Object();
 	protected byte direction;
 
 	@Override
