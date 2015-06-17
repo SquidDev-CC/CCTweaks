@@ -18,7 +18,7 @@ import java.util.Map;
  * </ul>
  * to make sure it doesn't break anything
  */
-public class AdapterPeripheral_Patch implements IPeripheralTargeted, INetworkedPeripheral {
+public abstract class AdapterPeripheral_Patch implements IPeripheralTargeted, INetworkedPeripheral {
 	@MergeVisitor.Stub
 	protected final Object target;
 

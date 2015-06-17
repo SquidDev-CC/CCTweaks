@@ -12,10 +12,12 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 
 public class CableBlockRenderingHandler_Patch {
-	private static FixedRenderBlocks fixedRenderBlocks = new FixedRenderBlocks();
+	private static FixedRenderBlocks fixedRenderBlocks;
 
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelID, RenderBlocks renderblocks) {
 		if (modelID == ComputerCraft.Blocks.cable.blockRenderID) {
+			if (fixedRenderBlocks == null) fixedRenderBlocks = new FixedRenderBlocks();
+
 			BlockCable cable = (BlockCable) block;
 			PeripheralType type = cable.getPeripheralType(world, x, y, z);
 

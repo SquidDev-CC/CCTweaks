@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * PeripheralProxy rewrite with INetworkedPeripheral support
  */
-public class PeripheralProxy_Patch implements INetworkedPeripheral, IPeripheralProxy {
+public abstract class PeripheralProxy_Patch implements INetworkedPeripheral, IPeripheralProxy {
 	@MergeVisitor.Stub
 	private final IPeripheral peripheral;
 

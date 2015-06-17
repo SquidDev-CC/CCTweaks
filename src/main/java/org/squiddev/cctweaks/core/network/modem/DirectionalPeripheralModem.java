@@ -7,6 +7,7 @@ import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralHidden;
 
 import java.io.File;
 
@@ -24,7 +25,7 @@ public abstract class DirectionalPeripheralModem extends SinglePeripheralModem {
 		int z = position.getZ() + Facing.offsetsZForSide[dir];
 		IPeripheral peripheral = PeripheralUtil.getPeripheral((World) position.getWorld(), x, y, z, Facing.oppositeSide[dir]);
 
-		if (peripheral == null) {
+		if (peripheral == null || peripheral instanceof IPeripheralHidden) {
 			id = -1;
 			peripheral = null;
 		} else if (id <= -1) {

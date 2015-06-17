@@ -7,6 +7,7 @@ import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralHidden;
 
 import java.io.File;
 import java.util.*;
@@ -75,7 +76,7 @@ public abstract class MultiPeripheralModem extends BasicModem {
 				Facing.oppositeSide[dir]
 			);
 
-			if (peripheral == null || (peripheral instanceof BasicModemPeripheral && ((BasicModemPeripheral) peripheral).modem instanceof MultiPeripheralModem)) {
+			if (peripheral == null || peripheral instanceof IPeripheralHidden || (peripheral instanceof BasicModemPeripheral && ((BasicModemPeripheral) peripheral).modem instanceof MultiPeripheralModem)) {
 				ids[dir] = -1;
 				peripherals[dir] = null;
 			} else if (ids[dir] <= -1) {
