@@ -6,7 +6,6 @@ import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.core.network.AbstractWorldNode;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.Set;
 import java.util.UUID;
@@ -43,6 +42,7 @@ public class NetworkBinding extends AbstractWorldNode {
 	public Set<INetworkNode> getConnectedNodes() {
 		Set<INetworkNode> nodes = super.getConnectedNodes();
 		nodes.addAll(NetworkBindings.getNodes(id));
+		nodes.remove(this);
 		return nodes;
 	}
 
@@ -71,11 +71,9 @@ public class NetworkBinding extends AbstractWorldNode {
 	public boolean load(NBTTagCompound tag) {
 		if (tag.hasKey(MSB) && tag.hasKey(LSB)) {
 			UUID newId = new UUID(tag.getLong(MSB), tag.getLong(LSB));
-			DebugLogger.debug("Loading " + newId);
 			if (!newId.equals(id)) setId(newId);
 			return true;
 		}
-		DebugLogger.debug("Cannot load");
 
 		return false;
 	}
@@ -108,5 +106,10 @@ public class NetworkBinding extends AbstractWorldNode {
 	@Override
 	public IWorldPosition getPosition() {
 		return position;
+	}
+
+	@Override
+	public String toString() {
+		return "Binding: " + super.toString();
 	}
 }

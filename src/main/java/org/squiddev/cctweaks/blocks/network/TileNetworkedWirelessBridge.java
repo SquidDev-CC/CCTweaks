@@ -95,7 +95,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	@Override
 	public void destroy() {
 		super.destroy();
-		binding.remove();
+		binding.destroy();
 		modem.destroy();
 	}
 
@@ -137,6 +137,6 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 
 	@Override
 	public IWorldNetworkNode getNode() {
-		return modem;
+		return binding;
 	}
 }

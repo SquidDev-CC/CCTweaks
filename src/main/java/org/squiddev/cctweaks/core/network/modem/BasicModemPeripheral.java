@@ -8,8 +8,6 @@ import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.Vec3;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
-import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +17,7 @@ import java.util.Map;
  *
  * @see BasicModem
  */
-public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IWorldNetworkNodeHost {
+public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral {
 	public final T modem;
 
 	public BasicModemPeripheral(T modem) {
@@ -141,10 +139,5 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 			throw new LuaException("Expected string");
 		}
 		return (String) arguments[index];
-	}
-
-	@Override
-	public IWorldNetworkNode getNode() {
-		return modem;
 	}
 }

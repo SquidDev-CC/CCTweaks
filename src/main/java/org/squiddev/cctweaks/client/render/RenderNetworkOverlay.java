@@ -65,8 +65,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 				}
 			}
 		} else {
-			// Deselect if the current item isn't the debugger
-			controller = null;
+			return;
 		}
 
 		if (controller == null) return;

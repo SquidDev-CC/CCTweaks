@@ -88,8 +88,6 @@ public final class NetworkHelpers {
 	 * @param connections The nodes that can connect
 	 */
 	public static void joinOrCreateNetwork(INetworkNode node, Set<? extends INetworkNode> connections) {
-		if (node.getAttachedNetwork() != null) return;
-
 		for (INetworkNode neighbour : connections) {
 			if (neighbour.getAttachedNetwork() != null) {
 				INetworkController network = neighbour.getAttachedNetwork();
@@ -103,7 +101,8 @@ public final class NetworkHelpers {
 	}
 
 	/**
-	 * Creates a new network for the node
+	 * Creates a new network for the node.
+	 * It will be removed from the current network.
 	 *
 	 * @param node The node to create the network with
 	 */
