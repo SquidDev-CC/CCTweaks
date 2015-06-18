@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.core.network;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
+import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 
@@ -80,7 +81,6 @@ public class NetworkTest {
 				\  /
 				 C
 			 */
-			System.out.println("Forming...");
 			controller.formConnection(c, a);
 			controller.formConnection(c, b);
 			controller.formConnection(a, b);
@@ -92,15 +92,57 @@ public class NetworkTest {
 
 		{
 			// A--B
-			System.out.println("Removing...");
 			controller.removeNode(c);
-			System.out.println("Done!");
 
 			assertNull(c.getAttachedNetwork());
 
 			assertNotNull(a.getAttachedNetwork());
 			assertNotNull(b.getAttachedNetwork());
 			assertEquals(a.getAttachedNetwork(), b.getAttachedNetwork());
+		}
+	}
+
+	@Test
+	public void breakConnection() {
+		INetworkNode a = new Node("a");
+		INetworkNode b = new Node("b");
+		INetworkNode c = new Node("c");
+
+		INetworkController controller = new NetworkController(c);
+
+		{
+			/*
+				A---B
+				\  /
+				 C
+			 */
+			controller.formConnection(c, a);
+			controller.formConnection(c, b);
+			controller.formConnection(a, b);
+
+			assertEquals(controller, c.getAttachedNetwork());
+			assertEquals(controller, a.getAttachedNetwork());
+			assertEquals(controller, b.getAttachedNetwork());
+		}
+
+		{
+			// A--B--C
+			a.getAttachedNetwork().breakConnection(new SingleTypeUnorderedPair<INetworkNode>(a, c));
+
+			assertNotNull(a.getAttachedNetwork());
+			assertEquals(a.getAttachedNetwork(), b.getAttachedNetwork());
+			assertEquals(a.getAttachedNetwork(), c.getAttachedNetwork());
+		}
+
+		{
+			// A--B  C
+			a.getAttachedNetwork().breakConnection(new SingleTypeUnorderedPair<INetworkNode>(b, c));
+
+			assertNotNull(a.getAttachedNetwork());
+			assertEquals(a.getAttachedNetwork(), b.getAttachedNetwork());
+
+			assertNotNull(c.getAttachedNetwork());
+			assertNotEquals(a.getAttachedNetwork(), c.getAttachedNetwork());
 		}
 	}
 }

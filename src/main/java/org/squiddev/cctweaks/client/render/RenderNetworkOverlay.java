@@ -26,6 +26,7 @@ import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
 
 import java.awt.*;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -87,6 +88,9 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 	private void renderNetwork(Set<SingleTypeUnorderedPair<INetworkNode>> connections, Color color, float thickness) {
 		World world = theWorld;
+		MovingObjectPosition position = Minecraft.getMinecraft().objectMouseOver;
+
+		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
 
 		for (SingleTypeUnorderedPair<INetworkNode> connection : connections) {
 			INetworkNode a = connection.x, b = connection.y;
@@ -95,37 +99,34 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 				IWorldNetworkNode aNode = (IWorldNetworkNode) a, bNode = (IWorldNetworkNode) b;
 				IBlockAccess aWorld = aNode.getPosition().getWorld(), bWorld = bNode.getPosition().getWorld();
 
-				if (aWorld == world) {
-					if (bWorld == world) {
-						renderConnection(aNode, bNode, color, thickness);
-					} else {
-						renderSingleNode(aNode, bNode);
+				if (aWorld == world && bWorld == world) {
+					renderConnection(aNode, bNode, color, thickness);
+				}
+			}
+
+			// We render a label of all nodes at this point.
+			if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+				if (a instanceof IWorldNetworkNode) {
+					IWorldPosition nodePosition = ((IWorldNetworkNode) a).getPosition();
+					if (nodePosition.getWorld() == world && nodePosition.getX() == position.blockX && nodePosition.getY() == position.blockY && nodePosition.getZ() == position.blockZ) {
+						nodes.add(a);
+						if (!(b instanceof IWorldNetworkNode)) nodes.add(b);
 					}
-				} else if (bWorld == world) {
-					renderSingleNode(aNode, bNode);
 				}
-			} else if (a instanceof IWorldNetworkNode) {
-				IWorldNetworkNode aNode = (IWorldNetworkNode) a;
-				if (aNode.getPosition().getWorld() == world) {
-					renderSingleNode(aNode, b);
-				}
-			} else if (b instanceof IWorldNetworkNode) {
-				IWorldNetworkNode bNode = (IWorldNetworkNode) b;
-				if (bNode.getPosition().getWorld() == world) {
-					renderSingleNode(bNode, a);
+
+				if (b instanceof IWorldNetworkNode) {
+					IWorldPosition nodePosition = ((IWorldNetworkNode) b).getPosition();
+					if (nodePosition.getWorld() == world && nodePosition.getX() == position.blockX && nodePosition.getY() == position.blockY && nodePosition.getZ() == position.blockZ) {
+						if (!(a instanceof IWorldNetworkNode)) nodes.add(a);
+						nodes.add(b);
+					}
 				}
 			}
 		}
-	}
 
-	public void renderSingleNode(IWorldNetworkNode aNode, INetworkNode bNode) {
-		MovingObjectPosition position = Minecraft.getMinecraft().objectMouseOver;
-
-		if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-			IWorldPosition nodePosition = aNode.getPosition();
-			if (nodePosition.getX() == position.blockX && nodePosition.getY() == position.blockY && nodePosition.getZ() == position.blockZ) {
-				renderLabel(position.blockX + 0.5, position.blockY + 1.5, position.blockZ + 0.5, bNode.toString());
-			}
+		int counter = 0;
+		for (INetworkNode node : nodes) {
+			renderLabel(position.blockX + 0.5, position.blockY + 1.5 + (counter++) * 0.4, position.blockZ + 0.5, node.toString());
 		}
 	}
 
@@ -149,8 +150,11 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 	}
 
 	private void renderLabel(double x, double y, double z, String label) {
+		if (label == null) return;
+
 		RenderManager renderManager = RenderManager.instance;
 		FontRenderer fontrenderer = renderManager.getFontRenderer();
+		if (fontrenderer == null) return;
 		float scale = 0.02666667F;
 		GL11.glPushMatrix();
 

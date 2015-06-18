@@ -95,11 +95,9 @@ public class NetworkController implements INetworkController {
 
 	@Override
 	public void breakConnection(final SingleTypeUnorderedPair<INetworkNode> connection) {
-		if (!networkConnections.contains(connection)) {
+		if (!networkConnections.remove(connection)) {
 			throw new IllegalArgumentException("Connection does not exist " + connection);
 		}
-
-		networkConnections.remove(connection);
 
 		Optional<NetworkController> xNetwork = new CancelOnFindScanner(connection.y).scan(connection.x);
 
@@ -117,6 +115,10 @@ public class NetworkController implements INetworkController {
 
 	@Override
 	public void removeNode(INetworkNode removedNode) {
+		if (removedNode.getAttachedNetwork() != this) {
+			throw new IllegalArgumentException("Node must be on the network");
+		}
+
 		removedNode.detachFromNetwork();
 
 		List<INetworkNode> connectingNodes = new ArrayList<INetworkNode>();

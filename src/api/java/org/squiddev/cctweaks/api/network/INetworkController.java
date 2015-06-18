@@ -18,8 +18,10 @@ public interface INetworkController {
 	 * This is not used when a node comes to exist.
 	 * Only when a connection is formed.
 	 *
-	 * @param existingNode	The node already on this network.
-	 * @param newNode		The node that might not already be on this network.
+	 * @param existingNode The node already on this network.
+	 * @param newNode      The node that might not already be on this network.
+	 * @throws IllegalArgumentException If attempting to connect to itself
+	 * @throws IllegalArgumentException If {@code existingNode} is not on the network
 	 */
 	void formConnection(INetworkNode existingNode, INetworkNode newNode);
 
@@ -32,6 +34,7 @@ public interface INetworkController {
 	 * Only when two nodes disconnect.
 	 *
 	 * @param connection A pair of nodes representing the nodes being disconnected.
+	 * @throws IllegalArgumentException When the connection doesn't exist
 	 */
 	void breakConnection(SingleTypeUnorderedPair<INetworkNode> connection);
 
@@ -41,6 +44,7 @@ public interface INetworkController {
 	 * The network will reevaluate nodes and create as many severed networks as necessary.
 	 *
 	 * @param node The node being removed.
+	 * @throws IllegalArgumentException If the node is not on the network
 	 */
 	void removeNode(INetworkNode node);
 
@@ -71,7 +75,7 @@ public interface INetworkController {
 	/**
 	 * Transmits a packet on the network.
 	 *
-	 * @param node The node emitting the packet.
+	 * @param node   The node emitting the packet.
 	 * @param packet The packet being transmitted.
 	 */
 	void transmitPacket(INetworkNode node, Packet packet);
