@@ -97,6 +97,10 @@ public final class NetworkHelpers {
 
 		if (node.getAttachedNetwork() == null) {
 			joinNewNetwork(node);
+			/* TODO: Maybe?
+			for (INetworkNode neighbour : connections) {
+				node.getAttachedNetwork().formConnection(node, neighbour);
+			}*/
 		}
 	}
 
@@ -123,6 +127,20 @@ public final class NetworkHelpers {
 			@Override
 			public void run() {
 				joinOrCreateNetwork(node);
+			}
+		});
+	}
+
+	/**
+	 * Schedule calling {@link AbstractWorldNode#connect()} next tick
+	 *
+	 * @param node The node to schedule
+	 */
+	public static void scheduleConnect(final AbstractWorldNode node) {
+		FmlEvents.schedule(new Runnable() {
+			@Override
+			public void run() {
+				node.connect();
 			}
 		});
 	}

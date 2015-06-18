@@ -22,24 +22,39 @@ public final class FmlEvents {
 		}
 	}
 
-	private final Queue<Runnable> scheduledQueue = new LinkedList<Runnable>();
+	private final Queue<Runnable> serverQueue = new LinkedList<Runnable>();
+	private final Queue<Runnable> clientQueue = new LinkedList<Runnable>();
 
-	private void add(Runnable runnable) {
-		synchronized (scheduledQueue) {
-			scheduledQueue.add(runnable);
+	public static void schedule(Runnable runnable) {
+		synchronized (instance.serverQueue) {
+			instance.serverQueue.add(runnable);
 		}
 	}
 
-	public static void schedule(Runnable runnable) {
-		instance.add(runnable);
+	public static void scheduleClient(Runnable runnable) {
+		synchronized (instance.clientQueue) {
+			instance.clientQueue.add(runnable);
+		}
 	}
 
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.START) {
-			synchronized (scheduledQueue) {
+			synchronized (serverQueue) {
 				Runnable scheduled;
-				while ((scheduled = scheduledQueue.poll()) != null) {
+				while ((scheduled = serverQueue.poll()) != null) {
+					scheduled.run();
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onClientTick(TickEvent.ClientTickEvent event) {
+		if (event.phase == TickEvent.Phase.START) {
+			synchronized (clientQueue) {
+				Runnable scheduled;
+				while ((scheduled = clientQueue.poll()) != null) {
 					scheduled.run();
 				}
 			}

@@ -31,11 +31,13 @@ public abstract class PartBase extends TMultiPart implements JNormalOcclusion, J
 		return getBrokenIcon(side);
 	}
 
+	@Override
 	@SideOnly(Side.CLIENT)
 	public void addHitEffects(MovingObjectPosition hit, EffectRenderer effectRenderer) {
 		IconHitEffects.addHitEffects(this, hit, effectRenderer);
 	}
 
+	@Override
 	@SideOnly(Side.CLIENT)
 	public void addDestroyEffects(MovingObjectPosition hit, EffectRenderer effectRenderer) {
 		IconHitEffects.addDestroyEffects(this, effectRenderer, false);

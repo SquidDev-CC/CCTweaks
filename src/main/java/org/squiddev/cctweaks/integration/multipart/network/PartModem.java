@@ -81,7 +81,6 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	@Override
 	public void harvest(MovingObjectPosition hit, EntityPlayer player) {
 		World world = world();
-		int x = x(), y = y(), z = z();
 
 		super.harvest(hit, player);
 

@@ -12,7 +12,7 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHidden;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileLazyNBT;
-import org.squiddev.cctweaks.core.FmlEvents;
+import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
@@ -84,12 +84,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	@Override
 	public void create() {
 		super.create();
-		FmlEvents.schedule(new Runnable() {
-			@Override
-			public void run() {
-				binding.connect();
-			}
-		});
+		NetworkHelpers.scheduleConnect(binding);
 	}
 
 	@Override

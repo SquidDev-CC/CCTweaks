@@ -17,6 +17,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
 import org.squiddev.cctweaks.core.Config;
@@ -29,6 +30,7 @@ import org.squiddev.cctweaks.core.registry.Registry;
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Turtle upgrade for the {@link TileNetworkedWirelessBridge} tile
@@ -92,6 +94,28 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 	@Override
 	public void init() {
 		ComputerCraft.registerTurtleUpgrade(this);
+	}
+
+	public static class TurtleBinding extends NetworkBinding {
+		private final TurtleModem modem;
+
+		public TurtleBinding(TurtleModem modem) {
+			super(modem.getPosition());
+			this.modem = modem;
+		}
+
+		@Override
+		public Set<INetworkNode> getConnectedNodes() {
+			Set<INetworkNode> nodes = super.getConnectedNodes();
+			nodes.add(modem);
+			return nodes;
+		}
+
+		@Override
+		public void connect() {
+			super.connect();
+			getAttachedNetwork().formConnection(this, modem);
+		}
 	}
 
 	/**

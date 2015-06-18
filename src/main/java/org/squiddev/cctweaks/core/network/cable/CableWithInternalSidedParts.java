@@ -7,16 +7,17 @@ public abstract class CableWithInternalSidedParts extends BasicCable {
 
 	public abstract boolean canConnectInternally(ForgeDirection direction);
 
-	public int getInternalConnectionMap() {
-		return internalConnMap;
-	}
-
 	public boolean doesConnectInternally(ForgeDirection direction) {
 		int flag = 1 << direction.ordinal();
 		return (internalConnMap & flag) == flag;
 	}
 
-	public void updateInternalConnections() {
+
+	public boolean doesConnectSide(ForgeDirection direction) {
+		return doesConnect(direction) || doesConnectInternally(direction);
+	}
+
+	protected void updateInternalConnectionMap() {
 		internalConnMap = 0;
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			if (canConnectInternally(dir)) {
@@ -27,7 +28,8 @@ public abstract class CableWithInternalSidedParts extends BasicCable {
 
 	@Override
 	public boolean updateConnections() {
-		updateInternalConnections();
-		return super.updateConnections();
+		int internal = internalConnMap;
+		updateInternalConnectionMap();
+		return super.updateConnections() || internal != internalConnMap;
 	}
 }

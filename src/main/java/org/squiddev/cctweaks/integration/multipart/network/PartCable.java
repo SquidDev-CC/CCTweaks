@@ -1,7 +1,6 @@
 package org.squiddev.cctweaks.integration.multipart.network;
 
 import codechicken.lib.data.MCDataInput;
-import codechicken.lib.data.MCDataOutput;
 import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
@@ -30,13 +29,17 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
+import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.cable.CableWithInternalSidedParts;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.PartBase;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlottedPart, ISidedHollowConnect {
 	public static final String NAME = CCTweaks.NAME + ":networkCable";
@@ -59,9 +62,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 
 	@SideOnly(Side.CLIENT)
 	public CableRenderer getRender() {
-		if (render == null) {
-			render = new CableRenderer();
-		}
+		if (render == null) return render = new CableRenderer();
 		return render;
 	}
 
@@ -167,9 +168,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 		World world = world();
 		super.harvest(hit, player);
 
-		if (!world.isRemote) {
-			cable.destroy();
-		}
+		if (!world.isRemote) cable.destroy();
 	}
 
 	@Override
@@ -196,27 +195,32 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 
 	@Override
 	public void onPartChanged(TMultiPart part) {
-		// Fire a network changed event when the entire part is modified.
-		// This is because it may block a connection or release a new one
-		if (tile() != null) {
-			if (!world().isRemote && cable.updateConnections()) {
-				sendDescUpdate();
-			}
+		if (tile() != null && cable.updateConnections()) {
+			tile().notifyPartChange(this);
 		}
 	}
 
 	@Override
 	public void onNeighborChanged() {
-		if (tile() != null) {
-			if (!world().isRemote && cable.updateConnections()) {
-				sendDescUpdate();
-			}
+		if (tile() != null && cable.updateConnections()) {
+			sendDescUpdate();
 		}
 	}
 
 	@Override
 	public void onWorldJoin() {
-		cable.updateConnections();
+		if (!world().isRemote) {
+			NetworkHelpers.scheduleConnect(cable);
+		} else {
+			FmlEvents.scheduleClient(new Runnable() {
+				@Override
+				public void run() {
+					if (cable.updateConnections()) {
+						tile().notifyPartChange(PartCable.this);
+					}
+				}
+			});
+		}
 	}
 
 	@Override
@@ -227,16 +231,6 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	@Override
 	public boolean doesTick() {
 		return false;
-	}
-
-	@Override
-	public void writeDesc(MCDataOutput data){
-		// TODO: Implement
-	}
-
-	@Override
-	public void readDesc(MCDataInput data){
-		// TODO: Implement
 	}
 
 	/**
@@ -251,10 +245,23 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	 * @return whether the cable can extend in that direction.
 	 */
 	protected boolean canCableExtendInDirection(ForgeDirection dir) {
+		// TODO: Cache this - some nodes don't cache connections.
 		connectionTestSide = dir;
 		boolean occludes = tile().canReplacePart(this, this);
 		connectionTestSide = ForgeDirection.UNKNOWN;
 		return occludes;
+	}
+
+	/**
+	 * When we receive an update packet we should
+	 * update connections, as we send these when the neighbour
+	 * is changed
+	 */
+	@Override
+	public void readDesc(MCDataInput packet) {
+		if (tile() != null && cable.updateConnections()) {
+			tile().notifyPartChange(this);
+		}
 	}
 
 	@Override
@@ -265,8 +272,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	protected class CableImpl extends CableWithInternalSidedParts {
 		@Override
 		public Set<INetworkNode> getConnectedNodes() {
-			Set<INetworkNode> nodes = new HashSet<INetworkNode>();
-			nodes.addAll(super.getConnectedNodes());
+			Set<INetworkNode> nodes = super.getConnectedNodes();
 
 			for (TMultiPart part : tile().jPartList()) {
 				if (part != PartCable.this) {
@@ -285,8 +291,8 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 		public boolean canConnectInternally(ForgeDirection direction) {
 			TMultiPart part = tile().partMap(direction.ordinal());
 			INetworkNode node = part instanceof INetworkNode ? (INetworkNode) part
-					: part instanceof IWorldNetworkNodeHost ? ((IWorldNetworkNodeHost) part).getNode()
-					: null;
+				: part instanceof IWorldNetworkNodeHost ? ((IWorldNetworkNodeHost) part).getNode()
+				: null;
 			return node != null;
 		}
 
@@ -297,7 +303,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 
 		@Override
 		public boolean canConnect(ForgeDirection direction) {
-			return canCableExtendInDirection(direction) && NetworkHelpers.canConnect(PartCable.this, direction);
+			return canCableExtendInDirection(direction);
 		}
 	}
 
@@ -335,13 +341,13 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 		public IIcon getBlockIcon(Block block, IBlockAccess world, int x, int y, int z, int side) {
 			int dir = -1;
 
-			if (canVisuallyConnect(ForgeDirection.WEST) || canVisuallyConnect(ForgeDirection.EAST)) {
+			if (cable.doesConnectSide(ForgeDirection.WEST) || cable.doesConnectSide(ForgeDirection.EAST)) {
 				dir = dir == -1 ? 4 : -2;
 			}
-			if (canVisuallyConnect(ForgeDirection.UP) || canVisuallyConnect(ForgeDirection.DOWN)) {
+			if (cable.doesConnectSide(ForgeDirection.UP) || cable.doesConnectSide(ForgeDirection.DOWN)) {
 				dir = dir == -1 ? 0 : -2;
 			}
-			if (canVisuallyConnect(ForgeDirection.NORTH) || canVisuallyConnect(ForgeDirection.SOUTH)) {
+			if (cable.doesConnectSide(ForgeDirection.NORTH) || cable.doesConnectSide(ForgeDirection.SOUTH)) {
 				dir = dir == -1 ? 2 : -2;
 			}
 			if (dir == -1) dir = 2;
@@ -407,17 +413,6 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 				setRenderBounds(MAX, MIN, MIN, 1 - RENDER_PADDING, MAX, MAX);
 				renderStandardBlock(block, x, y, z);
 			}
-		}
-
-		/**
-		 * Tests to see if there is something to connect to, either in the
-		 * same block space or out
-		 *
-		 * @param side The side to check
-		 * @return If we should appear to connect on that side.
-		 */
-		public boolean canVisuallyConnect(ForgeDirection side) {
-			return cable.doesConnect(side) || cable.doesConnectInternally(side);
 		}
 	}
 }

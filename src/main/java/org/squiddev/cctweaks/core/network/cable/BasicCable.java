@@ -1,67 +1,70 @@
 package org.squiddev.cctweaks.core.network.cable;
 
+import com.google.common.collect.Sets;
 import net.minecraftforge.common.util.ForgeDirection;
+import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
-import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.core.network.AbstractWorldNode;
+import org.squiddev.cctweaks.core.network.NetworkHelpers;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
-// No pun intended...
+/**
+ * A world node that caches where it can connect to and
+ * handles adding and removing connections
+ */
 public abstract class BasicCable extends AbstractWorldNode {
 	private int connMap;
-	private Set<INetworkNode> attachedNodes = new HashSet<INetworkNode>();
+	private Set<INetworkNode> connections = Collections.emptySet();
 
 	protected void updateConnectionMap() {
-		//TODO: Could we inline this in updateConnections?
-		connMap = 0;
+		int map = 0;
 
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-			if (canConnect(dir)) {
-				int x = getPosition().getX() + dir.offsetX;
-				int y = getPosition().getY() + dir.offsetY;
-				int z = getPosition().getZ() + dir.offsetZ;
-
-				IWorldNetworkNode node = NetworkAPI.registry().getNode(getPosition().getWorld(), x, y, z);
-				if (node != null && node.canConnect(dir.getOpposite())) {
-					connMap |= 1 << dir.ordinal();
-				}
+			if (canConnect(dir) && NetworkHelpers.canConnect(getPosition(), dir)) {
+				map |= 1 << dir.ordinal();
 			}
 		}
+
+		connMap = map;
 	}
 
 	/**
-	 * Update connections and the connection map
+	 * Update the connection map.
+	 *
+	 * On a server, this will also connect/disconnect networks
 	 *
 	 * @return If the connections changed
 	 */
 	public boolean updateConnections() {
-		Set<INetworkNode> newNodes = getConnectedNodes();
+		if (getAttachedNetwork() != null) {
+			Set<INetworkNode> attachedNodes = connections;
+			Set<INetworkNode> newNodes = connections = getConnectedNodes();
 
-		// FIXME: Don't think these should be called.
-		/*for (INetworkNode newNode : Sets.difference(newNodes, attachedNodes)) {
-			networkController.formConnection(this, newNode);
+			for (INetworkNode newNode : Sets.difference(newNodes, attachedNodes)) {
+				getAttachedNetwork().formConnection(this, newNode);
+			}
+
+			for (INetworkNode removedNode : Sets.difference(attachedNodes, newNodes)) {
+				SingleTypeUnorderedPair<INetworkNode> connection = new SingleTypeUnorderedPair<INetworkNode>(this, removedNode);
+
+				// The network can/will change whilst the loop is iterating.
+				if (getAttachedNetwork().getNodeConnections().contains(connection)) {
+					getAttachedNetwork().breakConnection(connection);
+				}
+			}
 		}
 
-		for (INetworkNode removedNode : Sets.difference(attachedNodes, newNodes)) {
-			networkController.breakConnection(new SingleTypeUnorderedPair<INetworkNode>(this, removedNode));
-		}*/
-
+		int map = connMap;
 		updateConnectionMap();
-		// TODO: Maybe we should check if the connection map changes instead.
-		return !attachedNodes.equals(attachedNodes = newNodes);
+		return map != connMap;
 	}
 
 	@Override
 	public void connect() {
 		super.connect();
 		updateConnections();
-	}
-
-	public int getConnectionMap() {
-		return connMap;
 	}
 
 	public boolean doesConnect(ForgeDirection dir) {

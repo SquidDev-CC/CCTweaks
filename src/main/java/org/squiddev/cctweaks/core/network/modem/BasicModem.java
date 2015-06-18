@@ -327,6 +327,8 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 				((INetworkedPeripheral) value).attachToNetwork(this, key);
 			}
 		}
+
+		if (getAttachedNetwork() != null) getAttachedNetwork().invalidateNetwork();
 	}
 
 	@Override
