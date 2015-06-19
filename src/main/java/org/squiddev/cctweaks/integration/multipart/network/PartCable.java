@@ -1,6 +1,5 @@
 package org.squiddev.cctweaks.integration.multipart.network;
 
-import codechicken.lib.data.MCDataInput;
 import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
@@ -29,7 +28,6 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
-import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.cable.CableWithInternalSidedParts;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -51,11 +49,11 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	/**
 	 * Side we are testing the connection on
 	 *
-	 * @see #canCableExtendInDirection(ForgeDirection)
+	 * @see #rebuildCanConnectMap()
 	 */
 	private ForgeDirection connectionTestSide = ForgeDirection.UNKNOWN;
 
-	protected CableWithInternalSidedParts cable = new CableImpl();
+	protected CableImpl cable = new CableImpl();
 
 	@SideOnly(Side.CLIENT)
 	private CableRenderer render;
@@ -195,15 +193,15 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 
 	@Override
 	public void onPartChanged(TMultiPart part) {
-		if (tile() != null && cable.updateConnections()) {
-			tile().notifyPartChange(this);
+		if (!world().isRemote) {
+			cable.updateConnections();
 		}
 	}
 
 	@Override
 	public void onNeighborChanged() {
-		if (tile() != null && cable.updateConnections()) {
-			sendDescUpdate();
+		if (!world().isRemote) {
+			cable.updateConnections();
 		}
 	}
 
@@ -211,15 +209,6 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	public void onWorldJoin() {
 		if (!world().isRemote) {
 			NetworkHelpers.scheduleConnect(cable);
-		} else {
-			FmlEvents.scheduleClient(new Runnable() {
-				@Override
-				public void run() {
-					if (cable.updateConnections()) {
-						tile().notifyPartChange(PartCable.this);
-					}
-				}
-			});
 		}
 	}
 
@@ -234,34 +223,25 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	}
 
 	/**
-	 * Tests if the cable can pass through a side.
+	 * Rebuild the cache of occluded sides
+	 *
 	 * Uses TileMultipart.canReplacePart to see if a version of this cable with
 	 * with a certain side's occlusion extended to the full length
 	 * can be placed in the multipart.
 	 * If not, there's a cover or something in the way.
 	 * Else, there's no cover, or something like a hollow cover.
 	 *
-	 * @param dir The direction to test in
-	 * @return whether the cable can extend in that direction.
+	 * @return The new connection map
 	 */
-	protected boolean canCableExtendInDirection(ForgeDirection dir) {
-		// TODO: Cache this - some nodes don't cache connections.
-		connectionTestSide = dir;
-		boolean occludes = tile().canReplacePart(this, this);
-		connectionTestSide = ForgeDirection.UNKNOWN;
-		return occludes;
-	}
-
-	/**
-	 * When we receive an update packet we should
-	 * update connections, as we send these when the neighbour
-	 * is changed
-	 */
-	@Override
-	public void readDesc(MCDataInput packet) {
-		if (tile() != null && cable.updateConnections()) {
-			tile().notifyPartChange(this);
+	protected int rebuildCanConnectMap() {
+		int map = 0;
+		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+			connectionTestSide = direction;
+			if (tile().canReplacePart(this, this)) map |= 1 << direction.ordinal();
 		}
+		connectionTestSide = ForgeDirection.UNKNOWN;
+
+		return map;
 	}
 
 	@Override
@@ -270,6 +250,8 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	}
 
 	protected class CableImpl extends CableWithInternalSidedParts {
+		private int canConnectMap;
+
 		@Override
 		public Set<INetworkNode> getConnectedNodes() {
 			Set<INetworkNode> nodes = super.getConnectedNodes();
@@ -302,8 +284,16 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 		}
 
 		@Override
+		public void updateInternalConnectionMap() {
+			// We need to build before anything else
+			canConnectMap = rebuildCanConnectMap();
+			super.updateInternalConnectionMap();
+		}
+
+		@Override
 		public boolean canConnect(ForgeDirection direction) {
-			return canCableExtendInDirection(direction);
+			int flag = 1 << direction.ordinal();
+			return (canConnectMap & flag) == flag;
 		}
 	}
 
@@ -341,18 +331,18 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 		public IIcon getBlockIcon(Block block, IBlockAccess world, int x, int y, int z, int side) {
 			int dir = -1;
 
-			if (cable.doesConnectSide(ForgeDirection.WEST) || cable.doesConnectSide(ForgeDirection.EAST)) {
-				dir = dir == -1 ? 4 : -2;
+			if (cable.doesConnectVisually(ForgeDirection.WEST) || cable.doesConnectVisually(ForgeDirection.EAST)) {
+				dir = 4;
 			}
-			if (cable.doesConnectSide(ForgeDirection.UP) || cable.doesConnectSide(ForgeDirection.DOWN)) {
+			if (cable.doesConnectVisually(ForgeDirection.UP) || cable.doesConnectVisually(ForgeDirection.DOWN)) {
 				dir = dir == -1 ? 0 : -2;
 			}
-			if (cable.doesConnectSide(ForgeDirection.NORTH) || cable.doesConnectSide(ForgeDirection.SOUTH)) {
+			if (cable.doesConnectVisually(ForgeDirection.NORTH) || cable.doesConnectVisually(ForgeDirection.SOUTH)) {
 				dir = dir == -1 ? 2 : -2;
 			}
 			if (dir == -1) dir = 2;
 
-			if ((dir >= 0) && ((side == dir) || (side == Facing.oppositeSide[dir]))) {
+			if (dir >= 0 && (side == dir || side == Facing.oppositeSide[dir])) {
 				return getIcons()[1];
 			}
 
@@ -360,6 +350,13 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 		}
 
 		public void drawTile(IBlockAccess world, int x, int y, int z) {
+			/*
+				Caching cable connections is quite hard, so instead we update
+				the connection list every tick.
+				This means that we gain some performance (not looking up connections for icons as well)
+				but we don't have render derpyness.
+			 */
+			cable.updateConnections();
 			setWorld(world);
 
 			Block block = ComputerCraft.Blocks.cable;

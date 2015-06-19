@@ -12,8 +12,7 @@ public abstract class CableWithInternalSidedParts extends BasicCable {
 		return (internalConnMap & flag) == flag;
 	}
 
-
-	public boolean doesConnectSide(ForgeDirection direction) {
+	public boolean doesConnectVisually(ForgeDirection direction) {
 		return doesConnect(direction) || doesConnectInternally(direction);
 	}
 

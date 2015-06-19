@@ -145,7 +145,7 @@ public class PartModemWithCableIntermediate extends PartCable implements IPeriph
 	}
 
 	@Override
-	public boolean canCableExtendInDirection(ForgeDirection dir) {
-		return dir.ordinal() != modem.direction && super.canCableExtendInDirection(dir);
+	public int rebuildCanConnectMap() {
+		return super.rebuildCanConnectMap() & ~modem.direction;
 	}
 }
