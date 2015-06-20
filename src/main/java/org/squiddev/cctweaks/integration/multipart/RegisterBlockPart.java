@@ -16,6 +16,7 @@ import org.squiddev.cctweaks.integration.multipart.network.PartWirelessBridge;
 import java.util.Arrays;
 
 public class RegisterBlockPart implements MultiPartRegistry.IPartFactory, MultiPartRegistry.IPartConverter {
+	@Override
 	public TMultiPart createPart(String name, boolean client) {
 		if (name.equals(PartCable.NAME)) return new PartCable();
 		if (name.equals(PartModem.NAME)) return new PartModem();
@@ -30,10 +31,12 @@ public class RegisterBlockPart implements MultiPartRegistry.IPartFactory, MultiP
 		MultiPartRegistry.registerParts(this, new String[]{PartCable.NAME, PartModem.NAME, PartModemWithCableIntermediate.NAME, PartWirelessBridge.NAME});
 	}
 
+	@Override
 	public Iterable<Block> blockTypes() {
 		return Arrays.asList(new Block[]{ComputerCraft.Blocks.cable});
 	}
 
+	@Override
 	public TMultiPart convert(World world, BlockCoord pos) {
 		TileEntity tile = world.getTileEntity(pos.x, pos.y, pos.z);
 		if (tile != null && tile instanceof TileCable) {

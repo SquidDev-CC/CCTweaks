@@ -10,7 +10,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
-import org.squiddev.cctweaks.api.network.*;
+import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.core.registry.Module;
 
@@ -18,6 +21,7 @@ import org.squiddev.cctweaks.core.registry.Module;
  * Registers turtle related things
  */
 public class DefaultTurtleProviders extends Module {
+	@Override
 	public void init() {
 		// Add default furnace fuel provider
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {

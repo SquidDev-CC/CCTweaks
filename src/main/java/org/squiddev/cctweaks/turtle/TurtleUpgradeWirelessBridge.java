@@ -205,35 +205,30 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			@Override
 			public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
 				String[] methods = super.getMethodNames();
-				try {
-					switch (method - methods.length) {
-						case 0: { // bindFromCard
-							ItemStack stack = turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
-							if (stack != null && stack.getItem() instanceof IDataCard) {
-								IDataCard card = (IDataCard) stack.getItem();
-								if (TurtleBinding.this.load(stack, card)) {
-									TurtleBinding.this.save();
-									return new Object[]{true};
-								}
-							}
-							return new Object[]{false};
-						}
-						case 1: { // bindToCard
-							ItemStack stack = turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
-							if (stack != null && stack.getItem() instanceof IDataCard) {
-								IDataCard card = (IDataCard) stack.getItem();
-								TurtleBinding.this.save(stack, card);
+				switch (method - methods.length) {
+					case 0: { // bindFromCard
+						ItemStack stack = turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
+						if (stack != null && stack.getItem() instanceof IDataCard) {
+							IDataCard card = (IDataCard) stack.getItem();
+							if (TurtleBinding.this.load(stack, card)) {
+								TurtleBinding.this.save();
 								return new Object[]{true};
 							}
-							return new Object[]{false};
 						}
+						return new Object[]{false};
 					}
-
-					return super.callMethod(computer, context, method, arguments);
-				} catch (RuntimeException e) {
-					e.printStackTrace();
-					throw e;
+					case 1: { // bindToCard
+						ItemStack stack = turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
+						if (stack != null && stack.getItem() instanceof IDataCard) {
+							IDataCard card = (IDataCard) stack.getItem();
+							TurtleBinding.this.save(stack, card);
+							return new Object[]{true};
+						}
+						return new Object[]{false};
+					}
 				}
+
+				return super.callMethod(computer, context, method, arguments);
 			}
 
 			/**

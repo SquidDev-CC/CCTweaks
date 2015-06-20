@@ -21,15 +21,18 @@ public class ItemMultiBlock extends ItemBlock {
 		setHasSubtypes(true);
 	}
 
+	@Override
 	public int getMetadata(int meta) {
 		return meta;
 	}
 
+	@Override
 	@SideOnly(Side.CLIENT)
 	public IIcon getIconFromDamage(int meta) {
 		return field_150939_a.getIcon(0, meta);
 	}
 
+	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 		return ((IMultiBlock) field_150939_a).getUnlocalizedName(stack.getItemDamage());
 	}

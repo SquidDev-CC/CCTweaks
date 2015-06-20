@@ -3,7 +3,10 @@ package org.squiddev.cctweaks.core.network;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.*;
+import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
+import org.squiddev.cctweaks.api.network.INetworkRegistry;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.HashSet;
@@ -15,6 +18,7 @@ import java.util.Set;
 public final class NetworkRegistry implements INetworkRegistry {
 	private final Set<INetworkNodeProvider> providers = new HashSet<INetworkNodeProvider>();
 
+	@Override
 	public void addNodeProvider(INetworkNodeProvider provider) {
 		if (provider != null) providers.add(provider);
 	}
