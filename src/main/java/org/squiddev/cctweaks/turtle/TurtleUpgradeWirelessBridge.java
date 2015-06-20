@@ -6,31 +6,23 @@ import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
-import dan200.computercraft.shared.util.IDAssigner;
-import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
-import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
-import org.squiddev.cctweaks.core.network.modem.BasicModem;
+import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
 import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
 
-import java.io.File;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Turtle upgrade for the {@link TileNetworkedWirelessBridge} tile
@@ -58,7 +50,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 
 	@Override
 	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
-		return Config.Network.WirelessBridge.turtleEnabled ? new TurtleModem(turtle, side).modem : null;
+		return Config.Network.WirelessBridge.turtleEnabled ? new TurtleBinding(turtle, side).getModem().modem : null;
 	}
 
 	@Override
@@ -81,12 +73,8 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 	public void update(ITurtleAccess turtle, TurtleSide side) {
 		if (Config.Network.WirelessBridge.turtleEnabled && !turtle.getWorld().isRemote) {
 			IPeripheral peripheral = turtle.getPeripheral(side);
-			if (peripheral != null && peripheral instanceof TurtleModemPeripheral) {
-				TurtleModemPeripheral modemPeripheral = (TurtleModemPeripheral) peripheral;
-
-				TurtleModem modem = modemPeripheral.modem;
-				modem.processQueue();
-				if (modemPeripheral.pollChanged()) modem.save();
+			if (peripheral != null && peripheral instanceof TurtleBinding.TurtleModemPeripheral) {
+				((TurtleBinding.TurtleModemPeripheral) peripheral).update();
 			}
 		}
 	}
@@ -96,167 +84,169 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 		ComputerCraft.registerTurtleUpgrade(this);
 	}
 
-	public static class TurtleBinding extends NetworkBinding {
-		private final TurtleModem modem;
-
-		public TurtleBinding(TurtleModem modem) {
-			super(modem.getPosition());
-			this.modem = modem;
-		}
-
-		@Override
-		public Set<INetworkNode> getConnectedNodes() {
-			Set<INetworkNode> nodes = super.getConnectedNodes();
-			nodes.add(modem);
-			return nodes;
-		}
-
-		@Override
-		public void connect() {
-			super.connect();
-			getAttachedNetwork().formConnection(this, modem);
-		}
-	}
-
 	/**
-	 * Custom modem that allows binding and
+	 * This is really, really broken.
+	 *
+	 * The issue is two fold:
+	 * - The only way to check if the node is removed is through {@link IPeripheral#detach(IComputerAccess)}. However,
+	 * this means we are removing then attaching nodes and so forcing things to be recalculated when the world is
+	 * unloaded.
+	 * - Wrapping a turtle as a peripheral is hard.
 	 */
-	public static class TurtleModem extends BasicModem implements IWorldPosition {
+	public static class TurtleBinding extends NetworkBindingWithModem {
 		public final ITurtleAccess turtle;
 		public final TurtleSide side;
-		protected int id = -1;
-		protected final NetworkBinding binding;
 
-		public TurtleModem(ITurtleAccess turtle, TurtleSide side) {
+		public TurtleBinding(ITurtleAccess turtle, TurtleSide side) {
+			super(new TurtlePosition(turtle));
 			this.turtle = turtle;
 			this.side = side;
-			binding = new NetworkBinding(this);
 
-			NBTTagCompound data = turtle.getUpgradeNBTData(side);
-			binding.load(data);
-			if (data.hasKey("turtle_id")) id = data.getInteger("turtle_id");
+			load();
+			connect();
 		}
 
 		@Override
-		public IWorldPosition getPosition() {
-			return this;
+		public BindingModem createModem() {
+			return new TurtleModem();
+		}
+
+		@Override
+		public TurtleModem getModem() {
+			return (TurtleModem) modem;
+		}
+
+		public void load() {
+			load(turtle.getUpgradeNBTData(side));
+			getModem().load();
 		}
 
 		public void save() {
-			NBTTagCompound data = turtle.getUpgradeNBTData(side);
-			binding.save(data);
-			data.setBoolean("active", isActive());
-			data.setInteger("turtle_id", id);
+			save(turtle.getUpgradeNBTData(side));
+			getModem().save();
 			turtle.updateUpgradeNBTData(side);
 		}
 
 		/**
-		 * Get the turtle as a peripheral
-		 *
-		 * @return The turtle peripheral
+		 * Custom modem that allows modifying bindings
 		 */
-		@Override
-		public Map<String, IPeripheral> getConnectedPeripherals() {
-			ChunkCoordinates pos = turtle.getPosition();
-			IPeripheral peripheral = PeripheralUtil.getPeripheral(getWorld(), pos.posX, pos.posY, pos.posZ, 0);
-			if (peripheral == null) {
-				id = -1;
-				return Collections.emptyMap();
-			} else if (id <= -1) {
-				id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(getWorld()), "computer/lastid_" + peripheral.getType() + ".txt"));
+		public class TurtleModem extends BindingModem {
+			protected int id = -1;
+
+			public void load() {
+				NBTTagCompound data = turtle.getUpgradeNBTData(side);
+				if (data.hasKey("turtle_id")) id = data.getInteger("turtle_id");
 			}
 
-			return Collections.singletonMap(peripheral.getType() + "_" + id, peripheral);
-		}
+			public void save() {
+				turtle.getUpgradeNBTData(side).setInteger("turtle_id", id);
+			}
 
-		@Override
-		protected BasicModemPeripheral createPeripheral() {
-			return new TurtleModemPeripheral(this);
-		}
-
-		@Override
-		public boolean canConnect(ForgeDirection side) {
-			return side == ForgeDirection.UNKNOWN;
-		}
-
-		@Override
-		public World getWorld() {
-			return turtle.getWorld();
-		}
-
-		@Override
-		public int getX() {
-			return turtle.getPosition().posX;
-		}
-
-		@Override
-		public int getY() {
-			return turtle.getPosition().posY;
-		}
-
-		@Override
-		public int getZ() {
-			return turtle.getPosition().posZ;
-		}
-	}
-
-	/**
-	 * Extension of modem with bindToCard and bindFromCard methods
-	 */
-	public static class TurtleModemPeripheral extends BasicModemPeripheral<TurtleModem> {
-		public final NetworkBinding binding;
-
-		public TurtleModemPeripheral(TurtleModem modem) {
-			super(modem);
-			binding = new NetworkBinding(modem);
-		}
-
-		@Override
-		public String[] getMethodNames() {
-			String[] methods = super.getMethodNames();
-			String[] newMethods = new String[methods.length + 3];
-			System.arraycopy(methods, 0, newMethods, 0, methods.length);
-
-
-			int l = methods.length;
-			newMethods[l] = "bindFromCard";
-			newMethods[l + 1] = "bindToCard";
-
-			return newMethods;
-		}
-
-		@Override
-		public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
-			try {
-				String[] methods = super.getMethodNames();
-				switch (method - methods.length) {
-					case 0: { // bindFromCard
-						ItemStack stack = modem.turtle.getInventory().getStackInSlot(modem.turtle.getSelectedSlot());
-						if (stack != null && stack.getItem() instanceof IDataCard) {
-							IDataCard card = (IDataCard) stack.getItem();
-							if (binding.load(stack, card)) {
-								modem.save();
-								return new Object[]{true};
-							}
-						}
-						return new Object[]{false};
-					}
-					case 1: { // bindToCard
-						ItemStack stack = modem.turtle.getInventory().getStackInSlot(modem.turtle.getSelectedSlot());
-						if (stack != null && stack.getItem() instanceof IDataCard) {
-							IDataCard card = (IDataCard) stack.getItem();
-							binding.save(stack, card);
-							modem.save();
-							return new Object[]{true};
-						}
-						return new Object[]{false};
-					}
+			/**
+			 * Get the turtle as a peripheral
+			 *
+			 * @return The turtle peripheral
+			 */
+			@Override
+			public Map<String, IPeripheral> getConnectedPeripherals() {
+				/*
+				 * Wrapping the turtle as a peripheral is really cool.
+				 * However, there are some massive issues with recalculating peripherals
+				 * on detach, infinite loops when creating, etc...
+				 *
+				 * When I enable this, remember to wrap the load, connect methods with FmlEvents.schedule
+				 */
+				/*ChunkCoordinates pos = turtle.getPosition();
+				IPeripheral peripheral = PeripheralUtil.getPeripheral(turtle.getWorld(), pos.posX, pos.posY, pos.posZ, 0);
+				if (peripheral == null) {
+					id = -1;
+					return Collections.emptyMap();
+				} else if (id <= -1) {
+					id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(turtle.getWorld()), "computer/lastid_" + peripheral.getType() + ".txt"));
 				}
 
-				return super.callMethod(computer, context, method, arguments);
-			} catch (RuntimeException e) {
-				e.printStackTrace();
-				throw e;
+				return Collections.singletonMap(peripheral.getType() + "_" + id, peripheral);*/
+				return super.getConnectedPeripherals();
+			}
+
+			@Override
+			protected BasicModemPeripheral createPeripheral() {
+				return new TurtleModemPeripheral(this);
+			}
+
+			@Override
+			public boolean canConnect(ForgeDirection side) {
+				return side == ForgeDirection.UNKNOWN;
+			}
+		}
+
+		/**
+		 * Extension of modem with bindToCard and bindFromCard methods
+		 */
+		public class TurtleModemPeripheral extends BindingModemPeripheral implements IWorldNetworkNodeHost {
+			public TurtleModemPeripheral(BindingModem modem) {
+				super(modem);
+			}
+
+			@Override
+			public String[] getMethodNames() {
+				String[] methods = super.getMethodNames();
+				String[] newMethods = new String[methods.length + 3];
+				System.arraycopy(methods, 0, newMethods, 0, methods.length);
+
+
+				int l = methods.length;
+				newMethods[l] = "bindFromCard";
+				newMethods[l + 1] = "bindToCard";
+
+				return newMethods;
+			}
+
+			@Override
+			public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
+				String[] methods = super.getMethodNames();
+				try {
+					switch (method - methods.length) {
+						case 0: { // bindFromCard
+							ItemStack stack = turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
+							if (stack != null && stack.getItem() instanceof IDataCard) {
+								IDataCard card = (IDataCard) stack.getItem();
+								if (TurtleBinding.this.load(stack, card)) {
+									TurtleBinding.this.save();
+									return new Object[]{true};
+								}
+							}
+							return new Object[]{false};
+						}
+						case 1: { // bindToCard
+							ItemStack stack = turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
+							if (stack != null && stack.getItem() instanceof IDataCard) {
+								IDataCard card = (IDataCard) stack.getItem();
+								TurtleBinding.this.save(stack, card);
+								return new Object[]{true};
+							}
+							return new Object[]{false};
+						}
+					}
+
+					return super.callMethod(computer, context, method, arguments);
+				} catch (RuntimeException e) {
+					e.printStackTrace();
+					throw e;
+				}
+			}
+
+			/**
+			 * Handles the update tick.
+			 */
+			public void update() {
+				modem.processQueue();
+				if (pollChanged()) TurtleBinding.this.save();
+			}
+
+			@Override
+			public IWorldNetworkNode getNode() {
+				return TurtleBinding.this;
 			}
 		}
 	}

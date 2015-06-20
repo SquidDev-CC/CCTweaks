@@ -122,7 +122,8 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	}
 
 	/**
-	 * Set the state of the modem
+	 * Set the state of the modem.
+	 * This is purely cosmetic, use {@link #setPeripheralEnabled(boolean)} to set peripheral state.
 	 *
 	 * @param state The flags to set the state with
 	 * @see #MODEM_ON
@@ -130,7 +131,6 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	 */
 	public void setState(byte state) {
 		this.state = state;
-		setPeripheralEnabled((state & MODEM_PERIPHERAL) == MODEM_PERIPHERAL);
 	}
 
 	/**
@@ -299,7 +299,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 		return peripheralEnabled;
 	}
 
-	protected void setPeripheralEnabled(boolean peripheralEnabled) {
+	public void setPeripheralEnabled(boolean peripheralEnabled) {
 		if (peripheralEnabled == this.peripheralEnabled) {
 			return;
 		}

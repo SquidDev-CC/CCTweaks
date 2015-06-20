@@ -145,7 +145,8 @@ public class PartModemWithCableIntermediate extends PartCable implements IPeriph
 	}
 
 	@Override
-	public int rebuildCanConnectMap() {
-		return super.rebuildCanConnectMap() & ~modem.direction;
+	public void rebuildCanConnectMap() {
+		super.rebuildCanConnectMap();
+		canConnectMap &= ~modem.direction;
 	}
 }

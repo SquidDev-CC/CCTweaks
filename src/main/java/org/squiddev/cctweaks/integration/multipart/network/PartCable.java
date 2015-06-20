@@ -54,6 +54,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	private ForgeDirection connectionTestSide = ForgeDirection.UNKNOWN;
 
 	protected CableImpl cable = new CableImpl();
+	protected int canConnectMap;
 
 	@SideOnly(Side.CLIENT)
 	private CableRenderer render;
@@ -193,20 +194,18 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 
 	@Override
 	public void onPartChanged(TMultiPart part) {
-		if (!world().isRemote) {
-			cable.updateConnections();
-		}
+		rebuildCanConnectMap();
+		if (!world().isRemote) cable.updateConnections();
 	}
 
 	@Override
 	public void onNeighborChanged() {
-		if (!world().isRemote) {
-			cable.updateConnections();
-		}
+		if (!world().isRemote) cable.updateConnections();
 	}
 
 	@Override
 	public void onWorldJoin() {
+		rebuildCanConnectMap();
 		if (!world().isRemote) {
 			NetworkHelpers.scheduleConnect(cable);
 		}
@@ -230,10 +229,8 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	 * can be placed in the multipart.
 	 * If not, there's a cover or something in the way.
 	 * Else, there's no cover, or something like a hollow cover.
-	 *
-	 * @return The new connection map
 	 */
-	protected int rebuildCanConnectMap() {
+	protected void rebuildCanConnectMap() {
 		int map = 0;
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
 			connectionTestSide = direction;
@@ -241,7 +238,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 		}
 		connectionTestSide = ForgeDirection.UNKNOWN;
 
-		return map;
+		canConnectMap = map;
 	}
 
 	@Override
@@ -250,8 +247,6 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 	}
 
 	protected class CableImpl extends CableWithInternalSidedParts {
-		private int canConnectMap;
-
 		@Override
 		public Set<INetworkNode> getConnectedNodes() {
 			Set<INetworkNode> nodes = super.getConnectedNodes();
@@ -281,13 +276,6 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 		@Override
 		public IWorldPosition getPosition() {
 			return PartCable.this;
-		}
-
-		@Override
-		public void updateInternalConnectionMap() {
-			// We need to build before anything else
-			canConnectMap = rebuildCanConnectMap();
-			super.updateInternalConnectionMap();
 		}
 
 		@Override

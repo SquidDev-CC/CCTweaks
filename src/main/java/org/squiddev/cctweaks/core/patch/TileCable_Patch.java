@@ -21,7 +21,6 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.network.cable.SingleModemCable;
-import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.patcher.visitors.MergeVisitor;
@@ -73,7 +72,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 				}
 
 				@Override
-				protected void setPeripheralEnabled(boolean peripheralEnabled) {
+				public void setPeripheralEnabled(boolean peripheralEnabled) {
 					super.setPeripheralEnabled(peripheralEnabled);
 
 					// Required for OpenPeripheral's PeripheralProxy
@@ -207,6 +206,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
+		getModem().id = tag.getInteger("peripheralID");
 		if (worldObj == null) {
 			lazyTag = tag;
 		} else {
@@ -215,8 +215,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	}
 
 	protected void readLazyNBT(NBTTagCompound tag) {
-		getModem().setState(tag.getBoolean("peripheralAccess") ? BasicModem.MODEM_PERIPHERAL : 0);
-		modem.id = tag.getInteger("peripheralID");
+		getModem().setPeripheralEnabled(tag.getBoolean("peripheralAccess"));
 	}
 
 	@Override

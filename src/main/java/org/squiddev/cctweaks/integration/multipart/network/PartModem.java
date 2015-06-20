@@ -28,12 +28,13 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
+import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.lang.reflect.Field;
-import java.util.Map;
+import java.util.Collections;
 
 public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	@SideOnly(Side.CLIENT)
@@ -51,11 +52,12 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	}
 
 	public PartModem(TileCable modem) {
-		this.direction = (byte) modem.getDirection();
-
 		try {
-			this.modem.id = ComputerAccessor.cablePeripheralId.getInt(modem);
-			this.modem.setState((byte) modem.getAnim());
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setByte("node_direction", (byte) modem.getDirection());
+			tag.setInteger("modem_id", ComputerAccessor.cablePeripheralId.getInt(modem));
+			tag.setBoolean("modem_enabled", (modem.getAnim() & BasicModem.MODEM_PERIPHERAL) == BasicModem.MODEM_PERIPHERAL);
+			load(tag);
 		} catch (Exception e) {
 			DebugLogger.error("Cannot get modem from tile", e);
 		}
@@ -113,7 +115,6 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 		if (world().isRemote) return;
 
 		if (modem.modem.pollChanged()) markDirty();
-
 		modem.processQueue();
 	}
 
@@ -124,7 +125,6 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 
 	@Override
 	public void onNeighborChanged() {
-		Map<String, IPeripheral> peripherals = modem.getConnectedPeripherals();
 		if (modem.updateEnabled()) {
 			markDirty();
 			modem.getAttachedNetwork().invalidateNetwork();
@@ -188,16 +188,25 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 
 	@Override
 	public void save(NBTTagCompound tag) {
-		tag.setByte("modem_direction", direction);
+		super.save(tag);
 		tag.setBoolean("modem_enabled", modem.isEnabled());
 		tag.setInteger("modem_id", modem.id);
 	}
 
 	@Override
+	public Iterable<String> getFields() {
+		return Collections.singletonList("modem_enabled");
+	}
+
+	@Override
 	public void load(NBTTagCompound tag) {
-		direction = tag.getByte("modem_direction");
-		modem.setState(tag.getBoolean("modem_enabled") ? WiredModem.MODEM_PERIPHERAL : 0);
+		super.load(tag);
 		modem.id = tag.getInteger("modem_id");
+	}
+
+	@Override
+	public void loadLazy(NBTTagCompound tag) {
+		modem.setPeripheralEnabled(tag.getBoolean("modem_enabled"));
 	}
 
 	@Override

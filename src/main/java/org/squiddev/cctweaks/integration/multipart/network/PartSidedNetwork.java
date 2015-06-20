@@ -8,7 +8,7 @@ import codechicken.multipart.TSlottedPart;
 import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.integration.multipart.MultipartHelpers;
-import org.squiddev.cctweaks.integration.multipart.PartBase;
+import org.squiddev.cctweaks.integration.multipart.PartLazyNBT;
 
 import java.util.Collections;
 
@@ -16,7 +16,7 @@ import java.util.Collections;
  * An abstract network to help with creating network nodes.
  * This takes the size/drawing style of a modem
  */
-public abstract class PartSidedNetwork extends PartBase implements IWorldNetworkNodeHost, TSlottedPart {
+public abstract class PartSidedNetwork extends PartLazyNBT implements IWorldNetworkNodeHost, TSlottedPart {
 	protected byte direction;
 
 	@Override
@@ -53,8 +53,8 @@ public abstract class PartSidedNetwork extends PartBase implements IWorldNetwork
 
 	@Override
 	public void save(NBTTagCompound tag) {
-		super.save(tag);
 		tag.setByte("node_direction", direction);
+		super.save(tag);
 	}
 
 	@Override

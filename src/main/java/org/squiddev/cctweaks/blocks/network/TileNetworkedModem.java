@@ -87,11 +87,15 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	}
 
 	@Override
-	public void readLazyNBT(NBTTagCompound tag) {
-		modem.setState(tag.getBoolean("modem_enabled") ? MultiPeripheralModem.MODEM_PERIPHERAL : 0);
-
+	public void readFromNBT(NBTTagCompound tag) {
+		super.readFromNBT(tag);
 		int[] ids = tag.getIntArray("modem_id");
 		if (ids != null && ids.length == 6) System.arraycopy(ids, 0, modem.ids, 0, 6);
+	}
+
+	@Override
+	public void readLazyNBT(NBTTagCompound tag) {
+		modem.setPeripheralEnabled(tag.getBoolean("modem_enabled"));
 	}
 
 	@Override

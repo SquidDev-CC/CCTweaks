@@ -74,6 +74,6 @@ public abstract class BasicCable extends AbstractWorldNode {
 
 	@Override
 	public String toString() {
-		return "Cable:" + super.toString();
+		return "Cable: " + super.toString();
 	}
 }
