@@ -16,6 +16,8 @@ public class DebugLogger {
 
 	public static void deprecated(String message) {
 		if (Config.Testing.deprecatedWarnings) {
+			throw new IllegalStateException("Deprecated " + message);
+		} else {
 			trace("Deprecated " + message);
 		}
 	}

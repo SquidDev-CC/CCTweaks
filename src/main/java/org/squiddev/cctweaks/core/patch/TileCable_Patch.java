@@ -178,7 +178,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Override
 	public boolean onActivate(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-		if ((getPeripheralType() == PeripheralType.WiredModemWithCable) && (!player.isSneaking())) {
+		if (getPeripheralType() == PeripheralType.WiredModemWithCable && !player.isSneaking()) {
 			if (!worldObj.isRemote) {
 
 				String oldPeriphName = getModem().getPeripheralName();
@@ -254,6 +254,13 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 		if (getModem().modem.pollChanged()) updateAnim();
 		modem.processQueue();
+	}
+
+	@Override
+	public int getDirection() {
+		if (!m_destroyed && getPeripheralType() != PeripheralType.Cable) return -1;
+		int metadata = this.getMetadata();
+		return metadata < 6 ? metadata : (metadata < 12 ? metadata - 6 : 2);
 	}
 
 	@Override
@@ -359,35 +366,30 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Override
 	public IIcon getTexture(int side) {
-		PeripheralType type = getPeripheralType();
-		if (BlockCable.renderAsModem) type = PeripheralType.WiredModem;
+		PeripheralType type = BlockCable.renderAsModem ? PeripheralType.WiredModem : getPeripheralType();
 
-		switch (type) {
-			case Cable:
-			case WiredModemWithCable:
-				int dir = -1;
-				if (type == PeripheralType.WiredModemWithCable) {
-					dir = getDirection();
-					dir -= dir % 2;
-				}
+		if (type == PeripheralType.Cable || type == PeripheralType.WiredModemWithCable) {
+			int dir = -1;
+			if (type == PeripheralType.WiredModemWithCable) {
+				dir = getDirection();
+				dir -= dir % 2;
+			}
 
-				int x = xCoord, y = yCoord, z = zCoord;
-				IBlockAccess world = worldObj;
+			int x = xCoord, y = yCoord, z = zCoord;
+			IBlockAccess world = worldObj;
 
-				if (canConnect(world, x, y, z, ForgeDirection.EAST) || canConnect(world, x, y, z, ForgeDirection.WEST)) {
-					dir = dir == -1 || dir == 4 ? 4 : -2;
-				}
-				if (canConnect(world, x, y, z, ForgeDirection.UP) || canConnect(world, x, y, z, ForgeDirection.DOWN)) {
-					dir = dir == -1 || dir == 0 ? 0 : -2;
-				}
-				if (canConnect(world, x, y, z, ForgeDirection.NORTH) || canConnect(world, x, y, z, ForgeDirection.SOUTH)) {
-					dir = dir == -1 || dir == 2 ? 2 : -2;
-				}
+			if (canConnect(world, x, y, z, ForgeDirection.EAST) || canConnect(world, x, y, z, ForgeDirection.WEST)) {
+				dir = dir == -1 || dir == 4 ? 4 : -2;
+			}
+			if (canConnect(world, x, y, z, ForgeDirection.UP) || canConnect(world, x, y, z, ForgeDirection.DOWN)) {
+				dir = dir == -1 || dir == 0 ? 0 : -2;
+			}
+			if (canConnect(world, x, y, z, ForgeDirection.NORTH) || canConnect(world, x, y, z, ForgeDirection.SOUTH)) {
+				dir = dir == -1 || dir == 2 ? 2 : -2;
+			}
 
-				if (dir == -1) dir = 2;
-
-				if (dir >= 0 && (side == dir || side == Facing.oppositeSide[dir])) return s_cableIcons[1];
-				return s_cableIcons[0];
+			if (dir == -1) dir = 2;
+			return dir >= 0 && (side == dir || side == Facing.oppositeSide[dir]) ? s_cableIcons[1] : s_cableIcons[0];
 		}
 
 		return super.getTexture(side);
