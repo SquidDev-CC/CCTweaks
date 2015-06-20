@@ -135,6 +135,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	public boolean activate(EntityPlayer player, MovingObjectPosition hit, ItemStack item) {
 		if (player.isSneaking()) return false;
 		if (world().isRemote) return true;
+		if (modem.getAttachedNetwork() == null) return false;
 
 		String name = modem.getPeripheralName();
 

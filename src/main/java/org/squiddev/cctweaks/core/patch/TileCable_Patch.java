@@ -243,7 +243,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Override
 	public IPeripheral getPeripheral(int side) {
-		return side == getDirection() ? getModem().modem : null;
+		return side == getDirection() && getPeripheralType() != PeripheralType.Cable ? getModem().modem : null;
 	}
 
 	@Override
@@ -254,13 +254,6 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 		if (getModem().modem.pollChanged()) updateAnim();
 		modem.processQueue();
-	}
-
-	@Override
-	public int getDirection() {
-		if (!m_destroyed && getPeripheralType() != PeripheralType.Cable) return -1;
-		int metadata = this.getMetadata();
-		return metadata < 6 ? metadata : (metadata < 12 ? metadata - 6 : 2);
 	}
 
 	@Override

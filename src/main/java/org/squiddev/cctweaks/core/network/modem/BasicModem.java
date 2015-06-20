@@ -72,6 +72,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	 * Process the transmit queue
 	 */
 	public void processQueue() {
+		if (networkController == null) return;
 		synchronized (transmitQueue) {
 			Packet packet;
 			while ((packet = transmitQueue.poll()) != null) {

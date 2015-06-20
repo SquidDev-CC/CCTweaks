@@ -76,6 +76,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 		renderNetwork(controller.getNodeConnections(), new Color(Color.HSBtoRGB(ticksInGame % 200 / 200F, 0.6F, 1F)), 1f);
 
@@ -154,42 +155,35 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		RenderManager renderManager = RenderManager.instance;
 		FontRenderer fontrenderer = renderManager.getFontRenderer();
 		if (fontrenderer == null) return;
-		float scale = 0.02666667F;
+
+		float scale = 0.02666667f;
 		GL11.glPushMatrix();
 
 		GL11.glTranslated(x, y, z);
-		// GL11.glNormal3f(0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(-renderManager.playerViewY, 0, 1, 0);
 		GL11.glRotatef(renderManager.playerViewX, 1, 0, 0);
 		GL11.glScalef(-scale, -scale, scale);
 
 		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glDepthMask(false);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 		Tessellator tessellator = Tessellator.instance;
 
-		int yOffset = 0;
-		int xOffset = fontrenderer.getStringWidth(label) / 2;
+		int width = fontrenderer.getStringWidth(label);
+		int xOffset = width / 2;
+
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA_F(0, 0, 0, 0);
-		tessellator.addVertex(-xOffset - 1, -1 + yOffset, 0);
-		tessellator.addVertex(-xOffset - 1, 8 + yOffset, 0);
-		tessellator.addVertex(xOffset + 1, 8 + yOffset, 0);
-		tessellator.addVertex(xOffset + 1, -1 + yOffset, 0);
+		tessellator.setColorRGBA(0, 0, 0, 65);
+		tessellator.addVertex(-xOffset - 1, -1, 0);
+		tessellator.addVertex(-xOffset - 1, 8, 0);
+		tessellator.addVertex(xOffset + 1, 8, 0);
+		tessellator.addVertex(xOffset + 1, -1, 0);
 		tessellator.draw();
+
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		fontrenderer.drawString(label, -width / 2, 0, 0xFFFFFFFF);
 
-		fontrenderer.drawString(label, -fontrenderer.getStringWidth(label) / 2, yOffset, 553648127);
-
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(true);
-		fontrenderer.drawString(label, -fontrenderer.getStringWidth(label) / 2, yOffset, -1);
 		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glColor4f(1, 1, 1, 1);
 
 		GL11.glPopMatrix();
