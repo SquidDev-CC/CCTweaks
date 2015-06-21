@@ -291,6 +291,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Override
 	public void networkChanged() {
+		getCable().updateConnections();
 		if (!worldObj.isRemote) {
 			getModem().invalidateNetwork();
 		}

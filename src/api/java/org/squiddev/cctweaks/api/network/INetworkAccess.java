@@ -10,6 +10,7 @@ import java.util.Map;
 public interface INetworkAccess {
 	/**
 	 * Gets all peripherals on the network mapped by their names.
+	 *
 	 * @return The map of these peripherals.
 	 */
 	Map<String, IPeripheral> getPeripheralsOnNetwork();

@@ -28,7 +28,7 @@ public interface INetworkNode {
 	 * Called when the peripheral map on the network changes.
 	 *
 	 * @param oldPeripherals A map representing the peripheral
-	 *                          map before the network changed
+	 *                       map before the network changed
 	 */
 	void networkInvalidated(Map<String, IPeripheral> oldPeripherals);
 

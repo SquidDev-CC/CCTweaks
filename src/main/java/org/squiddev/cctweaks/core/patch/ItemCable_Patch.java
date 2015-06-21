@@ -70,7 +70,7 @@ public class ItemCable_Patch extends ItemCable implements TItemMultiPart {
 		Vector3 hit = new Vector3(hitX, hitY, hitZ);
 		double d = getHitDepth(hit, side);
 
-		return 	(d < 1 && place(stack, player, world, pos, side, hit))
+		return (d < 1 && place(stack, player, world, pos, side, hit))
 			|| nativePlace(stack, player, world, x, y, z, side, hitX, hitY, hitZ)
 			|| place(stack, player, world, pos.offset(side), side, hit);
 	}
