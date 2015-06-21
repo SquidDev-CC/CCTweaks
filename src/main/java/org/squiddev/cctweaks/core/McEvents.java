@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Main event handler
  */
-public class Events {
+public class McEvents {
 	public interface IDropConsumer {
 		void consumeDrop(ItemStack stack);
 	}
@@ -76,6 +76,7 @@ public class Events {
 					}
 				}
 				event.drops.clear();
+
 			}
 		}
 	}

@@ -10,7 +10,6 @@ import dan200.computercraft.shared.turtle.items.ITurtleItem;
 import dan200.computercraft.shared.util.Colour;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.patcher.visitors.MergeVisitor;
@@ -20,7 +19,7 @@ import java.util.List;
 /**
  * Various patches to the turtle renderer
  */
-public class TurtleRenderer_Patch extends TileEntityTurtleRenderer {
+public abstract class TurtleRenderer_Patch extends TileEntityTurtleRenderer {
 	@Override
 	public void renderInventoryTurtle(ItemStack stack) {
 		if ((stack.getItem() instanceof ITurtleItem)) {
@@ -81,10 +80,5 @@ public class TurtleRenderer_Patch extends TileEntityTurtleRenderer {
 
 	@MergeVisitor.Stub
 	private void renderTurtle(ITurtleTile a, ComputerFamily b, Colour c, ITurtleUpgrade d, ITurtleUpgrade e, float f, float g) {
-	}
-
-	@Override
-	@MergeVisitor.Stub
-	public void renderTileEntityAt(TileEntity e, double x, double y, double z, float f) {
 	}
 }

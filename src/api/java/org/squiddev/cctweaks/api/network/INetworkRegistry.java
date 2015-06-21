@@ -53,7 +53,7 @@ public interface INetworkRegistry {
 	 * @param z     Z position of the block
 	 * @return The node, or null if there is none
 	 */
-	INetworkNode getNode(IBlockAccess world, int x, int y, int z);
+	IWorldNetworkNode getNode(IBlockAccess world, int x, int y, int z);
 
 	/**
 	 * Get the node from this tile entity
@@ -61,7 +61,7 @@ public interface INetworkRegistry {
 	 * @param tile The tile to check
 	 * @return The node, or null if there is none
 	 */
-	INetworkNode getNode(TileEntity tile);
+	IWorldNetworkNode getNode(TileEntity tile);
 
 	/**
 	 * Get the node for this position
@@ -69,5 +69,5 @@ public interface INetworkRegistry {
 	 * @param position The position to check
 	 * @return The node, or null if there is none
 	 */
-	INetworkNode getNode(IWorldPosition position);
+	IWorldNetworkNode getNode(IWorldPosition position);
 }

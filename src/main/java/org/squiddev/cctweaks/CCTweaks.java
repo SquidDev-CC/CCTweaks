@@ -1,18 +1,17 @@
 package org.squiddev.cctweaks;
 
-import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.common.MinecraftForge;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.Events;
+import org.squiddev.cctweaks.core.McEvents;
+import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.registry.Registry;
 
 @Mod(modid = CCTweaks.ID, name = CCTweaks.NAME, version = CCTweaks.VERSION, dependencies = CCTweaks.DEPENDENCIES, guiFactory = CCTweaks.GUI_FACTORY)
@@ -33,8 +32,8 @@ public class CCTweaks {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		Config.init(event.getSuggestedConfigurationFile());
-		FMLCommonHandler.instance().bus().register(new FMLBus());
-		MinecraftForge.EVENT_BUS.register(new Events());
+		FMLCommonHandler.instance().bus().register(new FmlEvents());
+		MinecraftForge.EVENT_BUS.register(new McEvents());
 
 		Registry.preInit();
 	}
@@ -47,14 +46,5 @@ public class CCTweaks {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		Registry.postInit();
-	}
-
-	public static class FMLBus {
-		@SubscribeEvent
-		public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-			if (eventArgs.modID.equals(CCTweaks.ID)) {
-				Config.sync();
-			}
-		}
 	}
 }

@@ -3,10 +3,10 @@ package org.squiddev.cctweaks.core.network;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeHost;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
 import org.squiddev.cctweaks.api.network.INetworkRegistry;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.HashSet;
@@ -18,6 +18,7 @@ import java.util.Set;
 public final class NetworkRegistry implements INetworkRegistry {
 	private final Set<INetworkNodeProvider> providers = new HashSet<INetworkNodeProvider>();
 
+	@Override
 	public void addNodeProvider(INetworkNodeProvider provider) {
 		if (provider != null) providers.add(provider);
 	}
@@ -31,7 +32,7 @@ public final class NetworkRegistry implements INetworkRegistry {
 	public boolean isNode(TileEntity tile) {
 		if (tile == null) return false;
 
-		if (tile instanceof INetworkNode || tile instanceof INetworkNodeHost) return true;
+		if (tile instanceof IWorldNetworkNode || tile instanceof IWorldNetworkNodeHost) return true;
 
 		for (INetworkNodeProvider provider : providers) {
 			try {
@@ -51,20 +52,20 @@ public final class NetworkRegistry implements INetworkRegistry {
 
 
 	@Override
-	public INetworkNode getNode(IBlockAccess world, int x, int y, int z) {
+	public IWorldNetworkNode getNode(IBlockAccess world, int x, int y, int z) {
 		return y >= 0 ? getNode(world.getTileEntity(x, y, z)) : null;
 	}
 
 	@Override
-	public INetworkNode getNode(TileEntity tile) {
+	public IWorldNetworkNode getNode(TileEntity tile) {
 		if (tile == null) return null;
 
-		if (tile instanceof INetworkNode) return (INetworkNode) tile;
-		if (tile instanceof INetworkNodeHost) return ((INetworkNodeHost) tile).getNode();
+		if (tile instanceof IWorldNetworkNode) return (IWorldNetworkNode) tile;
+		if (tile instanceof IWorldNetworkNodeHost) return ((IWorldNetworkNodeHost) tile).getNode();
 
 		for (INetworkNodeProvider provider : providers) {
 			try {
-				INetworkNode node = provider.getNode(tile);
+				IWorldNetworkNode node = provider.getNode(tile);
 				if (node != null) return node;
 			} catch (Exception e) {
 				DebugLogger.debug("Node provider " + provider + " threw exception", e);
@@ -75,7 +76,7 @@ public final class NetworkRegistry implements INetworkRegistry {
 	}
 
 	@Override
-	public INetworkNode getNode(IWorldPosition position) {
+	public IWorldNetworkNode getNode(IWorldPosition position) {
 		return getNode(position.getWorld(), position.getX(), position.getY(), position.getZ());
 	}
 }

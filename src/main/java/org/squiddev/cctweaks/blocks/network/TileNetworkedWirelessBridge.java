@@ -4,46 +4,22 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IDataCard;
-import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeHost;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
-import org.squiddev.cctweaks.blocks.TileBase;
+import org.squiddev.cctweaks.blocks.TileLazyNBT;
+import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
-import org.squiddev.cctweaks.core.network.modem.BasicModem;
+import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.Arrays;
 
 /**
  * Bind networks together
  */
-public class TileNetworkedWirelessBridge extends TileBase implements IPeripheralHost, INetworkNodeHost {
-	protected final NetworkBinding binding = new NetworkBinding(this);
-	protected final BasicModem modem = new BasicModem() {
-		@Override
-		public IWorldPosition getPosition() {
-			return TileNetworkedWirelessBridge.this;
-		}
-
-		@Override
-		public Map<String, IPeripheral> findConnectedPeripherals() {
-			return Collections.emptyMap();
-		}
-
-		@Override
-		public Iterable<IWorldPosition> getExtraNodes() {
-			return binding.getPositions();
-		}
-	};
-
-	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		super.readFromNBT(tag);
-		binding.load(tag);
-	}
+public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeripheralHost, IWorldNetworkNodeHost {
+	protected final NetworkBindingWithModem binding = new NetworkBindingWithModem(this);
 
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
@@ -52,15 +28,25 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 	}
 
 	@Override
-	public void postRemove() {
-		binding.remove();
-		modem.modem.destroy();
+	public void readLazyNBT(NBTTagCompound tag) {
+		binding.load(tag);
 	}
 
 	@Override
-	public void setWorldObj(World world) {
-		super.setWorldObj(world);
-		binding.add();
+	public Iterable<String> getFields() {
+		return Arrays.asList(NetworkBinding.LSB, NetworkBinding.MSB);
+	}
+
+	@Override
+	public void create() {
+		super.create();
+		NetworkHelpers.scheduleConnect(binding);
+	}
+
+	@Override
+	public void destroy() {
+		super.destroy();
+		binding.destroy();
 	}
 
 	@Override
@@ -91,17 +77,16 @@ public class TileNetworkedWirelessBridge extends TileBase implements IPeripheral
 	public void updateEntity() {
 		if (worldObj.isRemote) return;
 
-		modem.processQueue();
-		if (!modem.peripheralsKnown) modem.findPeripherals();
+		binding.getModem().processQueue();
 	}
 
 	@Override
 	public IPeripheral getPeripheral(int side) {
-		return modem.modem;
+		return binding.getModem().modem;
 	}
 
 	@Override
-	public INetworkNode getNode() {
-		return modem;
+	public IWorldNetworkNode getNode() {
+		return binding;
 	}
 }

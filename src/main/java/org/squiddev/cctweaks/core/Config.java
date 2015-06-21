@@ -8,10 +8,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@org.squiddev.configgen.Config(languagePrefix = "gui.config.cctweaks.")
 /**
  * The main config class
  */
+@org.squiddev.configgen.Config(languagePrefix = "gui.config.cctweaks.")
 public final class Config {
 	public static Configuration configuration;
 	public static Set<String> turtleDisabledActions;
@@ -260,5 +260,13 @@ public final class Config {
 		 */
 		@DefaultBoolean(false)
 		public static boolean debugItems;
+
+		/**
+		 * Throw exceptions on calling deprecated methods
+		 *
+		 * Only for development/testing
+		 */
+		@DefaultBoolean(false)
+		public static boolean deprecatedWarnings;
 	}
 }

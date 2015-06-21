@@ -63,34 +63,42 @@ public class PeripheralAccess implements IComputerAccess {
 		throw new LuaException("No such method " + methodName);
 	}
 
+	@Override
 	public String mount(String desiredLocation, IMount mount) {
 		return computer.mount(desiredLocation, mount, name);
 	}
 
+	@Override
 	public String mount(String desiredLocation, IMount mount, String driveName) {
 		return computer.mount(desiredLocation, mount, driveName);
 	}
 
+	@Override
 	public String mountWritable(String desiredLocation, IWritableMount mount) {
 		return computer.mountWritable(desiredLocation, mount, name);
 	}
 
+	@Override
 	public String mountWritable(String desiredLocation, IWritableMount mount, String driveName) {
 		return computer.mountWritable(desiredLocation, mount, driveName);
 	}
 
+	@Override
 	public void unmount(String location) {
 		computer.unmount(location);
 	}
 
+	@Override
 	public int getID() {
 		return computer.getID();
 	}
 
+	@Override
 	public void queueEvent(String event, Object[] arguments) {
 		computer.queueEvent(event, arguments);
 	}
 
+	@Override
 	public String getAttachmentName() {
 		return name;
 	}

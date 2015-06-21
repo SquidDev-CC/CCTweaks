@@ -4,18 +4,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.core.network.AbstractWorldNode;
 
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * An implementation for {@link NetworkBindings} that saves the id to NBT
  */
-public class NetworkBinding {
-	protected static final String MSB = "bound_id_msb";
-	protected static final String LSB = "bound_id_lsb";
+public class NetworkBinding extends AbstractWorldNode {
+	public static final String MSB = "bound_id_msb";
+	public static final String LSB = "bound_id_lsb";
 
 	protected UUID id = UUID.randomUUID();
-	protected IWorldPosition position;
+	protected final IWorldPosition position;
 
 	public NetworkBinding(IWorldPosition position) {
 		this.position = position;
@@ -25,23 +28,22 @@ public class NetworkBinding {
 	 * Add the position to the bindings
 	 */
 	public void add() {
-		if (position.getWorld() != null) NetworkBindings.addPosition(id, position);
+		if (getPosition().getWorld() != null) NetworkBindings.addNode(id, this);
 	}
 
 	/**
 	 * Remove the position from the bindings
 	 */
 	public void remove() {
-		if (position.getWorld() != null) NetworkBindings.removePosition(id, position);
+		NetworkBindings.removeNode(id, this);
 	}
 
-	/**
-	 * Get all bound positions for this binding
-	 *
-	 * @return The positions for this binding
-	 */
-	public Iterable<IWorldPosition> getPositions() {
-		return NetworkBindings.getPositions(id);
+	@Override
+	public Set<INetworkNode> getConnectedNodes() {
+		Set<INetworkNode> nodes = super.getConnectedNodes();
+		nodes.addAll(NetworkBindings.getNodes(id));
+		nodes.remove(this);
+		return nodes;
 	}
 
 	public void setId(UUID newId) {
@@ -99,5 +101,15 @@ public class NetworkBinding {
 	 */
 	public boolean load(ItemStack stack, IDataCard card) {
 		return card.getType(stack).equals(NetworkBindings.BINDING_NAME) && load(card.getData(stack));
+	}
+
+	@Override
+	public IWorldPosition getPosition() {
+		return position;
+	}
+
+	@Override
+	public String toString() {
+		return "Binding: " + super.toString();
 	}
 }

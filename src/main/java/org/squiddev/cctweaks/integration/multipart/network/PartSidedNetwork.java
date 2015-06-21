@@ -5,24 +5,18 @@ import codechicken.lib.data.MCDataOutput;
 import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.multipart.TSlottedPart;
-import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.integration.multipart.MultipartHelpers;
-import org.squiddev.cctweaks.integration.multipart.PartBase;
+import org.squiddev.cctweaks.integration.multipart.PartLazyNBT;
 
 import java.util.Collections;
-import java.util.Map;
 
 /**
  * An abstract network to help with creating network nodes.
  * This takes the size/drawing style of a modem
  */
-public abstract class PartSidedNetwork extends PartBase implements INetworkNode, TSlottedPart {
-	private final Object lock = new Object();
+public abstract class PartSidedNetwork extends PartLazyNBT implements IWorldNetworkNodeHost, TSlottedPart {
 	protected byte direction;
 
 	@Override
@@ -59,47 +53,14 @@ public abstract class PartSidedNetwork extends PartBase implements INetworkNode,
 
 	@Override
 	public void save(NBTTagCompound tag) {
-		super.save(tag);
 		tag.setByte("node_direction", direction);
+		super.save(tag);
 	}
 
 	@Override
 	public void load(NBTTagCompound tag) {
 		super.load(tag);
 		direction = tag.getByte("node_direction");
-	}
-
-	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		return from.ordinal() != direction;
-	}
-
-	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return canBeVisited(to);
-	}
-
-	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		return null;
-	}
-
-	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-	}
-
-	@Override
-	public void networkInvalidated() {
-	}
-
-	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		return null;
-	}
-
-	@Override
-	public Object lock() {
-		return lock;
 	}
 
 	@Override

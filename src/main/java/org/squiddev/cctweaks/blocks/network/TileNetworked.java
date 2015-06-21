@@ -1,58 +1,26 @@
 package org.squiddev.cctweaks.blocks.network;
 
-import dan200.computercraft.api.peripheral.IPeripheral;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.blocks.TileBase;
-
-import java.util.Map;
+import org.squiddev.cctweaks.core.network.AbstractWorldNode;
+import org.squiddev.cctweaks.core.network.NetworkHelpers;
 
 /**
- * Abstract TE to prevent having to override every item
+ * Abstract world node host
  */
-public abstract class TileNetworked extends TileBase implements INetworkNode {
-	private Object lock = new Object();
+public abstract class TileNetworked extends TileBase implements IWorldNetworkNodeHost {
+	@Override
+	public abstract AbstractWorldNode getNode();
 
 	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		return true;
-	}
-
-	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return true;
+	public void create() {
+		super.create();
+		NetworkHelpers.scheduleConnect(getNode());
 	}
 
 	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		return null;
-	}
-
-	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-	}
-
-	@Override
-	public void networkInvalidated() {
-	}
-
-	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		return null;
-	}
-
-	@Override
-	public Object lock() {
-		return lock;
-	}
-
-	public boolean onActivated(EntityPlayer player, int side) {
-		return false;
-	}
-
-	public void onNeighborChanged() {
+	public void destroy() {
+		super.destroy();
+		getNode().destroy();
 	}
 }

@@ -34,20 +34,38 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	}
 
 	/**
-	 * Called before the block is removed or on chunk unload
+	 * Called when the TileEntity is validated
 	 */
-	public void preRemove() {
+	public void create() {
 	}
 
 	/**
-	 * Called after being removed
+	 * Called when the TileEntity is destroyed
 	 */
-	public void postRemove() {
+	public void destroy() {
+	}
+
+	@Override
+	public void validate() {
+		if (worldObj == null || !worldObj.isRemote) {
+			create();
+		}
 	}
 
 	@Override
 	public void onChunkUnload() {
-		preRemove();
+		super.onChunkUnload();
+		if (worldObj == null || !worldObj.isRemote) {
+			destroy();
+		}
+	}
+
+	@Override
+	public void invalidate() {
+		super.invalidate();
+		if (worldObj == null || !worldObj.isRemote) {
+			destroy();
+		}
 	}
 
 	/**
@@ -68,11 +86,13 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	protected void readDescription(NBTTagCompound tag) {
 	}
 
+	@Override
 	public final Packet getDescriptionPacket() {
 		NBTTagCompound tag = new NBTTagCompound();
 		return writeDescription(tag) ? new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag) : null;
 	}
 
+	@Override
 	public final void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
 		switch (packet.func_148853_f()) {
 			case 0:

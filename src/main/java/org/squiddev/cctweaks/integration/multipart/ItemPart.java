@@ -49,6 +49,7 @@ public class ItemPart extends ItemBase {
 		return false;
 	}
 
+	@Override
 	@SideOnly(Side.CLIENT)
 	public IIcon getIconFromDamage(int damage) {
 		return getIcon(damage, 0);

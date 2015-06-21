@@ -12,8 +12,8 @@ public abstract class SinglePeripheralModem extends BasicModem {
 	public int id = -1;
 
 	@Override
-	public Map<String, IPeripheral> findConnectedPeripherals() {
-		if (!peripheralEnabled) return Collections.emptyMap();
+	public Map<String, IPeripheral> getConnectedPeripherals() {
+		if (!isPeripheralEnabled()) return Collections.emptyMap();
 
 		IPeripheral peripheral = getPeripheral();
 
@@ -22,7 +22,7 @@ public abstract class SinglePeripheralModem extends BasicModem {
 	}
 
 	public String getPeripheralName() {
-		if (!peripheralEnabled) return null;
+		if (!isPeripheralEnabled()) return null;
 
 		IPeripheral peripheral = getPeripheral();
 		if (peripheral == null) return null;

@@ -6,6 +6,8 @@ import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import java.util.Map;
+
 /**
  * A networked peripheral that logs events to the console
  */
@@ -36,12 +38,12 @@ public class TileDebugNetworkedPeripheral extends TileDebugPeripheral {
 		}
 
 		@Override
-		public void networkInvalidated(INetworkAccess network) {
+		public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals) {
 			DebugLogger.debug("Network was invalidated");
 		}
 
 		@Override
-		public void receivePacket(Packet packet, int distanceTravelled) {
+		public void receivePacket(INetworkAccess network, Packet packet, double distanceTravelled) {
 			DebugLogger.debug("Received packet from " + distanceTravelled + " blocks away");
 		}
 	}

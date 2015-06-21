@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.Events;
+import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.utils.FakeNetHandler;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 
@@ -33,7 +33,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 	private ChunkCoordinates digPosition;
 	private Block digBlock;
 
-	private final Events.IDropConsumer consumer = new Events.IDropConsumer() {
+	private final McEvents.IDropConsumer consumer = new McEvents.IDropConsumer() {
 		@Override
 		public void consumeDrop(ItemStack drop) {
 			ItemStack remainder = InventoryUtil.storeItems(drop, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
@@ -64,9 +64,9 @@ public class ToolHostPlayer extends TurtlePlayer {
 		if (hitEntity != null) {
 			loadInventory(getItem());
 
-			Events.addEntityConsumer(hitEntity, consumer);
+			McEvents.addEntityConsumer(hitEntity, consumer);
 			attackTargetEntityWithCurrentItem(hitEntity);
-			Events.removeEntityConsumer(hitEntity);
+			McEvents.removeEntityConsumer(hitEntity);
 
 			unloadInventory(turtle);
 			return TurtleCommandResult.success();
@@ -110,9 +110,9 @@ public class ToolHostPlayer extends TurtlePlayer {
 					if (manager.durabilityRemainingOnBlock >= 9) {
 
 						IWorldPosition position = new WorldPosition(world, x, y, z);
-						Events.addBlockConsumer(position, consumer);
+						McEvents.addBlockConsumer(position, consumer);
 						manager.uncheckedTryHarvestBlock(x, y, z);
-						Events.removeBlockConsumer(position);
+						McEvents.removeBlockConsumer(position);
 
 						manager.durabilityRemainingOnBlock = -1;
 

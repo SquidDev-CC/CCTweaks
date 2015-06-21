@@ -10,9 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeHost;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.core.registry.Module;
@@ -21,6 +21,7 @@ import org.squiddev.cctweaks.core.registry.Module;
  * Registers turtle related things
  */
 public class DefaultTurtleProviders extends Module {
+	@Override
 	public void init() {
 		// Add default furnace fuel provider
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {
@@ -50,12 +51,12 @@ public class DefaultTurtleProviders extends Module {
 		// TODO: Bind all nodes into one like CablePart
 		NetworkAPI.registry().addNodeProvider(new INetworkNodeProvider() {
 			@Override
-			public INetworkNode getNode(TileEntity tile) {
+			public IWorldNetworkNode getNode(TileEntity tile) {
 				if (tile instanceof ITurtleTile) {
 					ITurtleAccess turtle = ((ITurtleTile) tile).getAccess();
 
 					for (TurtleSide side : TurtleSide.values()) {
-						INetworkNode node = getNode(turtle, side);
+						IWorldNetworkNode node = getNode(turtle, side);
 						if (node != null) return node;
 					}
 				}
@@ -68,17 +69,17 @@ public class DefaultTurtleProviders extends Module {
 				return getNode(tile) != null;
 			}
 
-			public INetworkNode getNode(ITurtleAccess turtle, TurtleSide side) {
+			public IWorldNetworkNode getNode(ITurtleAccess turtle, TurtleSide side) {
 				ITurtleUpgrade upgrade = turtle.getUpgrade(side);
 				if (upgrade != null) {
-					if (upgrade instanceof INetworkNode) return (INetworkNode) upgrade;
-					if (upgrade instanceof INetworkNodeHost) return ((INetworkNodeHost) upgrade).getNode();
+					if (upgrade instanceof IWorldNetworkNode) return (IWorldNetworkNode) upgrade;
+					if (upgrade instanceof IWorldNetworkNodeHost) return ((IWorldNetworkNodeHost) upgrade).getNode();
 				}
 
 				IPeripheral peripheral = turtle.getPeripheral(side);
 				if (peripheral != null) {
-					if (peripheral instanceof INetworkNode) return (INetworkNode) peripheral;
-					if (peripheral instanceof INetworkNodeHost) return ((INetworkNodeHost) peripheral).getNode();
+					if (peripheral instanceof IWorldNetworkNode) return (IWorldNetworkNode) peripheral;
+					if (peripheral instanceof IWorldNetworkNodeHost) return ((IWorldNetworkNodeHost) peripheral).getNode();
 				}
 
 				return null;

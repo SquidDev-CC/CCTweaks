@@ -14,8 +14,6 @@ import dan200.computercraft.client.render.FixedRenderBlocks;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
-import dan200.computercraft.shared.util.IDAssigner;
-import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -28,16 +26,15 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
-import org.squiddev.cctweaks.core.network.NetworkHelpers;
-import org.squiddev.cctweaks.core.network.modem.SinglePeripheralModem;
+import org.squiddev.cctweaks.core.network.modem.BasicModem;
+import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
-import java.io.File;
 import java.lang.reflect.Field;
-import java.util.Map;
+import java.util.Collections;
 
 public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	@SideOnly(Side.CLIENT)
@@ -55,11 +52,12 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	}
 
 	public PartModem(TileCable modem) {
-		this.direction = (byte) modem.getDirection();
-
 		try {
-			this.modem.id = ComputerAccessor.cablePeripheralId.getInt(modem);
-			this.modem.setState((byte) modem.getAnim());
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setByte("node_direction", (byte) modem.getDirection());
+			tag.setInteger("modem_id", ComputerAccessor.cablePeripheralId.getInt(modem));
+			tag.setBoolean("modem_enabled", (modem.getAnim() & BasicModem.MODEM_PERIPHERAL) == BasicModem.MODEM_PERIPHERAL);
+			load(tag);
 		} catch (Exception e) {
 			DebugLogger.error("Cannot get modem from tile", e);
 		}
@@ -85,12 +83,11 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	@Override
 	public void harvest(MovingObjectPosition hit, EntityPlayer player) {
 		World world = world();
-		int x = x(), y = y(), z = z();
 
 		super.harvest(hit, player);
 
 		if (!world.isRemote) {
-			NetworkHelpers.fireNetworkInvalidateAdjacent(world, x, y, z);
+			modem.destroy();
 		}
 	}
 
@@ -118,10 +115,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 		if (world().isRemote) return;
 
 		if (modem.modem.pollChanged()) markDirty();
-
 		modem.processQueue();
-
-		if (!modem.peripheralsKnown) modem.findPeripherals();
 	}
 
 	@Override
@@ -131,11 +125,9 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 
 	@Override
 	public void onNeighborChanged() {
-		Map<String, IPeripheral> peripherals = modem.getConnectedPeripherals();
 		if (modem.updateEnabled()) {
-			modem.detachConnectedPeripheralsFromNetwork(peripherals);
 			markDirty();
-			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
+			modem.getAttachedNetwork().invalidateNetwork();
 		}
 	}
 
@@ -143,12 +135,11 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	public boolean activate(EntityPlayer player, MovingObjectPosition hit, ItemStack item) {
 		if (player.isSneaking()) return false;
 		if (world().isRemote) return true;
+		if (modem.getAttachedNetwork() == null) return false;
 
 		String name = modem.getPeripheralName();
 
-		modem.detachConnectedPeripheralsFromNetwork();
 		modem.toggleEnabled();
-		modem.attachConnectedPeripheralsToNetwork();
 
 		String newName = modem.getPeripheralName();
 
@@ -161,7 +152,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
 			}
 
-			NetworkHelpers.fireNetworkInvalidate(world(), x(), y(), z());
+			modem.getAttachedNetwork().invalidateNetwork();
 			markDirty();
 		}
 
@@ -198,42 +189,36 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 
 	@Override
 	public void save(NBTTagCompound tag) {
-		tag.setByte("modem_direction", direction);
+		super.save(tag);
 		tag.setBoolean("modem_enabled", modem.isEnabled());
 		tag.setInteger("modem_id", modem.id);
 	}
 
 	@Override
+	public Iterable<String> getFields() {
+		return Collections.singletonList("modem_enabled");
+	}
+
+	@Override
 	public void load(NBTTagCompound tag) {
-		direction = tag.getByte("modem_direction");
-		modem.setState(tag.getBoolean("modem_enabled") ? WiredModem.MODEM_PERIPHERAL : 0);
+		super.load(tag);
 		modem.id = tag.getInteger("modem_id");
 	}
 
 	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		return modem.getConnectedPeripherals();
-	}
-
-	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-		modem.receivePacket(packet, distanceTravelled);
-	}
-
-	@Override
-	public void networkInvalidated() {
-		modem.networkInvalidated();
-	}
-
-	@Override
-	public Object lock() {
-		return modem.lock();
+	public void loadLazy(NBTTagCompound tag) {
+		modem.setPeripheralEnabled(tag.getBoolean("modem_enabled"));
 	}
 
 	@Override
 	public IPeripheral getPeripheral(int side) {
 		if (side == direction) return modem.modem;
 		return null;
+	}
+
+	@Override
+	public IWorldNetworkNode getNode() {
+		return modem;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -289,28 +274,15 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 		}
 	}
 
-	public class WiredModem extends SinglePeripheralModem {
-		@Override
-		public IPeripheral getPeripheral() {
-			int dir = direction;
-			int x = x() + Facing.offsetsXForSide[dir];
-			int y = y() + Facing.offsetsYForSide[dir];
-			int z = z() + Facing.offsetsZForSide[dir];
-			IPeripheral peripheral = PeripheralUtil.getPeripheral(world(), x, y, z, Facing.oppositeSide[dir]);
-
-			if (peripheral == null) {
-				id = -1;
-				peripheral = null;
-			} else if (id <= -1) {
-				id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(world()), "computer/lastid_" + peripheral.getType() + ".txt"));
-			}
-
-			return peripheral;
-		}
-
+	public class WiredModem extends DirectionalPeripheralModem {
 		@Override
 		public IWorldPosition getPosition() {
 			return PartModem.this;
+		}
+
+		@Override
+		public int getDirection() {
+			return direction;
 		}
 	}
 }

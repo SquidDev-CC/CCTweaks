@@ -84,13 +84,13 @@ public class ItemDebugger extends ItemComputerAction {
 		peripheral = PeripheralUtil.getPeripheral(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord, side);
 		if (peripheral != null) {
 			if (peripheral instanceof BasicModemPeripheral) {
-				Map<String, IPeripheral> p = ((BasicModemPeripheral) peripheral).modem.peripheralsByName();
+				Map<String, IPeripheral> p = ((BasicModemPeripheral) peripheral).modem.getPeripheralsOnNetwork();
 				if (p != null) remotes.addAll(p.keySet());
 			}
 		}
 
 		if (tile instanceof INetworkAccess) {
-			Map<String, IPeripheral> p = ((INetworkAccess) tile).peripheralsByName();
+			Map<String, IPeripheral> p = ((INetworkAccess) tile).getPeripheralsOnNetwork();
 			if (p != null) remotes.addAll(p.keySet());
 		}
 

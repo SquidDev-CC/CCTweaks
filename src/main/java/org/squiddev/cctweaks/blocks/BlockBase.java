@@ -47,11 +47,10 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int damage) {
 		T tile = getTile(world, x, y, z);
-		if (tile != null) tile.preRemove();
 
 		super.breakBlock(world, x, y, z, block, damage);
 
-		if (tile != null) tile.postRemove();
+		if (tile != null) tile.destroy();
 	}
 
 	@Override

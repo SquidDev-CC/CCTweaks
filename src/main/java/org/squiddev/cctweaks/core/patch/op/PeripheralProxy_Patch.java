@@ -7,10 +7,12 @@ import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralProxy;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
+import java.util.Map;
+
 /**
  * PeripheralProxy rewrite with INetworkedPeripheral support
  */
-public class PeripheralProxy_Patch implements INetworkedPeripheral, IPeripheralProxy {
+public abstract class PeripheralProxy_Patch implements INetworkedPeripheral, IPeripheralProxy {
 	@MergeVisitor.Stub
 	private final IPeripheral peripheral;
 
@@ -34,16 +36,16 @@ public class PeripheralProxy_Patch implements INetworkedPeripheral, IPeripheralP
 	}
 
 	@Override
-	public void networkInvalidated(INetworkAccess network) {
+	public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals) {
 		if (peripheral instanceof INetworkedPeripheral) {
-			((INetworkedPeripheral) peripheral).networkInvalidated(network);
+			((INetworkedPeripheral) peripheral).networkInvalidated(network, oldPeripherals);
 		}
 	}
 
 	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
+	public void receivePacket(INetworkAccess network, Packet packet, double distanceTravelled) {
 		if (peripheral instanceof INetworkedPeripheral) {
-			((INetworkedPeripheral) peripheral).receivePacket(packet, distanceTravelled);
+			((INetworkedPeripheral) peripheral).receivePacket(network, packet, distanceTravelled);
 		}
 	}
 

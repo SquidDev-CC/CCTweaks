@@ -6,22 +6,21 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeHost;
-import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
-import org.squiddev.cctweaks.blocks.TileBase;
+import org.squiddev.cctweaks.blocks.TileLazyNBT;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.modem.MultiPeripheralModem;
 
-import java.util.Map;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
 /**
  * A full block implementation of a modem
  */
-public class TileNetworkedModem extends TileBase implements IPeripheralHost, INetworkNodeHost {
+public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, IWorldNetworkNodeHost {
 	public final MultiPeripheralModem modem = new MultiPeripheralModem() {
 		@Override
 		public IWorldPosition getPosition() {
@@ -30,40 +29,25 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, INe
 	};
 
 	@Override
+	public void create() {
+		NetworkHelpers.scheduleJoin(modem);
+		super.create();
+	}
+
+	@Override
 	public void updateEntity() {
 		if (worldObj.isRemote) return;
 
 		if (modem.modem.pollChanged()) markForUpdate();
 
 		modem.processQueue();
-		if (!modem.peripheralsKnown) modem.findPeripherals();
 	}
 
 	@Override
 	public void onNeighborChanged() {
-		Map<String, IPeripheral> oldPeripherals = modem.getConnectedPeripherals();
 		if (modem.hasChanged()) {
-			Map<String, IPeripheral> newPeripherals = modem.getConnectedPeripherals();
-			for (Map.Entry<String, IPeripheral> p : newPeripherals.entrySet()) {
-				IPeripheral newPeriph = p.getValue();
-				String newName = p.getKey();
-				IPeripheral oldPeriph = oldPeripherals.get(newName);
-				if (oldPeriph == null || (!newPeriph.equals(oldPeriph) && newPeriph instanceof INetworkedPeripheral)) {
-					((INetworkedPeripheral) newPeriph).attachToNetwork(modem, newName);
-				}
-			}
-
-			for (Map.Entry<String, IPeripheral> p : oldPeripherals.entrySet()) {
-				IPeripheral oldPeriph = p.getValue();
-				String oldName = p.getKey();
-				IPeripheral newPeriph = newPeripherals.get(oldName);
-				if (newPeriph == null || (!oldPeriph.equals(newPeriph) && oldPeriph instanceof INetworkedPeripheral)) {
-					((INetworkedPeripheral) oldPeriph).detachFromNetwork(modem, oldName);
-				}
-			}
-
+			modem.getAttachedNetwork().invalidateNetwork();
 			markForUpdate();
-			NetworkHelpers.fireNetworkInvalidate(worldObj, xCoord, yCoord, zCoord);
 		}
 	}
 
@@ -74,9 +58,7 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, INe
 
 		Set<String> names = modem.getPeripheralNames();
 
-		modem.detachConnectedPeripheralsFromNetwork();
 		modem.toggleEnabled();
-		modem.attachConnectedPeripheralsToNetwork();
 
 		Set<String> newNames = modem.getPeripheralNames();
 
@@ -89,21 +71,11 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, INe
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", StringUtils.join(newNames, ", ")));
 			}
 
-			NetworkHelpers.fireNetworkInvalidate(worldObj, xCoord, yCoord, zCoord);
+			modem.getAttachedNetwork().invalidateNetwork();
 			markForUpdate();
 		}
 
 		return true;
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		super.readFromNBT(tag);
-
-		modem.setState(tag.getBoolean("modem_enabled") ? MultiPeripheralModem.MODEM_PERIPHERAL : 0);
-
-		int[] ids = tag.getIntArray("modem_id");
-		if (ids != null && ids.length == 6) System.arraycopy(ids, 0, modem.ids, 0, 6);
 	}
 
 	@Override
@@ -115,9 +87,26 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, INe
 	}
 
 	@Override
-	public void postRemove() {
-		NetworkHelpers.fireNetworkInvalidateAdjacent(worldObj, xCoord, yCoord, zCoord);
-		modem.modem.destroy();
+	public void readFromNBT(NBTTagCompound tag) {
+		super.readFromNBT(tag);
+		int[] ids = tag.getIntArray("modem_id");
+		if (ids != null && ids.length == 6) System.arraycopy(ids, 0, modem.ids, 0, 6);
+	}
+
+	@Override
+	public void readLazyNBT(NBTTagCompound tag) {
+		modem.setPeripheralEnabled(tag.getBoolean("modem_enabled"));
+	}
+
+	@Override
+	public Iterable<String> getFields() {
+		return Arrays.asList("modem_enabled", "modem_id");
+	}
+
+	@Override
+	public void destroy() {
+		super.destroy();
+		modem.destroy();
 	}
 
 	@Override
@@ -145,7 +134,7 @@ public class TileNetworkedModem extends TileBase implements IPeripheralHost, INe
 	}
 
 	@Override
-	public INetworkNode getNode() {
+	public IWorldNetworkNode getNode() {
 		return modem;
 	}
 }

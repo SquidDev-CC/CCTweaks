@@ -18,17 +18,35 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class PartModemWithCableIntermediate extends PartCable implements IPeripheralHost {
 	public static final String NAME = CCTweaks.NAME + ":networkModemCable";
 
 	private final PartModem modem;
+
+	{
+		cable = new CableImpl() {
+			@Override
+			public Set<INetworkNode> getConnectedNodes() {
+				Set<INetworkNode> nodes = new HashSet<INetworkNode>();
+				nodes.add(modem.getNode());
+				nodes.addAll(super.getConnectedNodes());
+				return nodes;
+			}
+
+			@Override
+			public boolean canConnectInternally(ForgeDirection dir) {
+				return dir.ordinal() == modem.direction || super.canConnectInternally(dir);
+			}
+		};
+	}
 
 	public PartModemWithCableIntermediate(TileCable modem) {
 		this.modem = new PartModem(modem);
@@ -122,44 +140,13 @@ public class PartModemWithCableIntermediate extends PartCable implements IPeriph
 	}
 
 	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		return super.canBeVisited(from) && modem.canBeVisited(from);
-	}
-
-	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return super.canVisitTo(to) && modem.canVisitTo(to);
-	}
-
-	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-		super.receivePacket(packet, distanceTravelled);
-		modem.receivePacket(packet, distanceTravelled);
-	}
-
-	@Override
-	public void networkInvalidated() {
-		super.networkInvalidated();
-		modem.networkInvalidated();
-	}
-
-	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		Map<String, IPeripheral> peripherals = super.getConnectedPeripherals();
-
-		Map<String, IPeripheral> modemPerips = modem.getConnectedPeripherals();
-		if (modemPerips != null) peripherals.putAll(modemPerips);
-
-		return peripherals;
-	}
-
-	@Override
-	public Object lock() {
-		return modem.lock();
-	}
-
-	@Override
 	public IPeripheral getPeripheral(int side) {
 		return modem.getPeripheral(side);
+	}
+
+	@Override
+	public void rebuildCanConnectMap() {
+		super.rebuildCanConnectMap();
+		canConnectMap &= ~modem.direction;
 	}
 }

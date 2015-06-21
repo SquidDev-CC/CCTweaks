@@ -8,8 +8,6 @@ import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.Vec3;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.INetworkNodeHost;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +17,7 @@ import java.util.Map;
  *
  * @see BasicModem
  */
-public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements INetworkNodeHost {
+public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral {
 	public final T modem;
 
 	public BasicModemPeripheral(T modem) {
@@ -47,6 +45,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 		return other instanceof BasicModemPeripheral && ((BasicModemPeripheral) other).modem.equals(this.modem);
 	}
 
+	@Override
 	public String[] getMethodNames() {
 		String[] methods = super.getMethodNames();
 		String[] newMethods = new String[methods.length + 5];
@@ -67,7 +66,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 		String[] methods = super.getMethodNames();
 		switch (method - methods.length) {
 			case 0: // getNamesRemote
-				synchronized (modem.peripheralsByName()) {
+				synchronized (modem.getPeripheralsOnNetwork()) {
 					int idx = 1;
 					Map<Object, Object> table = new HashMap<Object, Object>();
 					for (String name : modem.peripheralWrappersByName.keySet()) {
@@ -118,8 +117,8 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	@Override
 	public synchronized void attach(IComputerAccess computer) {
 		super.attach(computer);
-		synchronized (modem.peripheralsByName()) {
-			for (Map.Entry<String, IPeripheral> peripheral : modem.peripheralsByName().entrySet()) {
+		synchronized (modem.getPeripheralsOnNetwork()) {
+			for (Map.Entry<String, IPeripheral> peripheral : modem.getPeripheralsOnNetwork().entrySet()) {
 				modem.attachPeripheral(peripheral.getKey(), peripheral.getValue());
 			}
 		}
@@ -128,8 +127,8 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	@Override
 	public synchronized void detach(IComputerAccess computer) {
 		super.detach(computer);
-		synchronized (modem.peripheralsByName()) {
-			for (String name : modem.peripheralsByName().keySet()) {
+		synchronized (modem.getPeripheralsOnNetwork()) {
+			for (String name : modem.getPeripheralsOnNetwork().keySet()) {
 				modem.detachPeripheral(name);
 			}
 		}
@@ -140,10 +139,5 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 			throw new LuaException("Expected string");
 		}
 		return (String) arguments[index];
-	}
-
-	@Override
-	public INetworkNode getNode() {
-		return modem;
 	}
 }

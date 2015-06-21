@@ -5,6 +5,7 @@ import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.client.render.FixedRenderBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,28 +16,34 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
-import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
+import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
+import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
+
+import java.util.Arrays;
 
 /**
  * A multipart equivalent of {@link TileNetworkedWirelessBridge}
  */
-public class PartWirelessBridge extends PartSidedNetwork {
+public class PartWirelessBridge extends PartSidedNetwork implements IPeripheralHost {
 	public static final String NAME = CCTweaks.NAME + ":wirelessBridge";
 
 	@SideOnly(Side.CLIENT)
 	public static BridgeRenderer renderBlocks;
 
-	protected final NetworkBinding binding = new NetworkBinding(this);
+	protected final NetworkBindingWithModem binding = new NetworkBindingWithModem(this);
 
 	public PartWirelessBridge(int direction) {
 		this.direction = (byte) direction;
 	}
 
+	@Override
 	public String getType() {
 		return NAME;
 	}
@@ -49,25 +56,29 @@ public class PartWirelessBridge extends PartSidedNetwork {
 	@Override
 	public void onWorldSeparate() {
 		super.onWorldSeparate();
-		binding.remove();
+		if (world() == null || !world().isRemote) binding.destroy();
+	}
+
+	@Override
+	public void loadLazy(NBTTagCompound tag) {
+		binding.load(tag);
+	}
+
+	@Override
+	public Iterable<String> getFields() {
+		return Arrays.asList(NetworkBinding.LSB, NetworkBinding.MSB);
 	}
 
 	@Override
 	public void onWorldJoin() {
 		super.onWorldJoin();
-		binding.add();
+		NetworkHelpers.scheduleConnect(binding);
 	}
 
 	@Override
 	public void save(NBTTagCompound tag) {
-		super.save(tag);
 		binding.save(tag);
-	}
-
-	@Override
-	public void load(NBTTagCompound tag) {
-		super.load(tag);
-		binding.load(tag);
+		super.save(tag);
 	}
 
 	@Override
@@ -124,8 +135,13 @@ public class PartWirelessBridge extends PartSidedNetwork {
 	}
 
 	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		return binding.getPositions();
+	public IWorldNetworkNode getNode() {
+		return binding;
+	}
+
+	@Override
+	public IPeripheral getPeripheral(int side) {
+		return binding.getModem().modem;
 	}
 
 	@SideOnly(Side.CLIENT)

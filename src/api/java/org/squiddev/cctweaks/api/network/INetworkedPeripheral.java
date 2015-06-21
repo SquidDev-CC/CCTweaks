@@ -1,6 +1,10 @@
 package org.squiddev.cctweaks.api.network;
 
-public interface INetworkedPeripheral {
+import dan200.computercraft.api.peripheral.IPeripheral;
+
+import java.util.Map;
+
+public interface INetworkedPeripheral extends IPeripheral {
 	/**
 	 * Called when this peripheral is attached to a network.
 	 *
@@ -20,15 +24,17 @@ public interface INetworkedPeripheral {
 	/**
 	 * Called when the network is invalidated.
 	 *
-	 * @param network The network that was invalidated.
+	 * @param network			The network that was invalidated.
+	 * @param oldPeripherals    A map of peripherals as they were before the invalidation.
 	 */
-	void networkInvalidated(INetworkAccess network);
+	void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals);
 
 	/**
 	 * Called when the network receives a packet.
 	 *
+	 * @param network			The network this packet was sent on.
 	 * @param packet			The packet received.
 	 * @param distanceTravelled The distance that packet travelled.
 	 */
-	void receivePacket(Packet packet, int distanceTravelled);
+	void receivePacket(INetworkAccess network, Packet packet, double distanceTravelled);
 }

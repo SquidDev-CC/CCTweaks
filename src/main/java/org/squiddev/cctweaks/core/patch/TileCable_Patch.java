@@ -1,12 +1,14 @@
 package org.squiddev.cctweaks.core.patch;
 
-import dan200.computercraft.api.peripheral.IComputerAccess;
+import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.BlockCable;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
+import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.Facing;
@@ -14,195 +16,330 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.*;
-import org.squiddev.cctweaks.core.network.NetworkHelpers;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
+import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.core.FmlEvents;
+import org.squiddev.cctweaks.core.network.cable.SingleModemCable;
+import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
-import java.util.*;
+import java.util.Objects;
 
 import static org.squiddev.cctweaks.core.network.NetworkHelpers.canConnect;
 
-@SuppressWarnings("all")
 @MergeVisitor.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
-public class TileCable_Patch extends TileCable implements INetworkNode, INetworkAccess {
+public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost, IWorldPosition {
 	public static final double MIN = 0.375;
 	public static final double MAX = 1 - MIN;
 
 	@MergeVisitor.Stub
-	private static IIcon[] s_cableIcons;
-	@MergeVisitor.Stub
-	private Map<Integer, Set<IReceiver>> m_receivers;
-	@MergeVisitor.Stub
-	private Map<String, IPeripheral> m_peripheralsByName;
-	@MergeVisitor.Stub
-	private Map<String, RemotePeripheralWrapper> m_peripheralWrappersByName;
-	@MergeVisitor.Stub
-	private boolean m_peripheralsKnown;
-	@MergeVisitor.Stub
 	private boolean m_destroyed;
 	@MergeVisitor.Stub
-	private Queue<Packet> m_transmitQueue;
-	private IPeripheral connectedPeripheral;
+	private static IIcon[] s_cableIcons;
+	@MergeVisitor.Stub
+	private boolean m_peripheralAccessAllowed;
+
+	protected DirectionalPeripheralModem modem;
+	protected SingleModemCable cable;
+	protected NBTTagCompound lazyTag;
+
+	/**
+	 * The patcher doesn't enable constructors (yet) so we lazy load the modem
+	 *
+	 * @return The resulting modem
+	 */
+	public DirectionalPeripheralModem getModem() {
+		if (modem == null) {
+			return modem = new DirectionalPeripheralModem() {
+				@MergeVisitor.Rewrite
+				protected boolean ANNOTATION;
+
+				@Override
+				public int getDirection() {
+					return TileCable_Patch.this.getDirection();
+				}
+
+				@Override
+				public IWorldPosition getPosition() {
+					return TileCable_Patch.this;
+				}
+
+				@Override
+				public boolean canConnect(ForgeDirection from) {
+					return true;
+				}
+
+				@Override
+				public void setPeripheralEnabled(boolean peripheralEnabled) {
+					super.setPeripheralEnabled(peripheralEnabled);
+
+					// Required for OpenPeripheral's PeripheralProxy
+					// https://github.com/OpenMods/OpenPeripheral-Addons/blob/master/src/main/java/openperipheral/addons/peripheralproxy/TileEntityPeripheralProxy.java#L23-L32
+					m_peripheralAccessAllowed = peripheralEnabled;
+				}
+
+				@Override
+				protected boolean isPeripheralEnabled() {
+					return super.isPeripheralEnabled() && !m_destroyed && getPeripheralType() == PeripheralType.WiredModemWithCable;
+				}
+			};
+		}
+		return modem;
+	}
+
+	public SingleModemCable getCable() {
+		if (cable == null) {
+			return cable = new SingleModemCable() {
+				@MergeVisitor.Rewrite
+				protected boolean ANNOTATION;
+
+				@Override
+				public DirectionalPeripheralModem getModem() {
+					return TileCable_Patch.this.getModem();
+				}
+
+				@Override
+				public IWorldPosition getPosition() {
+					return TileCable_Patch.this;
+				}
+
+				@Override
+				public boolean canConnect(ForgeDirection direction) {
+					// Can't be visited by other nodes if it is destroyed
+					if (m_destroyed) return false;
+
+					// Or has no cable or is the side it is facing
+					PeripheralType type = getPeripheralType();
+					return type == PeripheralType.Cable || (type == PeripheralType.WiredModemWithCable && direction.ordinal() != getDirection());
+				}
+			};
+		}
+		return cable;
+	}
+
+	@Override
+	public void destroy() {
+		// TODO: Maybe on invalidate instead?
+		if (!m_destroyed) {
+			m_destroyed = true;
+			getModem().destroy();
+			getCable().destroy();
+		}
+		super.destroy();
+	}
+
+	@Override
+	public void onChunkUnload() {
+		super.onChunkUnload();
+		destroy();
+	}
+
+	@Override
+	public void validate() {
+		// TODO: This is also called when being destroyed
+		super.validate();
+		if (!worldObj.isRemote) {
+			FmlEvents.schedule(new Runnable() {
+				@MergeVisitor.Rewrite
+				protected boolean ANNOTATION;
+
+				@Override
+				public void run() {
+					getCable().connect();
+					if (lazyTag != null) {
+						readLazyNBT(lazyTag);
+						lazyTag = null;
+					}
+				}
+			});
+		}
+	}
+
+	@Override
+	public void onNeighbourChange() {
+		// Update the neighbour first as this might break the type
+		nativeOnNeighbourChange();
+
+		// TODO: Break the modem if we change
+		if (getPeripheralType() == PeripheralType.WiredModemWithCable) {
+			if (getModem().updateEnabled()) {
+				modem.getAttachedNetwork().invalidateNetwork();
+				updateAnim();
+			}
+		}
+	}
+
+	@MergeVisitor.Stub
+	@MergeVisitor.Rename(from = {"onNeighbourChange"})
+	public void nativeOnNeighbourChange() {
+	}
+
+	@Override
+	public boolean onActivate(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+		if (getPeripheralType() == PeripheralType.WiredModemWithCable && !player.isSneaking()) {
+			if (!worldObj.isRemote) {
+
+				String oldPeriphName = getModem().getPeripheralName();
+				getModem().toggleEnabled();
+				String periphName = getModem().getPeripheralName();
+
+				if (!Objects.equals(periphName, oldPeriphName)) {
+					if (oldPeriphName != null) {
+						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", oldPeriphName));
+					}
+					if (periphName != null) {
+						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", periphName));
+					}
+
+					getModem().getAttachedNetwork().invalidateNetwork();
+					return true;
+				}
+			} else {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound tag) {
+		super.readFromNBT(tag);
+		getModem().id = tag.getInteger("peripheralID");
+		if (worldObj == null) {
+			lazyTag = tag;
+		} else {
+			readLazyNBT(tag);
+		}
+	}
+
+	protected void readLazyNBT(NBTTagCompound tag) {
+		getModem().setPeripheralEnabled(tag.getBoolean("peripheralAccess"));
+	}
+
+	@Override
+	public void writeToNBT(NBTTagCompound tag) {
+		super.writeToNBT(tag);
+		if (lazyTag != null) {
+			tag.setBoolean("peripheralAccess", tag.getBoolean("peripheralAccess"));
+			tag.setInteger("peripheralID", tag.getInteger("peripheralID"));
+		} else {
+			tag.setBoolean("peripheralAccess", modem.isEnabled());
+			tag.setInteger("peripheralID", modem.id);
+		}
+	}
+
+	@Override
+	protected ModemPeripheral createPeripheral() {
+		return getModem().modem;
+	}
+
+	@Override
+	protected void updateAnim() {
+		getModem().refreshState();
+		setAnim(modem.state);
+	}
+
+	@Override
+	public IPeripheral getPeripheral(int side) {
+		return side == getDirection() && getPeripheralType() != PeripheralType.Cable ? getModem().modem : null;
+	}
+
+	@Override
+	public void updateEntity() {
+		// TODO: This should call TilePeripheralBase's updateEntity method instead
+		super.updateEntity();
+		if (worldObj.isRemote) return;
+
+		if (getModem().modem.pollChanged()) updateAnim();
+		modem.processQueue();
+	}
 
 	@Override
 	public void addReceiver(IReceiver receiver) {
-		synchronized (m_receivers) {
-			int channel = receiver.getChannel();
-			Set<IReceiver> receivers = m_receivers.get(channel);
-			if (receivers == null) {
-				receivers = new HashSet<IReceiver>();
-				m_receivers.put(channel, receivers);
-			}
-			receivers.add(receiver);
-		}
+		getModem().addReceiver(receiver);
 	}
 
 	@Override
 	public void removeReceiver(IReceiver receiver) {
-		synchronized (m_receivers) {
-			int channel = receiver.getChannel();
-			Set<IReceiver> receivers = m_receivers.get(channel);
-			if (receivers != null) {
-				receivers.remove(receiver);
-			}
-		}
+		getModem().removeReceiver(receiver);
 	}
 
 	@Override
 	public void transmit(int channel, int replyChannel, Object payload, double range, double xPos, double yPos, double zPos, Object senderObject) {
-		synchronized (m_transmitQueue) {
-			m_transmitQueue.offer(new Packet(channel, replyChannel, payload, senderObject));
-		}
+		getModem().transmit(channel, replyChannel, payload, range, xPos, yPos, zPos, senderObject);
 	}
 
+	@Deprecated
 	private void attachPeripheral(String name, IPeripheral peripheral) {
-		if (!m_peripheralWrappersByName.containsKey(name)) {
-			RemotePeripheralWrapper wrapper = new RemotePeripheralWrapper(peripheral, m_modem.getComputer(), name);
-			m_peripheralWrappersByName.put(name, wrapper);
-			wrapper.attach();
-		}
+		getModem().attachPeripheral(name, peripheral);
 	}
 
+	@Deprecated
 	private void detachPeripheral(String name) {
-		if (m_peripheralWrappersByName.containsKey(name)) {
-			RemotePeripheralWrapper wrapper = m_peripheralWrappersByName.get(name);
-			m_peripheralWrappersByName.remove(name);
-			wrapper.detach();
-		}
+		getModem().detachPeripheral(name);
+	}
+
+	@Deprecated
+	private String getTypeRemote(String remoteName) {
+		return null;
+	}
+
+	@Deprecated
+	private String[] getMethodNamesRemote(String remoteName) {
+		return null;
+	}
+
+	@Deprecated
+	private Object[] callMethodRemote(String remoteName, ILuaContext context, String method, Object[] arguments) {
+		return null;
 	}
 
 	@Override
 	public void networkChanged() {
 		if (!worldObj.isRemote) {
-			if (m_destroyed) {
-				NetworkHelpers.fireNetworkInvalidateAdjacent(worldObj, xCoord, yCoord, zCoord);
-			} else {
-				NetworkHelpers.fireNetworkInvalidate(worldObj, xCoord, yCoord, zCoord);
-			}
+			getModem().invalidateNetwork();
 		}
 	}
 
-	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		return null;
-	}
-
+	@Deprecated
 	private void dispatchPacket(Packet packet) {
-		NetworkHelpers.sendPacket(worldObj, xCoord, yCoord, zCoord, packet);
+		getModem().transmitPacket(packet);
 	}
 
-	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		// Can't be visited by other nodes if it is destroyed
-		if (m_destroyed) return false;
-
-		// Or has no cable or is the side it is facing
-		PeripheralType type = getPeripheralType();
-		return type == PeripheralType.Cable || (type == PeripheralType.WiredModemWithCable && from.ordinal() != getDirection());
+	@Deprecated
+	private void receivePacket(Packet packet, int distanceTravelled) {
+		getModem().receivePacket(packet, distanceTravelled);
 	}
 
-	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return canBeVisited(to);
-	}
-
-	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		String name = getConnectedPeripheralName();
-		IPeripheral peripheral = getConnectedPeripheral();
-		if (name != null && peripheral != null) {
-			return Collections.singletonMap(name, peripheral);
-		}
-		return null;
-	}
-
-	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-		synchronized (m_receivers) {
-			Set<IReceiver> receivers = m_receivers.get(packet.channel);
-			if (receivers != null) {
-				for (IReceiver receiver : receivers) {
-					receiver.receive(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
-				}
-			}
-		}
-	}
-
-	@Override
-	public void networkInvalidated() {
-		IPeripheral peripheral = getConnectedPeripheral();
-		if (peripheral instanceof INetworkedPeripheral) {
-			((INetworkedPeripheral) peripheral).networkInvalidated(this);
-		}
-		m_peripheralsKnown = false;
-		connectedPeripheral = null;
-	}
-
-	@Override
-	public Object lock() {
-		return m_peripheralsByName;
-	}
-
+	@Deprecated
 	private void findPeripherals() {
-		// TEs are not replaced on Multipart crashes
-		if (getBlock() == null) {
-			worldObj.removeTileEntity(xCoord, yCoord, zCoord);
-			return;
-		}
+		// TODO: Do we need to do something?
+		DebugLogger.deprecated("Handled by BasicModem");
+	}
 
-		final TileCable_Patch origin = this;
-		synchronized (m_peripheralsByName) {
-			Map<String, IPeripheral> newPeripheralsByName = new HashMap<String, IPeripheral>();
-			if (getPeripheralType() == PeripheralType.WiredModemWithCable) {
-				for (ISearchLoc loc : NetworkAPI.visitor().visitNetwork(this)) {
-					INetworkNode node = loc.getNode();
-					if (node != origin) {
-						Map<String, IPeripheral> peripherals = node.getConnectedPeripherals();
-						if (peripherals != null) newPeripheralsByName.putAll(peripherals);
-					}
-				}
-			}
+	@Override
+	public void togglePeripheralAccess() {
+		// This is needed for OpenPeripherals' peripheral proxy
+		// See https://github.com/OpenMods/OpenPeripheral-Addons/blob/master/src/main/java/openperipheral/addons/peripheralproxy/TileEntityPeripheralProxy.java#L23-L32
+		getModem().toggleEnabled();
+	}
 
-			Iterator it = m_peripheralsByName.keySet().iterator();
-			while (it.hasNext()) {
-				String periphName = (String) it.next();
-				if (!newPeripheralsByName.containsKey(periphName)) {
-					it.remove();
-					detachPeripheral(periphName);
-				}
+	@Override
+	@Deprecated
+	public String getConnectedPeripheralName() {
+		return getModem().getPeripheralName();
+	}
 
-			}
+	@Deprecated
+	private IPeripheral getConnectedPeripheral() {
+		return getModem().isEnabled() ? modem.getPeripheral() : null;
+	}
 
-			for (String periphName : newPeripheralsByName.keySet()) {
-				if (!m_peripheralsByName.containsKey(periphName)) {
-					IPeripheral peripheral = newPeripheralsByName.get(periphName);
-					if (peripheral != null) {
-						m_peripheralsByName.put(periphName, peripheral);
-						if (isAttached()) attachPeripheral(periphName, peripheral);
-					}
-				}
-			}
-		}
+	@Override
+	protected boolean isAttached() {
+		return getModem().modem.getComputer() != null;
 	}
 
 	@Override
@@ -222,129 +359,57 @@ public class TileCable_Patch extends TileCable implements INetworkNode, INetwork
 
 	@Override
 	public IIcon getTexture(int side) {
-		PeripheralType type = getPeripheralType();
-		if (BlockCable.renderAsModem) type = PeripheralType.WiredModem;
+		PeripheralType type = BlockCable.renderAsModem ? PeripheralType.WiredModem : getPeripheralType();
 
-		switch (type) {
-			case Cable:
-			case WiredModemWithCable:
-				int dir = -1;
-				if (type == PeripheralType.WiredModemWithCable) {
-					dir = getDirection();
-					dir -= dir % 2;
-				}
+		if (type == PeripheralType.Cable || type == PeripheralType.WiredModemWithCable) {
+			int dir = -1;
+			if (type == PeripheralType.WiredModemWithCable) {
+				dir = getDirection();
+				dir -= dir % 2;
+			}
 
-				int x = xCoord, y = yCoord, z = zCoord;
-				IBlockAccess world = worldObj;
+			int x = xCoord, y = yCoord, z = zCoord;
+			IBlockAccess world = worldObj;
 
-				if (canConnect(world, x, y, z, ForgeDirection.EAST) || canConnect(world, x, y, z, ForgeDirection.WEST)) {
-					dir = dir == -1 || dir == 4 ? 4 : -2;
-				}
-				if (canConnect(world, x, y, z, ForgeDirection.UP) || canConnect(world, x, y, z, ForgeDirection.DOWN)) {
-					dir = dir == -1 || dir == 0 ? dir = 0 : -2;
-				}
-				if (canConnect(world, x, y, z, ForgeDirection.NORTH) || canConnect(world, x, y, z, ForgeDirection.SOUTH)) {
-					dir = dir == -1 || dir == 2 ? 2 : -2;
-				}
+			if (canConnect(world, x, y, z, ForgeDirection.EAST) || canConnect(world, x, y, z, ForgeDirection.WEST)) {
+				dir = dir == -1 || dir == 4 ? 4 : -2;
+			}
+			if (canConnect(world, x, y, z, ForgeDirection.UP) || canConnect(world, x, y, z, ForgeDirection.DOWN)) {
+				dir = dir == -1 || dir == 0 ? 0 : -2;
+			}
+			if (canConnect(world, x, y, z, ForgeDirection.NORTH) || canConnect(world, x, y, z, ForgeDirection.SOUTH)) {
+				dir = dir == -1 || dir == 2 ? 2 : -2;
+			}
 
-				if (dir == -1) dir = 2;
-
-				if (dir >= 0 && (side == dir || side == Facing.oppositeSide[dir])) return s_cableIcons[1];
-				return s_cableIcons[0];
+			if (dir == -1) dir = 2;
+			return dir >= 0 && (side == dir || side == Facing.oppositeSide[dir]) ? s_cableIcons[1] : s_cableIcons[0];
 		}
 
 		return super.getTexture(side);
 	}
 
 	@Override
-	public boolean onActivate(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-		if ((getPeripheralType() == PeripheralType.WiredModemWithCable) && (!player.isSneaking())) {
-			if (!this.worldObj.isRemote) {
-				String oldPeriphName = getConnectedPeripheralName();
-				IPeripheral oldPeriph = getConnectedPeripheral();
-				togglePeripheralAccess();
-				String periphName = getConnectedPeripheralName();
-				IPeripheral periph = getConnectedPeripheral();
-				if (!Objects.equals(periphName, oldPeriphName)) {
-					if (oldPeriphName != null) {
-						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", new Object[]{oldPeriphName}));
-						if (oldPeriph instanceof INetworkedPeripheral) {
-							((INetworkedPeripheral) oldPeriph).detachFromNetwork(this, oldPeriphName);
-						}
-					}
-					if (periphName != null) {
-						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", new Object[]{periphName}));
-						if (periph instanceof INetworkedPeripheral) {
-							((INetworkedPeripheral) periph).attachToNetwork(this, periphName);
-						}
-					}
-					return true;
-				}
-			} else {
-				return true;
-			}
-		}
-		return false;
+	public IWorldNetworkNode getNode() {
+		return getCable();
 	}
 
 	@Override
-	public void onNeighbourChange() {
-		if (getPeripheralType() == PeripheralType.WiredModemWithCable) {
-			IPeripheral oldPeriph = getConnectedPeripheral();
-			String oldName = getConnectedPeripheralName();
-			connectedPeripheral = null;
-			IPeripheral periph = getConnectedPeripheral();
-
-			if (!Objects.equals(periph, oldPeriph) && oldPeriph != null && (oldPeriph instanceof INetworkedPeripheral)) {
-				((INetworkedPeripheral) oldPeriph).detachFromNetwork(this, oldName);
-			}
-		}
-		nativeOnNeighbourChange();
-	}
-
-	@MergeVisitor.Stub
-	@MergeVisitor.Rename(from = {"onNeighbourChange"})
-	public void nativeOnNeighbourChange() {
-	}
-
-	private IPeripheral getConnectedPeripheral() {
-		if (connectedPeripheral == null) {
-			connectedPeripheral = nativeGetConnectedPeripheral();
-		}
-		return connectedPeripheral;
-	}
-
-	@MergeVisitor.Stub
-	@MergeVisitor.Rename(from = {"getConnectedPeripheral"})
-	private IPeripheral nativeGetConnectedPeripheral() {
-		return null;
+	public IBlockAccess getWorld() {
+		return worldObj;
 	}
 
 	@Override
-	public Map<String, IPeripheral> peripheralsByName() {
-		return Collections.unmodifiableMap(m_peripheralsByName);
+	public int getX() {
+		return xCoord;
 	}
 
 	@Override
-	public void invalidateNetwork() {
-		networkChanged();
+	public int getY() {
+		return yCoord;
 	}
 
 	@Override
-	public boolean transmitPacket(Packet packet) {
-		dispatchPacket(packet);
-		return true;
-	}
-
-	@MergeVisitor.Stub
-	private static class RemotePeripheralWrapper {
-		public RemotePeripheralWrapper(IPeripheral peripheral, IComputerAccess computer, String name) {
-		}
-
-		public void attach() {
-		}
-
-		public void detach() {
-		}
+	public int getZ() {
+		return zCoord;
 	}
 }

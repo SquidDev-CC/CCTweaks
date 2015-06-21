@@ -1,7 +1,5 @@
 package org.squiddev.cctweaks.integration.multipart.network;
 
-import codechicken.lib.data.MCDataInput;
-import codechicken.lib.data.MCDataOutput;
 import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
@@ -12,7 +10,6 @@ import codechicken.multipart.TSlottedPart;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
-import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.client.render.FixedRenderBlocks;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
@@ -29,15 +26,20 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
+import org.squiddev.cctweaks.core.network.cable.CableWithInternalSidedParts;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.PartBase;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-public class PartCable extends PartBase implements INetworkNode, TSlottedPart, ISidedHollowConnect {
+public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlottedPart, ISidedHollowConnect {
 	public static final String NAME = CCTweaks.NAME + ":networkCable";
 	private static IIcon[] icons;
 
@@ -47,41 +49,21 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 	/**
 	 * Side we are testing the connection on
 	 *
-	 * @see #canCableExtendInDirection(ForgeDirection)
+	 * @see #rebuildCanConnectMap()
 	 */
 	private ForgeDirection connectionTestSide = ForgeDirection.UNKNOWN;
 
-	/**
-	 * Caches list of connections that occur internally
-	 * - nodes that are inside the multipart.
-	 *
-	 * Each byte is represented with {@code 1 << side}
-	 */
-	private int internalConnection = 0;
-
-	/**
-	 * Caches list of where the cable can travel to
-	 * 0 if the route is blocked
-	 *
-	 * Each byte is represented with {@code 1 << side}
-	 */
-	private int cableConnection = 0;
+	protected CableImpl cable = new CableImpl();
+	protected int canConnectMap;
 
 	@SideOnly(Side.CLIENT)
 	private CableRenderer render;
 
 	@SideOnly(Side.CLIENT)
 	public CableRenderer getRender() {
-		CableRenderer draw = render;
-		if (draw == null) {
-			draw = render = new CableRenderer();
-		}
-		return draw;
+		if (render == null) return render = new CableRenderer();
+		return render;
 	}
-
-	private final Object lock = new Object();
-
-	private boolean active = true;
 
 	@Override
 	public String getType() {
@@ -140,12 +122,12 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 		double zMax = MAX;
 
 		if (tile() != null) {
-			if (canConnect(ForgeDirection.WEST)) xMin = 0.0D;
-			if (canConnect(ForgeDirection.EAST)) xMax = 1.0D;
-			if (canConnect(ForgeDirection.DOWN)) yMin = 0.0D;
-			if (canConnect(ForgeDirection.UP)) yMax = 1.0D;
-			if (canConnect(ForgeDirection.NORTH)) zMin = 0.0D;
-			if (canConnect(ForgeDirection.SOUTH)) zMax = 1.0D;
+			if (cable.doesConnect(ForgeDirection.WEST)) xMin = 0.0D;
+			if (cable.doesConnect(ForgeDirection.EAST)) xMax = 1.0D;
+			if (cable.doesConnect(ForgeDirection.DOWN)) yMin = 0.0D;
+			if (cable.doesConnect(ForgeDirection.UP)) yMax = 1.0D;
+			if (cable.doesConnect(ForgeDirection.NORTH)) zMin = 0.0D;
+			if (cable.doesConnect(ForgeDirection.SOUTH)) zMax = 1.0D;
 		}
 
 		return new Cuboid6(xMin, yMin, zMin, xMax, yMax, zMax);
@@ -157,22 +139,22 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 		parts.add(new IndexedCuboid6(ForgeDirection.UNKNOWN, new Cuboid6(MIN, MIN, MIN, MAX, MAX, MAX)));
 
 		if (tile() != null) {
-			if (canConnect(ForgeDirection.WEST)) {
+			if (cable.doesConnect(ForgeDirection.WEST)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.WEST, new Cuboid6(0, MIN, MIN, MIN, MAX, MAX)));
 			}
-			if (canConnect(ForgeDirection.EAST)) {
+			if (cable.doesConnect(ForgeDirection.EAST)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.EAST, new Cuboid6(MAX, MIN, MIN, 1, MAX, MAX)));
 			}
-			if (canConnect(ForgeDirection.DOWN)) {
+			if (cable.doesConnect(ForgeDirection.DOWN)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.DOWN, new Cuboid6(MIN, 0, MIN, MAX, MIN, MAX)));
 			}
-			if (canConnect(ForgeDirection.UP)) {
+			if (cable.doesConnect(ForgeDirection.UP)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.UP, new Cuboid6(MIN, MAX, MIN, MAX, 1, MAX)));
 			}
-			if (canConnect(ForgeDirection.NORTH)) {
+			if (cable.doesConnect(ForgeDirection.NORTH)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.NORTH, new Cuboid6(MIN, MIN, 0, MAX, MAX, MIN)));
 			}
-			if (canConnect(ForgeDirection.SOUTH)) {
+			if (cable.doesConnect(ForgeDirection.SOUTH)) {
 				parts.add(new IndexedCuboid6(ForgeDirection.SOUTH, new Cuboid6(MIN, MIN, MAX, MAX, MAX, 1)));
 			}
 		}
@@ -183,16 +165,9 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 	@Override
 	public void harvest(MovingObjectPosition hit, EntityPlayer player) {
 		World world = world();
-		int x = x(), y = y(), z = z();
-
 		super.harvest(hit, player);
 
-		// Prevent visiting the node
-		active = false;
-
-		if (!world.isRemote) {
-			NetworkHelpers.fireNetworkInvalidateAdjacent(world, x, y, z);
-		}
+		if (!world.isRemote) cable.destroy();
 	}
 
 	@Override
@@ -219,19 +194,21 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 
 	@Override
 	public void onPartChanged(TMultiPart part) {
-		// Fire a network changed event when the entire part is modified.
-		// This is because it may block a connection or release a new one
-		if (tile() != null) {
-			if (!world().isRemote && rebuildConnections()) {
-				NetworkHelpers.fireNetworkInvalidateAdjacent(world(), x(), y(), z());
-				sendDescUpdate();
-			}
-		}
+		rebuildCanConnectMap();
+		if (!world().isRemote) cable.updateConnections();
+	}
+
+	@Override
+	public void onNeighborChanged() {
+		if (!world().isRemote) cable.updateConnections();
 	}
 
 	@Override
 	public void onWorldJoin() {
-		rebuildConnections();
+		rebuildCanConnectMap();
+		if (!world().isRemote) {
+			NetworkHelpers.scheduleConnect(cable);
+		}
 	}
 
 	@Override
@@ -244,155 +221,68 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 		return false;
 	}
 
-	@Override
-	public boolean canBeVisited(ForgeDirection from) {
-		return active && canConnectCached(cableConnection, from);
-	}
-
-	@Override
-	public boolean canVisitTo(ForgeDirection to) {
-		return active && canConnectCached(cableConnection, to);
-	}
-
 	/**
-	 * Tests if the cable can pass through a side.
+	 * Rebuild the cache of occluded sides
+	 *
 	 * Uses TileMultipart.canReplacePart to see if a version of this cable with
 	 * with a certain side's occlusion extended to the full length
 	 * can be placed in the multipart.
 	 * If not, there's a cover or something in the way.
 	 * Else, there's no cover, or something like a hollow cover.
-	 *
-	 * @param dir The direction to test in
-	 * @return whether the cable can extend in that direction.
 	 */
-	protected boolean canCableExtendInDirection(ForgeDirection dir) {
-		connectionTestSide = dir;
-		boolean occludes = tile().canReplacePart(this, this);
-		connectionTestSide = ForgeDirection.UNKNOWN;
-		return occludes;
-	}
-
-	/**
-	 * Checks if this connects to a node inside this multipart
-	 *
-	 * @param side The side to check
-	 * @return If there is a multipart on that sides
-	 */
-	protected boolean canConnectInternally(ForgeDirection side) {
-		TMultiPart part = tile().partMap(side.ordinal());
-		return part != null && part instanceof INetworkNode;
-	}
-
-	/**
-	 * Checks if we can connect to that side
-	 *
-	 * @param side The side to connect to
-	 * @return If a connection can occur
-	 */
-	protected boolean canConnect(ForgeDirection side) {
-		return canConnectCached(cableConnection, side) && NetworkHelpers.canConnect(world(), x(), y(), z(), side);
-	}
-
-	/**
-	 * Rebuild the cache of connections
-	 *
-	 * @see #internalConnection
-	 * @see #cableConnection
-	 */
-	protected boolean rebuildConnections() {
-		// Always allow from ForgeDirection.UNKNOWN
-		int internal = 1 << 6, cable = 1 << 6;
-
+	protected void rebuildCanConnectMap() {
+		int map = 0;
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
-			int flag = 1 << direction.ordinal();
-
-			if (canConnectInternally(direction)) internal |= flag;
-			if (canCableExtendInDirection(direction)) cable |= flag;
+			connectionTestSide = direction;
+			if (tile().canReplacePart(this, this)) map |= 1 << direction.ordinal();
 		}
+		connectionTestSide = ForgeDirection.UNKNOWN;
 
-		boolean changed = internalConnection != internal || cableConnection != cable;
-
-		internalConnection = internal;
-		cableConnection = cable;
-
-		return changed;
-	}
-
-	/**
-	 * Check if we can connect using a particular flag
-	 *
-	 * @param direction Direction to check in
-	 * @return If a connection should occur
-	 * @see #rebuildConnections()
-	 */
-	protected boolean canConnectCached(int flags, ForgeDirection direction) {
-		int flag = 1 << direction.ordinal();
-		return (flags & flag) == flag;
+		canConnectMap = map;
 	}
 
 	@Override
-	public void writeDesc(MCDataOutput packet) {
-		packet.writeBoolean(true);
+	public IWorldNetworkNode getNode() {
+		return cable;
 	}
 
-	@Override
-	public void readDesc(MCDataInput packet) {
-		if (packet.readBoolean() && tile() != null) rebuildConnections();
-	}
+	protected class CableImpl extends CableWithInternalSidedParts {
+		@Override
+		public Set<INetworkNode> getConnectedNodes() {
+			Set<INetworkNode> nodes = super.getConnectedNodes();
 
-	@Override
-	public Map<String, IPeripheral> getConnectedPeripherals() {
-		Map<String, IPeripheral> peripherals = new HashMap<String, IPeripheral>();
-
-		for (TMultiPart part : tile().jPartList()) {
-			if (part instanceof INetworkNode && part != this) {
-				Map<String, IPeripheral> nodePeripherals = ((INetworkNode) part).getConnectedPeripherals();
-				if (nodePeripherals != null) peripherals.putAll(nodePeripherals);
-			}
-		}
-
-		return peripherals;
-	}
-
-	@Override
-	public void receivePacket(Packet packet, int distanceTravelled) {
-		for (TMultiPart part : tile().jPartList()) {
-			if (part instanceof INetworkNode && part != this) {
-				((INetworkNode) part).receivePacket(packet, distanceTravelled);
-			}
-		}
-	}
-
-	@Override
-	public void networkInvalidated() {
-		for (TMultiPart part : tile().jPartList()) {
-			if (part instanceof INetworkNode && part != this) {
-				((INetworkNode) part).networkInvalidated();
-			}
-		}
-	}
-
-	@Override
-	public Iterable<IWorldPosition> getExtraNodes() {
-		Set<IWorldPosition> nodes = new HashSet<IWorldPosition>();
-
-		for (TMultiPart part : tile().jPartList()) {
-			if (part instanceof INetworkNode && part != this) {
-				Iterable<IWorldPosition> extras = ((INetworkNode) part).getExtraNodes();
-				if (extras != null) {
-					for (IWorldPosition extra : extras) {
-						nodes.add(extra);
+			for (TMultiPart part : tile().jPartList()) {
+				if (part != PartCable.this) {
+					if (part instanceof INetworkNode) {
+						nodes.add((INetworkNode) part);
+					} else if (part instanceof IWorldNetworkNodeHost) {
+						nodes.add(((IWorldNetworkNodeHost) part).getNode());
 					}
 				}
 			}
+
+			return nodes;
 		}
 
-		return nodes;
-	}
+		@Override
+		public boolean canConnectInternally(ForgeDirection direction) {
+			TMultiPart part = tile().partMap(direction.ordinal());
+			INetworkNode node = part instanceof INetworkNode ? (INetworkNode) part
+				: part instanceof IWorldNetworkNodeHost ? ((IWorldNetworkNodeHost) part).getNode()
+				: null;
+			return node != null;
+		}
 
-	@Override
-	public Object lock() {
-		return lock;
+		@Override
+		public IWorldPosition getPosition() {
+			return PartCable.this;
+		}
+
+		@Override
+		public boolean canConnect(ForgeDirection direction) {
+			int flag = 1 << direction.ordinal();
+			return (canConnectMap & flag) == flag;
+		}
 	}
 
 	public class CableRenderer extends FixedRenderBlocks {
@@ -406,8 +296,6 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 		 * There are probably better ways of doing this using {@link TMultiPart#getRenderBounds()}
 		 */
 		public static final double RENDER_PADDING = 0.1;
-
-		protected int externalConnection;
 
 		public IIcon[] getIcons() {
 			IIcon[] icons;
@@ -427,38 +315,22 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 			return icons;
 		}
 
-		/**
-		 * Rebuild external connections
-		 *
-		 * We do this once per draw instead as this means we don't have to look it up
-		 * for icons, but don't have client-server sync issues
-		 *
-		 * @see #externalConnection
-		 */
-		protected void rebuildExternal() {
-			int external = 0;
-			for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
-				if (NetworkHelpers.canConnect(world(), x(), y(), z(), direction)) external |= 1 << direction.ordinal();
-			}
-			externalConnection = cableConnection & external;
-		}
-
 		@Override
 		public IIcon getBlockIcon(Block block, IBlockAccess world, int x, int y, int z, int side) {
 			int dir = -1;
 
-			if (canVisuallyConnect(ForgeDirection.WEST) || canVisuallyConnect(ForgeDirection.EAST)) {
-				dir = dir == -1 ? 4 : -2;
+			if (cable.doesConnectVisually(ForgeDirection.WEST) || cable.doesConnectVisually(ForgeDirection.EAST)) {
+				dir = 4;
 			}
-			if (canVisuallyConnect(ForgeDirection.UP) || canVisuallyConnect(ForgeDirection.DOWN)) {
+			if (cable.doesConnectVisually(ForgeDirection.UP) || cable.doesConnectVisually(ForgeDirection.DOWN)) {
 				dir = dir == -1 ? 0 : -2;
 			}
-			if (canVisuallyConnect(ForgeDirection.NORTH) || canVisuallyConnect(ForgeDirection.SOUTH)) {
+			if (cable.doesConnectVisually(ForgeDirection.NORTH) || cable.doesConnectVisually(ForgeDirection.SOUTH)) {
 				dir = dir == -1 ? 2 : -2;
 			}
 			if (dir == -1) dir = 2;
 
-			if ((dir >= 0) && ((side == dir) || (side == Facing.oppositeSide[dir]))) {
+			if (dir >= 0 && (side == dir || side == Facing.oppositeSide[dir])) {
 				return getIcons()[1];
 			}
 
@@ -466,74 +338,66 @@ public class PartCable extends PartBase implements INetworkNode, TSlottedPart, I
 		}
 
 		public void drawTile(IBlockAccess world, int x, int y, int z) {
+			/*
+				Caching cable connections is quite hard, so instead we update
+				the connection list every tick.
+				This means that we gain some performance (not looking up connections for icons as well)
+				but we don't have render derpyness.
+			 */
+			cable.updateConnections();
 			setWorld(world);
-			rebuildExternal();
 
 			Block block = ComputerCraft.Blocks.cable;
 			setRenderBounds(MIN, MIN, MIN, MAX, MAX, MAX);
 			renderStandardBlock(block, x, y, z);
 
-			int internal = internalConnection;
-			int external = externalConnection;
-
-			if (canConnectCached(external, ForgeDirection.DOWN)) {
+			if (cable.doesConnect(ForgeDirection.DOWN)) {
 				setRenderBounds(MIN, 0, MIN, MAX, MIN, MAX);
 				renderStandardBlock(block, x, y, z);
-			} else if (canConnectCached(internal, ForgeDirection.DOWN)) {
+			} else if (cable.doesConnectInternally(ForgeDirection.DOWN)) {
 				setRenderBounds(MIN, 0 + RENDER_PADDING, MIN, MAX, MIN, MAX);
 				renderStandardBlock(block, x, y, z);
 			}
 
-			if (canConnectCached(external, ForgeDirection.UP)) {
+			if (cable.doesConnect(ForgeDirection.UP)) {
 				setRenderBounds(MIN, MAX, MIN, MAX, 1, MAX);
 				renderStandardBlock(block, x, y, z);
-			} else if (canConnectCached(internal, ForgeDirection.UP)) {
+			} else if (cable.doesConnectInternally(ForgeDirection.UP)) {
 				setRenderBounds(MIN, MAX, MIN, MAX, 1 - RENDER_PADDING, MAX);
 				renderStandardBlock(block, x, y, z);
 			}
 
-			if (canConnectCached(external, ForgeDirection.NORTH)) {
+			if (cable.doesConnect(ForgeDirection.NORTH)) {
 				setRenderBounds(MIN, MIN, 0, MAX, MAX, MIN);
 				renderStandardBlock(block, x, y, z);
-			} else if (canConnectCached(internal, ForgeDirection.NORTH)) {
+			} else if (cable.doesConnectInternally(ForgeDirection.NORTH)) {
 				setRenderBounds(MIN, MIN, 0 + RENDER_PADDING, MAX, MAX, MIN);
 				renderStandardBlock(block, x, y, z);
 			}
 
-			if (canConnectCached(external, ForgeDirection.SOUTH)) {
+			if (cable.doesConnect(ForgeDirection.SOUTH)) {
 				setRenderBounds(MIN, MIN, MAX, MAX, MAX, 1);
 				renderStandardBlock(block, x, y, z);
-			} else if (canConnectCached(internal, ForgeDirection.SOUTH)) {
+			} else if (cable.doesConnectInternally(ForgeDirection.SOUTH)) {
 				setRenderBounds(MIN, MIN, MAX, MAX, MAX, 1 - RENDER_PADDING);
 				renderStandardBlock(block, x, y, z);
 			}
 
-			if (canConnectCached(external, ForgeDirection.WEST)) {
+			if (cable.doesConnect(ForgeDirection.WEST)) {
 				setRenderBounds(0, MIN, MIN, MIN, MAX, MAX);
 				renderStandardBlock(block, x, y, z);
-			} else if (canConnectCached(internal, ForgeDirection.WEST)) {
+			} else if (cable.doesConnectInternally(ForgeDirection.WEST)) {
 				setRenderBounds(0 + RENDER_PADDING, MIN, MIN, MIN, MAX, MAX);
 				renderStandardBlock(block, x, y, z);
 			}
 
-			if (canConnectCached(external, ForgeDirection.EAST)) {
+			if (cable.doesConnect(ForgeDirection.EAST)) {
 				setRenderBounds(MAX, MIN, MIN, 1, MAX, MAX);
 				renderStandardBlock(block, x, y, z);
-			} else if (canConnectCached(internal, ForgeDirection.EAST)) {
+			} else if (cable.doesConnectInternally(ForgeDirection.EAST)) {
 				setRenderBounds(MAX, MIN, MIN, 1 - RENDER_PADDING, MAX, MAX);
 				renderStandardBlock(block, x, y, z);
 			}
-		}
-
-		/**
-		 * Tests to see if there is something to connect to, either in the
-		 * same block space or using {@link #canConnect(ForgeDirection)}
-		 *
-		 * @param side The side to check
-		 * @return If we should appear to connect on that side.
-		 */
-		public boolean canVisuallyConnect(ForgeDirection side) {
-			return canConnectCached(internalConnection | externalConnection, side);
 		}
 	}
 }

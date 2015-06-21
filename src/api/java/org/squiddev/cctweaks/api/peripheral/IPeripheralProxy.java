@@ -13,7 +13,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
  * You should implement {@link org.squiddev.cctweaks.api.network.INetworkedPeripheral}
  * if you wish to delegate network events.
  */
-public interface IPeripheralProxy {
+public interface IPeripheralProxy extends IPeripheral {
 	/**
 	 * Get the base peripheral for this peripheral
 	 *
