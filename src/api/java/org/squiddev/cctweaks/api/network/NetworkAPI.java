@@ -15,5 +15,15 @@ public final class NetworkAPI {
 		return REGISTRY;
 	}
 
+	/**
+	 * Get the network helper instance
+	 *
+	 * @return The network helper instance
+	 */
+	public static INetworkHelpers helpers() {
+		return HELPERS;
+	}
+
 	private static final INetworkRegistry REGISTRY = CCTweaksAPI.instance().networkRegistry();
+	private static final INetworkHelpers HELPERS = CCTweaksAPI.instance().networkHelpers();
 }

@@ -19,7 +19,7 @@ public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
 	public static File minecraftDir;
 
 	public TweaksLoadingPlugin() {
-		if (minecraftDir != null) {
+		if (minecraftDir == null) {
 			minecraftDir = (File) FMLInjectionData.data()[6];
 			Config.init(new File(new File(minecraftDir, "config"), CCTweaks.ID + ".cfg"));
 		}
@@ -50,12 +50,11 @@ public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
 	}
 
 	public static class CCTweaksDummyMod extends DummyModContainer {
-
 		public CCTweaksDummyMod() {
 			super(new ModMetadata());
 			ModMetadata md = getMetadata();
 			md.name = md.modId = "<CCTweaks ASM>";
-			md.authorList = Arrays.asList("SquidDev");
+			md.authorList = Arrays.asList("SquidDev", "ElvishJerricco");
 			md.description = "CCTweaks ASM Transformer. Refer to the main CCTweaks mod for info.";
 			md.version = "${mod_version}";
 		}

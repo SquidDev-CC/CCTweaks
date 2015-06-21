@@ -9,8 +9,8 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import static org.squiddev.cctweaks.core.network.NetworkHelpers.canConnect;
+import org.squiddev.cctweaks.api.network.INetworkHelpers;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
 
 public abstract class CableBlockRenderingHandler_Patch implements ISimpleBlockRenderingHandler {
 	public static final double MIN = 0.375;
@@ -36,8 +36,9 @@ public abstract class CableBlockRenderingHandler_Patch implements ISimpleBlockRe
 				} else {
 					modemDir = -1;
 				}
+				INetworkHelpers helpers = NetworkAPI.helpers();
 				for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-					if (dir.ordinal() == modemDir || canConnect(world, x, y, z, dir)) {
+					if (dir.ordinal() == modemDir || helpers.canConnect(world, x, y, z, dir)) {
 						fixedRenderBlocks.setRenderBounds(
 							dir.offsetX == -1 ? 0 : dir.offsetX == 1 ? MAX : MIN,
 							dir.offsetY == -1 ? 0 : dir.offsetY == 1 ? MAX : MIN,

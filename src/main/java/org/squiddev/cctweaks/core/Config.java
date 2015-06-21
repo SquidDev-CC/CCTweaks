@@ -95,10 +95,9 @@ public final class Config {
 		 * This will slow down compilation.
 		 * If you have errors, please turn this and debug on and
 		 * send it with the bug report.
-		 * TODO: Get this working again
 		 */
-		// @DefaultBoolean(false)
-		// public static boolean luaJCVerify;
+		@DefaultBoolean(false)
+		public static boolean luaJCVerify;
 	}
 
 	/**
@@ -133,7 +132,6 @@ public final class Config {
 		 * drop, equip, inspect, move, place,
 		 * refuel, select, suck, tool, turn).
 		 */
-		@RequiresRestart(mc = false, world = true)
 		public static String[] disabledActions;
 
 		/**

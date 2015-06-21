@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.core.lua;
 
 import org.luaj.vm2.*;
 import org.luaj.vm2.compiler.LuaC;
+import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.luaj.luajc.JavaLoader;
 import org.squiddev.luaj.luajc.LuaJC;
@@ -32,6 +33,7 @@ public class FallbackLuaJC extends LuaJC {
 		Prototype p = LuaC.compile(stream, name);
 		String className = toStandardJavaClassName(name);
 		JavaLoader loader = new JavaLoader(env);
+		loader.verifySources = Config.Computer.luaJCVerify;
 		try {
 			return loader.load(p, className, name);
 		} catch (RuntimeException e) {

@@ -4,6 +4,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
 
 import java.util.Set;
 
@@ -26,7 +27,7 @@ public abstract class AbstractWorldNode extends AbstractNode implements IWorldNe
 	 * This set can be modified in place.
 	 */
 	public Set<INetworkNode> getConnectedNodes() {
-		return NetworkHelpers.getAdjacentNodes(this);
+		return NetworkAPI.helpers().getAdjacentNodes(this);
 	}
 
 	/**
@@ -34,12 +35,11 @@ public abstract class AbstractWorldNode extends AbstractNode implements IWorldNe
 	 * This is a one way attempt: It will not assimilate nodes into the network
 	 */
 	public void connect() {
-		NetworkHelpers.joinOrCreateNetwork(this, getConnectedNodes());
+		NetworkAPI.helpers().joinOrCreateNetwork(this, getConnectedNodes());
 	}
 
 	/**
 	 * Remove this node from the network
-	 * TODO: Remove internal nodes?
 	 */
 	public void destroy() {
 		if (networkController != null) networkController.removeNode(this);

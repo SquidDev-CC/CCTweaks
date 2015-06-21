@@ -3,9 +3,10 @@ package org.squiddev.cctweaks.core.network.cable;
 import com.google.common.collect.Sets;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
+import org.squiddev.cctweaks.api.network.INetworkHelpers;
 import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.core.network.AbstractWorldNode;
-import org.squiddev.cctweaks.core.network.NetworkHelpers;
 
 import java.util.Collections;
 import java.util.Set;
@@ -21,8 +22,9 @@ public abstract class BasicCable extends AbstractWorldNode {
 	protected void updateConnectionMap() {
 		int map = 0;
 
+		INetworkHelpers helpers = NetworkAPI.helpers();
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-			if (canConnect(dir) && NetworkHelpers.canConnect(getPosition(), dir)) {
+			if (canConnect(dir) && helpers.canConnect(getPosition(), dir)) {
 				map |= 1 << dir.ordinal();
 			}
 		}

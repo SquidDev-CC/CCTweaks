@@ -8,9 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
+import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileLazyNBT;
-import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.modem.MultiPeripheralModem;
 
 import java.util.Arrays;
@@ -30,7 +30,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 
 	@Override
 	public void create() {
-		NetworkHelpers.scheduleJoin(modem);
+		NetworkAPI.helpers().scheduleJoin(modem);
 		super.create();
 	}
 

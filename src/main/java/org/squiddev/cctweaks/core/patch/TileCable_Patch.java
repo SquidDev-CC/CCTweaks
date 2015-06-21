@@ -16,9 +16,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
-import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
-import org.squiddev.cctweaks.api.network.Packet;
+import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.network.cable.SingleModemCable;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
@@ -26,8 +24,6 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
 import java.util.Objects;
-
-import static org.squiddev.cctweaks.core.network.NetworkHelpers.canConnect;
 
 @MergeVisitor.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
 public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost, IWorldPosition {
@@ -121,7 +117,6 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Override
 	public void destroy() {
-		// TODO: Maybe on invalidate instead?
 		if (!m_destroyed) {
 			m_destroyed = true;
 			getModem().destroy();
@@ -138,7 +133,6 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Override
 	public void validate() {
-		// TODO: This is also called when being destroyed
 		super.validate();
 		if (!worldObj.isRemote) {
 			FmlEvents.schedule(new Runnable() {
@@ -248,7 +242,6 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Override
 	public void updateEntity() {
-		// TODO: This should call TilePeripheralBase's updateEntity method instead
 		super.updateEntity();
 		if (worldObj.isRemote) return;
 
@@ -315,7 +308,6 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Deprecated
 	private void findPeripherals() {
-		// TODO: Do we need to do something?
 		DebugLogger.deprecated("Handled by BasicModem");
 	}
 
@@ -347,13 +339,14 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		int x = xCoord, y = yCoord, z = zCoord;
 		IBlockAccess world = worldObj;
 
+		INetworkHelpers helpers = NetworkAPI.helpers();
 		return AxisAlignedBB.getBoundingBox(
-			canConnect(world, x, y, z, ForgeDirection.WEST) ? 0 : MIN,
-			canConnect(world, x, y, z, ForgeDirection.DOWN) ? 0 : MIN,
-			canConnect(world, x, y, z, ForgeDirection.NORTH) ? 0 : MIN,
-			canConnect(world, x, y, z, ForgeDirection.EAST) ? 1 : MAX,
-			canConnect(world, x, y, z, ForgeDirection.UP) ? 1 : MAX,
-			canConnect(world, x, y, z, ForgeDirection.SOUTH) ? 1 : MAX
+			helpers.canConnect(world, x, y, z, ForgeDirection.WEST) ? 0 : MIN,
+			helpers.canConnect(world, x, y, z, ForgeDirection.DOWN) ? 0 : MIN,
+			helpers.canConnect(world, x, y, z, ForgeDirection.NORTH) ? 0 : MIN,
+			helpers.canConnect(world, x, y, z, ForgeDirection.EAST) ? 1 : MAX,
+			helpers.canConnect(world, x, y, z, ForgeDirection.UP) ? 1 : MAX,
+			helpers.canConnect(world, x, y, z, ForgeDirection.SOUTH) ? 1 : MAX
 		);
 	}
 
@@ -371,13 +364,14 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 			int x = xCoord, y = yCoord, z = zCoord;
 			IBlockAccess world = worldObj;
 
-			if (canConnect(world, x, y, z, ForgeDirection.EAST) || canConnect(world, x, y, z, ForgeDirection.WEST)) {
+			INetworkHelpers helpers = NetworkAPI.helpers();
+			if (helpers.canConnect(world, x, y, z, ForgeDirection.EAST) || helpers.canConnect(world, x, y, z, ForgeDirection.WEST)) {
 				dir = dir == -1 || dir == 4 ? 4 : -2;
 			}
-			if (canConnect(world, x, y, z, ForgeDirection.UP) || canConnect(world, x, y, z, ForgeDirection.DOWN)) {
+			if (helpers.canConnect(world, x, y, z, ForgeDirection.UP) || helpers.canConnect(world, x, y, z, ForgeDirection.DOWN)) {
 				dir = dir == -1 || dir == 0 ? 0 : -2;
 			}
-			if (canConnect(world, x, y, z, ForgeDirection.NORTH) || canConnect(world, x, y, z, ForgeDirection.SOUTH)) {
+			if (helpers.canConnect(world, x, y, z, ForgeDirection.NORTH) || helpers.canConnect(world, x, y, z, ForgeDirection.SOUTH)) {
 				dir = dir == -1 || dir == 2 ? 2 : -2;
 			}
 

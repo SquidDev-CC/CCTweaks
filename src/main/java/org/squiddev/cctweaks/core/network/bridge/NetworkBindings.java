@@ -43,7 +43,6 @@ public final class NetworkBindings {
 		if (nodes.remove(node)) {
 			if (node.getAttachedNetwork() != null) {
 				for (IWorldNetworkNode other : nodes) {
-					// TODO: Optimise this.
 					SingleTypeUnorderedPair<INetworkNode> connection = new SingleTypeUnorderedPair<INetworkNode>(node, other);
 					if (node.getAttachedNetwork().getNodeConnections().contains(connection)) {
 						node.getAttachedNetwork().breakConnection(connection);
