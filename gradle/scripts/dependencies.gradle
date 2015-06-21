@@ -40,7 +40,6 @@ configurations {
 	compile.extendsFrom shade
 
 	packaged
-	compile.extendsFrom packaged
 
 	deployerJars
 }
@@ -53,9 +52,9 @@ dependencies {
 	compile "codechicken:NotEnoughItems:${project.mc_version}-${project.nei_version}:dev"
 	compile "codechicken:CodeChickenCore:${project.mc_version}-${project.ccc_version}:dev"
 
-	compile "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev:jar"
-	compile "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
-	compile "openperipheral:OpenPeripheralCore-API:${project.op_version}"
+	packaged "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev:jar"
+	packaged "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
+	packaged "openperipheral:OpenPeripheralCore-API:${project.op_version}"
 
 	shade('org.squiddev:luaj.luajc:1.0.1') {
 		// We provide a custom LuaJ source with ComputerCraft
@@ -70,8 +69,8 @@ dependencies {
 
 	deployerJars "org.apache.maven.wagon:wagon-ftp:2.2"
 }
-/*sourceSets.main.compileClasspath += [configurations.fatPackage, configurations.packaged]
+sourceSets.main.compileClasspath += [configurations.packaged]
 
-idea.module.scopes.PROVIDED.plus += [configurations.fatPackage, configurations.packaged]
-eclipse.classpath.plusConfigurations += [configurations.fatPackage, configurations.packaged]
-*/
+idea.module.scopes.PROVIDED.plus += [configurations.packaged]
+eclipse.classpath.plusConfigurations += [configurations.packaged]
+

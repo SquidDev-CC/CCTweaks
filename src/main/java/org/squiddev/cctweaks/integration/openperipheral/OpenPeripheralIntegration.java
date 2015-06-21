@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.integration.openperipheral;
 
+import cpw.mods.fml.common.Optional;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.adapter.IPeripheralAdapterRegistry;
 import org.squiddev.cctweaks.core.Config;
@@ -15,6 +16,7 @@ public class OpenPeripheralIntegration extends ModIntegration {
 	}
 
 	@Override
+	@Optional.Method(modid = "OpenPeripheral")
 	public void postInit() {
 		try {
 			if (ApiAccess.isApiPresent(IPeripheralAdapterRegistry.class)) {
