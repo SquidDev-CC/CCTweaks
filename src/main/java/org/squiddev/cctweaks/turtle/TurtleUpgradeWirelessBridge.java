@@ -6,8 +6,11 @@ import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
+import dan200.computercraft.shared.util.IDAssigner;
+import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
@@ -19,9 +22,12 @@ import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
+import org.squiddev.cctweaks.core.peripheral.PeripheralProxy;
 import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
 
+import java.io.File;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -101,9 +107,6 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			super(new TurtlePosition(turtle));
 			this.turtle = turtle;
 			this.side = side;
-
-			load();
-			connect();
 		}
 
 		@Override
@@ -116,9 +119,12 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			return (TurtleModem) modem;
 		}
 
-		public void load() {
+		@Override
+		public void connect() {
 			load(turtle.getUpgradeNBTData(side));
 			getModem().load();
+
+			super.connect();
 		}
 
 		public void save() {
@@ -132,6 +138,13 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 		 */
 		public class TurtleModem extends BindingModem {
 			protected int id = -1;
+			protected IPeripheral peripheral = new PeripheralProxy("turtle") {
+				@Override
+				protected IPeripheral createPeripheral() {
+					ChunkCoordinates pos = turtle.getPosition();
+					return PeripheralUtil.getPeripheral(turtle.getWorld(), pos.posX, pos.posY, pos.posZ, 0);
+				}
+			};
 
 			public void load() {
 				NBTTagCompound data = turtle.getUpgradeNBTData(side);
@@ -149,24 +162,10 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			 */
 			@Override
 			public Map<String, IPeripheral> getConnectedPeripherals() {
-				/*
-				 * Wrapping the turtle as a peripheral is really cool.
-				 * However, there are some massive issues with recalculating peripherals
-				 * on detach, infinite loops when creating, etc...
-				 *
-				 * When I enable this, remember to wrap the load, connect methods with FmlEvents.schedule
-				 */
-				/*ChunkCoordinates pos = turtle.getPosition();
-				IPeripheral peripheral = PeripheralUtil.getPeripheral(turtle.getWorld(), pos.posX, pos.posY, pos.posZ, 0);
-				if (peripheral == null) {
-					id = -1;
-					return Collections.emptyMap();
-				} else if (id <= -1) {
+				if (id <= -1) {
 					id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(turtle.getWorld()), "computer/lastid_" + peripheral.getType() + ".txt"));
 				}
-
-				return Collections.singletonMap(peripheral.getType() + "_" + id, peripheral);*/
-				return super.getConnectedPeripherals();
+				return Collections.singletonMap(peripheral.getType() + "_" + id, peripheral);
 			}
 
 			@Override
@@ -182,6 +181,8 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 
 		/**
 		 * Extension of modem with bindToCard and bindFromCard methods
+		 *
+		 * Also calls {@link TurtleBinding#connect()} and {@link TurtleBinding#destroy()} on attach and detach.
 		 */
 		public class TurtleModemPeripheral extends BindingModemPeripheral implements IWorldNetworkNodeHost {
 			public TurtleModemPeripheral(BindingModem modem) {
@@ -229,6 +230,24 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 				}
 
 				return super.callMethod(computer, context, method, arguments);
+			}
+
+			@Override
+			public synchronized void attach(IComputerAccess computer) {
+				TurtleBinding.this.connect();
+				super.attach(computer);
+			}
+
+			@Override
+			public synchronized void detach(IComputerAccess computer) {
+				super.detach(computer);
+				/**
+				 * The issue with this is that the node is destroyed and then
+				 * the entire network is recalculated. This then in turn attempts
+				 * to load peripherals whilst the world is being unloaded, and so
+				 * everything kinda explodes.
+				 */
+				// TurtleBinding.this.destroy();
 			}
 
 			/**

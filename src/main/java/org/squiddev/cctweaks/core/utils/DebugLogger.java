@@ -26,7 +26,7 @@ public class DebugLogger {
 		try {
 			throw new RuntimeException();
 		} catch (RuntimeException e) {
-			debug(message + "\n\tat " + StringUtils.join(Thread.currentThread().getStackTrace(), "\n\tat "));
+			debug(message + "\n\tat " + StringUtils.join(new Exception().getStackTrace(), "\n\tat "));
 		}
 	}
 
