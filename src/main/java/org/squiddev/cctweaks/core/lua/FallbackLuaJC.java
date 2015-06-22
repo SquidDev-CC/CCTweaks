@@ -5,7 +5,6 @@ import org.luaj.vm2.compiler.LuaC;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.luaj.luajc.JavaLoader;
-import org.squiddev.luaj.luajc.LuaJC;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +12,7 @@ import java.io.InputStream;
 /**
  * A version of LuaJC that falls
  */
-public class FallbackLuaJC extends LuaJC {
+public class FallbackLuaJC implements LoadState.LuaCompiler {
 	protected static FallbackLuaJC instance;
 
 	public static FallbackLuaJC getInstance() {
@@ -37,6 +36,10 @@ public class FallbackLuaJC extends LuaJC {
 		try {
 			return loader.load(p, className, name);
 		} catch (RuntimeException e) {
+			if (e.getMessage().length() > 1000 && !Config.Computer.luaJCVerify) {
+				e = new RuntimeException(e.getMessage().substring(0, 1000) + "...");
+			}
+
 			DebugLogger.error(
 				"Could not compile " + name + ". Falling back to normal Lua.\n"
 					+ "Please report this at https://github.com/SquidDev/luaj.luajc/issues along with the following exception",
