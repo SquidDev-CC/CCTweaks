@@ -9,11 +9,11 @@ import java.util.Map;
  */
 public interface INetworkNode {
 	/**
-	 * Get connected peripherals this node provides
+	 * Get connected peripherals this node provides.
 	 *
 	 * If this changes, call {@link INetworkController#invalidateNode(INetworkNode)}
 	 *
-	 * @return Map of name to peripheral or {@code null} if there are no peripherals
+	 * @return Map of name to peripheral. This should *never* be {@code null}.
 	 * @see INetworkController#getPeripheralsOnNetwork()
 	 */
 	Map<String, IPeripheral> getConnectedPeripherals();

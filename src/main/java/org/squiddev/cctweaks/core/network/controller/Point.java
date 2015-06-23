@@ -42,12 +42,11 @@ public class Point implements INetworkAccess {
 		return true;
 	}
 
-	public Collection<Map<INetworkNode, Point>> remove() {
+	public Collection<Map<INetworkNode, Point>> breakConnections() {
 		for (Connection connection : connections) {
 			connection.other(this).connections.remove(connection);
 		}
 
-		// TODO: Invalidate network
 		final Iterator<Connection> iterator = connections.iterator();
 
 		return NodeScanner.scanNetwork(new IterableIterator<Point>() {
@@ -63,6 +62,11 @@ public class Point implements INetworkAccess {
 		});
 	}
 
+	@Override
+	public String toString() {
+		return "Point<" + node + '>';
+	}
+
 	public static class Connection extends SingleTypeUnorderedPair<Point> {
 		public Connection(Point x, Point y) {
 			super(x, y);
@@ -71,7 +75,7 @@ public class Point implements INetworkAccess {
 			y.connections.add(this);
 		}
 
-		public Collection<Map<INetworkNode, Point>> remove() {
+		public Collection<Map<INetworkNode, Point>> breakConnection() {
 			x.connections.remove(this);
 			y.connections.remove(this);
 

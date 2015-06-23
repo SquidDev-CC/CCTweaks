@@ -14,13 +14,15 @@ import org.squiddev.cctweaks.api.network.Packet;
 import java.util.*;
 
 public class NetworkController implements INetworkController {
-	public Map<String, IPeripheral> peripheralsOnNetwork = new HashMap<String, IPeripheral>();
+	protected Map<String, IPeripheral> peripheralsOnNetwork = new HashMap<String, IPeripheral>();
 
-	public Map<INetworkNode, Point> points = new HashMap<INetworkNode, Point>();
+	protected Map<INetworkNode, Point> points = new HashMap<INetworkNode, Point>();
 
 	public NetworkController(INetworkNode node) {
 		this(new HashMap<INetworkNode, Point>());
 		assimilateNode(node);
+
+		ControllerValidator.validate(this);
 	}
 
 	public NetworkController(Map<INetworkNode, Point> points) {
@@ -29,9 +31,20 @@ public class NetworkController implements INetworkController {
 		for (Point point : points.values()) {
 			addPoint(point);
 		}
+
+		ControllerValidator.validate(this);
 	}
 
-	private void addPoint(Point point) {
+	//region Controller internals
+
+	/**
+	 * Add a point into the network.
+	 *
+	 * This handles detaching the node, merging peripherals and attaching the node to this controller.
+	 *
+	 * @param point The point to add
+	 */
+	protected void addPoint(Point point) {
 		INetworkNode node = point.node;
 		if (node.getAttachedNetwork() != null) {
 			node.detachFromNetwork();
@@ -39,46 +52,78 @@ public class NetworkController implements INetworkController {
 
 		points.put(node, point);
 		point.controller = this;
+
+		if (point.peripherals == null) point.peripherals = point.node.getConnectedPeripherals();
 		peripheralsOnNetwork.putAll(point.peripherals);
 
 		node.attachToNetwork(this);
 	}
 
+	/**
+	 * Get the point for the node or explode if it doesn't exist
+	 *
+	 * @param node The node to lookup
+	 * @return The point
+	 * @throws NullPointerException If the point cannot be found.
+	 */
 	protected Point getPoint(INetworkNode node) {
 		Preconditions.checkNotNull(node, "Node cannot be null");
 		return Preconditions.checkNotNull(points.get(node), "Cannot find point for node %s", node);
 	}
 
-	private void assimilateNode(INetworkNode newNode) {
+	/**
+	 * Assimilate a node into the network.
+	 *
+	 * This handles merging its current network.
+	 *
+	 * @param newNode The node to merge
+	 */
+	protected void assimilateNode(INetworkNode newNode) {
 		INetworkController controller = newNode.getAttachedNetwork();
 
-		addPoint(new Point(newNode, this));
-
-		if (controller == null) return;
-
-		if (controller instanceof NetworkController) {
+		if (controller == null) {
+			Point newPoint = new Point(newNode, this);
+			addPoint(newPoint);
+			handleInvalidation(Collections.<String, IPeripheral>emptyMap(), newPoint.peripherals);
+		} else if (controller instanceof NetworkController) {
 			NetworkController nController = (NetworkController) controller;
+			Map<String, IPeripheral> peripherals = new HashMap<String, IPeripheral>();
+
 			for (Point point : nController.points.values()) {
 				addPoint(point);
+				peripherals.putAll(point.peripherals);
 			}
+
 			nController.points.clear();
+			nController.peripheralsOnNetwork.clear();
 
-			newNode.detachFromNetwork();
-			newNode.attachToNetwork(this);
+			handleInvalidation(Collections.<String, IPeripheral>emptyMap(), peripherals);
 		} else {
+			Map<String, IPeripheral> peripherals = new HashMap<String, IPeripheral>();
+
 			for (INetworkNode node : controller.getNodesOnNetwork()) {
-				node.detachFromNetwork();
-			}
-			for (INetworkNode node : controller.getNodesOnNetwork()) {
-				node.attachToNetwork(this);
+				Point point = new Point(node, this);
+				addPoint(point);
+				peripherals.putAll(point.peripherals);
 			}
 
-			// TODO: Add a way of merging other networks
-			throw new IllegalStateException("Cannot handle non-NetworkController controller");
+			for (SingleTypeUnorderedPair<INetworkNode> connection : controller.getNodeConnections()) {
+				new Point.Connection(getPoint(connection.x), getPoint(connection.y));
+			}
+
+			handleInvalidation(Collections.<String, IPeripheral>emptyMap(), peripherals);
 		}
 	}
 
-	private Map<String, IPeripheral> calculatePeripheralsOnNetwork() {
+	/**
+	 * Get the list of new peripherals.
+	 *
+	 * Ideally we wouldn't ever have to do this,
+	 * but there might be a time when we have to.
+	 *
+	 * @return The new peripherals.
+	 */
+	protected Map<String, IPeripheral> calculatePeripheralsOnNetwork() {
 		Map<String, IPeripheral> peripherals = new HashMap<String, IPeripheral>();
 		for (Point point : points.values()) {
 			peripherals.putAll(point.peripherals = point.node.getConnectedPeripherals());
@@ -87,12 +132,39 @@ public class NetworkController implements INetworkController {
 		return peripherals;
 	}
 
-	public void handleSplit(Collection<Map<INetworkNode, Point>> networks) {
+	/**
+	 * Handle breaking a network.
+	 *
+	 * @param networks The networks to split into.
+	 */
+	protected void handleSplit(Collection<Map<INetworkNode, Point>> networks) {
 		// If there are no changes, then we just ignore it.
 		if (networks.size() <= 1) return;
 
+		points.clear();
+		peripheralsOnNetwork.clear();
+
+		/*
+			It is just easier to split the network, rather than keep one and split the others.
+			If we ever keep one network, we should ideally keep the largest one.
+		*/
 		for (Map<INetworkNode, Point> network : networks) {
 			new NetworkController(network);
+		}
+	}
+
+	/**
+	 * Invalidate every node on the network
+	 *
+	 * @param difference The result of {@link Maps#difference(Map, Map)} on oldPeripherals, newPeripherals
+	 */
+	protected void handleInvalidation(MapDifference<String, IPeripheral> difference) {
+		handleInvalidation(difference.entriesOnlyOnLeft(), difference.entriesOnlyOnRight());
+	}
+
+	protected void handleInvalidation(Map<String, IPeripheral> removed, Map<String, IPeripheral> added) {
+		for (INetworkNode node : points.keySet()) {
+			node.networkInvalidated(removed, added);
 		}
 	}
 	//endregion
@@ -108,6 +180,8 @@ public class NetworkController implements INetworkController {
 		}
 
 		new Point.Connection(getPoint(existingNode), getPoint(newNode));
+
+		ControllerValidator.validate(this);
 	}
 
 	@Override
@@ -117,14 +191,20 @@ public class NetworkController implements INetworkController {
 
 		if (!xPoint.connections.contains(pointConnection)) return;
 
-		handleSplit(pointConnection.remove());
+		handleSplit(pointConnection.breakConnection());
+
+		ControllerValidator.validate(this);
 	}
 
 	@Override
 	public void removeNode(INetworkNode removedNode) {
 		Point point = getPoint(removedNode);
+
+		points.remove(removedNode);
 		removedNode.detachFromNetwork();
-		handleSplit(point.remove());
+		handleSplit(point.breakConnections());
+
+		ControllerValidator.validate(this);
 	}
 	//endregion
 
@@ -134,10 +214,9 @@ public class NetworkController implements INetworkController {
 		Map<String, IPeripheral> oldPeripherals = peripheralsOnNetwork;
 		peripheralsOnNetwork = calculatePeripheralsOnNetwork();
 
-		MapDifference<String, IPeripheral> difference = Maps.difference(peripheralsOnNetwork, oldPeripherals);
-		for (INetworkNode node : points.keySet()) {
-			node.networkInvalidated(difference.entriesOnlyOnRight(), difference.entriesOnlyOnLeft());
-		}
+		handleInvalidation(Maps.difference(oldPeripherals, peripheralsOnNetwork));
+
+		ControllerValidator.validate(this);
 	}
 
 	@Override
@@ -147,7 +226,7 @@ public class NetworkController implements INetworkController {
 		Map<String, IPeripheral> oldPeripherals = point.peripherals;
 		point.peripherals = toInvalidate.getConnectedPeripherals();
 
-		MapDifference<String, IPeripheral> difference = Maps.difference(point.peripherals, oldPeripherals);
+		MapDifference<String, IPeripheral> difference = Maps.difference(oldPeripherals, point.peripherals);
 
 		// Remove old peripherals
 		for (String name : difference.entriesOnlyOnRight().keySet()) {
@@ -155,17 +234,15 @@ public class NetworkController implements INetworkController {
 		}
 
 		// Add new ones
-		for (Map.Entry<String, IPeripheral> peripheral : difference.entriesOnlyOnLeft().entrySet()) {
-			peripheralsOnNetwork.put(peripheral.getKey(), peripheral.getValue());
-		}
+		peripheralsOnNetwork.putAll(difference.entriesOnlyOnLeft());
 
-		for (INetworkNode node : points.keySet()) {
-			node.networkInvalidated(difference.entriesOnlyOnRight(), difference.entriesOnlyOnLeft());
-		}
+		handleInvalidation(difference);
+
+		ControllerValidator.validate(this);
 	}
 	//endregion
 
-	//region INetworkController access
+	//region INetworkController getters
 	@Override
 	public Set<INetworkNode> getNodesOnNetwork() {
 		return Collections.unmodifiableSet(points.keySet());

@@ -127,6 +127,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	@Override
 	public synchronized void detach(IComputerAccess computer) {
 		super.detach(computer);
+		// TODO: This shouldn't use getPeripheralsOnNetwork.
 		synchronized (modem.getPeripheralsOnNetwork()) {
 			for (String name : modem.getPeripheralsOnNetwork().keySet()) {
 				modem.detachPeripheral(name);
