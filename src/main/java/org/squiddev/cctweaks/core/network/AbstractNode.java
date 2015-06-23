@@ -27,7 +27,7 @@ public abstract class AbstractNode implements INetworkNode {
 	}
 
 	@Override
-	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals) {
+	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
 	}
 
 	@Override

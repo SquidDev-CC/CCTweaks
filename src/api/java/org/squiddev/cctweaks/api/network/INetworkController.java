@@ -34,7 +34,6 @@ public interface INetworkController {
 	 * Only when two nodes disconnect.
 	 *
 	 * @param connection A pair of nodes representing the nodes being disconnected.
-	 * @throws IllegalArgumentException When the connection doesn't exist
 	 */
 	void breakConnection(SingleTypeUnorderedPair<INetworkNode> connection);
 
@@ -59,8 +58,16 @@ public interface INetworkController {
 
 	/**
 	 * Invalidate the list of peripherals on the network.
+	 *
+	 * {@link #invalidateNode(INetworkNode)} is preferred.
 	 */
 	void invalidateNetwork();
+
+	/**
+	 * A more lightweight version of {@link #invalidateNetwork()}, this invalidates the
+	 * peripherals for one node.
+	 */
+	void invalidateNode(INetworkNode node);
 
 	/**
 	 * @return All nodes on the network.

@@ -25,7 +25,7 @@ public class TileDebugNode extends TileNetworked {
 		}
 
 		@Override
-		public void networkInvalidated(Map<String, IPeripheral> oldPeripherals) {
+		public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
 			DebugLogger.debug("Node invalidated at " + xCoord + " ," + yCoord + ", " + zCoord);
 		}
 	};

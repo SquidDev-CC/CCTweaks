@@ -5,6 +5,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.FmlEvents;
+import org.squiddev.cctweaks.core.network.controller.NetworkController;
 
 import java.util.HashSet;
 import java.util.Set;

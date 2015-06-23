@@ -38,7 +38,7 @@ public class TileDebugNetworkedPeripheral extends TileDebugPeripheral {
 		}
 
 		@Override
-		public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals) {
+		public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
 			DebugLogger.debug("Network was invalidated");
 		}
 

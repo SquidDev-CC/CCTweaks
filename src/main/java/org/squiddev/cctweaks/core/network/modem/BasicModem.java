@@ -216,7 +216,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	}
 
 	@Override
-	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals) {
+	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
 		// Clone to prevent modification errors
 		Set<String> peripheralNames = new HashSet<String>(peripheralWrappersByName.keySet());
 		for (String wrapper : peripheralNames) {
@@ -241,7 +241,8 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 			IPeripheral value = entry.getValue();
 
 			if (value instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) value).networkInvalidated(this, oldPeripherals);
+				// TODO: Move this into Point
+				((INetworkedPeripheral) value).networkInvalidated(this, oldPeripherals, newPeripherals);
 			}
 		}
 	}
