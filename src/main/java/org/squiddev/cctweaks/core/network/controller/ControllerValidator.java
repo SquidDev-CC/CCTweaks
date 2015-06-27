@@ -8,7 +8,6 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Validates {@link NetworkController} instances.
@@ -37,8 +36,8 @@ public class ControllerValidator {
 			for (Map.Entry<String, IPeripheral> peripheral : point.peripherals.entrySet()) {
 				IPeripheral other = controller.peripheralsOnNetwork.get(peripheral.getKey());
 
-				if (!Objects.equals(peripheral.getValue(), other)) {
-					errors.add(String.format("Peripherals for node %s: %s != %s", point.node, peripheral.getKey(), other));
+				if (other == null || !peripheral.getValue().equals(other)) {
+					errors.add(String.format("Peripherals for node %s (%s): %s != %s", point.node, peripheral.getKey(), peripheral.getValue(), other));
 				}
 			}
 
@@ -50,7 +49,7 @@ public class ControllerValidator {
 		}
 
 		if (errors.size() > 0) {
-			DebugLogger.error("Controller is invalid:\n - " + Strings.join(errors, "\n - "));
+			DebugLogger.trace("Controller is invalid:\n - " + Strings.join(errors, "\n - "));
 		}
 	}
 }

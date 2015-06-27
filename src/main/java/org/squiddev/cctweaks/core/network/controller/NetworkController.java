@@ -20,6 +20,9 @@ public class NetworkController implements INetworkController {
 
 	public NetworkController(INetworkNode node) {
 		this(new HashMap<INetworkNode, Point>());
+		if (node.getAttachedNetwork() != null) {
+			throw new IllegalArgumentException(String.format("%s is already attached to %s", node, node.getAttachedNetwork()));
+		}
 		assimilateNode(node);
 
 		ControllerValidator.validate(this);
@@ -31,6 +34,15 @@ public class NetworkController implements INetworkController {
 		for (Point point : points.values()) {
 			addPoint(point);
 		}
+
+		ControllerValidator.validate(this);
+	}
+
+	public NetworkController(Map<INetworkNode, Point> points, Map<String, IPeripheral> oldPeripherals) {
+		this(points);
+		Preconditions.checkNotNull(oldPeripherals, "Old peripheral list cannot be null");
+
+		handleInvalidation(Maps.difference(oldPeripherals, peripheralsOnNetwork));
 
 		ControllerValidator.validate(this);
 	}
@@ -47,16 +59,16 @@ public class NetworkController implements INetworkController {
 	protected void addPoint(Point point) {
 		INetworkNode node = point.node;
 		if (node.getAttachedNetwork() != null) {
-			node.detachFromNetwork();
+			point.detachFromNetwork();
 		}
 
 		points.put(node, point);
 		point.controller = this;
 
-		if (point.peripherals == null) point.peripherals = point.node.getConnectedPeripherals();
+		if (point.peripherals == null) point.refreshPeripherals();
 		peripheralsOnNetwork.putAll(point.peripherals);
 
-		node.attachToNetwork(this);
+		point.attachToNetwork(this);
 	}
 
 	/**
@@ -116,23 +128,6 @@ public class NetworkController implements INetworkController {
 	}
 
 	/**
-	 * Get the list of new peripherals.
-	 *
-	 * Ideally we wouldn't ever have to do this,
-	 * but there might be a time when we have to.
-	 *
-	 * @return The new peripherals.
-	 */
-	protected Map<String, IPeripheral> calculatePeripheralsOnNetwork() {
-		Map<String, IPeripheral> peripherals = new HashMap<String, IPeripheral>();
-		for (Point point : points.values()) {
-			peripherals.putAll(point.peripherals = point.node.getConnectedPeripherals());
-		}
-
-		return peripherals;
-	}
-
-	/**
 	 * Handle breaking a network.
 	 *
 	 * @param networks The networks to split into.
@@ -142,14 +137,15 @@ public class NetworkController implements INetworkController {
 		if (networks.size() <= 1) return;
 
 		points.clear();
-		peripheralsOnNetwork.clear();
+		Map<String, IPeripheral> oldPeripherals = peripheralsOnNetwork;
+		peripheralsOnNetwork = new HashMap<String, IPeripheral>();
 
 		/*
 			It is just easier to split the network, rather than keep one and split the others.
 			If we ever keep one network, we should ideally keep the largest one.
 		*/
 		for (Map<INetworkNode, Point> network : networks) {
-			new NetworkController(network);
+			new NetworkController(network, oldPeripherals);
 		}
 	}
 
@@ -163,8 +159,8 @@ public class NetworkController implements INetworkController {
 	}
 
 	protected void handleInvalidation(Map<String, IPeripheral> removed, Map<String, IPeripheral> added) {
-		for (INetworkNode node : points.keySet()) {
-			node.networkInvalidated(removed, added);
+		for (Point point : points.values()) {
+			point.networkInvalidated(removed, added);
 		}
 	}
 	//endregion
@@ -201,7 +197,7 @@ public class NetworkController implements INetworkController {
 		Point point = getPoint(removedNode);
 
 		points.remove(removedNode);
-		removedNode.detachFromNetwork();
+		point.detachFromNetwork();
 		handleSplit(point.breakConnections());
 
 		ControllerValidator.validate(this);
@@ -212,9 +208,13 @@ public class NetworkController implements INetworkController {
 	@Override
 	public void invalidateNetwork() {
 		Map<String, IPeripheral> oldPeripherals = peripheralsOnNetwork;
-		peripheralsOnNetwork = calculatePeripheralsOnNetwork();
 
-		handleInvalidation(Maps.difference(oldPeripherals, peripheralsOnNetwork));
+		Map<String, IPeripheral> newPeripherals = peripheralsOnNetwork = new HashMap<String, IPeripheral>();
+		for (Point point : points.values()) {
+			newPeripherals.putAll(point.refreshPeripherals());
+		}
+
+		handleInvalidation(Maps.difference(oldPeripherals, newPeripherals));
 
 		ControllerValidator.validate(this);
 	}
@@ -224,19 +224,17 @@ public class NetworkController implements INetworkController {
 		Point point = getPoint(toInvalidate);
 
 		Map<String, IPeripheral> oldPeripherals = point.peripherals;
-		point.peripherals = toInvalidate.getConnectedPeripherals();
-
-		MapDifference<String, IPeripheral> difference = Maps.difference(oldPeripherals, point.peripherals);
+		Map<String, IPeripheral> newPeripherals = point.refreshPeripherals();
 
 		// Remove old peripherals
-		for (String name : difference.entriesOnlyOnRight().keySet()) {
+		for (String name : oldPeripherals.keySet()) {
 			peripheralsOnNetwork.remove(name);
 		}
 
 		// Add new ones
-		peripheralsOnNetwork.putAll(difference.entriesOnlyOnLeft());
+		peripheralsOnNetwork.putAll(newPeripherals);
 
-		handleInvalidation(difference);
+		handleInvalidation(Maps.difference(oldPeripherals, newPeripherals));
 
 		ControllerValidator.validate(this);
 	}
@@ -269,7 +267,6 @@ public class NetworkController implements INetworkController {
 
 	@Override
 	public void transmitPacket(INetworkNode start, Packet packet) {
-		// TODO: Use a priority queue to ensure the shortest distance is used.
 		Point startPoint = getPoint(start);
 
 		Set<Point> received = new HashSet<Point>(points.size());
