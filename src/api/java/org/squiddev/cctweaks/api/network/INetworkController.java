@@ -49,8 +49,8 @@ public interface INetworkController {
 
 	/**
 	 * Gets the peripherals known to be on the network.
-	 * This is usually cached, only changing when {@link #invalidateNetwork()} is called.
-	 * This is done automatically in the network modification operations.
+	 * This is usually cached, only changing when {@link #invalidateNetwork()} or {@link #invalidateNode(INetworkNode)}
+	 * are called.
 	 *
 	 * @return The cached map of peripherals on the network.
 	 */

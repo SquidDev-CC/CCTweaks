@@ -127,7 +127,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 	public void onNeighborChanged() {
 		if (modem.updateEnabled()) {
 			markDirty();
-			modem.getAttachedNetwork().invalidateNetwork();
+			modem.getAttachedNetwork().invalidateNode(modem);
 		}
 	}
 
@@ -152,7 +152,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
 			}
 
-			modem.getAttachedNetwork().invalidateNetwork();
+			modem.getAttachedNetwork().invalidateNode(modem);
 			markDirty();
 		}
 

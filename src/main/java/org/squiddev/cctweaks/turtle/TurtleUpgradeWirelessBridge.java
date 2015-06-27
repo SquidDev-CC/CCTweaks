@@ -241,13 +241,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			@Override
 			public synchronized void detach(IComputerAccess computer) {
 				super.detach(computer);
-				/**
-				 * The issue with this is that the node is destroyed and then
-				 * the entire network is recalculated. This then in turn attempts
-				 * to load peripherals whilst the world is being unloaded, and so
-				 * everything kinda explodes.
-				 */
-				// TurtleBinding.this.destroy();
+				TurtleBinding.this.destroy();
 			}
 
 			/**
