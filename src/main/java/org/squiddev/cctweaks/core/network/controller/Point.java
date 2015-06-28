@@ -18,7 +18,7 @@ public class Point implements INetworkAccess {
 
 	public final Set<Connection> connections = new HashSet<Connection>();
 
-	public Map<String, IPeripheral> peripherals = Collections.emptyMap();
+	public Map<String, IPeripheral> peripherals;
 
 	public Point(INetworkNode node, INetworkController controller) {
 		this.node = node;
@@ -63,6 +63,8 @@ public class Point implements INetworkAccess {
 
 	public Map<String, IPeripheral> refreshPeripherals() {
 		Map<String, IPeripheral> oldPeripherals = peripherals;
+		if (oldPeripherals == null) oldPeripherals = Collections.emptyMap();
+
 		Map<String, IPeripheral> newPeripherals = peripherals = node.getConnectedPeripherals();
 
 		MapDifference<String, IPeripheral> difference = Maps.difference(oldPeripherals, newPeripherals);
@@ -77,7 +79,7 @@ public class Point implements INetworkAccess {
 		for (Map.Entry<String, IPeripheral> entry : difference.entriesOnlyOnRight().entrySet()) {
 			IPeripheral peripheral = entry.getValue();
 			if (peripheral instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) peripheral).detachFromNetwork(this, entry.getKey());
+				((INetworkedPeripheral) peripheral).attachToNetwork(this, entry.getKey());
 			}
 		}
 
@@ -90,7 +92,7 @@ public class Point implements INetworkAccess {
 		for (Map.Entry<String, IPeripheral> entry : peripherals.entrySet()) {
 			IPeripheral peripheral = entry.getValue();
 			if (peripheral instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) peripheral).attachToNetwork(this, entry.getKey());
+				((INetworkedPeripheral) peripheral).detachFromNetwork(this, entry.getKey());
 			}
 		}
 	}
