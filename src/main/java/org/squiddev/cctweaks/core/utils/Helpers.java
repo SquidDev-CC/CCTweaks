@@ -27,8 +27,7 @@ public class Helpers {
 	 */
 	public static String translateOrDefault(String def, String... strings) {
 		for (String string : strings) {
-			String translated = StatCollector.translateToLocal(string);
-			if (!string.equals(translated)) return translated;
+			if(StatCollector.canTranslate(string)) return StatCollector.translateToLocal(string);
 		}
 
 		return def;

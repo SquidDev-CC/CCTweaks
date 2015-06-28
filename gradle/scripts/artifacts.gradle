@@ -21,7 +21,7 @@ task apiJar(type: Jar) {
 	classifier = 'api'
 }
 
-// Build a non-obsfucated jar
+// Build a non-obfuscated jar
 task devJar(type: Jar) {
 	manifest {
 		attributes(
@@ -43,6 +43,8 @@ task devJar(type: Jar) {
 	})
 
 	classifier = 'dev'
+
+	exclude("assets/**/docs")
 }
 
 // All the artifacts to build
