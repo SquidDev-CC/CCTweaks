@@ -11,7 +11,10 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractNode;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Basic wired modem that handles peripherals and
@@ -25,11 +28,6 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	 * Set of receivers to use
 	 */
 	protected final SetMultimap<Integer, IReceiver> receivers = MultimapBuilder.hashKeys().hashSetValues().build();
-
-	/**
-	 * Set of messages to transmit across the network
-	 */
-	protected final Queue<Packet> transmitQueue = new LinkedList<Packet>();
 
 	/**
 	 * List of wrappers for peripherals on the remote network
@@ -64,22 +62,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 
 	@Override
 	public void transmit(int channel, int replyChannel, Object payload, double range, double xPos, double yPos, double zPos, Object senderObject) {
-		synchronized (transmitQueue) {
-			transmitQueue.offer(new Packet(channel, replyChannel, payload, senderObject));
-		}
-	}
-
-	/**
-	 * Process the transmit queue
-	 */
-	public void processQueue() {
-		if (networkController == null) return;
-		synchronized (transmitQueue) {
-			Packet packet;
-			while ((packet = transmitQueue.poll()) != null) {
-				networkController.transmitPacket(this, packet);
-			}
-		}
+		networkController.transmitPacket(this, new Packet(channel, replyChannel, payload, senderObject));
 	}
 
 	/**

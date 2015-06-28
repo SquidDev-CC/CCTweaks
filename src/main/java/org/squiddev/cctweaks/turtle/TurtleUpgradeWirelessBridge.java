@@ -77,12 +77,6 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 	 */
 	@Override
 	public void update(ITurtleAccess turtle, TurtleSide side) {
-		if (Config.Network.WirelessBridge.turtleEnabled && !turtle.getWorld().isRemote) {
-			IPeripheral peripheral = turtle.getPeripheral(side);
-			if (peripheral != null && peripheral instanceof TurtleBinding.TurtleModemPeripheral) {
-				((TurtleBinding.TurtleModemPeripheral) peripheral).update();
-			}
-		}
 	}
 
 	@Override
@@ -90,15 +84,6 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 		ComputerCraft.registerTurtleUpgrade(this);
 	}
 
-	/**
-	 * This is really, really broken.
-	 *
-	 * The issue is two fold:
-	 * - The only way to check if the node is removed is through {@link IPeripheral#detach(IComputerAccess)}. However,
-	 * this means we are removing then attaching nodes and so forcing things to be recalculated when the world is
-	 * unloaded.
-	 * - Wrapping a turtle as a peripheral is hard.
-	 */
 	public static class TurtleBinding extends NetworkBindingWithModem {
 		public final ITurtleAccess turtle;
 		public final TurtleSide side;
@@ -164,6 +149,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			public Map<String, IPeripheral> getConnectedPeripherals() {
 				if (id <= -1) {
 					id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(turtle.getWorld()), "computer/lastid_" + peripheral.getType() + ".txt"));
+					TurtleBinding.this.save();
 				}
 				return Collections.singletonMap(peripheral.getType() + "_" + id, peripheral);
 			}
@@ -192,7 +178,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			@Override
 			public String[] getMethodNames() {
 				String[] methods = super.getMethodNames();
-				String[] newMethods = new String[methods.length + 3];
+				String[] newMethods = new String[methods.length + 2];
 				System.arraycopy(methods, 0, newMethods, 0, methods.length);
 
 
@@ -242,14 +228,6 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			public synchronized void detach(IComputerAccess computer) {
 				super.detach(computer);
 				TurtleBinding.this.destroy();
-			}
-
-			/**
-			 * Handles the update tick.
-			 */
-			public void update() {
-				modem.processQueue();
-				if (pollChanged()) TurtleBinding.this.save();
 			}
 
 			@Override

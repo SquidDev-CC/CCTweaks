@@ -31,8 +31,7 @@ public abstract class AbstractWorldNode extends AbstractNode implements IWorldNe
 	}
 
 	/**
-	 * Attempt to connect to {@link #getConnectedNodes()}
-	 * This is a one way attempt: It will not assimilate nodes into the network
+	 * Attempt to connect to {@link #getConnectedNodes()} using {@link NetworkHelpers#joinOrCreateNetwork(INetworkNode, Set)}
 	 */
 	public void connect() {
 		NetworkAPI.helpers().joinOrCreateNetwork(this, getConnectedNodes());

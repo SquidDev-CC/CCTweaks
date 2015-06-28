@@ -39,8 +39,6 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 		if (worldObj.isRemote) return;
 
 		if (modem.modem.pollChanged()) markForUpdate();
-
-		modem.processQueue();
 	}
 
 	@Override

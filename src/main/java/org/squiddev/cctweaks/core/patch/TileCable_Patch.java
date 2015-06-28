@@ -246,7 +246,6 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		if (worldObj.isRemote) return;
 
 		if (getModem().modem.pollChanged()) updateAnim();
-		modem.processQueue();
 	}
 
 	@Override

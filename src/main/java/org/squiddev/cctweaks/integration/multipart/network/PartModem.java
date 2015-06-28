@@ -115,7 +115,6 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 		if (world().isRemote) return;
 
 		if (modem.modem.pollChanged()) markDirty();
-		modem.processQueue();
 	}
 
 	@Override
