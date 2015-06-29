@@ -35,23 +35,22 @@ public class CraftingComputerUpgrade implements IRecipe {
 		// Get the current data
 		int id = computerItem.getComputerID(computerStack);
 		String label = computerItem.getLabel(computerStack);
-		ComputerFamily family = ComputerFamily.Advanced;
 
 		if (computerItem instanceof ItemComputer) {
-			return ComputerItemFactory.create(id, label, family);
+			return ComputerItemFactory.create(id, label, ComputerFamily.Advanced);
 		} else if (computerItem instanceof ItemTurtleBase) {
 			ItemTurtleBase turtle = (ItemTurtleBase) computerItem;
 
 			return TurtleItemFactory.create(
-				id, label, turtle.getColour(computerStack), family,
+				id, label, turtle.getColour(computerStack), ComputerFamily.Advanced,
 				turtle.getUpgrade(computerStack, TurtleSide.Left),
 				turtle.getUpgrade(computerStack, TurtleSide.Right),
-				turtle.getFuelLevel(computerStack)
+				turtle.getFuelLevel(computerStack), null, null
 			);
 		} else if (computerItem instanceof ItemPocketComputer) {
 			ItemPocketComputer pocket = (ItemPocketComputer) computerItem;
 
-			return PocketComputerItemFactory.create(id, label, family, pocket.getHasModem(computerStack));
+			return PocketComputerItemFactory.create(id, label, ComputerFamily.Advanced, pocket.getHasModem(computerStack));
 		}
 
 		return null;

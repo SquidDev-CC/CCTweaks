@@ -79,7 +79,7 @@ public final class Config {
 		 * You cannot shutdown/reboot the computer during this time.
 		 * Use carefully.
 		 */
-		@DefaultInt(5000)
+		@DefaultInt(7000)
 		@Range(min = 0)
 		public static int computerThreadTimeout;
 

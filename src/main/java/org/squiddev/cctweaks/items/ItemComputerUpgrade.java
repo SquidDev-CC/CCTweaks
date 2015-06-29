@@ -144,9 +144,9 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 
 			// Turtle (Is is silly to include every possible upgrade so we just do the normal one)
 			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
-				TurtleItemFactory.create(-1, null, null, ComputerFamily.Advanced, null, null, 0),
+				TurtleItemFactory.create(-1, null, null, ComputerFamily.Advanced, null, null, 0, null, null),
 				new Object[]{
-					TurtleItemFactory.create(-1, null, null, ComputerFamily.Normal, null, null, 0),
+					TurtleItemFactory.create(-1, null, null, ComputerFamily.Normal, null, null, 0, null, null),
 					stack
 				}
 			));

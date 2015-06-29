@@ -10,6 +10,7 @@ import dan200.computercraft.shared.turtle.items.ITurtleItem;
 import dan200.computercraft.shared.util.Colour;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.patcher.visitors.MergeVisitor;
@@ -25,7 +26,7 @@ public abstract class TurtleRenderer_Patch extends TileEntityTurtleRenderer {
 		if ((stack.getItem() instanceof ITurtleItem)) {
 			ITurtleItem item = (ITurtleItem) stack.getItem();
 			applyCustomNames(item.getLabel(stack), true);
-			renderTurtle(null, item.getFamily(stack), item.getColour(stack), item.getUpgrade(stack, TurtleSide.Left), item.getUpgrade(stack, TurtleSide.Right), 0.0F, 0.0F);
+			renderTurtle(null, item.getFamily(stack), item.getColour(stack), item.getUpgrade(stack, TurtleSide.Left), item.getUpgrade(stack, TurtleSide.Right), 0.0f, 0.0f, null, null);
 		}
 	}
 
@@ -79,6 +80,6 @@ public abstract class TurtleRenderer_Patch extends TileEntityTurtleRenderer {
 	}
 
 	@MergeVisitor.Stub
-	private void renderTurtle(ITurtleTile a, ComputerFamily b, Colour c, ITurtleUpgrade d, ITurtleUpgrade e, float f, float g) {
+	private void renderTurtle(ITurtleTile a, ComputerFamily b, Colour c, ITurtleUpgrade d, ITurtleUpgrade e, float f, float g, ResourceLocation overlay, ResourceLocation hatOverlay) {
 	}
 }

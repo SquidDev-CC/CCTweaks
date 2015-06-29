@@ -25,7 +25,7 @@ public class CustomTimeout implements IPatcher {
 		return new FindingVisitor(
 			delegate,
 			new VarInsnNode(ALOAD, 4),
-			new LdcInsnNode(5000L),
+			new LdcInsnNode(7000L),
 			new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Thread", "join", "(J)V", false)
 		) {
 			@Override
