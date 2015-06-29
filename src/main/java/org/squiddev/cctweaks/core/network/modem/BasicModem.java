@@ -7,16 +7,20 @@ import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.*;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractNode;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Basic wired modem that handles peripherals and
  * computer interaction
  */
-public abstract class BasicModem extends AbstractNode implements INetwork, IWorldNetworkNode, INetworkAccess {
+public abstract class BasicModem extends AbstractNode implements INetwork, IWorldNetworkNode {
 	public static final byte MODEM_ON = 1;
 	public static final byte MODEM_PERIPHERAL = 2;
 
@@ -24,11 +28,6 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	 * Set of receivers to use
 	 */
 	protected final SetMultimap<Integer, IReceiver> receivers = MultimapBuilder.hashKeys().hashSetValues().build();
-
-	/**
-	 * Set of messages to transmit across the network
-	 */
-	protected final Queue<Packet> transmitQueue = new LinkedList<Packet>();
 
 	/**
 	 * List of wrappers for peripherals on the remote network
@@ -63,22 +62,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 
 	@Override
 	public void transmit(int channel, int replyChannel, Object payload, double range, double xPos, double yPos, double zPos, Object senderObject) {
-		synchronized (transmitQueue) {
-			transmitQueue.offer(new Packet(channel, replyChannel, payload, senderObject));
-		}
-	}
-
-	/**
-	 * Process the transmit queue
-	 */
-	public void processQueue() {
-		if (networkController == null) return;
-		synchronized (transmitQueue) {
-			Packet packet;
-			while ((packet = transmitQueue.poll()) != null) {
-				networkController.transmitPacket(this, packet);
-			}
-		}
+		networkController.transmitPacket(this, new Packet(channel, replyChannel, payload, senderObject));
 	}
 
 	/**
@@ -110,14 +94,6 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 		synchronized (receivers) {
 			for (IReceiver receiver : receivers.get(packet.channel)) {
 				receiver.receive(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
-			}
-		}
-
-		for (Map.Entry<String, IPeripheral> entry : this.getConnectedPeripherals().entrySet()) {
-			IPeripheral value = entry.getValue();
-
-			if (value instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) value).receivePacket(this, packet, distanceTravelled);
 			}
 		}
 	}
@@ -216,7 +192,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	}
 
 	@Override
-	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals) {
+	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
 		// Clone to prevent modification errors
 		Set<String> peripheralNames = new HashSet<String>(peripheralWrappersByName.keySet());
 		for (String wrapper : peripheralNames) {
@@ -236,61 +212,11 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 				}
 			}
 		}
-
-		for (Map.Entry<String, IPeripheral> entry : getConnectedPeripherals().entrySet()) {
-			IPeripheral value = entry.getValue();
-
-			if (value instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) value).networkInvalidated(this, oldPeripherals);
-			}
-		}
-	}
-
-	@Override
-	public void detachFromNetwork() {
-		for (Map.Entry<String, IPeripheral> entry : getConnectedPeripherals().entrySet()) {
-			String key = entry.getKey();
-			IPeripheral value = entry.getValue();
-
-			if (value instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) value).detachFromNetwork(this, key);
-			}
-		}
-		super.detachFromNetwork();
-	}
-
-	@Override
-	public void attachToNetwork(INetworkController networkController) {
-		super.attachToNetwork(networkController);
-		for (Map.Entry<String, IPeripheral> entry : this.getConnectedPeripherals().entrySet()) {
-			String key = entry.getKey();
-			IPeripheral value = entry.getValue();
-
-			if (value instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) value).attachToNetwork(this, key);
-			}
-		}
 	}
 
 	public void destroy() {
 		if (networkController != null) networkController.removeNode(this);
 		modem.destroy();
-	}
-
-	@Override
-	public Map<String, IPeripheral> getPeripheralsOnNetwork() {
-		return networkController.getPeripheralsOnNetwork();
-	}
-
-	@Override
-	public void invalidateNetwork() {
-		networkController.invalidateNetwork();
-	}
-
-	@Override
-	public boolean transmitPacket(Packet packet) {
-		networkController.transmitPacket(this, packet);
-		return true;
 	}
 
 	/**
@@ -301,35 +227,10 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	}
 
 	public void setPeripheralEnabled(boolean peripheralEnabled) {
-		if (peripheralEnabled == this.peripheralEnabled) {
-			return;
-		}
-
-		Map<String, IPeripheral> oldPeripherals = getConnectedPeripherals();
+		if (peripheralEnabled == this.peripheralEnabled) return;
 
 		this.peripheralEnabled = peripheralEnabled;
-
-		Map<String, IPeripheral> newPeripherals = getConnectedPeripherals();
-
-		for (Map.Entry<String, IPeripheral> entry : oldPeripherals.entrySet()) {
-			String key = entry.getKey();
-			IPeripheral value = entry.getValue();
-
-			if (!newPeripherals.containsKey(key) && value instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) value).detachFromNetwork(this, key);
-			}
-		}
-
-		for (Map.Entry<String, IPeripheral> entry : newPeripherals.entrySet()) {
-			String key = entry.getKey();
-			IPeripheral value = entry.getValue();
-
-			if (!oldPeripherals.containsKey(key) && value instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) value).attachToNetwork(this, key);
-			}
-		}
-
-		if (getAttachedNetwork() != null) getAttachedNetwork().invalidateNetwork();
+		if (getAttachedNetwork() != null) getAttachedNetwork().invalidateNode(this);
 	}
 
 	@Override

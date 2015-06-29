@@ -9,9 +9,12 @@ import java.util.Map;
  */
 public interface INetworkNode {
 	/**
-	 * Get connected peripherals this node provides
+	 * Get connected peripherals this node provides.
 	 *
-	 * @return Map of name to peripheral or {@code null} if there are no peripherals
+	 * If this changes, call {@link INetworkController#invalidateNode(INetworkNode)}
+	 *
+	 * @return Map of name to peripheral. This should *never* be {@code null}.
+	 * @see INetworkController#getPeripheralsOnNetwork()
 	 */
 	Map<String, IPeripheral> getConnectedPeripherals();
 
@@ -27,10 +30,10 @@ public interface INetworkNode {
 	/**
 	 * Called when the peripheral map on the network changes.
 	 *
-	 * @param oldPeripherals A map representing the peripheral
-	 *                       map before the network changed
+	 * @param oldPeripherals Peripherals removed from the network
+	 * @param newPeripherals Peripherals added to the network
 	 */
-	void networkInvalidated(Map<String, IPeripheral> oldPeripherals);
+	void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals);
 
 	/**
 	 * Called when the network is detached from this node.

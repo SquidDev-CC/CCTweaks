@@ -25,9 +25,10 @@ public interface INetworkedPeripheral extends IPeripheral {
 	 * Called when the network is invalidated.
 	 *
 	 * @param network        The network that was invalidated.
-	 * @param oldPeripherals A map of peripherals as they were before the invalidation.
+	 * @param oldPeripherals Peripherals removed from the network
+	 * @param newPeripherals Peripherals added to the network
 	 */
-	void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals);
+	void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals);
 
 	/**
 	 * Called when the network receives a packet.

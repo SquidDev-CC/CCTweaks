@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.blocks.debug;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
+import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.network.INetworkAccess;
 import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.network.Packet;
@@ -17,7 +18,7 @@ public class TileDebugNetworkedPeripheral extends TileDebugPeripheral {
 		return new NetworkedPeripheral(side);
 	}
 
-	public static class NetworkedPeripheral extends SidedPeripheral implements INetworkedPeripheral {
+	public class NetworkedPeripheral extends SidedPeripheral implements INetworkedPeripheral {
 		public NetworkedPeripheral(int side) {
 			super(side);
 		}
@@ -38,8 +39,13 @@ public class TileDebugNetworkedPeripheral extends TileDebugPeripheral {
 		}
 
 		@Override
-		public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals) {
-			DebugLogger.debug("Network was invalidated");
+		public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
+			DebugLogger.debug(
+				"Node invalidated at %s, %s, %s\n - Old: %s\n - New: %s",
+				xCoord, yCoord, zCoord,
+				StringUtils.join(oldPeripherals.keySet(), ", "),
+				StringUtils.join(newPeripherals.keySet(), ", ")
+			);
 		}
 
 		@Override

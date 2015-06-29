@@ -20,7 +20,6 @@ import org.squiddev.cctweaks.api.network.INetworkAccess;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
@@ -73,21 +72,14 @@ public class ItemDebugger extends ItemComputerAction {
 	protected boolean useGeneric(ItemStack stack, EntityPlayer player, TileEntity tile, int side) {
 		Set<String> locals = new HashSet<String>();
 		Set<String> remotes = new HashSet<String>();
-		IPeripheral peripheral;
 
 		INetworkNode node = NetworkAPI.registry().getNode(tile);
 		if (node != null) {
-			Map<String, IPeripheral> p = node.getConnectedPeripherals();
-			if (p != null) locals.addAll(p.keySet());
+			locals.addAll(node.getConnectedPeripherals().keySet());
+			remotes.addAll(node.getAttachedNetwork().getPeripheralsOnNetwork().keySet());
 		}
 
-		peripheral = PeripheralUtil.getPeripheral(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord, side);
-		if (peripheral != null) {
-			if (peripheral instanceof BasicModemPeripheral) {
-				Map<String, IPeripheral> p = ((BasicModemPeripheral) peripheral).modem.getPeripheralsOnNetwork();
-				if (p != null) remotes.addAll(p.keySet());
-			}
-		}
+		IPeripheral peripheral = PeripheralUtil.getPeripheral(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord, side);
 
 		if (tile instanceof INetworkAccess) {
 			Map<String, IPeripheral> p = ((INetworkAccess) tile).getPeripheralsOnNetwork();

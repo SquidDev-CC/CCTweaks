@@ -36,9 +36,9 @@ public abstract class PeripheralProxy_Patch implements INetworkedPeripheral, IPe
 	}
 
 	@Override
-	public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals) {
+	public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
 		if (peripheral instanceof INetworkedPeripheral) {
-			((INetworkedPeripheral) peripheral).networkInvalidated(network, oldPeripherals);
+			((INetworkedPeripheral) peripheral).networkInvalidated(network, oldPeripherals, newPeripherals);
 		}
 	}
 

@@ -159,7 +159,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		// TODO: Break the modem if we change
 		if (getPeripheralType() == PeripheralType.WiredModemWithCable) {
 			if (getModem().updateEnabled()) {
-				modem.getAttachedNetwork().invalidateNetwork();
+				modem.getAttachedNetwork().invalidateNode(modem);
 				updateAnim();
 			}
 		}
@@ -187,7 +187,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", periphName));
 					}
 
-					getModem().getAttachedNetwork().invalidateNetwork();
+					getModem().getAttachedNetwork().invalidateNode(modem);
 					return true;
 				}
 			} else {
@@ -246,7 +246,6 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 		if (worldObj.isRemote) return;
 
 		if (getModem().modem.pollChanged()) updateAnim();
-		modem.processQueue();
 	}
 
 	@Override
@@ -293,13 +292,13 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	public void networkChanged() {
 		getCable().updateConnections();
 		if (!worldObj.isRemote) {
-			getModem().invalidateNetwork();
+			getModem().getAttachedNetwork().invalidateNode(modem);
 		}
 	}
 
 	@Deprecated
 	private void dispatchPacket(Packet packet) {
-		getModem().transmitPacket(packet);
+		getModem().getAttachedNetwork().transmitPacket(modem, packet);
 	}
 
 	@Deprecated

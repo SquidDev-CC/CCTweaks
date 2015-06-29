@@ -74,10 +74,8 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	}
 
 	@Override
-	public void updateEntity() {
-		if (worldObj.isRemote) return;
-
-		binding.getModem().processQueue();
+	public boolean canUpdate() {
+		return false;
 	}
 
 	@Override

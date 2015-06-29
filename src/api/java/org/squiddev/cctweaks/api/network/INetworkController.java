@@ -34,7 +34,6 @@ public interface INetworkController {
 	 * Only when two nodes disconnect.
 	 *
 	 * @param connection A pair of nodes representing the nodes being disconnected.
-	 * @throws IllegalArgumentException When the connection doesn't exist
 	 */
 	void breakConnection(SingleTypeUnorderedPair<INetworkNode> connection);
 
@@ -50,8 +49,8 @@ public interface INetworkController {
 
 	/**
 	 * Gets the peripherals known to be on the network.
-	 * This is usually cached, only changing when {@link #invalidateNetwork()} is called.
-	 * This is done automatically in the network modification operations.
+	 * This is usually cached, only changing when {@link #invalidateNetwork()} or {@link #invalidateNode(INetworkNode)}
+	 * are called.
 	 *
 	 * @return The cached map of peripherals on the network.
 	 */
@@ -59,8 +58,16 @@ public interface INetworkController {
 
 	/**
 	 * Invalidate the list of peripherals on the network.
+	 *
+	 * {@link #invalidateNode(INetworkNode)} is preferred.
 	 */
 	void invalidateNetwork();
+
+	/**
+	 * A more lightweight version of {@link #invalidateNetwork()}, this invalidates the
+	 * peripherals for one node.
+	 */
+	void invalidateNode(INetworkNode node);
 
 	/**
 	 * @return All nodes on the network.

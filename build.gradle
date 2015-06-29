@@ -81,3 +81,9 @@ processResources {
 		exclude 'mcmod.info'
 	}
 }
+
+test {
+	testLogging {
+		events "passed", "skipped", "failed", "standardOut", "standardError"
+	}
+}

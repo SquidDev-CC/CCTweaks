@@ -39,14 +39,12 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 		if (worldObj.isRemote) return;
 
 		if (modem.modem.pollChanged()) markForUpdate();
-
-		modem.processQueue();
 	}
 
 	@Override
 	public void onNeighborChanged() {
 		if (modem.hasChanged()) {
-			modem.getAttachedNetwork().invalidateNetwork();
+			modem.getAttachedNetwork().invalidateNode(modem);
 			markForUpdate();
 		}
 	}
@@ -71,7 +69,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", StringUtils.join(newNames, ", ")));
 			}
 
-			modem.getAttachedNetwork().invalidateNetwork();
+			modem.getAttachedNetwork().invalidateNode(modem);
 			markForUpdate();
 		}
 

@@ -46,6 +46,18 @@ public class NetworkBinding extends AbstractWorldNode {
 		return nodes;
 	}
 
+	@Override
+	public void connect() {
+		NetworkBindings.addNode(id, this);
+		super.connect();
+	}
+
+	@Override
+	public void destroy() {
+		NetworkBindings.removeNode(id, this);
+		super.destroy();
+	}
+
 	public void setId(UUID newId) {
 		remove();
 		id = newId;

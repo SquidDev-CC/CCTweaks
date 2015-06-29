@@ -51,4 +51,9 @@ public final class NetworkBindings {
 			}
 		}
 	}
+
+	public static void reset() {
+		// TODO: There might be a cleaner way.
+		networks.clear();
+	}
 }

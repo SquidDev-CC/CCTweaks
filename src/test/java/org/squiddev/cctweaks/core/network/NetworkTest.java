@@ -6,6 +6,7 @@ import org.junit.rules.Timeout;
 import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.core.network.controller.NetworkController;
 
 import static org.junit.Assert.*;
 

@@ -50,7 +50,7 @@ public abstract class AdapterPeripheral_Patch implements IPeripheralTargeted, IN
 	}
 
 	@Override
-	public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals) {
+	public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
 	}
 
 	@Override

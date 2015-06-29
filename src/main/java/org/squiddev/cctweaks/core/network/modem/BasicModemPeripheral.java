@@ -66,16 +66,14 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
 		String[] methods = super.getMethodNames();
 		switch (method - methods.length) {
-			case 0: // getNamesRemote
-				synchronized (modem.getPeripheralsOnNetwork()) {
-					int idx = 1;
-					Map<Object, Object> table = new HashMap<Object, Object>();
-					for (String name : modem.peripheralWrappersByName.keySet()) {
-						table.put(idx++, name);
-					}
-					return new Object[]{table};
+			case 0: { // getNamesRemote
+				int idx = 1;
+				Map<Object, Object> table = new HashMap<Object, Object>();
+				for (String name : modem.getAttachedNetwork().getPeripheralsOnNetwork().keySet()) {
+					table.put(idx++, name);
 				}
-
+				return new Object[]{table};
+			}
 			case 1: { // isPresentRemote
 				PeripheralAccess access = modem.peripheralWrappersByName.get(parseString(arguments, 0));
 				return new Object[]{access != null && access.getType() != null};
@@ -118,20 +116,16 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	@Override
 	public synchronized void attach(IComputerAccess computer) {
 		super.attach(computer);
-		synchronized (modem.getPeripheralsOnNetwork()) {
-			for (Map.Entry<String, IPeripheral> peripheral : modem.getPeripheralsOnNetwork().entrySet()) {
-				modem.attachPeripheral(peripheral.getKey(), peripheral.getValue());
-			}
+		for (Map.Entry<String, IPeripheral> peripheral : modem.getAttachedNetwork().getPeripheralsOnNetwork().entrySet()) {
+			modem.attachPeripheral(peripheral.getKey(), peripheral.getValue());
 		}
 	}
 
 	@Override
 	public synchronized void detach(IComputerAccess computer) {
 		super.detach(computer);
-		synchronized (modem.getPeripheralsOnNetwork()) {
-			for (String name : modem.getPeripheralsOnNetwork().keySet()) {
-				modem.detachPeripheral(name);
-			}
+		for (String name : modem.getAttachedNetwork().getPeripheralsOnNetwork().keySet()) {
+			modem.detachPeripheral(name);
 		}
 	}
 
