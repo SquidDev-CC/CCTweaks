@@ -8,6 +8,7 @@ import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.Vec3;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ import java.util.Map;
  *
  * @see BasicModem
  */
-public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral {
+public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted {
 	public final T modem;
 
 	public BasicModemPeripheral(T modem) {
@@ -139,5 +140,10 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 			throw new LuaException("Expected string");
 		}
 		return (String) arguments[index];
+	}
+
+	@Override
+	public Object getTarget() {
+		return modem;
 	}
 }

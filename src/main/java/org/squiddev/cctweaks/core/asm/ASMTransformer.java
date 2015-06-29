@@ -25,12 +25,20 @@ public class ASMTransformer implements IClassTransformer {
 
 	public ASMTransformer() {
 		add(new Object[]{
+			// General stuff
 			new ClassReplaceSource("org.luaj.vm2.lib.DebugLib"),
 			new ClassReplaceSource("org.luaj.vm2.lib.StringLib"),
 			new ClassReplacer(
 				"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
 				"org.squiddev.cctweaks.core.patch.TurtleRefuelCommand_Rewrite"
 			),
+			new DisableTurtleCommand(),
+			new CustomTimeout(),
+			new InjectLuaJC(),
+			new WhitelistGlobals(),
+			new PatchTurtleRenderer(),
+
+			// Networking
 			new ClassMerger(
 				"dan200.computercraft.shared.peripheral.common.BlockCable",
 				"org.squiddev.cctweaks.core.patch.BlockCable_Patch"
@@ -60,17 +68,28 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.core.apis.PeripheralAPI",
 				"org.squiddev.cctweaks.core.patch.PeripheralAPI_Patch"
 			),
+
+			// Open peripheral
 			new ClassMerger(
 				"openperipheral.addons.peripheralproxy.WrappedPeripheral",
 				"org.squiddev.cctweaks.core.patch.op.PeripheralProxy_Patch"
 			),
 			new PatchOpenPeripheralAdapter(),
 			new PatchOpenModule(),
-			new DisableTurtleCommand(),
-			new CustomTimeout(),
-			new InjectLuaJC(),
-			new WhitelistGlobals(),
-			new PatchTurtleRenderer(),
+
+			// Targeted peripherals
+			new ClassMerger(
+				"dan200.computercraft.shared.computer.blocks.ComputerPeripheral",
+				"org.squiddev.cctweaks.core.patch.targeted.ComputerPeripheral_Patch"
+			),
+			new ClassMerger(
+				"dan200.computercraft.shared.peripheral.diskdrive.DiskDrivePeripheral",
+				"org.squiddev.cctweaks.core.patch.targeted.DiskDrivePeripheral_Patch"
+			),
+			new ClassMerger(
+				"dan200.computercraft.shared.peripheral.printer.PrinterPeripheral",
+				"org.squiddev.cctweaks.core.patch.targeted.PrinterPeripheral_Patch"
+			),
 		});
 
 		// Patch the logger instance
