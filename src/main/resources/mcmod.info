@@ -8,7 +8,8 @@
 		"url": "https://github.com/SquidDev-CC/CC-Tweaks",
 		"credits": "Dan200, Forge team",
 		"authorList": [
-			"SquidDev"
+			"SquidDev",
+			"ElvishJerricco"
 		],
 		"dependencies": [
 			"ComputerCraft"
