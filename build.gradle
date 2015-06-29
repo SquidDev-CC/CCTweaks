@@ -19,6 +19,7 @@ apply plugin: 'forge'
 apply from: 'gradle/scripts/dependencies.gradle'
 apply from: 'gradle/scripts/artifacts.gradle'
 apply from: 'gradle/scripts/upload.gradle'
+apply from: 'gradle/scripts/documentation.gradle'
 
 group = "org.squiddev"
 archivesBaseName = "CCTweaks"
@@ -50,6 +51,8 @@ jar {
 	filesMatching("org/luaj/**", {
 		it.path = "patch/" + it.path
 	})
+
+	exclude("assets/**/docs")
 }
 
 sourceSets {

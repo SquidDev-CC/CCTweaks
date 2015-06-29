@@ -1,0 +1,192 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+class DocumentationParser extends DefaultTask {
+	@InputFiles
+	@SkipWhenEmpty
+	@Optional
+	public FileCollection sources;
+
+	private static final Pattern regex = Pattern.compile(/.+\/([a-z]+)\/docs\/([a-z]+_[A-Z]+)\/([a-z]+)\/(.+)\.txt/);
+	public Map<String, StringBuilder> languages = new HashMap<String, StringBuilder>();
+
+	@TaskAction
+	public void run() {
+		sources
+			.findAll { regex.matcher(it.getPath()).matches() }
+			.each { parse(it) };
+	}
+
+	public void parse(File file) {
+		Matcher matcher = regex.matcher(file.getPath());
+		if (!matcher.find()) throw new IllegalArgumentException("Cannot extract for " + file.getPath());
+
+		String language = matcher.group(2) + ".lang";
+		StringBuilder lang = languages[language];
+		if (lang == null) languages[language] = lang = new StringBuilder().append("\n#Auto generated files\n");
+
+		String key = matcher.group(3) + "." + matcher.group(1) + "." + matcher.group(4) + ".information.";
+
+		int counter = 0;
+		for (String contents in file.getText().split(/\n-{3,}|\*{3,}\n/)) {
+			lang.append(key + counter + "=" + State.parse(contents).replace("\n\n", "\\n").replace("\n", " ").replace(" +", " ").trim() + "\n");
+			counter++;
+		}
+	}
+}
+
+class State {
+	private static final String CODE = "\u00a7";
+	private static final Pattern regex = Pattern.compile(/\$\{([^}]+)\}/);
+
+	public boolean bold = false;
+	public boolean strikethrough = false;
+	public boolean underline = false;
+	public boolean italic = false;
+
+	public String color = null;
+
+	public String getCode() {
+		return getCode(new StringBuilder()).toString();
+	}
+
+	public StringBuilder getCode(StringBuilder builder) {
+		builder.append(CODE).append('r');
+		if (bold) builder.append(CODE).append('l');
+		if (strikethrough) builder.append(CODE).append('m');
+		if (underline) builder.append(CODE).append('n');
+		if (italic) builder.append(CODE).append('o');
+		if (color != null) builder.append(CODE).append(color);
+
+		return builder;
+	}
+
+	public static String parse(String input) {
+		Matcher matcher = regex.matcher(input);
+		int lastIndex = 0;
+		StringBuilder result = new StringBuilder();
+
+		State style = new State();
+		while (matcher.find()) {
+			result.append(input.substring(lastIndex, matcher.start()));
+
+			for (String group : matcher.group(1).split("/")) {
+				if (group.equals("*")) {
+					style.italic = !style.italic;
+				} else if (group.equals("**")) {
+					style.bold = !style.bold;
+				} else if (group.equals("~~")) {
+					style.strikethrough = !style.strikethrough;
+				} else if (group.equals("_")) {
+					style.underline = !style.underline;
+				} else {
+					style.color = getColor(group);
+				}
+			}
+
+			style.getCode(result);
+			lastIndex = matcher.end();
+		}
+
+		result.append(input.substring(lastIndex));
+
+		return result.toString();
+	}
+
+	public static String getColor(String color) {
+		switch (color.toUpperCase()) {
+			case "BLACK": return '0';
+			case "DARK_BLUE": return '1';
+			case "DARK_GREEN": return '2';
+			case "DARK_AQUA": return '3';
+			case "DARK_RED": return '4';
+			case "DARK_PURPLE": return '5';
+			case "GOLD": return '6';
+			case "GREY": case "GRAY": return '7';
+			case "DARK_GREY": case "DARK_GRAY": return '8';
+			case "BLUE": return '9';
+			case "GREEN": return 'a';
+			case "AQUA": return 'b';
+			case "RED": return 'c';
+			case "LIGHT_PURPLE": return 'd';
+			case "YELLOW": return 'e';
+			case "WHITE": return 'f';
+		}
+
+		return null;
+	}
+}
+
+class DocFilter extends FilterReader {
+	private Queue<Reader> readers;
+
+	public DocFilter(Reader reader) {
+		super(reader)
+		readers = new LinkedList<Reader>();
+	}
+
+	public int read() throws IOException {
+		if (this.in == null) return -1;
+
+		int data = this.in.read();
+		if (data > -1) return data;
+		this.in.close();
+
+		this.in = readers.poll();
+		return read();
+	}
+
+	public int read(char[] cbuf, int off, int len) throws IOException {
+		for (int i = 0; i < len; ++i) {
+			int ch = this.read();
+			if (ch == -1) return i == 0 ? -1 : i;
+			cbuf[off + i] = (char) ch;
+		}
+
+		return len;
+	}
+
+	public long skip(long n) throws IOException {
+		if (this.in == null) throw new IOException("No more to read");
+		return this.in.skip(n);
+	}
+
+	public boolean ready() throws IOException {
+		if (this.in == null) throw new IOException("No more to read");
+		return this.in.ready();
+	}
+
+	public boolean markSupported() {
+		if (this.in == null) return false;
+		return this.in.markSupported();
+	}
+
+	public void mark(int readAheadLimit) throws IOException {
+		if (this.in == null) throw new IOException("No more to read");
+		this.in.mark(readAheadLimit);
+	}
+
+	public void reset() throws IOException {
+		if (this.in == null) throw new IOException("No more to read. Cannot reset");
+		this.in.reset();
+	}
+
+	public void close() throws IOException {
+		if (this.in != null) this.in.close();
+	}
+}
+
+task documentation(type: DocumentationParser) {
+	sources = sourceSets.main.resources
+}
+
+processResources {
+	from("assets/**/lang").eachFile({ file ->
+		StringBuilder lang = documentation.languages[file.getName()];
+		if (lang != null) {
+			file.filter([readers: [new StringReader(lang.toString())] as Queue], DocFilter.class)
+		}
+	})
+}
+processResources.dependsOn += documentation
+

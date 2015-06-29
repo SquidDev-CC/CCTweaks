@@ -1,0 +1,5 @@
+Tired of testing broken scripts? Need some help? The all new
+${**}Debug Wand${**} will help you on the way.
+
+Shift right-clicking a computer will add a whole host of debugging
+tools. On other objects, it just prints a ton of information to chat.

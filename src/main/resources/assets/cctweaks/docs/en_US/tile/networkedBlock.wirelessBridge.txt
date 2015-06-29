@@ -1,0 +1,15 @@
+Now you're talking! The ${**}Wireless Bridge${**} allows you
+to bind multiple wired networks together across infinite distances,
+even spanning worlds.
+
+Firstly place your bridge on a cable, then you'll need to get a
+${**}Data Card${**} to bind two bridges together, but make sure
+they're both chunk-loaded.
+
+***
+
+These devices also work on turtles, though you must use the
+${dark_gray}bindFromCard${none} method.
+
+It is a matter of some debate how these work, some say it is ${*}quantum${*},
+others say ${*}magic${*}. It works

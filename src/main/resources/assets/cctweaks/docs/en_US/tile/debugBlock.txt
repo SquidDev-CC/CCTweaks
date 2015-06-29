@@ -1,0 +1,4 @@
+The ${**}Debug Block${**} and friends are testing
+blocks to help check everything works.
+
+Move along now, nothing more to see.
