@@ -1,4 +1,5 @@
 apply plugin: 'maven'
+apply plugin: 'curseforge'
 
 uploadArchives {
 	repositories {
@@ -39,11 +40,19 @@ uploadArchives {
 					}
 				}
 				pom*.whenConfigured { pom ->
-					pom.dependencies.removeAll({ dep ->
-						dep.groupId != "ComputerCraft" && dep.scope == "compile"
-					})
+					pom.dependencies.clear()
 				}
 			}
 		}
 	}
+}
+
+curse {
+	projectId = '232180'
+	apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''
+	releaseType = 'release'
+
+	additionalArtifact devJar
+
+	relatedProject 'computercraft' : 'requiredLibrary'
 }
