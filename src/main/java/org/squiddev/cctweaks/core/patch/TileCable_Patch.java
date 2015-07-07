@@ -154,10 +154,11 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	@Override
 	public void onNeighbourChange() {
 		// Update the neighbour first as this might break the type
+		PeripheralType type = getPeripheralType();
 		nativeOnNeighbourChange();
 
 		// TODO: Break the modem if we change
-		if (getPeripheralType() == PeripheralType.WiredModemWithCable) {
+		if (type == PeripheralType.WiredModemWithCable) {
 			if (getModem().updateEnabled()) {
 				modem.getAttachedNetwork().invalidateNode(modem);
 				updateAnim();
