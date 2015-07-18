@@ -66,6 +66,9 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	public void registerBlockIcons(IIconRegister register) {
 		bridgeIcon = blockIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":wirelessBridge");
 		bridgeSmallIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":wirelessBridgeSmall");
+
+		// Clear the cache to ensure we have the latest texture
+		modemIcons = null;
 	}
 
 	@SideOnly(Side.CLIENT)
