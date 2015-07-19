@@ -189,6 +189,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 					}
 
 					getModem().getAttachedNetwork().invalidateNode(modem);
+					updateAnim();
 					return true;
 				}
 			} else {
