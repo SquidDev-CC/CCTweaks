@@ -207,6 +207,23 @@ public final class Config {
 			@Range(min = 1)
 			@RequiresRestart
 			public static int turtleId;
+
+			/**
+			 * Enable the Wireless Bridge upgrade for pocket computers.
+			 * Requires Peripherals++
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart
+			public static boolean pocketEnabled;
+
+			/**
+			 * The pocket upgrade Id
+			 * Requires Peripherals++
+			 */
+			@DefaultInt(331)
+			@Range(min = 1)
+			@RequiresRestart
+			public static int pocketId;
 		}
 
 		/**

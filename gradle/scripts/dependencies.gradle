@@ -24,6 +24,11 @@ repositories {
 		url "http://repo.openmods.info/artifactory/openmods"
 	}
 
+	maven {
+		name = "austinv11" // Peripherals++
+		url "http://jcenter.bintray.com"
+	}
+
 	ivy {
 		name = "ComputerCraft"
 		artifactPattern "http://addons-origin.cursecdn.com/files/2244/605/[module][revision].[ext]"
@@ -51,6 +56,8 @@ dependencies {
 	compile "codechicken:CodeChickenLib:${project.mc_version}-${project.ccl_version}:dev"
 	compile "codechicken:NotEnoughItems:${project.mc_version}-${project.nei_version}:dev"
 	compile "codechicken:CodeChickenCore:${project.mc_version}-${project.ccc_version}:dev"
+	compile "com.austinv11.collectiveframework:CollectiveFramework:${project.collectiveframework_verion}:deobf"
+	compile "com.austinv11.peripheralsplusplus:PeripheralsPlusPlus:${project.peripheralspp_version}:deobf"
 
 	packaged "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev:jar"
 	packaged "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"

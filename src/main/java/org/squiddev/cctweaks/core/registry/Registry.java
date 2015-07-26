@@ -11,6 +11,7 @@ import org.squiddev.cctweaks.integration.IndustrialCraftIntegration;
 import org.squiddev.cctweaks.integration.RedstoneFluxIntegration;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.cctweaks.integration.openperipheral.OpenPeripheralIntegration;
+import org.squiddev.cctweaks.integration.peripheralspp.PeripheralsPlusPlusIntegration;
 import org.squiddev.cctweaks.items.ItemComputerUpgrade;
 import org.squiddev.cctweaks.items.ItemDataCard;
 import org.squiddev.cctweaks.items.ItemDebugger;
@@ -56,6 +57,7 @@ public final class Registry {
 		addModule(new TurtleUpgradeWirelessBridge());
 		addModule(new RedstoneFluxIntegration());
 		addModule(new IndustrialCraftIntegration());
+		addModule(new PeripheralsPlusPlusIntegration());
 
 		addModule(new RenderNetworkOverlay());
 	}
