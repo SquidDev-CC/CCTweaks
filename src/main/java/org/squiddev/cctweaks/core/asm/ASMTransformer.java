@@ -32,6 +32,10 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
 				"org.squiddev.cctweaks.core.patch.TurtleRefuelCommand_Rewrite"
 			),
+			new ClassMerger(
+				"dan200.computercraft.shared.peripheral.common.BlockPeripheral",
+				"org.squiddev.cctweaks.core.patch.BlockPeripheral_Patch"
+			),
 			new DisableTurtleCommand(),
 			new CustomTimeout(),
 			new InjectLuaJC(),

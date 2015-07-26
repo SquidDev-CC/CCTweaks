@@ -241,6 +241,27 @@ public final class Config {
 	}
 
 	/**
+	 * Various tweaks that don't belong to anything
+	 */
+	public static final class Misc {
+		/**
+		 * The light level given off by normal monitors.
+		 * Redstone torches are 7, normal torches are 14.
+		 */
+		@DefaultInt(7)
+		@Range(min = 0, max = 15)
+		public static int monitorLight;
+
+		/**
+		 * The light level given off by advanced monitors.
+		 * Redstone torches are 7, normal torches are 14.
+		 */
+		@DefaultInt(10)
+		@Range(min = 0, max = 15)
+		public static int advancedMonitorLight;
+	}
+
+	/**
 	 * Only used when testing and developing the mod.
 	 * Nothing to see here, move along...
 	 */
