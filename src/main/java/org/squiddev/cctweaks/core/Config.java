@@ -199,7 +199,6 @@ public final class Config {
 			@RequiresRestart
 			public static boolean turtleEnabled;
 
-			// TODO: Register on the wiki: http://www.computercraft.info/wiki/Turtle_Upgrade_IDs
 			/**
 			 * The turtle upgrade Id
 			 */
