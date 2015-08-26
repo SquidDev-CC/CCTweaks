@@ -30,6 +30,14 @@ public class DebugLogger {
 		}
 	}
 
+	public static void trace(String message, Object... params) {
+		try {
+			throw new RuntimeException();
+		} catch (RuntimeException e) {
+			debug(String.format(message, params) + "\n\tat " + StringUtils.join(new Exception().getStackTrace(), "\n\tat "));
+		}
+	}
+
 	public static void debug(Marker marker, String message) {
 		if (Config.Testing.debug) {
 			logger.info(marker, message);

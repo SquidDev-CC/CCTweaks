@@ -20,6 +20,7 @@ chat.cctweaks.data.messages.Cleared=Settings cleared
 
 turtle.cctweaks.wirelessBridge.adjective=Networked
 turtle.cctweaks.toolHost.adjective=Ambidextrous
+pocket.cctweaks.wirelessBridge.adjective=Networked
 
 gui.config.cctweaks.computer=Computer
 gui.config.cctweaks.computer.computerUpgradeEnabled=Computer Upgrade Enabled

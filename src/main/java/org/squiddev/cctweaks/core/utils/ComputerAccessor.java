@@ -5,7 +5,11 @@ import dan200.computercraft.core.lua.LuaJLuaMachine;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
+import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
 import dan200.computercraft.shared.turtle.blocks.TileTurtle;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -55,6 +59,13 @@ public final class ComputerAccessor {
 	 */
 	public static Field cablePeripheralId;
 
+	/**
+	 * Get the computer for pocket computers
+	 *
+	 * @see ItemPocketComputer#createServerComputer(World, IInventory, ItemStack)
+	 */
+	public static Method pocketServerComputer;
+
 	static {
 		try {
 			tileCopy = TileComputerBase.class.getDeclaredMethod("transferStateFrom", TileComputerBase.class);
@@ -74,6 +85,9 @@ public final class ComputerAccessor {
 
 			cablePeripheralId = TileCable.class.getDeclaredField("m_attachedPeripheralID");
 			cablePeripheralId.setAccessible(true);
+
+			pocketServerComputer = ItemPocketComputer.class.getDeclaredMethod("createServerComputer", World.class, IInventory.class, ItemStack.class);
+			pocketServerComputer.setAccessible(true);
 		} catch (Exception e) {
 			DebugLogger.error("ComputerCraft not found", e);
 			e.printStackTrace();

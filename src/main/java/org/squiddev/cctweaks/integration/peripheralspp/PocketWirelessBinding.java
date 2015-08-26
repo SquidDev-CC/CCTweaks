@@ -37,14 +37,19 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 
 	@Override
 	public IPeripheral createPeripheral(Entity entity, ItemStack stack) {
-		return Config.Network.WirelessBridge.pocketEnabled ? new PocketBinding(entity, stack).getModem().modem : null;
+		return Config.Network.WirelessBridge.pocketEnabled ? new PocketBinding(new PocketAccess(entity, stack)).getModem().modem : null;
 	}
 
 	@Override
-	public void update(Entity entity, ItemStack itemStack, IPeripheral peripheral) {
+	public void update(Entity entity, ItemStack stack, IPeripheral peripheral) {
 		if (peripheral instanceof PocketBinding.PocketModemPeripheral) {
 			PocketBinding binding = ((PocketBinding.PocketModemPeripheral) peripheral).getBinding();
-			if (binding != null) binding.setOwner(entity);
+
+			PocketAccess access = ((PocketAccess) binding.pocket);
+			access.entity = entity;
+			access.stack = stack;
+
+			binding.update(); // Update entity and save
 		}
 	}
 
@@ -54,12 +59,11 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 	}
 
 	public static class PocketBinding extends NetworkBindingWithModem {
-		public final ItemStack stack;
-		protected Entity owner;
+		public final IPocketAccess pocket;
 
-		public PocketBinding(Entity owner, ItemStack stack) {
-			super(new EntityPosition(owner));
-			this.stack = stack;
+		public PocketBinding(IPocketAccess pocket) {
+			super(new EntityPosition(pocket.getEntity()));
+			this.pocket = pocket;
 		}
 
 		@Override
@@ -74,17 +78,25 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 
 		@Override
 		public void connect() {
-			load(stack.getTagCompound());
+			load(pocket.getUpgradeNBTData());
 			super.connect();
 		}
 
 		public void save() {
-			save(stack.getTagCompound());
+			save(pocket.getUpgradeNBTData());
+			pocket.updateUpgradeNBTData();
+
+			pocket.setModemLight(modem.isActive());
 		}
 
-		public void setOwner(Entity owner) {
-			((EntityPosition) position).entity = owner;
-			this.owner = owner;
+		public void update() {
+			((EntityPosition) position).entity = pocket.getEntity();
+
+			// We may receive update events whilst not being attached. To prevent this, just exit if we
+			// have no network
+			if (getAttachedNetwork() == null) return;
+
+			if (getModem().modem.pollChanged()) save();
 		}
 
 		/**
@@ -129,8 +141,10 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 				String[] methods = super.getMethodNames();
 				switch (method - methods.length) {
 					case 0: { // bindFromCard
-						if (!(owner instanceof EntityPlayer)) return new Object[]{false, "No inventory found"};
-						InventoryPlayer inventory = ((EntityPlayer) owner).inventory;
+						if (!(pocket.getEntity() instanceof EntityPlayer)) {
+							return new Object[]{false, "No inventory found"};
+						}
+						InventoryPlayer inventory = ((EntityPlayer) pocket.getEntity()).inventory;
 
 						int size = inventory.getSizeInventory(), held = inventory.currentItem;
 						for (int i = 0; i < size; i++) {
@@ -147,8 +161,10 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 						return new Object[]{false, "No card found"};
 					}
 					case 1: { // bindToCard
-						if (!(owner instanceof EntityPlayer)) return new Object[]{false, "No inventory found"};
-						InventoryPlayer inventory = ((EntityPlayer) owner).inventory;
+						if (!(pocket.getEntity() instanceof EntityPlayer)) {
+							return new Object[]{false, "No inventory found"};
+						}
+						InventoryPlayer inventory = ((EntityPlayer) pocket.getEntity()).inventory;
 
 						int size = inventory.getSizeInventory(), held = inventory.currentItem;
 						for (int i = 0; i < size; i++) {
