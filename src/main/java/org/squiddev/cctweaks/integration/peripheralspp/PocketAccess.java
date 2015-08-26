@@ -1,14 +1,24 @@
 package org.squiddev.cctweaks.integration.peripheralspp;
 
+import com.austinv11.peripheralsplusplus.hooks.ComputerCraftHooks;
+import com.austinv11.peripheralsplusplus.hooks.ComputerCraftRegistry;
+import com.austinv11.peripheralsplusplus.pocket.PocketPeripheralContainer;
 import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.common.util.Constants;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Concrete implementation of https://github.com/austinv11/PeripheralsPlusPlus/issues/97
@@ -75,5 +85,47 @@ public class PocketAccess implements IPocketAccess {
 		if (inventory != null) {
 			inventory.markDirty();
 		}
+	}
+
+	@Override
+	public Map<Integer, IPeripheral> getUpgrades() {
+		NBTTagCompound tag = stack.getTagCompound();
+		if (tag == null) return Collections.emptyMap();
+
+		int upgrade = (int) tag.getShort("upgrade");
+
+		// 1 is reserved for wireless modems
+		if (upgrade == 1) return Collections.emptyMap();
+
+		// If we can't find the computer then abort
+		ServerComputer computer = getComputer();
+		if (computer == null) return Collections.emptyMap();
+
+		// If we can't find the peripheral then abort
+		IPeripheral peripheral = ComputerCraftHooks.cachedPeripherals.get(computer.getID());
+		if (peripheral == null) return Collections.emptyMap();
+
+		// Single peripheral, that is fine
+		if (!(ComputerCraftRegistry.pocketUpgrades.get(upgrade) instanceof PocketPeripheralContainer) || !tag.hasKey("upgrades")) {
+			return Collections.singletonMap(upgrade, peripheral);
+		}
+
+		// If we can't find
+		Map<Integer, IPeripheral> cached = ComputerCraftHooks.cachedExtraPeripherals.get(computer.getID());
+		NBTTagList list = tag.getTagList("upgrades", Constants.NBT.TAG_FLOAT);
+		if (cached == null || list == null || list.tagCount() == 0) {
+			return Collections.singletonMap(upgrade, peripheral);
+		}
+
+		Map<Integer, IPeripheral> peripherals = new HashMap<Integer, IPeripheral>();
+		peripherals.put(upgrade, peripheral);
+
+		for (int i = 0; i < list.tagCount(); i++) {
+			int id = (int) list.func_150308_e(i);
+			IPeripheral single = cached.get(id);
+			if (single != null) peripherals.put(id, single);
+		}
+
+		return peripherals;
 	}
 }

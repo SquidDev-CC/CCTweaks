@@ -1,7 +1,10 @@
 package org.squiddev.cctweaks.integration.peripheralspp;
 
+import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
+
+import java.util.Map;
 
 /**
  * Wrapper class for pocket computers
@@ -40,4 +43,11 @@ public interface IPocketAccess {
 	 * Mark the item as dirty
 	 */
 	void updateUpgradeNBTData();
+
+	/**
+	 * Get a lookup of all upgrades for the pocket computer
+	 *
+	 * @return An upgrade id => peripheral lookup
+	 */
+	Map<Integer, IPeripheral> getUpgrades();
 }

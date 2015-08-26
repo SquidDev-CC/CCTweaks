@@ -16,8 +16,11 @@ import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
+import org.squiddev.cctweaks.core.network.modem.DynamicPeripheralCollection;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.utils.EntityPosition;
+
+import java.util.Map;
 
 public class PocketWirelessBinding implements IPocketComputerUpgrade {
 	@Override
@@ -96,6 +99,7 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 			// have no network
 			if (getAttachedNetwork() == null) return;
 
+			modem.updateEnabled();
 			if (getModem().modem.pollChanged()) save();
 		}
 
@@ -103,6 +107,23 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 		 * Custom modem that allows modifying bindings
 		 */
 		public class PocketModem extends BindingModem {
+			protected DynamicPeripheralCollection<Integer> peripherals = new DynamicPeripheralCollection<Integer>() {
+				@Override
+				protected Map<Integer, IPeripheral> getPeripherals() {
+					return pocket.getUpgrades();
+				}
+
+				@Override
+				protected World getWorld() {
+					return pocket.getEntity().worldObj;
+				}
+			};
+
+			@Override
+			public Map<String, IPeripheral> getConnectedPeripherals() {
+				return peripherals.getConnectedPeripherals();
+			}
+
 			@Override
 			protected BasicModemPeripheral createPeripheral() {
 				return new PocketModemPeripheral(this);
