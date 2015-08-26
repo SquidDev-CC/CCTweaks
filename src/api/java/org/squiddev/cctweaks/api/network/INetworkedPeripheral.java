@@ -4,7 +4,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 
 import java.util.Map;
 
-public interface INetworkedPeripheral extends IPeripheral {
+public interface INetworkedPeripheral extends INetworkCompatiblePeripheral {
 	/**
 	 * Called when this peripheral is attached to a network.
 	 *

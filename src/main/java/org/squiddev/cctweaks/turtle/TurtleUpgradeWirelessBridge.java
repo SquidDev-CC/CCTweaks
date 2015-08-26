@@ -11,9 +11,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
+import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
@@ -21,12 +23,11 @@ import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
+import org.squiddev.cctweaks.core.network.modem.PeripheralCollection;
 import org.squiddev.cctweaks.core.peripheral.PeripheralProxy;
 import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
-import org.squiddev.cctweaks.core.utils.Helpers;
 
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -121,36 +122,59 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 		 * Custom modem that allows modifying bindings
 		 */
 		public class TurtleModem extends BindingModem {
-			protected int id = -1;
-			protected IPeripheral peripheral = new PeripheralProxy("turtle") {
+			protected PeripheralCollection peripherals = new PeripheralCollection(2) {
+				private IPeripheral peripheral = new PeripheralProxy("turtle") {
+					@Override
+					protected IPeripheral createPeripheral() {
+						ChunkCoordinates pos = turtle.getPosition();
+						return PeripheralUtil.getPeripheral(turtle.getWorld(), pos.posX, pos.posY, pos.posZ, 0);
+					}
+				};
+
 				@Override
-				protected IPeripheral createPeripheral() {
-					ChunkCoordinates pos = turtle.getPosition();
-					return PeripheralUtil.getPeripheral(turtle.getWorld(), pos.posX, pos.posY, pos.posZ, 0);
+				protected IPeripheral[] getPeripherals() {
+					IPeripheral[] peripherals = new IPeripheral[2];
+					peripherals[0] = peripheral;
+
+					IPeripheral opposite = turtle.getPeripheral(side == TurtleSide.Left ? TurtleSide.Right : TurtleSide.Left);
+					if (opposite instanceof INetworkCompatiblePeripheral) peripherals[1] = opposite;
+
+					return peripherals;
+				}
+
+				@Override
+				protected World getWorld() {
+					return turtle.getWorld();
+				}
+
+				@Override
+				protected void changed() {
+					super.changed();
+					TurtleBinding.this.save();
 				}
 			};
 
 			public void load() {
 				NBTTagCompound data = turtle.getUpgradeNBTData(side);
-				if (data.hasKey("turtle_id")) id = data.getInteger("turtle_id");
+
+				// Backwards compatibility
+				if (data.hasKey("turtle_id")) {
+					peripherals.ids[0] = data.getInteger("turtle_id");
+					data.removeTag("turtle_id");
+				}
+
+				int[] ids = data.getIntArray("peripheral_ids");
+				if (ids != null && ids.length == 6) System.arraycopy(ids, 0, peripherals.ids, 0, 6);
 			}
 
 			public void save() {
-				turtle.getUpgradeNBTData(side).setInteger("turtle_id", id);
+				NBTTagCompound tag = turtle.getUpgradeNBTData(side);
+				tag.setIntArray("peripheral_ids", peripherals.ids);
 			}
 
-			/**
-			 * Get the turtle as a peripheral
-			 *
-			 * @return The turtle peripheral
-			 */
 			@Override
 			public Map<String, IPeripheral> getConnectedPeripherals() {
-				if (id <= -1) {
-					id = Helpers.nextId(turtle.getWorld(), peripheral);
-					TurtleBinding.this.save();
-				}
-				return Collections.singletonMap(peripheral.getType() + "_" + id, peripheral);
+				return peripherals.getConnectedPeripherals();
 			}
 
 			@Override
