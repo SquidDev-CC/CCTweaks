@@ -6,7 +6,6 @@ import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
-import dan200.computercraft.shared.util.IDAssigner;
 import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,8 +24,8 @@ import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
 import org.squiddev.cctweaks.core.peripheral.PeripheralProxy;
 import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
+import org.squiddev.cctweaks.core.utils.Helpers;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.Map;
 
@@ -148,7 +147,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			@Override
 			public Map<String, IPeripheral> getConnectedPeripherals() {
 				if (id <= -1) {
-					id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(turtle.getWorld()), "computer/lastid_" + peripheral.getType() + ".txt"));
+					id = Helpers.nextId(turtle.getWorld(), peripheral);
 					TurtleBinding.this.save();
 				}
 				return Collections.singletonMap(peripheral.getType() + "_" + id, peripheral);

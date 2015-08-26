@@ -1,15 +1,13 @@
 package org.squiddev.cctweaks.core.network.modem;
 
-import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.shared.util.IDAssigner;
 import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHidden;
+import org.squiddev.cctweaks.core.utils.Helpers;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -80,7 +78,7 @@ public abstract class MultiPeripheralModem extends BasicModem {
 				ids[dir] = -1;
 				peripherals[dir] = null;
 			} else if (ids[dir] <= -1) {
-				ids[dir] = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(world), "computer/lastid_" + peripheral.getType() + ".txt"));
+				ids[dir] = Helpers.nextId(world, peripheral);
 			}
 		}
 

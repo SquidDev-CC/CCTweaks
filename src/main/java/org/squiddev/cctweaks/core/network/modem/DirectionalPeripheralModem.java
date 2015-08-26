@@ -1,15 +1,12 @@
 package org.squiddev.cctweaks.core.network.modem;
 
-import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.shared.util.IDAssigner;
 import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHidden;
-
-import java.io.File;
+import org.squiddev.cctweaks.core.utils.Helpers;
 
 /**
  * A modem that finds a peripheral in the side it is updating
@@ -29,7 +26,7 @@ public abstract class DirectionalPeripheralModem extends SinglePeripheralModem {
 			id = -1;
 			peripheral = null;
 		} else if (id <= -1) {
-			id = IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir((World) position.getWorld()), "computer/lastid_" + peripheral.getType() + ".txt"));
+			id = Helpers.nextId((World) position.getWorld(), peripheral);
 		}
 
 		return peripheral;

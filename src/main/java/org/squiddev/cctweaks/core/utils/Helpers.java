@@ -1,8 +1,14 @@
 package org.squiddev.cctweaks.core.utils;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.shared.util.IDAssigner;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
+import net.minecraft.world.World;
+
+import java.io.File;
 
 /**
  * Helper methods for various things
@@ -27,7 +33,7 @@ public class Helpers {
 	 */
 	public static String translateOrDefault(String def, String... strings) {
 		for (String string : strings) {
-			if(StatCollector.canTranslate(string)) return StatCollector.translateToLocal(string);
+			if (StatCollector.canTranslate(string)) return StatCollector.translateToLocal(string);
 		}
 
 		return def;
@@ -87,5 +93,13 @@ public class Helpers {
 			builder.append(c);
 		}
 		return builder.toString();
+	}
+
+	public static int nextId(World world, String type) {
+		return IDAssigner.getNextIDFromFile(new File(ComputerCraft.getWorldDir(world), "computer/lastid_" + type + ".txt"));
+	}
+
+	public static int nextId(World world, IPeripheral peripheral) {
+		return nextId(world, peripheral.getType());
 	}
 }
