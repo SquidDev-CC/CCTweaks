@@ -8,9 +8,6 @@ import org.squiddev.patcher.visitors.FindingVisitor;
 
 import static org.objectweb.asm.Opcodes.*;
 
-/**
- * Render turtles with a name of "Dinnerbone" or "Grumm" upside down.
- */
 public class PatchTurtleRenderer extends ClassMerger {
 	public PatchTurtleRenderer() {
 		super("dan200.computercraft.client.render.TileEntityTurtleRenderer", "org.squiddev.cctweaks.core.patch.TurtleRenderer_Patch");
@@ -18,7 +15,8 @@ public class PatchTurtleRenderer extends ClassMerger {
 
 	@Override
 	public ClassVisitor patch(String className, ClassVisitor delegate) throws Exception {
-		return new FindingVisitor(
+		// Render turtles with a name of "Dinnerbone" or "Grumm" upside down.
+		ClassVisitor mutator = new FindingVisitor(
 			super.patch(className, delegate),
 			new VarInsnNode(ALOAD, 9),
 			new VarInsnNode(FLOAD, 8),
@@ -37,5 +35,35 @@ public class PatchTurtleRenderer extends ClassMerger {
 				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "applyCustomNames", "(Ljava/lang/String;Z)V", false);
 			}
 		}.onMethod("func_147500_a").onMethod("renderTileEntityAt").once().mustFind();
+
+		// Add custom drawing flags before main rendering
+		mutator = new FindingVisitor(
+			mutator,
+			new VarInsnNode(ALOAD, 11),
+			new FieldInsnNode(GETFIELD, "net/minecraft/util/Vec3", null, "D"),
+			new MethodInsnNode(INVOKESTATIC, "org/lwjgl/opengl/GL11", "glTranslated", "(DDD)V", false)
+		) {
+			@Override
+			public void handle(InsnList nodes, MethodVisitor visitor) {
+				nodes.accept(visitor);
+				visitor.visitVarInsn(ALOAD, 0);
+				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "scale", "()V", false);
+			}
+		}.onMethod("func_147500_a").onMethod("renderTileEntityAt").once().mustFind();
+
+		// Remove custom drawing flags
+		mutator = new FindingVisitor(
+			mutator,
+			new MethodInsnNode(INVOKESTATIC, "org/lwjgl/opengl/GL11", "glPopMatrix", "()V", false)
+		) {
+			@Override
+			public void handle(InsnList nodes, MethodVisitor visitor) {
+				visitor.visitVarInsn(ALOAD, 0);
+				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "postScale", "()V", false);
+				nodes.accept(visitor);
+			}
+		}.onMethod("func_147500_a").onMethod("renderTileEntityAt").once().mustFind();
+
+		return mutator;
 	}
 }

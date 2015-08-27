@@ -54,7 +54,10 @@ public abstract class TurtleRenderer_Patch extends TileEntityTurtleRenderer {
 
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_CULL_FACE);
+
+		GL11.glTranslatef(0.5f, 0.5f, 0.5f);
 		GL11.glScalef(3.0f, 3.0f, 3.0f);
+		GL11.glTranslatef(-0.5f, -0.5f, -0.5f);
 	}
 
 	protected void postScale() {
