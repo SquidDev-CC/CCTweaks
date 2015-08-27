@@ -33,7 +33,8 @@ public class PatchTurtleRenderer extends ClassMerger {
 				nodes.accept(visitor);
 				visitor.visitVarInsn(ALOAD, 0);
 				visitor.visitVarInsn(ALOAD, 13);
-				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "applyCustomNames", "(Ljava/lang/String;)V", false);
+				visitor.visitInsn(ICONST_0);
+				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "applyCustomNames", "(Ljava/lang/String;Z)V", false);
 			}
 		}.onMethod("func_147500_a").onMethod("renderTileEntityAt").once().mustFind();
 	}

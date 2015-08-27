@@ -8,11 +8,13 @@ import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.turtle.blocks.ITurtleTile;
 import dan200.computercraft.shared.turtle.items.ITurtleItem;
 import dan200.computercraft.shared.util.Colour;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
 import java.util.List;
@@ -46,8 +48,21 @@ public abstract class TurtleRenderer_Patch extends TileEntityTurtleRenderer {
 		}
 	}
 
-	protected void applyCustomNames(String label) {
-		applyCustomNames(label, false);
+	protected void scale() {
+		ItemStack stack = Minecraft.getMinecraft().thePlayer.getHeldItem();
+		if (stack == null || stack.getItem() != Registry.itemTurtleWand) return;
+
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glScalef(3.0f, 3.0f, 3.0f);
+	}
+
+	protected void postScale() {
+		ItemStack stack = Minecraft.getMinecraft().thePlayer.getHeldItem();
+		if (stack == null || stack.getItem() != Registry.itemTurtleWand) return;
+
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_CULL_FACE);
 	}
 
 	/**
