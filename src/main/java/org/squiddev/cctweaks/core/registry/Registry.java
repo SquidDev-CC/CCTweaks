@@ -4,6 +4,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.blocks.debug.BlockDebug;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
+import org.squiddev.cctweaks.client.render.RenderInfo;
 import org.squiddev.cctweaks.client.render.RenderNetworkOverlay;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHostProvider;
 import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
@@ -60,7 +61,9 @@ public final class Registry {
 		addModule(new PeripheralsPlusPlusIntegration());
 
 		addModule(new NetworkPlayerWatcher());
+
 		addModule(new RenderNetworkOverlay());
+		addModule(new RenderInfo());
 	}
 
 	public static void addModule(IModule module) {

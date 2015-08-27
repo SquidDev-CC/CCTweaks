@@ -36,7 +36,7 @@ public class PatchTurtleRenderer extends ClassMerger {
 			}
 		}.onMethod("func_147500_a").onMethod("renderTileEntityAt").once().mustFind();
 
-		// Add custom drawing flags before main rendering
+		// Add custom drawing flags and scale
 		mutator = new FindingVisitor(
 			mutator,
 			new VarInsnNode(ALOAD, 11),
@@ -47,7 +47,8 @@ public class PatchTurtleRenderer extends ClassMerger {
 			public void handle(InsnList nodes, MethodVisitor visitor) {
 				nodes.accept(visitor);
 				visitor.visitVarInsn(ALOAD, 0);
-				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "scale", "()V", false);
+				visitor.visitVarInsn(ALOAD, 1);
+				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "scale", "(Lnet/minecraft/tileentity/TileEntity;)V", false);
 			}
 		}.onMethod("func_147500_a").onMethod("renderTileEntityAt").once().mustFind();
 
