@@ -6,7 +6,6 @@ import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
-import org.squiddev.cctweaks.core.network.controller.NetworkController;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +20,6 @@ public final class Gatherer {
 	public static VisualisationData gather(INetworkController controller, IBlockAccess world) {
 		if (controller == null) return new VisualisationData(new Node[0], new Connection[0]);
 
-		NetworkController network = controller instanceof NetworkController ? (NetworkController) controller : null;
-
 		Set<INetworkNode> nodes = controller.getNodesOnNetwork();
 		Map<INetworkNode, Node> lookup = new HashMap<INetworkNode, Node>();
 
@@ -31,20 +28,10 @@ public final class Gatherer {
 		for (INetworkNode node : nodes) {
 			IWorldPosition position = node instanceof IWorldNetworkNode ? ((IWorldNetworkNode) node).getPosition() : null;
 
-			// We only get peripherals if we know we can get them without side effects
-			String[] peripherals;
-			if (network == null) {
-				peripherals = new String[0];
-			} else {
-				Set<String> peripheralNames = network.getPoint(node).peripherals.keySet();
-				peripherals = new String[peripheralNames.size()];
-				peripheralNames.toArray(peripherals);
-			}
-
 			// We only care about the position if we are in the current world
 			Position resultPosition = position != null && position.getWorld() == world ? new Position(position.getX(), position.getY(), position.getZ()) : null;
 
-			Node result = resultNodes[index] = new Node(node.toString(), peripherals, resultPosition);
+			Node result = resultNodes[index] = new Node(node.toString(), resultPosition);
 			lookup.put(node, result);
 			index++;
 		}

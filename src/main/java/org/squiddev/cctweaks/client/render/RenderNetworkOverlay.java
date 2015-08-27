@@ -96,14 +96,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		}
 
 		int counter = 0;
-		boolean sneaking = Minecraft.getMinecraft().thePlayer.isSneaking();
 		for (Node node : nodes) {
-			if (sneaking) {
-				for (String peripheral : node.peripherals) {
-					renderLabel(position.blockX + 0.5, position.blockY + 1.5 + (counter++) * 0.4, position.blockZ + 0.5, "\u00a71" + peripheral);
-				}
-			}
-
 			String name = node.position == null ? "\u00a78" + node.name : node.name;
 			renderLabel(position.blockX + 0.5, position.blockY + 1.5 + (counter++) * 0.4, position.blockZ + 0.5, name);
 		}

@@ -87,16 +87,9 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 			DebugLogger.debug("Reading " + nodeSize + " nodes");
 			for (int i = 0; i < nodeSize; i++) {
 				String name = ByteBufUtils.readUTF8String(buffer);
-
-				int peripheralSize = buffer.readShort();
-				String[] peripherals = new String[peripheralSize];
-				for (int pIndex = 0; pIndex < peripheralSize; pIndex++) {
-					peripherals[pIndex] = ByteBufUtils.readUTF8String(buffer);
-				}
-
 				Position position = buffer.readByte() == 1 ? new Position(buffer.readInt(), buffer.readInt(), buffer.readInt()) : null;
 
-				nodes[i] = new Node(name, peripherals, position);
+				nodes[i] = new Node(name, position);
 			}
 
 			int connectionSize = buffer.readInt();
@@ -136,13 +129,7 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 			for (Node node : data.nodes) {
 				lookup.put(node, index);
 
-				ByteBufUtils.writeUTF8String(buffer, node.toString());
-
-				String[] peripherals = node.peripherals;
-				buffer.writeShort(peripherals.length);
-				for (String peripheral : peripherals) {
-					ByteBufUtils.writeUTF8String(buffer, peripheral);
-				}
+				ByteBufUtils.writeUTF8String(buffer, node.name);
 
 				Position position = node.position;
 				if (position != null) {
