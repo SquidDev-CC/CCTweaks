@@ -120,6 +120,8 @@ public class ASMTransformer implements IClassTransformer {
 		try {
 			return patches.transform(className, bytes);
 		} catch (Exception e) {
+			if (Config.Testing.asmExplosions) throw toRuntime(e);
+
 			DebugLogger.error("Cannot patch " + className + ", falling back to default", e);
 			return bytes;
 		}
@@ -129,5 +131,10 @@ public class ASMTransformer implements IClassTransformer {
 		StringWriter writer = new StringWriter();
 		new ClassReader(bytes).accept(new TraceClassVisitor(new PrintWriter(writer)), 0);
 		DebugLogger.debug("Dump for " + className + "\n" + writer.toString());
+	}
+
+	protected RuntimeException toRuntime(Exception e) {
+		if (e instanceof RuntimeException) return (RuntimeException) e;
+		return new RuntimeException(e);
 	}
 }

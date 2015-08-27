@@ -291,17 +291,20 @@ public final class Config {
 
 		/**
 		 * Enable debug blocks/items.
-		 * Only use for testing.
 		 */
 		@DefaultBoolean(false)
 		public static boolean debugItems;
 
 		/**
 		 * Throw exceptions on calling deprecated methods
-		 *
-		 * Only for development/testing
 		 */
 		@DefaultBoolean(false)
 		public static boolean deprecatedWarnings;
+
+		/**
+		 * Explode on ASM errors
+		 */
+		@DefaultBoolean(false)
+		public static boolean asmExplosions;
 	}
 }
