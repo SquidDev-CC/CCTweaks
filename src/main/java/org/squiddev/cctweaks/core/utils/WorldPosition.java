@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.utils;
 
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
@@ -11,6 +12,10 @@ public class WorldPosition implements IWorldPosition {
 	protected final int x;
 	protected final int y;
 	protected final int z;
+
+	public WorldPosition(TileEntity tile) {
+		this(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord);
+	}
 
 	public WorldPosition(IBlockAccess world, int x, int y, int z) {
 		this.world = world;

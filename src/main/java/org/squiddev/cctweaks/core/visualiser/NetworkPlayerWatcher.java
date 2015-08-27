@@ -76,6 +76,10 @@ public class NetworkPlayerWatcher extends AbstractPacketHandler<VisualisationPac
 
 	private static final Map<EntityPlayer, Watcher> watchers = new HashMap<EntityPlayer, Watcher>();
 
+	public static Watcher get(EntityPlayer player) {
+		return watchers.get(player);
+	}
+
 	public static Watcher remove(EntityPlayer player) {
 		return watchers.remove(player);
 	}

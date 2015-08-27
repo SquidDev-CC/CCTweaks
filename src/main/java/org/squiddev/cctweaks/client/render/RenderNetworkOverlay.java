@@ -87,7 +87,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 		// Custom handling for networks with 0 connections (single node networks)
 		if (data.connections.length == 0 && position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-			for (Node node : nodes) {
+			for (Node node : data.nodes) {
 				Position nodePosition = node.position;
 				if (nodePosition != null && nodePosition.x == position.blockX && nodePosition.y == position.blockY && nodePosition.z == position.blockZ) {
 					nodes.add(node);
@@ -119,8 +119,6 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 	}
 
 	private void renderLabel(double x, double y, double z, String label) {
-		if (label == null) return;
-
 		RenderManager renderManager = RenderManager.instance;
 		FontRenderer fontrenderer = renderManager.getFontRenderer();
 		if (fontrenderer == null) return;
