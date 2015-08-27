@@ -14,6 +14,7 @@ import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindings;
 import org.squiddev.cctweaks.core.registry.Registry;
+import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
 
 @Mod(modid = CCTweaks.ID, name = CCTweaks.NAME, version = CCTweaks.VERSION, dependencies = CCTweaks.DEPENDENCIES, guiFactory = CCTweaks.GUI_FACTORY)
 public class CCTweaks {
@@ -56,6 +57,7 @@ public class CCTweaks {
 	public void onServerStart(FMLServerStartedEvent event) {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
 			NetworkBindings.reset();
+			NetworkPlayerWatcher.reset();
 		}
 	}
 
@@ -63,6 +65,7 @@ public class CCTweaks {
 	public void onServerStopped(FMLServerStoppedEvent event) {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
 			NetworkBindings.reset();
+			NetworkPlayerWatcher.reset();
 		}
 	}
 }

@@ -78,7 +78,7 @@ public class NetworkController implements INetworkController {
 	 * @return The point
 	 * @throws NullPointerException If the point cannot be found.
 	 */
-	protected Point getPoint(INetworkNode node) {
+	public Point getPoint(INetworkNode node) {
 		Preconditions.checkNotNull(node, "Node cannot be null");
 		return Preconditions.checkNotNull(points.get(node), "Cannot find point for node %s", node);
 	}

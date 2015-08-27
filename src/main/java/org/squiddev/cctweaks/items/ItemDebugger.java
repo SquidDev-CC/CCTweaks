@@ -5,13 +5,12 @@ import dan200.computercraft.core.lua.LuaJLuaMachine;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.util.PeripheralUtil;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
 import org.luaj.vm2.LuaValue;
@@ -22,6 +21,8 @@ import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
+import org.squiddev.cctweaks.core.visualiser.VisualisationPacket;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -30,6 +31,25 @@ import java.util.Set;
 public class ItemDebugger extends ItemComputerAction {
 	public ItemDebugger() {
 		super("debugger");
+	}
+
+	@Override
+	public void onUpdate(ItemStack stack, World world, Entity entity, int p_77663_4_, boolean p_77663_5_) {
+		super.onUpdate(stack, world, entity, p_77663_4_, p_77663_5_);
+
+		if (entity instanceof EntityPlayerMP) {
+			EntityPlayerMP player = ((EntityPlayerMP) entity);
+			if (player.getHeldItem() == stack) {
+				MovingObjectPosition position = getMovingObjectPositionFromPlayer(world, player, false);
+				if (position == null || position.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
+
+				NetworkPlayerWatcher.Watcher watcher = NetworkPlayerWatcher.update(player, position.blockX, position.blockY, position.blockZ);
+
+				if (watcher == null) return;
+				if (watcher.changed()) VisualisationPacket.send(watcher.controller, player);
+				if (watcher.controller == null) NetworkPlayerWatcher.remove(player);
+			}
+		}
 	}
 
 	@Override
