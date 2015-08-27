@@ -4,6 +4,8 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.creativetab.CreativeTabs;
@@ -12,6 +14,7 @@ import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindings;
 import org.squiddev.cctweaks.core.registry.Registry;
+import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
 
 @Mod(modid = CCTweaks.ID, name = CCTweaks.NAME, version = CCTweaks.VERSION, dependencies = CCTweaks.DEPENDENCIES, guiFactory = CCTweaks.GUI_FACTORY)
 public class CCTweaks {
@@ -24,6 +27,8 @@ public class CCTweaks {
 	public static final String ROOT_NAME = "org.squiddev.cctweaks.";
 	public static final String GUI_FACTORY = ROOT_NAME + "client.gui.GuiConfigFactory";
 
+	public static SimpleNetworkWrapper NETWORK;
+
 	public static CreativeTabs getCreativeTab() {
 		return ComputerCraft.mainCreativeTab;
 	}
@@ -32,6 +37,8 @@ public class CCTweaks {
 	public void preInit(FMLPreInitializationEvent event) {
 		FMLCommonHandler.instance().bus().register(new FmlEvents());
 		MinecraftForge.EVENT_BUS.register(new McEvents());
+
+		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(ID);
 
 		Registry.preInit();
 	}
@@ -50,6 +57,7 @@ public class CCTweaks {
 	public void onServerStart(FMLServerStartedEvent event) {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
 			NetworkBindings.reset();
+			NetworkPlayerWatcher.reset();
 		}
 	}
 
@@ -57,6 +65,7 @@ public class CCTweaks {
 	public void onServerStopped(FMLServerStoppedEvent event) {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
 			NetworkBindings.reset();
+			NetworkPlayerWatcher.reset();
 		}
 	}
 }
