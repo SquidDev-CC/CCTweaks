@@ -7,32 +7,25 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
-import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.client.render.RenderNetworkOverlay;
-import org.squiddev.cctweaks.core.network.controller.NetworkController;
 import org.squiddev.cctweaks.core.packet.AbstractPacketHandler;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+
+import static org.squiddev.cctweaks.core.visualiser.VisualisationData.*;
 
 /**
  * Handles transmitting/receiving the network
  */
 public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 	public VisualisationData data;
-	public INetworkController controller;
-	public IBlockAccess world;
 
 	public static VisualisationPacket create(INetworkController controller, IBlockAccess world) {
 		VisualisationPacket packet = new VisualisationPacket();
-		packet.controller = controller;
-		packet.world = world;
+		packet.data = Gatherer.gather(controller, world);
 		return packet;
 	}
 
@@ -53,7 +46,7 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 	@Override
 	public void toBytes(ByteBuf buf) {
 		buf.writeByte(0);
-		version0.write(buf, controller, world);
+		version0.write(buf, data);
 	}
 
 	@Override
@@ -65,7 +58,7 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 	public interface Encoder {
 		VisualisationData read(ByteBuf buffer);
 
-		void write(ByteBuf buffer, INetworkController data, IBlockAccess world);
+		void write(ByteBuf buffer, VisualisationData data);
 	}
 
 	/**
@@ -73,13 +66,14 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 	 *
 	 * nodes length: int
 	 * nodes:
-	 * | kind: byte
 	 * | name: string
 	 * | peripherals length: short
 	 * | | name: string
-	 * | x: int ? kind == 1
-	 * | y: int ? kind == 1
-	 * | z: int ? kind == 1
+	 * | position exists: boolean
+	 * | position:
+	 * | | x: int
+	 * | | y: int
+	 * | | z: int
 	 * connections length: int
 	 * connections:
 	 * | x: int
@@ -89,10 +83,9 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 		@Override
 		public VisualisationData read(ByteBuf buffer) {
 			int nodeSize = buffer.readInt();
-			VisualisationData.Node[] nodes = new VisualisationData.Node[nodeSize];
+			Node[] nodes = new Node[nodeSize];
+			DebugLogger.debug("Reading " + nodeSize + " nodes");
 			for (int i = 0; i < nodeSize; i++) {
-				int kind = buffer.readByte();
-
 				String name = ByteBufUtils.readUTF8String(buffer);
 
 				int peripheralSize = buffer.readShort();
@@ -101,21 +94,14 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 					peripherals[pIndex] = ByteBufUtils.readUTF8String(buffer);
 				}
 
-				switch (kind) {
-					case 0:
-						nodes[i] = new VisualisationData.Node(name, peripherals);
-						break;
-					case 1:
-						nodes[i] = new VisualisationData.PositionedNode(name, peripherals, buffer.readInt(), buffer.readInt(), buffer.readInt());
-						break;
-					default:
-						DebugLogger.error("Unknown node kind " + kind);
-						return null;
-				}
+				Position position = buffer.readByte() == 1 ? new Position(buffer.readInt(), buffer.readInt(), buffer.readInt()) : null;
+
+				nodes[i] = new Node(name, peripherals, position);
 			}
 
 			int connectionSize = buffer.readInt();
-			VisualisationData.Connection[] connections = new VisualisationData.Connection[connectionSize];
+			DebugLogger.debug("Reading " + connectionSize + " connections");
+			Connection[] connections = new Connection[connectionSize];
 			for (int i = 0; i < connectionSize; i++) {
 				int x = buffer.readInt();
 				if (x < 0 || x >= nodeSize) {
@@ -129,59 +115,50 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 					return null;
 				}
 
-				connections[i] = new VisualisationData.Connection(nodes[x], nodes[y]);
+				connections[i] = new Connection(nodes[x], nodes[y]);
 			}
 
 			return new VisualisationData(nodes, connections);
 		}
 
 		@Override
-		public void write(ByteBuf buffer, INetworkController data, IBlockAccess world) {
+		public void write(ByteBuf buffer, VisualisationData data) {
 			if (data == null) {
 				buffer.writeInt(0);
 				buffer.writeInt(0);
 				return;
 			}
 
-			NetworkController controller = data instanceof NetworkController ? (NetworkController) data : null;
+			Map<Node, Integer> lookup = new HashMap<Node, Integer>();
 
-			Set<INetworkNode> nodes = data.getNodesOnNetwork();
-			Map<INetworkNode, Integer> lookup = new HashMap<INetworkNode, Integer>();
-
-			buffer.writeInt(nodes.size());
+			buffer.writeInt(data.nodes.length);
 			int index = 0;
-			for (INetworkNode node : nodes) {
+			for (Node node : data.nodes) {
 				lookup.put(node, index);
 
-				IWorldPosition position = node instanceof IWorldNetworkNode ? ((IWorldNetworkNode) node).getPosition() : null;
-				boolean validPosition = position != null && position.getWorld() == world;
-
-				buffer.writeByte(validPosition ? 1 : 0);
 				ByteBufUtils.writeUTF8String(buffer, node.toString());
 
-				if (controller == null) {
-					buffer.writeInt(0);
-				} else {
-					Set<String> peripherals = controller.getPoint(node).peripherals.keySet();
-					buffer.writeShort(peripherals.size());
-					for (String peripheral : peripherals) {
-						ByteBufUtils.writeUTF8String(buffer, peripheral);
-					}
+				String[] peripherals = node.peripherals;
+				buffer.writeShort(peripherals.length);
+				for (String peripheral : peripherals) {
+					ByteBufUtils.writeUTF8String(buffer, peripheral);
 				}
 
-				if (validPosition) {
-					buffer.writeInt(position.getX());
-					buffer.writeInt(position.getY());
-					buffer.writeInt(position.getZ());
+				Position position = node.position;
+				if (position != null) {
+					buffer.writeByte(1);
+					buffer.writeInt(position.x);
+					buffer.writeInt(position.y);
+					buffer.writeInt(position.z);
+				} else {
+					buffer.writeByte(0);
 				}
 
 				index++;
 			}
 
-			Set<SingleTypeUnorderedPair<INetworkNode>> connections = data.getNodeConnections();
-			buffer.writeInt(connections.size());
-
-			for (SingleTypeUnorderedPair<INetworkNode> connection : connections) {
+			buffer.writeInt(data.connections.length);
+			for (Connection connection : data.connections) {
 				buffer.writeInt(lookup.get(connection.x));
 				buffer.writeInt(lookup.get(connection.y));
 			}

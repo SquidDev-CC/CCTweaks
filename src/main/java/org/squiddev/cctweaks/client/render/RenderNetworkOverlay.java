@@ -10,7 +10,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.opengl.GL11;
-import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.registry.Module;
@@ -20,6 +19,8 @@ import org.squiddev.cctweaks.core.visualiser.VisualisationData;
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.squiddev.cctweaks.core.visualiser.VisualisationData.*;
 
 /**
  * This is a helper to render a network when testing.
@@ -55,49 +56,60 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 	private void renderNetwork(VisualisationData data, Color color, float thickness) {
 		MovingObjectPosition position = Minecraft.getMinecraft().objectMouseOver;
 
-		Set<VisualisationData.Node> nodes = new HashSet<VisualisationData.Node>();
+		Set<Node> nodes = new HashSet<Node>();
 
-		for (VisualisationData.Connection connection : data.connections) {
-			VisualisationData.Node a = connection.x, b = connection.y;
+		for (Connection connection : data.connections) {
+			Node a = connection.x, b = connection.y;
 
-			if (a instanceof VisualisationData.PositionedNode && b instanceof VisualisationData.PositionedNode) {
-				VisualisationData.PositionedNode aNode = (VisualisationData.PositionedNode) a, bNode = (VisualisationData.PositionedNode) b;
-				renderConnection(aNode, bNode, color, thickness);
+			if (a.position != null && b.position != null) {
+				renderConnection(a.position, b.position, color, thickness);
 			}
 
 			// We render a label of all nodes at this point.
 			if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-				if (a instanceof VisualisationData.PositionedNode) {
-					VisualisationData.PositionedNode nodePosition = (VisualisationData.PositionedNode) a;
+				if (a.position != null) {
+					Position nodePosition = a.position;
 					if (nodePosition.x == position.blockX && nodePosition.y == position.blockY && nodePosition.z == position.blockZ) {
 						nodes.add(a);
-						if (!(b instanceof VisualisationData.PositionedNode)) nodes.add(b);
+						if (b.position == null) nodes.add(b);
 					}
 				}
 
-				if (b instanceof VisualisationData.PositionedNode) {
-					VisualisationData.PositionedNode nodePosition = (VisualisationData.PositionedNode) b;
+				if (b.position != null) {
+					Position nodePosition = b.position;
 					if (nodePosition.x == position.blockX && nodePosition.y == position.blockY && nodePosition.z == position.blockZ) {
-						if (!(a instanceof IWorldNetworkNode)) nodes.add(a);
+						if (a.position == null) nodes.add(a);
 						nodes.add(b);
 					}
 				}
 			}
 		}
 
+		// Custom handling for networks with 0 connections (single node networks)
+		if (data.connections.length == 0 && position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+			for (Node node : nodes) {
+				Position nodePosition = node.position;
+				if (nodePosition != null && nodePosition.x == position.blockX && nodePosition.y == position.blockY && nodePosition.z == position.blockZ) {
+					nodes.add(node);
+				}
+			}
+		}
+
 		int counter = 0;
 		boolean sneaking = Minecraft.getMinecraft().thePlayer.isSneaking();
-		for (VisualisationData.Node node : nodes) {
+		for (Node node : nodes) {
 			if (sneaking) {
 				for (String peripheral : node.peripherals) {
 					renderLabel(position.blockX + 0.5, position.blockY + 1.5 + (counter++) * 0.4, position.blockZ + 0.5, "\u00a71" + peripheral);
 				}
 			}
-			renderLabel(position.blockX + 0.5, position.blockY + 1.5 + (counter++) * 0.4, position.blockZ + 0.5, node.name);
+
+			String name = node.position == null ? "\u00a78" + node.name : node.name;
+			renderLabel(position.blockX + 0.5, position.blockY + 1.5 + (counter++) * 0.4, position.blockZ + 0.5, name);
 		}
 	}
 
-	public void renderConnection(VisualisationData.PositionedNode aNode, VisualisationData.PositionedNode bNode, Color color, float thickness) {
+	public void renderConnection(Position aNode, Position bNode, Color color, float thickness) {
 		GL11.glPushMatrix();
 		GL11.glColor4ub((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue(), (byte) 255);
 
@@ -153,7 +165,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		GL11.glPopMatrix();
 	}
 
-	private void renderLine(VisualisationData.PositionedNode a, VisualisationData.PositionedNode b) {
+	private void renderLine(Position a, Position b) {
 		Tessellator tessellator = Tessellator.instance;
 		tessellator.startDrawing(GL11.GL_LINES);
 		tessellator.addVertex(a.x + 0.5, a.y + 0.5, a.z + 0.5);
