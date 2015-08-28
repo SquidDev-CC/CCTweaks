@@ -4,6 +4,8 @@ ${**}Debug Wand${**} will help you on the way.
 Shift right-clicking a computer will add a whole host of debugging
 tools. On other objects, it just prints a ton of information to chat.
 
+***
+
 Hovering over a network node will show a visualisation of
 the entire network. If you find this gets out of date, shift-right
 click in empty space to refresh it.

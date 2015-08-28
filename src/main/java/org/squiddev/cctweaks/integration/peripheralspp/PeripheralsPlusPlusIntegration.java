@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.integration.peripheralspp;
 
 import com.austinv11.peripheralsplusplus.hooks.ComputerCraftRegistry;
+import cpw.mods.fml.common.Optional;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.ModIntegration;
@@ -14,6 +15,7 @@ public class PeripheralsPlusPlusIntegration extends ModIntegration {
 	}
 
 	@Override
+	@Optional.Method(modid = "PeripheralsPlusPlus")
 	public void init() {
 		super.init();
 		try {
