@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.asm;
 
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.*;
 import org.squiddev.patcher.transformer.ClassMerger;
@@ -36,7 +37,7 @@ public class PatchTurtleRenderer extends ClassMerger {
 			}
 		}.onMethod("func_147500_a").onMethod("renderTileEntityAt").once().mustFind();
 
-		// Add custom drawing flags and scale
+		// Scale. This needs to be done pre-label otherwise the text will not be scaled
 		mutator = new FindingVisitor(
 			mutator,
 			new VarInsnNode(ALOAD, 11),
@@ -52,6 +53,24 @@ public class PatchTurtleRenderer extends ClassMerger {
 			}
 		}.onMethod("func_147500_a").onMethod("renderTileEntityAt").once().mustFind();
 
+		// Add custom drawing flags. This needs to be done after drawing the label otherwise the flags are reset.
+		// To make finding easier we just do it after rotation
+		mutator = new FindingVisitor(
+			mutator,
+			new LdcInsnNode(-0.5f),
+			new LdcInsnNode(-0.5f),
+			new LdcInsnNode(-0.5f),
+			new MethodInsnNode(INVOKESTATIC, "org/lwjgl/opengl/GL11", "glTranslatef", "(FFF)V", false)
+		) {
+			@Override
+			public void handle(InsnList nodes, MethodVisitor visitor) {
+				nodes.accept(visitor);
+				visitor.visitVarInsn(ALOAD, 0);
+				visitor.visitVarInsn(ALOAD, 1);
+				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "addFlags", "(Lnet/minecraft/tileentity/TileEntity;)V", false);
+			}
+		}.onMethod("func_147500_a").onMethod("renderTileEntityAt").once().mustFind();
+
 		// Remove custom drawing flags
 		mutator = new FindingVisitor(
 			mutator,
@@ -60,10 +79,39 @@ public class PatchTurtleRenderer extends ClassMerger {
 			@Override
 			public void handle(InsnList nodes, MethodVisitor visitor) {
 				visitor.visitVarInsn(ALOAD, 0);
-				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "postScale", "()V", false);
+				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "removeFlags", "()V", false);
 				nodes.accept(visitor);
 			}
 		}.onMethod("func_147500_a").onMethod("renderTileEntityAt").once().mustFind();
+
+		// Always draw label if holding
+		final Label drawLabel = new Label();
+		mutator = new FindingVisitor(
+			mutator,
+			new VarInsnNode(ALOAD, 4),
+			new JumpInsnNode(IFNULL, null)
+		) {
+			@Override
+			public void handle(InsnList nodes, MethodVisitor visitor) {
+				visitor.visitVarInsn(ALOAD, 0);
+				visitor.visitMethodInsn(INVOKEVIRTUAL, classType, "hasTurtleWand", "()Z", false);
+				visitor.visitJumpInsn(IFNE, drawLabel);
+				nodes.accept(visitor);
+			}
+		}.onMethod("renderLabel").once().mustFind();
+
+		// Simply injects a label in the correct place
+		mutator = new FindingVisitor(
+			mutator,
+			new VarInsnNode(ALOAD, 3),
+			new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/client/renderer/entity/RenderManager", null, "()Lnet/minecraft/client/gui/FontRenderer;", false)
+		) {
+			@Override
+			public void handle(InsnList nodes, MethodVisitor visitor) {
+				visitor.visitLabel(drawLabel);
+				nodes.accept(visitor);
+			}
+		}.onMethod("renderLabel").once().mustFind();
 
 		return mutator;
 	}

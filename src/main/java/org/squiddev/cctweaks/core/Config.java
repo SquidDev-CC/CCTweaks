@@ -293,6 +293,7 @@ public final class Config {
 		 * Enable debug blocks/items.
 		 */
 		@DefaultBoolean(false)
+		@RequiresRestart
 		public static boolean debugItems;
 
 		/**

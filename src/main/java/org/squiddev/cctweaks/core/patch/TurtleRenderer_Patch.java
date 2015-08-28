@@ -13,6 +13,7 @@ import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -64,18 +65,29 @@ public abstract class TurtleRenderer_Patch extends TileEntityTurtleRenderer {
 	protected void scale(TileEntity tile) {
 		if (!hasTurtleWand()) return;
 
-		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-
 		GL11.glTranslatef(0.5f, 0.5f, 0.5f);
 
 		double scale = getScaleForCandidate(new Vector3d(tile.xCoord, tile.yCoord, tile.zCoord));
 		GL11.glScaled(scale, scale, scale);
+
 		GL11.glTranslatef(-0.5f, -0.5f, -0.5f);
 	}
 
-	protected void postScale() {
+	protected void addFlags(TileEntity tile) {
+		if (!hasTurtleWand()) return;
+
+		// Don't do fancy rendering if we are hovering over it. Otherwise rendering just gets confusing.
+		MovingObjectPosition pos = Minecraft.getMinecraft().objectMouseOver;
+		if (pos.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && pos.blockX == tile.xCoord && pos.blockY == tile.yCoord && pos.blockZ == tile.zCoord) {
+			return;
+		}
+
+		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+	}
+
+	protected void removeFlags() {
 		if (!hasTurtleWand()) return;
 
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
