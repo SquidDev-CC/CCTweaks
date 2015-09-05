@@ -83,7 +83,9 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 				for (int i = 0; i < 4; i++) {
 					icons[i] = modemIcons[i * 2];
 				}
-			} catch (ReflectiveOperationException e) {
+			} catch (IllegalAccessException e) {
+				DebugLogger.error("Cannot find TileCable texture", e);
+			} catch (NoSuchFieldException e) {
 				DebugLogger.error("Cannot find TileCable texture", e);
 			}
 		}

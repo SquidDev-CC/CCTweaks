@@ -21,9 +21,8 @@ import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.network.cable.SingleModemCable;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.patcher.visitors.MergeVisitor;
-
-import java.util.Objects;
 
 @MergeVisitor.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
 public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost, IWorldPosition {
@@ -180,7 +179,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 				getModem().toggleEnabled();
 				String periphName = getModem().getPeripheralName();
 
-				if (!Objects.equals(periphName, oldPeriphName)) {
+				if (!Helpers.equals(periphName, oldPeriphName)) {
 					if (oldPeriphName != null) {
 						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", oldPeriphName));
 					}

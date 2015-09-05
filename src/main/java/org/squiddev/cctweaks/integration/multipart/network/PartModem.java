@@ -230,7 +230,10 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 					Field field = TileCable.class.getDeclaredField("s_modemIcons");
 					field.setAccessible(true);
 					icons = (IIcon[]) field.get(null);
-				} catch (ReflectiveOperationException e) {
+				} catch (IllegalAccessException e) {
+					DebugLogger.error("Cannot find TileCable texture", e);
+					icons = new IIcon[8];
+				} catch (NoSuchFieldException e) {
 					DebugLogger.error("Cannot find TileCable texture", e);
 					icons = new IIcon[8];
 				}

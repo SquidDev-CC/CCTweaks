@@ -16,6 +16,7 @@ import net.minecraftforge.common.util.Constants;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,10 @@ public class PocketAccess implements IPocketAccess {
 		try {
 			Object computer = ComputerAccessor.pocketServerComputer.invoke(ComputerCraft.Items.pocketComputer, entity.worldObj, inventory, stack);
 			return computer == null ? null : (ServerComputer) computer;
-		} catch (ReflectiveOperationException e) {
+		} catch (InvocationTargetException e) {
+			DebugLogger.error("Cannot find computer", e);
+			return null;
+		} catch (IllegalAccessException e) {
 			DebugLogger.error("Cannot find computer", e);
 			return null;
 		}

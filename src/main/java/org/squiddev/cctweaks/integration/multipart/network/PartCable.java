@@ -305,7 +305,10 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, TSlott
 					Field field = TileCable.class.getDeclaredField("s_cableIcons");
 					field.setAccessible(true);
 					icons = (IIcon[]) field.get(null);
-				} catch (ReflectiveOperationException e) {
+				} catch (IllegalAccessException e) {
+					DebugLogger.error("Cannot find TileCable texture", e);
+					icons = new IIcon[2];
+				} catch (NoSuchFieldException e) {
 					DebugLogger.error("Cannot find TileCable texture", e);
 					icons = new IIcon[2];
 				}

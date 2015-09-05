@@ -85,11 +85,10 @@ public class ItemDebugger extends ItemComputerAction {
 
 			LuaValue globals = (LuaValue) ComputerAccessor.luaMachineGlobals.get(luaMachine);
 			globals.load(new DebugLib());
-
-		} catch (ReflectiveOperationException e) {
+		} catch (NullPointerException e) {
 			DebugLogger.warn("Could not add DebugLib", e);
 			return false;
-		} catch (NullPointerException e) {
+		} catch (IllegalAccessException e) {
 			DebugLogger.warn("Could not add DebugLib", e);
 			return false;
 		} catch (Exception e) {

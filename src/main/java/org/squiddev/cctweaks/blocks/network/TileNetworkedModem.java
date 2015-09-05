@@ -12,9 +12,9 @@ import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileLazyNBT;
 import org.squiddev.cctweaks.core.network.modem.MultiPeripheralModem;
+import org.squiddev.cctweaks.core.utils.Helpers;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -60,7 +60,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 
 		Set<String> newNames = modem.getPeripheralNames();
 
-		if (!Objects.equals(names, newNames)) {
+		if (!Helpers.equals(names, newNames)) {
 			if (names != null) {
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", StringUtils.join(names, ", ")));
 			}

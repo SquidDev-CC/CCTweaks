@@ -102,4 +102,8 @@ public class Helpers {
 	public static int nextId(World world, IPeripheral peripheral) {
 		return nextId(world, peripheral.getType());
 	}
+
+	public static boolean equals(Object a, Object b) {
+		return a == b || (a != null && a.equals(b));
+	}
 }
