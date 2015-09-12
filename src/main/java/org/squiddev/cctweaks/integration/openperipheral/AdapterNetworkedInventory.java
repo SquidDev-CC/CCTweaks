@@ -32,7 +32,7 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 		if (slot != ANY_SLOT) Preconditions.checkElementIndex(slot, inventory.getSizeInventory(), name + " slot id");
 	}
 
-	public static IInventory getInventory(INetworkAccess network, String name) {
+	private static IInventory getInventory(INetworkAccess network, String name) {
 		Object object = CCTweaksAPI.instance().peripheralHelpers().getTarget(network.getPeripheralsOnNetwork().get(name));
 		if (object != null && object instanceof IInventory) return InventoryUtils.getInventory((IInventory) object);
 		return null;

@@ -41,6 +41,7 @@ public class PatchOpenModule implements IPatcher {
 		) {
 			@Override
 			public void handle(InsnList nodes, MethodVisitor visitor) {
+				nodes.accept(visitor);
 				visitor.visitLdcInsn(IPeripheralEnvironments.ARG_NETWORK);
 				visitor.visitLdcInsn(Type.getType("Lorg/squiddev/cctweaks/api/network/INetworkAccess;"));
 				visitor.visitMethodInsn(INVOKEVIRTUAL,
@@ -50,6 +51,6 @@ public class PatchOpenModule implements IPatcher {
 					false
 				);
 			}
-		}.onMethod("<clinit>").once().mustFind();
+		}.onMethod("<clinit>").onMethod("init").once().mustFind();
 	}
 }

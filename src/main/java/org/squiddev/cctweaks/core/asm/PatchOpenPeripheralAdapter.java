@@ -39,7 +39,7 @@ public class PatchOpenPeripheralAdapter implements IPatcher {
 				CLASS_NAME,
 				"org.squiddev.cctweaks.core.patch.op.AdapterPeripheral_Patch"
 			).patch(className, delegate),
-			new VarInsnNode(ALOAD, 0),
+			new VarInsnNode(ALOAD, -1),
 			new MethodInsnNode(
 				INVOKEINTERFACE,
 				"openperipheral/adapter/IMethodCall",
@@ -52,7 +52,7 @@ public class PatchOpenPeripheralAdapter implements IPatcher {
 			public void handle(InsnList nodes, MethodVisitor visitor) {
 				visitor.visitLdcInsn(IPeripheralEnvironments.ARG_NETWORK);
 				visitor.visitVarInsn(ALOAD, 0);
-				visitor.visitFieldInsn(GETFIELD, CLASS_TYPE, "network", "Lorg/squiddev/cctweaks/core/network/NetworkAccessDelegate;");
+				visitor.visitFieldInsn(INVOKEVIRTUAL, CLASS_TYPE, "getNetworkAccess", "()Lorg/squiddev/cctweaks/core/network/NetworkAccessDelegate;");
 				visitor.visitMethodInsn(
 					INVOKEINTERFACE,
 					"openperipheral/adapter/IMethodCall",
@@ -60,6 +60,8 @@ public class PatchOpenPeripheralAdapter implements IPatcher {
 					"(Ljava/lang/String;Ljava/lang/Object;)" + "Lopenperipheral/adapter/IMethodCall;",
 					true
 				);
+
+				nodes.accept(visitor);
 
 				DebugLogger.debug("Added additional environments into " + CLASS_NAME);
 			}
