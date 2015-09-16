@@ -7,6 +7,7 @@ import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.core.Config;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
@@ -42,7 +43,8 @@ public final class NetworkBindings {
 		Set<IWorldNetworkNode> nodes = networks.get(id);
 		if (nodes.remove(node)) {
 			if (node.getAttachedNetwork() != null) {
-				for (IWorldNetworkNode other : nodes) {
+				// See #59. This shouldn't happen but it does
+				for (IWorldNetworkNode other : new ArrayList<IWorldNetworkNode>(nodes)) {
 					SingleTypeUnorderedPair<INetworkNode> connection = new SingleTypeUnorderedPair<INetworkNode>(node, other);
 					if (node.getAttachedNetwork().getNodeConnections().contains(connection)) {
 						node.getAttachedNetwork().breakConnection(connection);

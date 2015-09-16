@@ -8,6 +8,7 @@ import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.Vec3;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
 
 import java.util.HashMap;
@@ -114,18 +115,25 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	}
 
 	@Override
-	public synchronized void attach(IComputerAccess computer) {
+	public void attach(IComputerAccess computer) {
 		super.attach(computer);
-		for (Map.Entry<String, IPeripheral> peripheral : modem.getAttachedNetwork().getPeripheralsOnNetwork().entrySet()) {
-			modem.attachPeripheral(peripheral.getKey(), peripheral.getValue());
+
+		INetworkController controller = modem.getAttachedNetwork();
+		if (controller != null) {
+			for (Map.Entry<String, IPeripheral> peripheral : controller.getPeripheralsOnNetwork().entrySet()) {
+				modem.attachPeripheral(peripheral.getKey(), peripheral.getValue());
+			}
 		}
 	}
 
 	@Override
-	public synchronized void detach(IComputerAccess computer) {
+	public void detach(IComputerAccess computer) {
 		super.detach(computer);
-		for (String name : modem.getAttachedNetwork().getPeripheralsOnNetwork().keySet()) {
-			modem.detachPeripheral(name);
+		INetworkController controller = modem.getAttachedNetwork();
+		if (controller != null) {
+			for (String name : controller.getPeripheralsOnNetwork().keySet()) {
+				modem.detachPeripheral(name);
+			}
 		}
 	}
 

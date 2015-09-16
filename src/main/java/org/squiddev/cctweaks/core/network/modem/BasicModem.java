@@ -72,6 +72,12 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	 * @param peripheral The peripheral to attach
 	 */
 	public void attachPeripheral(String name, IPeripheral peripheral) {
+		synchronized (peripheralWrappersByName) {
+			attachPeripheralUnsync(name, peripheral);
+		}
+	}
+
+	private void attachPeripheralUnsync(String name, IPeripheral peripheral) {
 		if (!peripheralWrappersByName.containsKey(name)) {
 			PeripheralAccess wrapper = new PeripheralAccess(peripheral, modem.getComputer(), name);
 			peripheralWrappersByName.put(name, wrapper);
@@ -85,6 +91,12 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	 * @param name The peripheral name
 	 */
 	public void detachPeripheral(String name) {
+		synchronized (peripheralWrappersByName) {
+			detachPeripheralUnsync(name);
+		}
+	}
+
+	private void detachPeripheralUnsync(String name) {
 		PeripheralAccess wrapper = peripheralWrappersByName.remove(name);
 		if (wrapper != null) wrapper.detach();
 	}
@@ -193,21 +205,23 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 
 	@Override
 	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
-		// Clone to prevent modification errors
-		Set<String> peripheralNames = new HashSet<String>(peripheralWrappersByName.keySet());
-		for (String wrapper : peripheralNames) {
-			if (!networkController.getPeripheralsOnNetwork().containsKey(wrapper)) {
-				// Wrapper removed
-				detachPeripheral(wrapper);
+		synchronized (peripheralWrappersByName) {
+			// Clone to prevent modification errors
+			Set<String> peripheralNames = new HashSet<String>(peripheralWrappersByName.keySet());
+			for (String wrapper : peripheralNames) {
+				if (!networkController.getPeripheralsOnNetwork().containsKey(wrapper)) {
+					// Wrapper removed
+					detachPeripheralUnsync(wrapper);
+				}
 			}
-		}
 
-		if (modem != null && modem.getComputer() != null) {
-			for (String name : networkController.getPeripheralsOnNetwork().keySet()) {
-				if (!peripheralWrappersByName.containsKey(name)) {
-					IPeripheral peripheral = networkController.getPeripheralsOnNetwork().get(name);
-					if (peripheral != null) {
-						attachPeripheral(name, peripheral);
+			if (modem != null && modem.getComputer() != null) {
+				for (String name : networkController.getPeripheralsOnNetwork().keySet()) {
+					if (!peripheralWrappersByName.containsKey(name)) {
+						IPeripheral peripheral = networkController.getPeripheralsOnNetwork().get(name);
+						if (peripheral != null) {
+							attachPeripheralUnsync(name, peripheral);
+						}
 					}
 				}
 			}
