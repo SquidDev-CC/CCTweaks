@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.network;
 
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
@@ -50,20 +51,24 @@ public final class NetworkHelpers implements INetworkHelpers {
 	 */
 	@Override
 	public Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node) {
+		return getAdjacentNodes(node, true);
+	}
+
+	@Override
+	public Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node, boolean checkExists) {
 		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
 		IWorldPosition position = node.getPosition();
+		World world = checkExists && position.getWorld() instanceof World ? (World) position.getWorld() : null;
 
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
 			if (node.canConnect(direction)) {
-				IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(
-					position.getWorld(),
-					position.getX() + direction.offsetX,
-					position.getY() + direction.offsetY,
-					position.getZ() + direction.offsetZ
-				);
+				int x = position.getX() + direction.offsetX, y = position.getY() + direction.offsetY, z = position.getZ() + direction.offsetZ;
+				if (world == null || world.blockExists(x, y, z)) {
+					IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(position.getWorld(), x, y, z);
 
-				if (neighbour != null && neighbour.canConnect(direction.getOpposite())) {
-					nodes.add(neighbour);
+					if (neighbour != null && neighbour.canConnect(direction.getOpposite())) {
+						nodes.add(neighbour);
+					}
 				}
 			}
 		}

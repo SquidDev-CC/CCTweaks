@@ -43,6 +43,20 @@ public interface INetworkHelpers {
 	Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node);
 
 	/**
+	 * Get adjacent nodes that can be connected to
+	 *
+	 * Checks the current node can connect, and adjacent node can be connected to
+	 * in that direction
+	 *
+	 * @param node        The current node
+	 * @param checkExists Check if the block exists. This is {@code true} by default
+	 *                    for {@link #getAdjacentNodes(IWorldNetworkNode)}, and controls
+	 *                    if we should check if the chunk the neighbouring blocks are loaded
+	 * @return The adjacent nodes
+	 */
+	Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node, boolean checkExists);
+
+	/**
 	 * Connect to adjacent nodes, or create a network.
 	 *
 	 * Uses {@link #getAdjacentNodes(IWorldNetworkNode)} and {@link #joinOrCreateNetwork(INetworkNode, Set)}.
