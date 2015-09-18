@@ -42,16 +42,16 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 	@ScriptCallable(returnTypes = ReturnType.NUMBER, description = "Pull an item from a slot in another inventory into a slot in this one. Returns the amount of items moved")
 	public int pullItemRemote(
 		IInventory target, @Env(IPeripheralEnvironments.ARG_NETWORK) INetworkAccess network,
-		@Arg(name = "remoteName", description = "The name of the remote inventory") String remote,
-		@Arg(name = "slot", description = "The slot in the OTHER inventory that you're pulling from") int fromSlot,
+		@Arg(name = "remoteName", description = "The name of the remote inventory") String remoteName,
+		@Arg(name = "fromSlot", description = "The slot in the OTHER inventory that you're pulling from") int fromSlot,
 		@Optionals @Arg(name = "maxAmount", description = "The maximum amount of items you want to pull") Integer maxAmount,
-		@Arg(name = "direction", description = "The direction to pull from the OTHER inventory") ForgeDirection fromDirection,
+		@Arg(name = "fromDirection", description = "The direction to pull from the OTHER inventory") ForgeDirection fromDirection,
 		@Arg(name = "intoSlot", description = "The slot in the current inventory that you want to pull into") Integer intoSlot,
-		@Arg(name = "direction", description = "The direction to push into the current inventory") ForgeDirection intoDirection
+		@Arg(name = "intoDirection", description = "The direction to push into the current inventory") ForgeDirection intoDirection
 	) {
 		Preconditions.checkNotNull(network, "Cannot find the network");
 
-		final IInventory otherInventory = Preconditions.checkNotNull(getInventory(network, remote), "Other inventory not found");
+		final IInventory otherInventory = Preconditions.checkNotNull(getInventory(network, remoteName), "Other inventory not found");
 		final IInventory thisInventory = Preconditions.checkNotNull(InventoryUtils.getInventory(target), "Inventory not found");
 
 		if (otherInventory == target) return 0;
@@ -80,16 +80,16 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 	@ScriptCallable(returnTypes = ReturnType.NUMBER, description = "Push an item from the current inventory into slot on the other one. Returns the amount of items moved")
 	public int pushItemRemote(
 		IInventory target, @Env(IPeripheralEnvironments.ARG_NETWORK) INetworkAccess network,
-		@Arg(name = "remoteName", description = "The name of the remote inventory") String remote,
-		@Arg(name = "slot", description = "The slot in the current inventory that you're pushing from") int fromSlot,
+		@Arg(name = "remoteName", description = "The name of the remote inventory") String remoteName,
+		@Arg(name = "fromSlot", description = "The slot in the current inventory that you're pushing from") int fromSlot,
 		@Optionals @Arg(name = "maxAmount", description = "The maximum amount of items you want to push") Integer maxAmount,
-		@Arg(name = "direction", description = "The direction to push into the current inventory") ForgeDirection fromDirection,
+		@Arg(name = "fromDirection", description = "The direction to push into the current inventory") ForgeDirection fromDirection,
 		@Arg(name = "intoSlot", description = "The slot in the other inventory that you want to push into") Integer intoSlot,
-		@Arg(name = "slot", description = "The slot in the other inventory that you're pulling from") ForgeDirection intoDirection
+		@Arg(name = "intoDirection", description = "The slot in the other inventory that you're pulling from") ForgeDirection intoDirection
 	) {
 		Preconditions.checkNotNull(network, "Cannot find the network");
 
-		final IInventory otherInventory = Preconditions.checkNotNull(getInventory(network, remote), "Other inventory not found");
+		final IInventory otherInventory = Preconditions.checkNotNull(getInventory(network, remoteName), "Other inventory not found");
 		final IInventory thisInventory = Preconditions.checkNotNull(InventoryUtils.getInventory(target), "Inventory not found");
 
 		if (otherInventory == target) return 0;
