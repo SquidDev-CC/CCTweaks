@@ -4,6 +4,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.blocks.debug.BlockDebug;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
+import org.squiddev.cctweaks.client.render.RenderInfo;
 import org.squiddev.cctweaks.client.render.RenderNetworkOverlay;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHostProvider;
 import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
@@ -13,10 +14,7 @@ import org.squiddev.cctweaks.integration.RedstoneFluxIntegration;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.cctweaks.integration.openperipheral.OpenPeripheralIntegration;
 import org.squiddev.cctweaks.integration.peripheralspp.PeripheralsPlusPlusIntegration;
-import org.squiddev.cctweaks.items.ItemComputerUpgrade;
-import org.squiddev.cctweaks.items.ItemDataCard;
-import org.squiddev.cctweaks.items.ItemDebugger;
-import org.squiddev.cctweaks.items.ItemToolHost;
+import org.squiddev.cctweaks.items.*;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
 
 import java.util.HashSet;
@@ -30,6 +28,7 @@ public final class Registry {
 	public static final ItemDebugger itemDebugger;
 	public static final ItemDataCard itemDataCard;
 	public static final ItemToolHost itemToolHost;
+	public static final ItemTurtleWand itemTurtleWand;
 
 	public static final BlockNetworked blockNetworked;
 
@@ -43,6 +42,7 @@ public final class Registry {
 		addModule(itemComputerUpgrade = new ItemComputerUpgrade());
 		addModule(itemDebugger = new ItemDebugger());
 		addModule(itemToolHost = new ItemToolHost());
+		addModule(itemTurtleWand = new ItemTurtleWand());
 
 		addModule(itemDataCard = new ItemDataCard());
 		addModule(blockNetworked = new BlockNetworked());
@@ -61,7 +61,9 @@ public final class Registry {
 		addModule(new PeripheralsPlusPlusIntegration());
 
 		addModule(new NetworkPlayerWatcher());
+
 		addModule(new RenderNetworkOverlay());
+		addModule(new RenderInfo());
 	}
 
 	public static void addModule(IModule module) {

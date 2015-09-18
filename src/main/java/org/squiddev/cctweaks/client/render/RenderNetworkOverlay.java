@@ -26,12 +26,10 @@ import static org.squiddev.cctweaks.core.visualiser.VisualisationData.*;
  * This is a helper to render a network when testing.
  */
 public final class RenderNetworkOverlay extends Module implements IClientModule {
-	public int ticksInGame;
 	public static VisualisationData data;
 
 	@SubscribeEvent
 	public void onWorldRenderLast(RenderWorldLastEvent event) {
-		++ticksInGame;
 		if (data == null) return;
 
 		ItemStack stack = Minecraft.getMinecraft().thePlayer.getHeldItem();
@@ -45,7 +43,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-		renderNetwork(data, new Color(Color.HSBtoRGB(ticksInGame % 200 / 200F, 0.6F, 1F)), 1f);
+		renderNetwork(data, new Color(Color.HSBtoRGB(RenderInfo.getTicks() % 200 / 200F, 0.6F, 1F)), 1f);
 
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
