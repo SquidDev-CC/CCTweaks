@@ -303,5 +303,17 @@ public final class Config {
 		 */
 		@DefaultBoolean(false)
 		public static boolean deprecatedWarnings;
+
+		/**
+		 * Controller validation occurs by default as a
+		 * way of ensuring that your network has been
+		 * correctly created.
+		 *
+		 * By enabling this it is easier to trace
+		 * faults, though it may slow things down
+		 * slightly
+		 */
+		@DefaultBoolean(false)
+		public static boolean extendedControllerValidation;
 	}
 }

@@ -166,7 +166,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 	@Override
 	public boolean canLoad() {
-		return super.canLoad() && Config.Testing.debug && Config.Computer.debugWandEnabled;
+		return super.canLoad() && Config.Computer.debugWandEnabled;
 	}
 
 	@Override

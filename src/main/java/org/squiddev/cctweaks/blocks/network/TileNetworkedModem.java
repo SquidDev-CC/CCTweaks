@@ -61,11 +61,11 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 		Set<String> newNames = modem.getPeripheralNames();
 
 		if (!Helpers.equals(names, newNames)) {
-			if (names != null) {
+			if (names != null && !names.isEmpty()) {
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", StringUtils.join(names, ", ")));
 			}
 
-			if (newNames != null) {
+			if (newNames != null && !newNames.isEmpty()) {
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", StringUtils.join(newNames, ", ")));
 			}
 

@@ -5,7 +5,6 @@ import codechicken.lib.data.MCDataOutput;
 import codechicken.lib.render.TextureUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
-import com.google.common.base.Objects;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
@@ -32,6 +31,7 @@ import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.cctweaks.core.utils.Helpers;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -142,7 +142,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 
 		String newName = modem.getPeripheralName();
 
-		if (!Objects.equal(name, newName)) {
+		if (!Helpers.equals(name, newName)) {
 			if (name != null) {
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", name));
 			}
