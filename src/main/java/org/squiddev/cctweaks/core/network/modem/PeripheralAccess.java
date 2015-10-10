@@ -6,6 +6,8 @@ import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import org.squiddev.cctweaks.api.lua.IBinaryLuaObject;
+import org.squiddev.cctweaks.core.lua.BinaryConverter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +60,7 @@ public class PeripheralAccess implements IComputerAccess {
 
 	public Object[] callMethod(ILuaContext context, String methodName, Object[] arguments) throws InterruptedException, LuaException {
 		Integer method = methodMap.get(methodName);
+		if (!(peripheral instanceof IBinaryLuaObject)) BinaryConverter.toStrings(arguments);
 		if (method != null) return peripheral.callMethod(this, context, method, arguments);
 
 		throw new LuaException("No such method " + methodName);

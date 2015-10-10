@@ -5,6 +5,8 @@ import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.asm.binary.BinaryCore;
+import org.squiddev.cctweaks.core.asm.binary.BinaryGeneric;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.patcher.Logger;
@@ -93,6 +95,21 @@ public class ASMTransformer implements IClassTransformer {
 			new ClassMerger(
 				"dan200.computercraft.shared.peripheral.printer.PrinterPeripheral",
 				"org.squiddev.cctweaks.core.patch.targeted.PrinterPeripheral_Patch"
+			),
+
+			new BinaryCore.PatchWrappedContext(),
+			new BinaryCore.PatchWrappedObject(),
+			new BinaryCore.PatchToValue(),
+			new BinaryGeneric(),
+
+			// Binary patches
+			new ClassMerger(
+				"dan200.computercraft.core.apis.HTTPAPI",
+				"org.squiddev.cctweaks.core.patch.HTTPAPI_Patch"
+			),
+			new ClassMerger(
+				"dan200.computercraft.core.apis.HTTPRequest",
+				"org.squiddev.cctweaks.core.patch.HTTPRequest_Patch"
 			),
 		});
 
