@@ -6,6 +6,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.asm.binary.BinaryCore;
+import org.squiddev.cctweaks.core.asm.binary.BinaryOS;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.patcher.Logger;
@@ -99,6 +100,7 @@ public class ASMTransformer implements IClassTransformer {
 			new BinaryCore.PatchWrappedContext(),
 			new BinaryCore.PatchWrappedObject(),
 			new BinaryCore.PatchToValue(),
+			new BinaryOS(),
 		});
 
 		// Patch the logger instance
