@@ -8,6 +8,7 @@ import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.Vec3;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.lua.IBinaryLuaObject;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
 
@@ -19,7 +20,7 @@ import java.util.Map;
  *
  * @see BasicModem
  */
-public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted {
+public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted, IBinaryLuaObject {
 	public final T modem;
 
 	public BasicModemPeripheral(T modem) {
@@ -138,10 +139,10 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	}
 
 	public static String parseString(Object[] arguments, int index) throws LuaException {
-		if ((arguments.length < index + 1) || (!(arguments[index] instanceof String))) {
+		if ((arguments.length < index + 1) || (!(arguments[index] instanceof byte[]))) {
 			throw new LuaException("Expected string");
 		}
-		return (String) arguments[index];
+		return new String((byte[]) arguments[index]);
 	}
 
 	@Override

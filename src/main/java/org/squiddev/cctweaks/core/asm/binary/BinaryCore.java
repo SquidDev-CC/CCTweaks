@@ -7,8 +7,6 @@ import org.objectweb.asm.tree.*;
 import org.squiddev.patcher.transformer.IPatcher;
 import org.squiddev.patcher.visitors.FindingVisitor;
 
-import java.util.Arrays;
-
 import static org.objectweb.asm.Opcodes.*;
 
 public final class BinaryCore {
@@ -156,11 +154,4 @@ public final class BinaryCore {
 			}.onMethod("toValue").once().mustFind();
 		}
 	}
-
-	public static String[] addBinaryInterface(String[] interfaces) {
-		String[] newInterfaces = Arrays.copyOf(interfaces, interfaces.length + 1);
-		newInterfaces[interfaces.length] = BinaryCore.BINARY_OBJECT;
-		return newInterfaces;
-	}
-
 }

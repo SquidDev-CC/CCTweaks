@@ -5,6 +5,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -59,7 +60,6 @@ public class BinaryConverter {
 	}
 
 	public static Object[] toObjects(Varargs values, int start) {
-		DebugLogger.debug("Dumping " + values + " from " + start);
 		int count = values.narg();
 		Object[] objects = new Object[count - start + 1];
 		for (int n = start; n <= count; n++) {
@@ -67,6 +67,7 @@ public class BinaryConverter {
 			LuaValue value = values.arg(n);
 			objects[i] = toObject(value, null);
 		}
+		DebugLogger.debug("Dumping " + values + ". Got " + Arrays.toString(objects));
 		return objects;
 	}
 
@@ -74,15 +75,12 @@ public class BinaryConverter {
 	 * Convert the arguments to use strings instead of byte arrays
 	 *
 	 * @param items The arguments to convert. This will be modified in place
-	 * @return The converted arguments (same as {@code items})
 	 */
-	public static Object[] asStrings(Object[] items) {
+	public static void toStrings(Object[] items) {
 		for (int i = 0; i < items.length; i++) {
 			Object item = items[i];
 			if (item instanceof byte[]) items[i] = new String((byte[]) item);
 		}
-
-		return items;
 	}
 
 }
