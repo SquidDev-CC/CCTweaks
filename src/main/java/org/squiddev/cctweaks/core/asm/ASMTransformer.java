@@ -101,6 +101,16 @@ public class ASMTransformer implements IClassTransformer {
 			new BinaryCore.PatchWrappedObject(),
 			new BinaryCore.PatchToValue(),
 			new BinaryGeneric(),
+
+			// Binary patches
+			new ClassMerger(
+				"dan200.computercraft.core.apis.HTTPAPI",
+				"org.squiddev.cctweaks.core.patch.HTTPAPI_Patch"
+			),
+			new ClassMerger(
+				"dan200.computercraft.core.apis.HTTPRequest",
+				"org.squiddev.cctweaks.core.patch.HTTPRequest_Patch"
+			),
 		});
 
 		// Patch the logger instance

@@ -3,9 +3,7 @@ package org.squiddev.cctweaks.core.lua;
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -67,7 +65,6 @@ public class BinaryConverter {
 			LuaValue value = values.arg(n);
 			objects[i] = toObject(value, null);
 		}
-		DebugLogger.debug("Dumping " + values + ". Got " + Arrays.toString(objects));
 		return objects;
 	}
 
