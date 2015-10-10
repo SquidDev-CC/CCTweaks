@@ -5,6 +5,7 @@ import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.asm.binary.BinaryCore;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.patcher.Logger;
@@ -94,6 +95,10 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.peripheral.printer.PrinterPeripheral",
 				"org.squiddev.cctweaks.core.patch.targeted.PrinterPeripheral_Patch"
 			),
+
+			new BinaryCore.PatchWrappedContext(),
+			new BinaryCore.PatchWrappedObject(),
+			new BinaryCore.PatchToValue(),
 		});
 
 		// Patch the logger instance
