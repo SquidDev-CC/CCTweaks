@@ -68,6 +68,33 @@ public class BinaryConverter {
 		return objects;
 	}
 
+	public static Object toString(Object value, Map<Object, Object> tables) {
+		if (value instanceof byte[]) {
+			return new String((byte[]) value);
+		} else if (value instanceof Map) {
+			if (tables == null) {
+				tables = new IdentityHashMap<Object, Object>();
+			} else {
+				Object object = tables.get(value);
+				if (object != null) return object;
+			}
+
+			Map<Object, Object> newMap = new HashMap<Object, Object>();
+			tables.put(value, newMap);
+
+			Map map = (Map) value;
+
+			for (Object key : map.keySet()) {
+				newMap.put(toString(key, tables), toString(map.get(key), tables));
+			}
+
+			return newMap;
+		} else {
+			return value;
+		}
+	}
+
+
 	/**
 	 * Convert the arguments to use strings instead of byte arrays
 	 *
@@ -75,8 +102,7 @@ public class BinaryConverter {
 	 */
 	public static void toStrings(Object[] items) {
 		for (int i = 0; i < items.length; i++) {
-			Object item = items[i];
-			if (item instanceof byte[]) items[i] = new String((byte[]) item);
+			items[i] = toString(items[i], null);
 		}
 	}
 
