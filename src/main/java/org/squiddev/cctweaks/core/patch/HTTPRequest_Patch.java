@@ -100,7 +100,7 @@ public class HTTPRequest_Patch {
 
 					// Read from the input stream
 					InputStream is = connection.getInputStream();
-					ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+					ByteArrayOutputStream buffer = new ByteArrayOutputStream(Math.max(1024, is.available()));
 					int nRead;
 					byte[] data = new byte[1024];
 					while ((nRead = is.read(data, 0, data.length)) != -1) {

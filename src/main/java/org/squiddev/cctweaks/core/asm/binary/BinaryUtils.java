@@ -4,6 +4,8 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.TypeInsnNode;
+import org.squiddev.patcher.transformer.ClassMerger;
+import org.squiddev.patcher.transformer.TransformationChain;
 import org.squiddev.patcher.visitors.FindingVisitor;
 
 import java.util.Arrays;
@@ -14,13 +16,16 @@ import static org.objectweb.asm.Opcodes.*;
  * Utilities for injecting binary patches
  */
 public final class BinaryUtils {
+	public static final String BINARY_CONVERTER = "org/squiddev/cctweaks/core/lua/BinaryConverter";
+	public static final String BINARY_OBJECT = "org/squiddev/cctweaks/api/lua/IBinaryLuaObject";
+
 	private BinaryUtils() {
-		throw new RuntimeException("Cannot creat instance of BinaryUtils");
+		throw new RuntimeException("Cannot create instance of BinaryUtils");
 	}
 
-	private static String[] addBinaryInterface(String[] interfaces) {
+	private static String[] addInterface(String type, String[] interfaces) {
 		String[] newInterfaces = Arrays.copyOf(interfaces, interfaces.length + 1);
-		newInterfaces[interfaces.length] = BinaryCore.BINARY_OBJECT;
+		newInterfaces[interfaces.length] = type;
 		return newInterfaces;
 	}
 
@@ -30,11 +35,11 @@ public final class BinaryUtils {
 	 * @param visitor The original visitor
 	 * @return The new visitor
 	 */
-	public static ClassVisitor withBinaryInterface(ClassVisitor visitor) {
+	public static ClassVisitor withBinaryInterface(final String type, ClassVisitor visitor) {
 		return new ClassVisitor(ASM5, visitor) {
 			@Override
 			public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-				super.visit(version, access, name, signature, superName, addBinaryInterface(interfaces));
+				super.visit(version, access, name, signature, superName, addInterface(type, interfaces));
 			}
 		};
 	}
@@ -46,8 +51,6 @@ public final class BinaryUtils {
 	 * @return The new visitor
 	 */
 	public static ClassVisitor withStringCasts(ClassVisitor visitor, String... methodNames) {
-		// Whilst these seem pretty pointless, they ensure that os.queueEvent doesn't scramble bytes, only
-		// the event name gets scrambled
 		FindingVisitor finder = new FindingVisitor(
 			visitor,
 			new TypeInsnNode(INSTANCEOF, "java/lang/String")
@@ -81,4 +84,26 @@ public final class BinaryUtils {
 		return finder;
 	}
 
+	/**
+	 * Inject all binary patches into the chain
+	 *
+	 * @param chain The chain to inject
+	 * @return The chain that has been injected
+	 */
+	public static TransformationChain inject(TransformationChain chain) {
+		chain.add(new BinaryGeneric());
+		chain.add(new BinaryMachine());
+		chain.add(new BinaryFS());
+
+		// HTTP rewrite
+		chain.add(new ClassMerger("dan200.computercraft.core.apis.HTTPAPI", "org.squiddev.cctweaks.core.patch.HTTPAPI_Patch"));
+		chain.add(new ClassMerger("dan200.computercraft.core.apis.HTTPRequest", "org.squiddev.cctweaks.core.patch.HTTPRequest_Patch"));
+
+		// FS handle rewrites
+		chain.add(new ClassMerger(BinaryFS.READER_OBJECT, BinaryFS.READER_OBJECT));
+		chain.add(new ClassMerger(BinaryFS.WRITER_OBJECT, BinaryFS.WRITER_OBJECT));
+		chain.add(new ClassMerger("dan200.computercraft.core.filesystem.FileSystem", "org.squiddev.cctweaks.core.patch.binfs.FileSystem_Patch"));
+
+		return chain;
+	}
 }

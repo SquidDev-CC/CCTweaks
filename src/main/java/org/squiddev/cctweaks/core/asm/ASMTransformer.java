@@ -5,8 +5,7 @@ import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.asm.binary.BinaryCore;
-import org.squiddev.cctweaks.core.asm.binary.BinaryGeneric;
+import org.squiddev.cctweaks.core.asm.binary.BinaryUtils;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.patcher.Logger;
@@ -26,6 +25,12 @@ public class ASMTransformer implements IClassTransformer {
 	}
 
 	public ASMTransformer() {
+		/*
+			TODO: Look into moving some rewrites into compile-time processing instead.
+			This probably includes *_Rewrite as well as many of the binary handlers as only exist
+			because they need to stub classes that we patch anyway.
+		 */
+
 		add(new Object[]{
 			// General stuff
 			new ClassReplaceSource("org.luaj.vm2.lib.DebugLib"),
@@ -96,22 +101,10 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.peripheral.printer.PrinterPeripheral",
 				"org.squiddev.cctweaks.core.patch.targeted.PrinterPeripheral_Patch"
 			),
-
-			new BinaryCore.PatchWrappedContext(),
-			new BinaryCore.PatchWrappedObject(),
-			new BinaryCore.PatchToValue(),
-			new BinaryGeneric(),
-
-			// Binary patches
-			new ClassMerger(
-				"dan200.computercraft.core.apis.HTTPAPI",
-				"org.squiddev.cctweaks.core.patch.HTTPAPI_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.core.apis.HTTPRequest",
-				"org.squiddev.cctweaks.core.patch.HTTPRequest_Patch"
-			),
 		});
+		BinaryUtils.inject(patches);
+
+		patches.finalise();
 
 		// Patch the logger instance
 		Logger.instance = new Logger() {

@@ -79,7 +79,9 @@ public class DefaultTurtleProviders extends Module {
 				IPeripheral peripheral = turtle.getPeripheral(side);
 				if (peripheral != null) {
 					if (peripheral instanceof IWorldNetworkNode) return (IWorldNetworkNode) peripheral;
-					if (peripheral instanceof IWorldNetworkNodeHost) return ((IWorldNetworkNodeHost) peripheral).getNode();
+					if (peripheral instanceof IWorldNetworkNodeHost) {
+						return ((IWorldNetworkNodeHost) peripheral).getNode();
+					}
 				}
 
 				return null;
