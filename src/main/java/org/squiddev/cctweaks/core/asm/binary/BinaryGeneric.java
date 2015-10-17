@@ -3,8 +3,6 @@ package org.squiddev.cctweaks.core.asm.binary;
 import org.objectweb.asm.ClassVisitor;
 import org.squiddev.patcher.transformer.IPatcher;
 
-import static org.squiddev.cctweaks.core.asm.binary.BinaryUtils.BINARY_OBJECT;
-
 public class BinaryGeneric implements IPatcher {
 	@Override
 	public boolean matches(String className) {
@@ -29,6 +27,6 @@ public class BinaryGeneric implements IPatcher {
 		 * We need such a trivial patcher as the grunt work is done in
 		 * {@link org.squiddev.cctweaks.core.patch.PeripheralAPI_Patch}
 		 */
-		return BinaryUtils.withStringCasts(BinaryUtils.withBinaryInterface(BINARY_OBJECT, delegate));
+		return BinaryUtils.withStringCasts(BinaryUtils.withBinaryInterface(delegate));
 	}
 }

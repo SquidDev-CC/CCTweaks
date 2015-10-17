@@ -23,9 +23,9 @@ public final class BinaryUtils {
 		throw new RuntimeException("Cannot create instance of BinaryUtils");
 	}
 
-	private static String[] addInterface(String type, String[] interfaces) {
+	private static String[] addInterface(String[] interfaces) {
 		String[] newInterfaces = Arrays.copyOf(interfaces, interfaces.length + 1);
-		newInterfaces[interfaces.length] = type;
+		newInterfaces[interfaces.length] = BINARY_OBJECT;
 		return newInterfaces;
 	}
 
@@ -35,11 +35,11 @@ public final class BinaryUtils {
 	 * @param visitor The original visitor
 	 * @return The new visitor
 	 */
-	public static ClassVisitor withBinaryInterface(final String type, ClassVisitor visitor) {
+	public static ClassVisitor withBinaryInterface(ClassVisitor visitor) {
 		return new ClassVisitor(ASM5, visitor) {
 			@Override
 			public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-				super.visit(version, access, name, signature, superName, addInterface(type, interfaces));
+				super.visit(version, access, name, signature, superName, addInterface(interfaces));
 			}
 		};
 	}
