@@ -58,7 +58,7 @@ public class WrappedTests {
 
 		@SuppressWarnings("unchecked")
 		public <T> T callAs(String method, Object... args) throws LuaException, InterruptedException {
-			return (T) object.callMethod(null, methodNames.get(method), args)[0];
+			return (T) call(method, args)[0];
 		}
 
 		public Callable callAsCallable(String method, Object... args) throws LuaException, InterruptedException {

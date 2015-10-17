@@ -13,7 +13,7 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
  * A peripheral that logs events and prints what side it comes from
  */
 public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
-	private IPeripheral[] sides = new IPeripheral[6];
+	private final IPeripheral[] sides = new IPeripheral[6];
 
 	@Override
 	public IPeripheral getPeripheral(int side) {

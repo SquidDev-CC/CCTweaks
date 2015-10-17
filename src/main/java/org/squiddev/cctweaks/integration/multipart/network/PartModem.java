@@ -42,7 +42,7 @@ public class PartModem extends PartSidedNetwork implements IPeripheralHost {
 
 	public static final String NAME = CCTweaks.NAME + ":networkModem";
 
-	protected WiredModem modem = new WiredModem();
+	protected final WiredModem modem = new WiredModem();
 
 	public PartModem() {
 	}

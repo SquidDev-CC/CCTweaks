@@ -23,8 +23,8 @@ import java.util.Set;
 public class RewriteClassLoader extends ClassLoader {
 	public final TransformationChain chain;
 
-	private Set<String> loaded = new HashSet<String>();
-	private Set<String> prefixes = new HashSet<String>();
+	private final Set<String> loaded = new HashSet<String>();
+	private final Set<String> prefixes = new HashSet<String>();
 
 	public RewriteClassLoader(TransformationChain chain) {
 		super(RewriteClassLoader.class.getClassLoader());

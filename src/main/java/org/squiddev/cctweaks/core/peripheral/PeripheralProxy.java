@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public abstract class PeripheralProxy implements IPeripheral, IPeripheralProxy {
 	protected IPeripheral instance;
-	protected Set<IComputerAccess> mounts = new HashSet<IComputerAccess>();
+	protected final Set<IComputerAccess> mounts = new HashSet<IComputerAccess>();
 
 	protected String defaultType = null;
 

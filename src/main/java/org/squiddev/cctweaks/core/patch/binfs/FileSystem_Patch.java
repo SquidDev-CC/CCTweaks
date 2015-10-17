@@ -50,7 +50,6 @@ public class FileSystem_Patch extends FileSystem {
 	@MergeVisitor.Rename(to = "openForRead")
 	public synchronized INormalFile openForRead_P(String path) throws FileSystemException {
 		path = sanitizePath(path);
-		final String wPath = path;
 		MountWrapper mount = getMount(path);
 		InputStream stream = mount.openForRead(path);
 		if (stream != null) {

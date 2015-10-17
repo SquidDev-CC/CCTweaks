@@ -9,7 +9,7 @@ import java.util.UUID;
 public class BoundNetworkNode extends KeyedNetworkNode {
 	public static final UUID id = UUID.randomUUID();
 
-	public NetworkBinding binding = new NetworkBinding(position);
+	public final NetworkBinding binding = new NetworkBinding(position);
 
 	public BoundNetworkNode(IWorldPosition position, String character) {
 		super(position, character);

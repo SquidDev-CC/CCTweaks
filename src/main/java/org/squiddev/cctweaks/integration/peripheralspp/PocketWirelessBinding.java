@@ -107,7 +107,7 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 		 * Custom modem that allows modifying bindings
 		 */
 		public class PocketModem extends BindingModem {
-			protected DynamicPeripheralCollection<Integer> peripherals = new DynamicPeripheralCollection<Integer>() {
+			protected final DynamicPeripheralCollection<Integer> peripherals = new DynamicPeripheralCollection<Integer>() {
 				@Override
 				protected Map<Integer, IPeripheral> getPeripherals() {
 					return pocket.getUpgrades();

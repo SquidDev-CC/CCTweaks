@@ -21,7 +21,7 @@ public class NetworkBindingWithModem extends NetworkBinding {
 		super(position);
 	}
 
-	protected BindingModem modem = createModem();
+	protected final BindingModem modem = createModem();
 
 	protected class BindingModem extends BasicModem {
 		@Override

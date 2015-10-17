@@ -14,7 +14,7 @@ import java.util.Map;
  * A network node that logs events to the console
  */
 public class TileDebugNode extends TileNetworked {
-	protected AbstractWorldNode node = new AbstractWorldNode() {
+	protected final AbstractWorldNode node = new AbstractWorldNode() {
 		@Override
 		public IWorldPosition getPosition() {
 			return TileDebugNode.this;

@@ -122,8 +122,8 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 		 * Custom modem that allows modifying bindings
 		 */
 		public class TurtleModem extends BindingModem {
-			protected PeripheralCollection peripherals = new PeripheralCollection(2) {
-				private IPeripheral peripheral = new PeripheralProxy("turtle") {
+			protected final PeripheralCollection peripherals = new PeripheralCollection(2) {
+				private final IPeripheral peripheral = new PeripheralProxy("turtle") {
 					@Override
 					protected IPeripheral createPeripheral() {
 						ChunkCoordinates pos = turtle.getPosition();
