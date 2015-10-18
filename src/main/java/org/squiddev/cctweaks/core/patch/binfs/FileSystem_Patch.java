@@ -61,12 +61,26 @@ public class FileSystem_Patch extends FileSystem {
 				@Override
 				public byte[] readLine() throws IOException {
 					// FIXME: Is this the most efficient way?
-					ByteArrayOutputStream buffer = new ByteArrayOutputStream(1024);
+					ByteArrayOutputStream buffer = new ByteArrayOutputStream(128);
 					int val;
 					while ((val = reader.read()) != -1) {
-						buffer.write(val);
+						if (val == '\r') {
+							// Peek one character ahead
+							reader.mark(1);
+							int newVal = reader.read();
+							reader.reset();
+
+							// Consume '\n' as well
+							if (newVal == '\n') reader.read();
+							return buffer.toByteArray();
+						} else if (val == '\n') {
+							return buffer.toByteArray();
+						} else {
+							buffer.write(val);
+						}
 					}
 
+					// We never hit a new line, so we've reached the end of the stream
 					return buffer.size() > 0 ? buffer.toByteArray() : null;
 				}
 
