@@ -5,21 +5,24 @@ import dan200.computercraft.api.lua.ILuaObject;
 import dan200.computercraft.api.lua.LuaException;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class HTTPResponse implements ILuaObject {
 	private final int responseCode;
 	private final byte[] result;
+	private final Map<String, Map<Integer, String>> headers;
 	private int index = 0;
 	private boolean closed = false;
 
-	public HTTPResponse(int responseCode, byte[] result) {
+	public HTTPResponse(int responseCode, byte[] result, Map<String, Map<Integer, String>> headers) {
 		this.responseCode = responseCode;
 		this.result = result;
+		this.headers = headers;
 	}
 
 	@Override
 	public String[] getMethodNames() {
-		return new String[]{"readLine", "readAll", "read", "close", "getResponseCode"};
+		return new String[]{"readLine", "readAll", "read", "close", "getResponseCode", "getResponseHeaders"};
 	}
 
 	@Override
@@ -80,6 +83,8 @@ public class HTTPResponse implements ILuaObject {
 				break;
 			case 4:
 				return new Object[]{responseCode};
+			case 5:
+				return new Object[]{headers};
 		}
 
 		return null;

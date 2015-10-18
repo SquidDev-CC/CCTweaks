@@ -26,7 +26,7 @@ public class HTTPAPI_Patch {
 					if (h.wasSuccessful()) {
 						m_apiEnvironment.queueEvent("http_success", new Object[]{url, h.asResponse()});
 					} else {
-						m_apiEnvironment.queueEvent("http_failure", new Object[]{url, "Could not connect"});
+						m_apiEnvironment.queueEvent("http_failure", new Object[]{url, "Could not connect", h.asResponse()});
 					}
 					it.remove();
 				}

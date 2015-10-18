@@ -8,6 +8,8 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -61,6 +63,7 @@ public class HTTPRequest_Patch {
 	private boolean success = false;
 	private byte[] result;
 	private int responseCode = -1;
+	private Map<String, Map<Integer, String>> responseHeaders;
 
 	public HTTPRequest_Patch(String url, final String postText, final Map<String, String> headers) throws HTTPRequestException {
 		urlString = url;
@@ -98,8 +101,21 @@ public class HTTPRequest_Patch {
 						}
 					}
 
+
+					int code = responseCode = connection.getResponseCode();
+
+					// If we get an error code then use the error stream instead
+					InputStream is;
+					boolean responseSuccess;
+					if (code >= 200 && code < 400) {
+						is = connection.getInputStream();
+						responseSuccess = true;
+					} else {
+						is = connection.getErrorStream();
+						responseSuccess = false;
+					}
+
 					// Read from the input stream
-					InputStream is = connection.getInputStream();
 					ByteArrayOutputStream buffer = new ByteArrayOutputStream(Math.max(1024, is.available()));
 					int nRead;
 					byte[] data = new byte[1024];
@@ -119,9 +135,20 @@ public class HTTPRequest_Patch {
 							result = null;
 						} else {
 							complete = true;
-							success = true;
+							success = responseSuccess;
 							result = buffer.toByteArray();
-							responseCode = connection.getResponseCode();
+
+							Map<String, Map<Integer, String>> headers = responseHeaders = new HashMap<String, Map<Integer, String>>();
+							for (Map.Entry<String, List<String>> header : connection.getHeaderFields().entrySet()) {
+								Map<Integer, String> values = new HashMap<Integer, String>();
+
+								int i = 0;
+								for (String value : header.getValue()) {
+									values.put(i, value);
+								}
+
+								headers.put(header.getKey(), values);
+							}
 						}
 					}
 
@@ -162,7 +189,7 @@ public class HTTPRequest_Patch {
 
 	public HTTPResponse asResponse() {
 		synchronized (lock) {
-			return new HTTPResponse(responseCode, result);
+			return result == null ? null : new HTTPResponse(responseCode, result, responseHeaders);
 		}
 	}
 
