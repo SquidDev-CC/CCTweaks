@@ -9,6 +9,7 @@ import dan200.computercraft.api.turtle.*;
 import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
@@ -21,6 +22,7 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
 import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.lua.LuaHelpers;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
 import org.squiddev.cctweaks.core.network.modem.PeripheralCollection;
@@ -201,13 +203,15 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			@Override
 			public String[] getMethodNames() {
 				String[] methods = super.getMethodNames();
-				String[] newMethods = new String[methods.length + 2];
+				String[] newMethods = new String[methods.length + 4];
 				System.arraycopy(methods, 0, newMethods, 0, methods.length);
 
 
 				int l = methods.length;
 				newMethods[l] = "bindFromCard";
 				newMethods[l + 1] = "bindToCard";
+				newMethods[l + 2] = "bindToBlock";
+				newMethods[l + 3] = "bindFromBlock";
 
 				return newMethods;
 			}
@@ -235,6 +239,49 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 							return new Object[]{true};
 						}
 						return new Object[]{false};
+					}
+					case 2: {
+						String direction;
+						if (arguments.length == 0) {
+							direction = "forward";
+						} else if (arguments[1] instanceof String) {
+							direction = (String) arguments[1];
+						} else {
+							throw new LuaException("Expected string");
+						}
+
+						ChunkCoordinates coords = LuaHelpers.getRelative(direction, turtle.getDirection(), turtle.getPosition());
+						TileEntity tile = turtle.getWorld().getTileEntity(coords.posX, coords.posY, coords.posZ);
+
+						if (!(tile instanceof TileNetworkedWirelessBridge)) {
+							throw new LuaException("No wireless bridge here");
+						}
+
+						TileNetworkedWirelessBridge bridge = (TileNetworkedWirelessBridge) tile;
+						bridge.setBindingId(TurtleBinding.this.getId());
+						break;
+					}
+					case 3: {
+						String direction;
+						if (arguments.length == 0) {
+							direction = "forward";
+						} else if (arguments[1] instanceof String) {
+							direction = (String) arguments[1];
+						} else {
+							throw new LuaException("Expected string");
+						}
+
+						ChunkCoordinates coords = LuaHelpers.getRelative(direction, turtle.getDirection(), turtle.getPosition());
+						TileEntity tile = turtle.getWorld().getTileEntity(coords.posX, coords.posY, coords.posZ);
+
+						if (!(tile instanceof TileNetworkedWirelessBridge)) {
+							throw new LuaException("No wireless bridge here");
+						}
+
+						TileNetworkedWirelessBridge bridge = (TileNetworkedWirelessBridge) tile;
+						TurtleBinding.this.setId(bridge.getBindingId());
+						TurtleBinding.this.save();
+						break;
 					}
 				}
 

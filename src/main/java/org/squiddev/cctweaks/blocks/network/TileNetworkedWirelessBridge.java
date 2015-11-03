@@ -14,6 +14,7 @@ import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * Bind networks together
@@ -71,6 +72,15 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 		}
 
 		return false;
+	}
+
+	public UUID getBindingId() {
+		return binding.getId();
+	}
+
+	public void setBindingId(UUID id) {
+		binding.setId(id);
+		markDirty();
 	}
 
 	@Override

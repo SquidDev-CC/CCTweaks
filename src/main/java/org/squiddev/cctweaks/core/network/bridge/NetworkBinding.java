@@ -64,6 +64,10 @@ public class NetworkBinding extends AbstractWorldNode {
 		add();
 	}
 
+	public UUID getId() {
+		return id;
+	}
+
 	/**
 	 * Save the UUID to a NBT tag
 	 *
