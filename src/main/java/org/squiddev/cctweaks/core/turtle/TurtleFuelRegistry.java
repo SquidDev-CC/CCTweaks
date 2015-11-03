@@ -16,6 +16,7 @@ public final class TurtleFuelRegistry implements ITurtleFuelRegistry {
 
 	@Override
 	public void addFuelProvider(ITurtleFuelProvider provider) {
+		if (provider == null) throw new IllegalArgumentException("provider cannot be null");
 		providers.add(provider);
 	}
 

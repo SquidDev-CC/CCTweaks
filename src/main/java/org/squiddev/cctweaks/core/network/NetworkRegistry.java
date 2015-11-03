@@ -20,7 +20,8 @@ public final class NetworkRegistry implements INetworkRegistry {
 
 	@Override
 	public void addNodeProvider(INetworkNodeProvider provider) {
-		if (provider != null) providers.add(provider);
+		if (provider == null) throw new IllegalArgumentException("provider cannot be null");
+		providers.add(provider);
 	}
 
 	@Override

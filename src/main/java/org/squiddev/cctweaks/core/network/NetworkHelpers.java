@@ -132,6 +132,7 @@ public final class NetworkHelpers implements INetworkHelpers {
 	 */
 	@Override
 	public void scheduleJoin(final IWorldNetworkNode node) {
+		if (node == null) throw new IllegalArgumentException("node cannot be null");
 		FmlEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
@@ -146,6 +147,7 @@ public final class NetworkHelpers implements INetworkHelpers {
 	 * @param node The node to schedule
 	 */
 	public static void scheduleConnect(final AbstractWorldNode node) {
+		if (node == null) throw new IllegalArgumentException("node cannot be null");
 		FmlEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
