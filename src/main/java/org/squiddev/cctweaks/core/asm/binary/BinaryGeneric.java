@@ -21,7 +21,7 @@ public class BinaryGeneric implements IPatcher {
 		 * converted and so preserve encoding.
 		 *
 		 * {@link dan200.computercraft.shared.peripheral.modem.ModemPeripheral}:
-		 * Very trivial: Just needs the binary interface
+		 * Very trivial: Just needs the binary interface. There are no casts.
 		 *
 		 * {@link dan200.computercraft.core.apis.PeripheralAPI}:
 		 * We need such a trivial patcher as the grunt work is done in

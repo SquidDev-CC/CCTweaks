@@ -26,7 +26,7 @@ archivesBaseName = "CCTweaks"
 version = mc_version + "-" + mod_version
 
 minecraft {
-	version = project.mc_version + "-" + project.forge_version
+	version = project.mc_version + "-" + project.forge_version + "-" + project.mc_version
 	runDir = "eclipse"
 
 	replace '${mod_version}', project.mod_version

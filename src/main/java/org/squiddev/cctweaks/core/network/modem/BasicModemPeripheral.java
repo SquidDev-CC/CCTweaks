@@ -139,10 +139,16 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	}
 
 	public static String parseString(Object[] arguments, int index) throws LuaException {
-		if ((arguments.length < index + 1) || (!(arguments[index] instanceof byte[]))) {
-			throw new LuaException("Expected string");
+		if (arguments.length > index) {
+			if (arguments[index] instanceof byte[]) {
+				return new String((byte[]) arguments[index]);
+			} else if (arguments[index] instanceof String) {
+				return (String) arguments[index];
+			}
 		}
-		return new String((byte[]) arguments[index]);
+
+		throw new LuaException("Expected string");
+
 	}
 
 	@Override
