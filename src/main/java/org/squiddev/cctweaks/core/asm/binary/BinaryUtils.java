@@ -71,10 +71,7 @@ public final class BinaryUtils {
 			@Override
 			public void handle(InsnList nodes, MethodVisitor visitor) {
 				visitor.visitTypeInsn(CHECKCAST, "[B");
-				visitor.visitTypeInsn(NEW, "java/lang/String");
-				visitor.visitInsn(DUP_X1);
-				visitor.visitInsn(SWAP);
-				visitor.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([B)V", false);
+				visitor.visitMethodInsn(INVOKESTATIC, BINARY_CONVERTER, "decodeString", "([B)Ljava/lang/String;", false);
 			}
 		}.onMethod("callMethod");
 		for (String name : methodNames) {

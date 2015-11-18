@@ -4,6 +4,7 @@ import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -106,4 +107,17 @@ public class BinaryConverter {
 		}
 	}
 
+	public static String decodeString(byte[] bytes) {
+		try {
+			return new String(bytes, "UTF8");
+		} catch (UnsupportedEncodingException e) {
+			try {
+				// Fall back. Shouldn't happen, but you never know
+				return new String(bytes, "ISO-8859-1");
+			} catch (UnsupportedEncodingException e1) {
+				// This should never be reached.
+				return new String(bytes);
+			}
+		}
+	}
 }
