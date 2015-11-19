@@ -8,7 +8,7 @@ import dan200.computercraft.core.apis.IAPIEnvironment;
 import dan200.computercraft.core.apis.PeripheralAPI;
 import dan200.computercraft.core.computer.Computer;
 import dan200.computercraft.core.filesystem.FileSystem;
-import org.squiddev.cctweaks.api.lua.IBinaryLuaObject;
+import org.squiddev.cctweaks.api.lua.IBinaryHandler;
 import org.squiddev.cctweaks.api.network.INetworkAccess;
 import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.network.Packet;
@@ -119,7 +119,7 @@ public class PeripheralAPI_Patch extends PeripheralAPI {
 			}
 
 			if (method >= 0) {
-				if (!(m_peripheral instanceof IBinaryLuaObject)) BinaryConverter.toStrings(arguments);
+				if (!(m_peripheral instanceof IBinaryHandler)) BinaryConverter.toStrings(arguments);
 				return m_peripheral.callMethod(this, context, method, arguments);
 			}
 

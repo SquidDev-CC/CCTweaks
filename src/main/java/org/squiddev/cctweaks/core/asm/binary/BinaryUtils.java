@@ -17,7 +17,7 @@ import static org.objectweb.asm.Opcodes.*;
  */
 public final class BinaryUtils {
 	public static final String BINARY_CONVERTER = "org/squiddev/cctweaks/core/lua/BinaryConverter";
-	public static final String BINARY_OBJECT = "org/squiddev/cctweaks/api/lua/IBinaryLuaObject";
+	public static final String BINARY_OBJECT = "org/squiddev/cctweaks/api/lua/IBinaryHandler";
 
 	private BinaryUtils() {
 		throw new RuntimeException("Cannot create instance of BinaryUtils");

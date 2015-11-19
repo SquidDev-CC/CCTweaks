@@ -8,7 +8,7 @@ import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.Vec3;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.lua.IBinaryLuaObject;
+import org.squiddev.cctweaks.api.lua.IBinaryHandler;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
 import org.squiddev.cctweaks.core.lua.BinaryConverter;
@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * @see BasicModem
  */
-public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted, IBinaryLuaObject {
+public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted, IBinaryHandler {
 	public final T modem;
 
 	public BasicModemPeripheral(T modem) {

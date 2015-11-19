@@ -4,12 +4,12 @@ import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.core.apis.ILuaAPI;
 import org.junit.Assert;
-import org.squiddev.cctweaks.api.lua.IBinaryLuaObject;
+import org.squiddev.cctweaks.api.lua.IBinaryHandler;
 
 /**
  * Adds various assertions to Lua
  */
-public class AssertionAPI implements ILuaAPI, IBinaryLuaObject {
+public class AssertionAPI implements ILuaAPI, IBinaryHandler {
 	private Throwable exception;
 
 	@Override
