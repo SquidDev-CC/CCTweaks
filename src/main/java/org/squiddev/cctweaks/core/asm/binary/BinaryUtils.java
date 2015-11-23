@@ -19,6 +19,10 @@ public final class BinaryUtils {
 	public static final String LUA_CONVERTER = "org/squiddev/cctweaks/core/lua/LuaConverter";
 	public static final String BINARY_OBJECT = "org/squiddev/cctweaks/api/lua/IBinaryHandler";
 
+	public static final String DELEGATOR = "org/squiddev/cctweaks/api/lua/ArgumentDelegator";
+	public static final String DELEGATE_OBJECT = "(Ldan200/computercraft/api/lua/ILuaObject;Ldan200/computercraft/api/lua/ILuaContext;ILorg/squiddev/cctweaks/api/lua/IArguments;)[Ljava/lang/Object;";
+	public static final String DELEGATE_PERIPHERAL = "(Ldan200/computercraft/api/peripheral/IPeripheral;Ldan200/computercraft/api/peripheral/IComputerAccess;Ldan200/computercraft/api/lua/ILuaContext;ILorg/squiddev/cctweaks/api/lua/IArguments;)[Ljava/lang/Object;";
+
 	private BinaryUtils() {
 		throw new RuntimeException("Cannot create instance of BinaryUtils");
 	}

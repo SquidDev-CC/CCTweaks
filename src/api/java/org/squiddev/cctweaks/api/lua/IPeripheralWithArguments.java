@@ -7,6 +7,8 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 
 /**
  * A peripheral interface with support for being called with {@link IArguments}
+ *
+ * This is primarily aimed at objects that need to delegate to other objects.
  */
 public interface IPeripheralWithArguments extends IPeripheral {
 	/**

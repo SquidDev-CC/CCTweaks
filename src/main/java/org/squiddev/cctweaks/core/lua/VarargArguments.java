@@ -6,10 +6,10 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.squiddev.cctweaks.api.lua.IArguments;
 
-public class Arguments implements IArguments {
+public class VarargArguments implements IArguments {
 	private final Varargs args;
 
-	public Arguments(Varargs args) {
+	public VarargArguments(Varargs args) {
 		this.args = args;
 	}
 
@@ -24,7 +24,7 @@ public class Arguments implements IArguments {
 		if (value.isnumber()) {
 			return value.todouble();
 		} else {
-			throw new LuaException("Expected number for argument " + (index + 1));
+			throw new LuaException("Expected number");
 		}
 	}
 
@@ -34,7 +34,7 @@ public class Arguments implements IArguments {
 		if (value.isboolean()) {
 			return value.toboolean();
 		} else {
-			throw new LuaException("Expected boolean for argument " + (index + 1));
+			throw new LuaException("Expected boolean");
 		}
 	}
 
@@ -44,7 +44,7 @@ public class Arguments implements IArguments {
 		if (value instanceof LuaString) {
 			return value.toString();
 		} else {
-			throw new LuaException("Expected string for argument " + (index + 1));
+			throw new LuaException("Expected string");
 		}
 	}
 
@@ -57,7 +57,7 @@ public class Arguments implements IArguments {
 			System.arraycopy(string.m_bytes, string.m_offset, result, 0, string.m_length);
 			return result;
 		} else {
-			throw new LuaException("Expected string for argument " + (index + 1));
+			throw new LuaException("Expected string");
 		}
 	}
 
@@ -78,6 +78,6 @@ public class Arguments implements IArguments {
 
 	@Override
 	public IArguments subArgs(int offset) {
-		return new Arguments(args.subargs(offset));
+		return new VarargArguments(args.subargs(offset));
 	}
 }

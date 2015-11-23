@@ -8,7 +8,9 @@ import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.Vec3;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.lua.IArguments;
 import org.squiddev.cctweaks.api.lua.IBinaryHandler;
+import org.squiddev.cctweaks.api.lua.IPeripheralWithArguments;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
 import org.squiddev.cctweaks.core.lua.LuaConverter;
@@ -21,7 +23,7 @@ import java.util.Map;
  *
  * @see BasicModem
  */
-public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted, IBinaryHandler {
+public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted, IBinaryHandler, IPeripheralWithArguments {
 	public final T modem;
 
 	public BasicModemPeripheral(T modem) {
@@ -114,6 +116,23 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 		}
 
 		return super.callMethod(computer, context, method, arguments);
+	}
+
+	@Override
+	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, IArguments arguments) throws LuaException, InterruptedException {
+		String[] methods = super.getMethodNames();
+		if (method - methods.length == 4) {
+			// This is kinda ugly. Sorry!
+			String remoteName = arguments.getString(0);
+			String methodName = arguments.getString(1);
+
+			// Get the peripheral and call it
+			PeripheralAccess access = modem.peripheralWrappersByName.get(remoteName);
+			if (access == null) throw new LuaException("No peripheral: " + remoteName);
+			return access.callMethod(context, methodName, arguments.subArgs(2));
+		} else {
+			return callMethod(computer, context, method, arguments.asBinary());
+		}
 	}
 
 	@Override
