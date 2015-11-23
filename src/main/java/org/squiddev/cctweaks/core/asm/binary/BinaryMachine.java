@@ -8,8 +8,8 @@ import org.squiddev.patcher.transformer.IPatcher;
 import org.squiddev.patcher.visitors.FindingVisitor;
 
 import static org.objectweb.asm.Opcodes.*;
-import static org.squiddev.cctweaks.core.asm.binary.BinaryUtils.BINARY_CONVERTER;
 import static org.squiddev.cctweaks.core.asm.binary.BinaryUtils.BINARY_OBJECT;
+import static org.squiddev.cctweaks.core.asm.binary.BinaryUtils.LUA_CONVERTER;
 
 /**
  * Patches various {@link dan200.computercraft.core.lua.LuaJLuaMachine} methods to support binary mode
@@ -149,6 +149,7 @@ public class BinaryMachine implements IPatcher {
 	private static void injectBinary(MethodVisitor visitor) {
 		visitor.visitVarInsn(ALOAD, 1);
 		visitor.visitInsn(ICONST_1);
-		visitor.visitMethodInsn(INVOKESTATIC, BINARY_CONVERTER, "toObjects", "(Lorg/luaj/vm2/Varargs;I)[Ljava/lang/Object;", false);
+		visitor.visitInsn(ICONST_1);
+		visitor.visitMethodInsn(INVOKESTATIC, LUA_CONVERTER, "toObjects", "(Lorg/luaj/vm2/Varargs;IZ)[Ljava/lang/Object;", false);
 	}
 }

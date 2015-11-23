@@ -16,7 +16,7 @@ import static org.objectweb.asm.Opcodes.*;
  * Utilities for injecting binary patches
  */
 public final class BinaryUtils {
-	public static final String BINARY_CONVERTER = "org/squiddev/cctweaks/core/lua/BinaryConverter";
+	public static final String LUA_CONVERTER = "org/squiddev/cctweaks/core/lua/LuaConverter";
 	public static final String BINARY_OBJECT = "org/squiddev/cctweaks/api/lua/IBinaryHandler";
 
 	private BinaryUtils() {
@@ -71,7 +71,7 @@ public final class BinaryUtils {
 			@Override
 			public void handle(InsnList nodes, MethodVisitor visitor) {
 				visitor.visitTypeInsn(CHECKCAST, "[B");
-				visitor.visitMethodInsn(INVOKESTATIC, BINARY_CONVERTER, "decodeString", "([B)Ljava/lang/String;", false);
+				visitor.visitMethodInsn(INVOKESTATIC, LUA_CONVERTER, "decodeString", "([B)Ljava/lang/String;", false);
 			}
 		}.onMethod("callMethod");
 		for (String name : methodNames) {

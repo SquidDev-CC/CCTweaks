@@ -13,8 +13,12 @@ import java.util.Map;
  * Duplicate of {@link dan200.computercraft.core.lua.LuaJLuaMachine#toObject(LuaValue)} with
  * binary support
  */
-public class BinaryConverter {
-	public static Object toObject(LuaValue value, Map<LuaValue, Object> tables) {
+public class LuaConverter {
+	public static Object toObject(LuaValue value, boolean binary) {
+		return toObject(value, null, binary);
+	}
+
+	private static Object toObject(LuaValue value, Map<LuaValue, Object> tables, boolean binary) {
 		switch (value.type()) {
 			case LuaValue.TNUMBER:
 			case LuaValue.TINT:
@@ -22,10 +26,14 @@ public class BinaryConverter {
 			case LuaValue.TBOOLEAN:
 				return value.toboolean();
 			case LuaValue.TSTRING: {
-				LuaString string = (LuaString) value;
-				byte[] result = new byte[string.m_length];
-				System.arraycopy(string.m_bytes, string.m_offset, result, 0, string.m_length);
-				return result;
+				if (binary) {
+					LuaString string = (LuaString) value;
+					byte[] result = new byte[string.m_length];
+					System.arraycopy(string.m_bytes, string.m_offset, result, 0, string.m_length);
+					return result;
+				} else {
+					return value.toString();
+				}
 			}
 			case LuaValue.TTABLE: {
 				if (tables == null) {
@@ -45,8 +53,8 @@ public class BinaryConverter {
 					if (k.isnil()) break;
 
 					LuaValue v = keyValue.arg(2);
-					Object keyObject = toObject(k, tables);
-					Object valueObject = toObject(v, tables);
+					Object keyObject = toObject(k, tables, binary);
+					Object valueObject = toObject(v, tables, binary);
 					if (keyObject != null && valueObject != null) {
 						table.put(keyObject, valueObject);
 					}
@@ -58,18 +66,22 @@ public class BinaryConverter {
 		}
 	}
 
-	public static Object[] toObjects(Varargs values, int start) {
+	public static Object[] toObjects(Varargs values, int start, boolean binary) {
 		int count = values.narg();
 		Object[] objects = new Object[count - start + 1];
 		for (int n = start; n <= count; n++) {
 			int i = n - start;
 			LuaValue value = values.arg(n);
-			objects[i] = toObject(value, null);
+			objects[i] = toObject(value, null, binary);
 		}
 		return objects;
 	}
 
-	public static Object toString(Object value, Map<Object, Object> tables) {
+	public static Object toString(Object value) {
+		return toString(value, null);
+	}
+
+	private static Object toString(Object value, Map<Object, Object> tables) {
 		if (value instanceof byte[]) {
 			return new String((byte[]) value);
 		} else if (value instanceof Map) {

@@ -13,7 +13,7 @@ import org.squiddev.cctweaks.api.network.INetworkAccess;
 import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.asm.binary.BinaryGeneric;
-import org.squiddev.cctweaks.core.lua.BinaryConverter;
+import org.squiddev.cctweaks.core.lua.LuaConverter;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
 import java.util.HashMap;
@@ -57,8 +57,8 @@ public class PeripheralAPI_Patch extends PeripheralAPI {
 
 		@MergeVisitor.Stub
 		public PeripheralWrapper(IPeripheral peripheral, String side) {
-			m_side = null;
-			m_peripheral = null;
+			m_side = side;
+			m_peripheral = peripheral;
 		}
 
 		@MergeVisitor.Stub
@@ -119,7 +119,7 @@ public class PeripheralAPI_Patch extends PeripheralAPI {
 			}
 
 			if (method >= 0) {
-				if (!(m_peripheral instanceof IBinaryHandler)) BinaryConverter.toStrings(arguments);
+				if (!(m_peripheral instanceof IBinaryHandler)) LuaConverter.toStrings(arguments);
 				return m_peripheral.callMethod(this, context, method, arguments);
 			}
 
