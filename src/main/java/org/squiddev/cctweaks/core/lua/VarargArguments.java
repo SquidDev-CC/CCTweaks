@@ -62,8 +62,13 @@ public class VarargArguments implements IArguments {
 	}
 
 	@Override
-	public Object getArgument(int index, boolean binary) {
-		return LuaConverter.toObject(args.arg(index + 1), binary);
+	public Object getArgumentBinary(int index) {
+		return LuaConverter.toObject(args.arg(index + 1), true);
+	}
+
+	@Override
+	public Object getArgument(int index) {
+		return LuaConverter.toObject(args.arg(index + 1), false);
 	}
 
 	@Override
@@ -78,6 +83,6 @@ public class VarargArguments implements IArguments {
 
 	@Override
 	public IArguments subArgs(int offset) {
-		return new VarargArguments(args.subargs(offset));
+		return new VarargArguments(args.subargs(offset + 1));
 	}
 }

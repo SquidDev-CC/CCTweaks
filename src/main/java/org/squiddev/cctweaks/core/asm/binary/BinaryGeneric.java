@@ -9,8 +9,7 @@ public class BinaryGeneric implements IPatcher {
 		if (!className.startsWith("dan200.computercraft.")) return false;
 
 		return className.equals("dan200.computercraft.core.apis.OSAPI") ||
-			className.equals("dan200.computercraft.shared.peripheral.modem.ModemPeripheral") ||
-			className.endsWith("dan200.computercraft.core.apis.PeripheralAPI");
+			className.equals("dan200.computercraft.shared.peripheral.modem.ModemPeripheral");
 	}
 
 	@Override
@@ -22,10 +21,6 @@ public class BinaryGeneric implements IPatcher {
 		 *
 		 * {@link dan200.computercraft.shared.peripheral.modem.ModemPeripheral}:
 		 * Very trivial: Just needs the binary interface. There are no casts.
-		 *
-		 * {@link dan200.computercraft.core.apis.PeripheralAPI}:
-		 * We need such a trivial patcher as the grunt work is done in
-		 * {@link org.squiddev.cctweaks.core.patch.PeripheralAPI_Patch}
 		 */
 		return BinaryUtils.withStringCasts(BinaryUtils.withBinaryInterface(delegate));
 	}

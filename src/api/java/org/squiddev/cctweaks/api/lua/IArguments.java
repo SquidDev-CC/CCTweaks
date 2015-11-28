@@ -20,7 +20,7 @@ public interface IArguments {
 	 *
 	 * @param index The argument index, starting at 0
 	 * @return The number that was read
-	 * @throws LuaException In the form {@code "Expected number at position #1"}, when the argument is not a number.
+	 * @throws LuaException In the form {@code "Expected number"}, when the argument is not a number.
 	 */
 	double getNumber(int index) throws LuaException;
 
@@ -29,7 +29,7 @@ public interface IArguments {
 	 *
 	 * @param index The argument index, starting at 0
 	 * @return The boolean that was read
-	 * @throws LuaException In the form {@code "Expected boolean at position #1"}, when the argument is not a boolean.
+	 * @throws LuaException In the form {@code "Expected boolean"}, when the argument is not a boolean.
 	 */
 	boolean getBoolean(int index) throws LuaException;
 
@@ -38,7 +38,7 @@ public interface IArguments {
 	 *
 	 * @param index The argument index, starting at 0
 	 * @return The string that was read
-	 * @throws LuaException In the form {@code "Expected string at position #1"}, when the argument is not a string.
+	 * @throws LuaException In the form {@code "Expected string"}, when the argument is not a string.
 	 */
 	String getString(int index) throws LuaException;
 
@@ -47,18 +47,25 @@ public interface IArguments {
 	 *
 	 * @param index The argument index, starting at 0
 	 * @return The string that was read
-	 * @throws LuaException In the form {@code "Expected string at position #1"}, when the argument is not a string.
+	 * @throws LuaException In the form {@code "Expected string"}, when the argument is not a string.
 	 */
 	byte[] getStringBytes(int index) throws LuaException;
 
 	/**
-	 * Attempt  to read an argument
+	 * Attempt to read an argument
 	 *
-	 * @param index  The argument index
-	 * @param binary If strings should be converted to byte[] or String.
+	 * @param index The argument index
 	 * @return The argument or {@code null} if not set
 	 */
-	Object getArgument(int index, boolean binary);
+	Object getArgumentBinary(int index);
+
+	/**
+	 * Attempt to read an argument
+	 *
+	 * @param index The argument index
+	 * @return The argument or {@code null} if not set
+	 */
+	Object getArgument(int index);
 
 	/**
 	 * Attempt to get the arguments in normal form, suitable for {@link dan200.computercraft.api.peripheral.IPeripheral} or {@link dan200.computercraft.api.lua.ILuaObject}
