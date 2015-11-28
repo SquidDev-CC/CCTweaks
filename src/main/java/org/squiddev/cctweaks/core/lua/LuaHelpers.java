@@ -1,8 +1,13 @@
 package org.squiddev.cctweaks.core.lua;
 
+import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.lua.ILuaObject;
 import dan200.computercraft.api.lua.LuaException;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Facing;
+import org.luaj.vm2.Varargs;
+import org.objectweb.asm.ClassVisitor;
+import org.squiddev.cctweaks.api.lua.ArgumentDelegator;
 
 /**
  * Various classes for helping with Lua conversion
@@ -33,4 +38,14 @@ public class LuaHelpers {
 		return coords;
 	}
 
+	/**
+	 * Simple method which creates varargs and delegates to the delegator. (I know how stupid that sounds).
+	 *
+	 * This exists so I don't have to grow the the stack size.
+	 *
+	 * @see org.squiddev.cctweaks.core.asm.binary.BinaryMachine#patchWrappedObject(ClassVisitor)
+	 */
+	public static Object[] delegateLuaObject(ILuaObject object, ILuaContext context, int method, Varargs arguments) throws LuaException, InterruptedException {
+		return ArgumentDelegator.delegateLuaObject(object, context, method, new VarargArguments(arguments));
+	}
 }

@@ -68,12 +68,12 @@ public class VarargArguments implements IArguments {
 
 	@Override
 	public Object[] asArguments() {
-		return LuaConverter.toObjects(args, 0, false);
+		return LuaConverter.toObjects(args, 1, false);
 	}
 
 	@Override
 	public Object[] asBinary() {
-		return LuaConverter.toObjects(args, 0, true);
+		return LuaConverter.toObjects(args, 1, true);
 	}
 
 	@Override

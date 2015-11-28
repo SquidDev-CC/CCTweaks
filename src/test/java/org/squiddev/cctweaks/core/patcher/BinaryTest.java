@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.core.patcher;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.squiddev.cctweaks.core.asm.binary.BinaryUtils;
+import org.squiddev.cctweaks.core.patcher.utils.TryCatch;
 import org.squiddev.patcher.transformer.ClassMerger;
 import org.squiddev.patcher.transformer.TransformationChain;
 
@@ -18,7 +19,10 @@ public class BinaryTest {
 			"dan200.computercraft.core.apis.PeripheralAPI",
 			"org.squiddev.cctweaks.core.patch.PeripheralAPI_Patch"
 		));
-		loader = new RewriteClassLoader(chain);
+		chain.add(new TryCatch("dan200.computercraft.core.lua.LuaJLuaMachine"));
+		loader = new RewriteClassLoader(chain)
+			.addPrefixes("org.squiddev.cctweaks.core.lua.")
+			.addPrefixes("org.squiddev.cctweaks.api.");
 	}
 
 	@Test
