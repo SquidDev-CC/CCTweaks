@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.api;
 
+import org.squiddev.cctweaks.api.lua.ILuaEnvironment;
 import org.squiddev.cctweaks.api.network.INetworkHelpers;
 import org.squiddev.cctweaks.api.network.INetworkRegistry;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHelpers;
@@ -16,4 +17,6 @@ public interface ICCTweaksAPI {
 	ITurtleFuelRegistry fuelRegistry();
 
 	IPeripheralHelpers peripheralHelpers();
+
+	ILuaEnvironment luaEnvironment();
 }
