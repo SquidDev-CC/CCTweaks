@@ -18,7 +18,7 @@ public class Point implements INetworkAccess {
 
 	public final Set<Connection> connections = new HashSet<Connection>();
 
-	public Map<String, IPeripheral> peripherals;
+	public Map<String, IPeripheral> peripherals = Collections.emptyMap();
 
 	public Point(INetworkNode node, INetworkController controller) {
 		this.node = node;
@@ -63,7 +63,6 @@ public class Point implements INetworkAccess {
 
 	public Map<String, IPeripheral> refreshPeripherals() {
 		Map<String, IPeripheral> oldPeripherals = peripherals;
-		if (oldPeripherals == null) oldPeripherals = Collections.emptyMap();
 
 		Map<String, IPeripheral> newPeripherals = peripherals = node.getConnectedPeripherals();
 

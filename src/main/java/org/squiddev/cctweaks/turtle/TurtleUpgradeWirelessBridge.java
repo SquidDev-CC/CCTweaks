@@ -17,8 +17,10 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
+import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
+import org.squiddev.cctweaks.api.turtle.IExtendedTurtleUpgrade;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
 import org.squiddev.cctweaks.core.Config;
@@ -35,7 +37,7 @@ import java.util.Map;
 /**
  * Turtle upgrade for the {@link TileNetworkedWirelessBridge} tile
  */
-public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrade {
+public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrade, IExtendedTurtleUpgrade {
 	@Override
 	public int getUpgradeID() {
 		return Config.Network.WirelessBridge.turtleId;
@@ -71,12 +73,6 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 		return BlockNetworked.bridgeSmallIcon;
 	}
 
-	/**
-	 * Called on turtle update. Used to check if messages should be sent
-	 *
-	 * @param turtle Current turtle
-	 * @param side   Peripheral side
-	 */
 	@Override
 	public void update(ITurtleAccess turtle, TurtleSide side) {
 	}
@@ -84,6 +80,18 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 	@Override
 	public void init() {
 		ComputerCraft.registerTurtleUpgrade(this);
+	}
+
+	@Override
+	public void upgradeChanged(ITurtleAccess turtle, TurtleSide side, ITurtleUpgrade oldUpgrade, ITurtleUpgrade newUpgrade) {
+		if (Config.Network.WirelessBridge.turtleEnabled) {
+			IPeripheral peripheral = turtle.getPeripheral(side);
+			if (peripheral instanceof TurtleBinding.TurtleModemPeripheral) {
+				IWorldNetworkNode binding = ((TurtleBinding.TurtleModemPeripheral) peripheral).getNode();
+				INetworkController network = binding.getAttachedNetwork();
+				if (network != null) network.invalidateNode(binding);
+			}
+		}
 	}
 
 	public static class TurtleBinding extends NetworkBindingWithModem {
