@@ -48,6 +48,7 @@ public class ASMTransformer implements IClassTransformer {
 			new InjectLuaJC(),
 			new WhitelistGlobals(),
 			new PatchTurtleRenderer(),
+			new CustomAPIs(),
 
 			// Networking
 			new ClassMerger(

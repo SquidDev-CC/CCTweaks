@@ -22,7 +22,7 @@ public final class API implements ICCTweaksAPI {
 	private final ITurtleFuelRegistry fuelRegistry = new TurtleFuelRegistry();
 	private final IPeripheralHelpers peripheralHelpers = new PeripheralHelpers();
 
-	private final ILuaEnvironment luaEnvironment = new LuaEnvironment();
+	private final ILuaEnvironment luaEnvironment = LuaEnvironment.instance;
 
 	@Override
 	public INetworkRegistry networkRegistry() {

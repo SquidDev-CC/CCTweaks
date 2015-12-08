@@ -3,6 +3,7 @@ apply plugin: 'eclipse'
 
 repositories {
 	mavenCentral()
+	jcenter()
 
 	maven {
 		name = "chickenbones"
@@ -24,19 +25,14 @@ repositories {
 		url "http://repo.openmods.info/artifactory/openmods"
 	}
 
-	maven {
-		name = "austinv11" // Peripherals++
-		url "http://jcenter.bintray.com"
-	}
-
 	ivy {
 		name = "ComputerCraft"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2244/605/[module][revision].[ext]"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2269/339/[module][revision](.[ext])"
 	}
 
 	ivy {
 		name = "CoFHLib"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2235/558/[module]-[revision].[ext]"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2235/558/[module]-[revision](.[ext])"
 	}
 }
 
@@ -50,7 +46,7 @@ configurations {
 }
 
 dependencies {
-	compile group: 'ComputerCraft', name: 'ComputerCraft', version: "${project.cc_version}", ext: 'jar'
+	compile "ComputerCraft:ComputerCraft:${project.cc_version}"
 
 	compile "codechicken:ForgeMultipart:${project.mc_version}-${project.multipart_version}:dev"
 	compile "codechicken:CodeChickenLib:${project.mc_version}-${project.ccl_version}:dev"
@@ -59,7 +55,7 @@ dependencies {
 	packaged "com.austinv11.collectiveframework:CollectiveFramework:${project.collectiveframework_verion}:deobf"
 	packaged "com.austinv11.peripheralsplusplus:PeripheralsPlusPlus:${project.peripheralspp_version}:deobf"
 
-	packaged "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev:jar"
+	packaged "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev"
 	packaged "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
 	packaged "openperipheral:OpenPeripheralCore-API:${project.op_version}"
 

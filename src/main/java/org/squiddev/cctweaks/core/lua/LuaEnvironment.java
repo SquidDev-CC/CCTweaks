@@ -16,7 +16,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LuaEnvironment implements ILuaEnvironment {
-	public final Set<ILuaAPIFactory> providers = new HashSet<ILuaAPIFactory>();
+	/**
+	 * The instance of the Lua environment - this exists as ASM is easier this way
+	 */
+	public static final LuaEnvironment instance = new LuaEnvironment();
+
+	private final Set<ILuaAPIFactory> providers = new HashSet<ILuaAPIFactory>();
+
+	private LuaEnvironment() {
+	}
 
 	@Override
 	public void registerAPI(ILuaAPIFactory factory) {
@@ -24,11 +32,11 @@ public class LuaEnvironment implements ILuaEnvironment {
 		providers.add(factory);
 	}
 
-	public void inject(Computer computer) {
-		if (providers.size() == 0) return;
+	public static void inject(Computer computer) {
+		if (instance.providers.size() == 0) return;
 
 		IComputerAccess access = new ComputerAccess(computer);
-		for (ILuaAPIFactory factory : providers) {
+		for (ILuaAPIFactory factory : instance.providers) {
 			org.squiddev.cctweaks.api.lua.ILuaAPI api = factory.create(access);
 			if (api != null) {
 				computer.addAPI(new LuaAPI(api, factory));
