@@ -30,7 +30,7 @@ public abstract class MultiPeripheralModem extends BasicModem {
 			for (EnumFacing facing : EnumFacing.VALUES) {
 				IPeripheral peripheral = peripherals[facing.ordinal()] = PeripheralUtil.getPeripheral(
 					world,
-					blockPos.add(facing.getDirectionVec()),
+					blockPos.offset(facing),
 					facing.getOpposite()
 				);
 

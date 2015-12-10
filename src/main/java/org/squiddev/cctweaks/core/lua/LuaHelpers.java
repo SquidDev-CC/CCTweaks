@@ -24,7 +24,7 @@ public class LuaHelpers {
 	 */
 	public static BlockPos getRelative(String direction, EnumFacing facing, BlockPos coords) throws LuaException {
 		if (direction.equals("forward")) {
-			coords.add(facing.getDirectionVec());
+			coords.offset(facing);
 		} else if (direction.equals("up")) {
 			return coords.add(0, 1, 0);
 		} else if (direction.equals("down")) {

@@ -18,7 +18,7 @@ import java.util.Set;
 public final class NetworkHelpers implements INetworkHelpers {
 	@Override
 	public boolean canConnect(IBlockAccess world, BlockPos position, EnumFacing direction) {
-		IWorldNetworkNode node = NetworkAPI.registry().getNode(world, position.add(direction.getDirectionVec()));
+		IWorldNetworkNode node = NetworkAPI.registry().getNode(world, position.offset(direction));
 		return node != null && node.canConnect(direction.getOpposite());
 	}
 
@@ -41,7 +41,7 @@ public final class NetworkHelpers implements INetworkHelpers {
 
 		for (EnumFacing direction : EnumFacing.VALUES) {
 			if (node.canConnect(direction)) {
-				BlockPos pos = blockPos.add(direction.getDirectionVec());
+				BlockPos pos = blockPos.offset(direction);
 				if (world == null || world.isBlockLoaded(pos)) {
 					IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(position.getBlockAccess(), pos);
 
