@@ -157,10 +157,10 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 		if (state.getValue(TYPE) == BlockNetworkedType.MODEM) {
 			TileBase te = getTile(worldIn, pos);
 			if (te instanceof TileNetworkedModem) {
-				BasicModem modem = ((TileNetworkedModem) te).modem;
+				int modemState = ((TileNetworkedModem) te).modem.state;
 				state = state
-					.withProperty(MODEM_ON, modem.isActive())
-					.withProperty(PERIPHERAL_ON, modem.isEnabled());
+					.withProperty(MODEM_ON, (modemState & BasicModem.MODEM_ON) == BasicModem.MODEM_ON)
+					.withProperty(PERIPHERAL_ON, (modemState & BasicModem.MODEM_PERIPHERAL) == BasicModem.MODEM_PERIPHERAL);
 			}
 		}
 		return state;
