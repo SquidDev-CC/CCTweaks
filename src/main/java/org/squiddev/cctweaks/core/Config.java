@@ -121,12 +121,6 @@ public final class Config {
 		public static int euRefuelAmount;
 
 		/**
-		 * Fun actions for turtle names
-		 */
-		@DefaultBoolean(true)
-		public static boolean funNames;
-
-		/**
 		 * Disabled turtle actions:
 		 * (compare, compareTo, craft, detect, dig,
 		 * drop, equip, inspect, move, place,

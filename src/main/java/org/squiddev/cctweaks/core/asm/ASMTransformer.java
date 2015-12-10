@@ -32,10 +32,10 @@ public class ASMTransformer implements IClassTransformer {
 			// General stuff
 			new ClassReplaceSource("org.luaj.vm2.lib.DebugLib"),
 			new ClassReplaceSource("org.luaj.vm2.lib.StringLib"),
-//			new ClassReplacer(
-//				"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
-//				"org.squiddev.cctweaks.core.patch.TurtleRefuelCommand_Rewrite"
-//			),
+			new ClassReplacer(
+				"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
+				"org.squiddev.cctweaks.core.patch.TurtleRefuelCommand_Rewrite"
+			),
 			new ClassMerger(
 				"dan200.computercraft.shared.peripheral.common.BlockPeripheral",
 				"org.squiddev.cctweaks.core.patch.BlockPeripheral_Patch"
@@ -48,7 +48,6 @@ public class ASMTransformer implements IClassTransformer {
 			new CustomTimeout(),
 			new InjectLuaJC(),
 			new WhitelistGlobals(),
-//			new PatchTurtleRenderer(),
 			new CustomAPIs(),
 
 			// Networking
