@@ -4,7 +4,7 @@ import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import net.minecraft.util.Facing;
+import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileBase;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -16,9 +16,10 @@ public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
 	private final IPeripheral[] sides = new IPeripheral[6];
 
 	@Override
-	public IPeripheral getPeripheral(int side) {
-		if (sides[side] != null) return sides[side];
-		return sides[side] = createPeripheral(side);
+	public IPeripheral getPeripheral(EnumFacing side) {
+		int s = side.ordinal();
+		if (sides[s] != null) return sides[s];
+		return sides[s] = createPeripheral(s);
 	}
 
 	protected IPeripheral createPeripheral(int side) {
@@ -29,7 +30,7 @@ public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
 		private final String sideName;
 
 		public SidedPeripheral(int side) {
-			this.sideName = Facing.facings[side];
+			this.sideName = EnumFacing.VALUES[side].getName();
 		}
 
 		@Override

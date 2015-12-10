@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.api;
 
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
 /**
@@ -11,28 +12,13 @@ public interface IWorldPosition {
 	 *
 	 * @return The block's world
 	 */
-	IBlockAccess getWorld();
+	IBlockAccess getBlockAccess();
 
 	/**
-	 * Get X position of the block
+	 * Get the position of the block
 	 *
-	 * @return X position of the block
+	 * @return The position of the block
 	 */
-	int getX();
-
-	/**
-	 * Get Y position of the block
-	 *
-	 * @return Y position of the block
-	 */
-
-	int getY();
-
-	/**
-	 * Get Z position of the block
-	 *
-	 * @return Z position of the block
-	 */
-	int getZ();
+	BlockPos getPosition();
 
 }

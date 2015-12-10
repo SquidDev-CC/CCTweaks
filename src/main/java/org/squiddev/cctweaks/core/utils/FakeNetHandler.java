@@ -1,22 +1,20 @@
 package org.squiddev.cctweaks.core.utils;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.network.*;
 import net.minecraft.network.play.client.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.crypto.SecretKey;
-import java.net.SocketAddress;
 
 public class FakeNetHandler extends NetHandlerPlayServer {
 	public static class FakeNetworkManager extends NetworkManager {
 		public FakeNetworkManager() {
-			super(false);
+			super(EnumPacketDirection.CLIENTBOUND);
 		}
 
 		@Override
@@ -39,17 +37,9 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 		public void setNetHandler(INetHandler handler) {
 		}
 
-		@Override
-		public void scheduleOutboundPacket(Packet packet, GenericFutureListener... listener) {
-		}
 
 		@Override
 		public void processReceivedPackets() {
-		}
-
-		@Override
-		public SocketAddress getSocketAddress() {
-			return null;
 		}
 
 		@Override
@@ -101,10 +91,6 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 	}
 
 	@Override
-	public void onNetworkTick() {
-	}
-
-	@Override
 	public void kickPlayerFromServer(String player) {
 	}
 
@@ -143,10 +129,6 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 
 	@Override
 	public void processChatMessage(C01PacketChatMessage packet) {
-	}
-
-	@Override
-	public void processAnimation(C0APacketAnimation packet) {
 	}
 
 	@Override
@@ -203,9 +185,5 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 
 	@Override
 	public void processVanilla250Packet(C17PacketCustomPayload packet) {
-	}
-
-	@Override
-	public void onConnectionStateTransition(EnumConnectionState old, EnumConnectionState newState) {
 	}
 }

@@ -1,11 +1,8 @@
 package org.squiddev.cctweaks.items;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 
 /**
@@ -27,13 +24,7 @@ public class ItemMultiBlock extends ItemBlock {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIconFromDamage(int meta) {
-		return field_150939_a.getIcon(0, meta);
-	}
-
-	@Override
 	public String getUnlocalizedName(ItemStack stack) {
-		return ((IMultiBlock) field_150939_a).getUnlocalizedName(stack.getItemDamage());
+		return ((IMultiBlock) block).getUnlocalizedName(stack.getItemDamage());
 	}
 }

@@ -1,6 +1,6 @@
 package org.squiddev.cctweaks.integration.openperipheral;
 
-import cpw.mods.fml.common.Optional;
+import net.minecraftforge.fml.common.Optional;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.adapter.IPeripheralAdapterRegistry;
 import org.squiddev.cctweaks.core.Config;

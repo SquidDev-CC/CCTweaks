@@ -3,18 +3,15 @@ package org.squiddev.cctweaks.core.patch;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
-import dan200.computercraft.shared.peripheral.common.BlockCable;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
-import dan200.computercraft.shared.peripheral.modem.TileCable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.Facing;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.FmlEvents;
@@ -25,14 +22,13 @@ import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
 @MergeVisitor.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
-public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost, IWorldPosition {
+public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNodeHost, IWorldPosition {
+
 	public static final double MIN = 0.375;
 	public static final double MAX = 1 - MIN;
 
 	@MergeVisitor.Stub
 	private boolean m_destroyed;
-	@MergeVisitor.Stub
-	private static IIcon[] s_cableIcons;
 	@MergeVisitor.Stub
 	private boolean m_peripheralAccessAllowed;
 
@@ -52,7 +48,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 				protected boolean ANNOTATION;
 
 				@Override
-				public int getDirection() {
+				public EnumFacing getDirection() {
 					return TileCable_Patch.this.getDirection();
 				}
 
@@ -62,7 +58,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 				}
 
 				@Override
-				public boolean canConnect(ForgeDirection from) {
+				public boolean canConnect(EnumFacing from) {
 					return true;
 				}
 
@@ -101,13 +97,13 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 				}
 
 				@Override
-				public boolean canConnect(ForgeDirection direction) {
+				public boolean canConnect(EnumFacing direction) {
 					// Can't be visited by other nodes if it is destroyed
 					if (m_destroyed) return false;
 
 					// Or has no cable or is the side it is facing
 					PeripheralType type = getPeripheralType();
-					return type == PeripheralType.Cable || (type == PeripheralType.WiredModemWithCable && direction.ordinal() != getDirection());
+					return type == PeripheralType.Cable || (type == PeripheralType.WiredModemWithCable && direction != getDirection());
 				}
 			};
 		}
@@ -171,7 +167,7 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	}
 
 	@Override
-	public boolean onActivate(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+	public boolean onActivate(EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (getPeripheralType() == PeripheralType.WiredModemWithCable && !player.isSneaking()) {
 			if (!worldObj.isRemote) {
 
@@ -237,13 +233,13 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	}
 
 	@Override
-	public IPeripheral getPeripheral(int side) {
+	public IPeripheral getPeripheral(EnumFacing side) {
 		return side == getDirection() && getPeripheralType() != PeripheralType.Cable ? getModem().modem : null;
 	}
 
 	@Override
-	public void updateEntity() {
-		super.updateEntity();
+	public void update() {
+		super.update();
 		if (worldObj.isRemote) return;
 
 		if (getModem().modem.pollChanged()) updateAnim();
@@ -337,50 +333,18 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 
 	@Override
 	public AxisAlignedBB getCableBounds() {
-		int x = xCoord, y = yCoord, z = zCoord;
+		BlockPos pos = this.pos;
 		IBlockAccess world = worldObj;
 
 		INetworkHelpers helpers = NetworkAPI.helpers();
-		return AxisAlignedBB.getBoundingBox(
-			helpers.canConnect(world, x, y, z, ForgeDirection.WEST) ? 0 : MIN,
-			helpers.canConnect(world, x, y, z, ForgeDirection.DOWN) ? 0 : MIN,
-			helpers.canConnect(world, x, y, z, ForgeDirection.NORTH) ? 0 : MIN,
-			helpers.canConnect(world, x, y, z, ForgeDirection.EAST) ? 1 : MAX,
-			helpers.canConnect(world, x, y, z, ForgeDirection.UP) ? 1 : MAX,
-			helpers.canConnect(world, x, y, z, ForgeDirection.SOUTH) ? 1 : MAX
+		return new AxisAlignedBB(
+			helpers.canConnect(world, pos, EnumFacing.WEST) ? 0 : MIN,
+			helpers.canConnect(world, pos, EnumFacing.DOWN) ? 0 : MIN,
+			helpers.canConnect(world, pos, EnumFacing.NORTH) ? 0 : MIN,
+			helpers.canConnect(world, pos, EnumFacing.EAST) ? 1 : MAX,
+			helpers.canConnect(world, pos, EnumFacing.UP) ? 1 : MAX,
+			helpers.canConnect(world, pos, EnumFacing.SOUTH) ? 1 : MAX
 		);
-	}
-
-	@Override
-	public IIcon getTexture(int side) {
-		PeripheralType type = BlockCable.renderAsModem ? PeripheralType.WiredModem : getPeripheralType();
-
-		if (type == PeripheralType.Cable || type == PeripheralType.WiredModemWithCable) {
-			int dir = -1;
-			if (type == PeripheralType.WiredModemWithCable) {
-				dir = getDirection();
-				dir -= dir % 2;
-			}
-
-			int x = xCoord, y = yCoord, z = zCoord;
-			IBlockAccess world = worldObj;
-
-			INetworkHelpers helpers = NetworkAPI.helpers();
-			if (helpers.canConnect(world, x, y, z, ForgeDirection.EAST) || helpers.canConnect(world, x, y, z, ForgeDirection.WEST)) {
-				dir = dir == -1 || dir == 4 ? 4 : -2;
-			}
-			if (helpers.canConnect(world, x, y, z, ForgeDirection.UP) || helpers.canConnect(world, x, y, z, ForgeDirection.DOWN)) {
-				dir = dir == -1 || dir == 0 ? 0 : -2;
-			}
-			if (helpers.canConnect(world, x, y, z, ForgeDirection.NORTH) || helpers.canConnect(world, x, y, z, ForgeDirection.SOUTH)) {
-				dir = dir == -1 || dir == 2 ? 2 : -2;
-			}
-
-			if (dir == -1) dir = 2;
-			return dir >= 0 && (side == dir || side == Facing.oppositeSide[dir]) ? s_cableIcons[1] : s_cableIcons[0];
-		}
-
-		return super.getTexture(side);
 	}
 
 	@Override
@@ -389,22 +353,12 @@ public class TileCable_Patch extends TileCable implements IWorldNetworkNodeHost,
 	}
 
 	@Override
-	public IBlockAccess getWorld() {
+	public IBlockAccess getBlockAccess() {
 		return worldObj;
 	}
 
 	@Override
-	public int getX() {
-		return xCoord;
-	}
-
-	@Override
-	public int getY() {
-		return yCoord;
-	}
-
-	@Override
-	public int getZ() {
-		return zCoord;
+	public BlockPos getPosition() {
+		return pos;
 	}
 }

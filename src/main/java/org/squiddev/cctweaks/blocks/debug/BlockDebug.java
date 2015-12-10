@@ -1,16 +1,13 @@
 package org.squiddev.cctweaks.blocks.debug;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.CCTweaks;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.blocks.TileBase;
@@ -23,9 +20,13 @@ import java.util.List;
  * The base debug block that provides debug TileEntities
  */
 public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
-	private IIcon peripheralIcon;
-	private IIcon networkedPeripheralIcon;
-	private IIcon nodeIcon;
+	public enum BlockDebugType {
+		PERIPHERAL,
+		NETWORKED_PERIPHERAL,
+		NODE,
+	}
+
+	public static final PropertyEnum TYPE = PropertyEnum.create("type", BlockDebugType.class);
 
 	public BlockDebug() {
 		super("debugBlock", TileBase.class);
@@ -37,15 +38,6 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 		itemStacks.add(new ItemStack(this, 1, 0));
 		itemStacks.add(new ItemStack(this, 1, 1));
 		itemStacks.add(new ItemStack(this, 1, 2));
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerBlockIcons(IIconRegister register) {
-		blockIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":debugTemplate");
-		peripheralIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":debugPeripheral");
-		networkedPeripheralIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":debugNetworkedPeripheral");
-		nodeIcon = register.registerIcon(CCTweaks.RESOURCE_DOMAIN + ":debugNode");
 	}
 
 	@Override
@@ -63,23 +55,16 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(int side, int meta) {
-		switch (meta) {
-			case 0:
-				return peripheralIcon;
-			case 1:
-				return networkedPeripheralIcon;
-			case 2:
-				return nodeIcon;
-		}
+	public IBlockState getStateFromMeta(int meta) {
+		IBlockState state = super.getStateFromMeta(meta);
 
-		return null;
+		BlockDebugType[] values = BlockDebugType.values();
+		return state.withProperty(TYPE, values[meta >= values.length || meta < 0 ? 0 : meta]);
 	}
 
 	@Override
-	public int damageDropped(int damage) {
-		return damage;
+	public int damageDropped(IBlockState state) {
+		return ((BlockDebugType) state.getValue(TYPE)).ordinal();
 	}
 
 	@Override

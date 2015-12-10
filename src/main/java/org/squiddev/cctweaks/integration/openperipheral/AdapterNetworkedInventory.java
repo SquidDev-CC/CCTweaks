@@ -2,7 +2,7 @@ package org.squiddev.cctweaks.integration.openperipheral;
 
 import com.google.common.base.Preconditions;
 import net.minecraft.inventory.IInventory;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.IPeripheralAdapter;
 import openperipheral.api.adapter.method.*;
@@ -45,9 +45,9 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 		@Arg(name = "remoteName", description = "The name of the remote inventory") String remoteName,
 		@Arg(name = "fromSlot", description = "The slot in the OTHER inventory that you're pulling from") int fromSlot,
 		@Optionals @Arg(name = "maxAmount", description = "The maximum amount of items you want to pull") Integer maxAmount,
-		@Arg(name = "fromDirection", description = "The direction to pull from the OTHER inventory") ForgeDirection fromDirection,
+		@Arg(name = "fromDirection", description = "The direction to pull from the OTHER inventory") EnumFacing fromDirection,
 		@Arg(name = "intoSlot", description = "The slot in the current inventory that you want to pull into") Integer intoSlot,
-		@Arg(name = "intoDirection", description = "The direction to push into the current inventory") ForgeDirection intoDirection
+		@Arg(name = "intoDirection", description = "The direction to push into the current inventory") EnumFacing intoDirection
 	) {
 		Preconditions.checkNotNull(network, "Cannot find the network");
 
@@ -58,8 +58,8 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 
 		if (maxAmount == null) maxAmount = 64;
 		if (intoSlot == null) intoSlot = 0;
-		if (fromDirection == null) fromDirection = ForgeDirection.UNKNOWN;
-		if (intoDirection == null) intoDirection = ForgeDirection.UNKNOWN;
+		if (fromDirection == null) fromDirection = null;
+		if (intoDirection == null) intoDirection = null;
 
 		fromSlot -= 1;
 		intoSlot -= 1;
@@ -83,9 +83,9 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 		@Arg(name = "remoteName", description = "The name of the remote inventory") String remoteName,
 		@Arg(name = "fromSlot", description = "The slot in the current inventory that you're pushing from") int fromSlot,
 		@Optionals @Arg(name = "maxAmount", description = "The maximum amount of items you want to push") Integer maxAmount,
-		@Arg(name = "fromDirection", description = "The direction to push into the current inventory") ForgeDirection fromDirection,
+		@Arg(name = "fromDirection", description = "The direction to push into the current inventory") EnumFacing fromDirection,
 		@Arg(name = "intoSlot", description = "The slot in the other inventory that you want to push into") Integer intoSlot,
-		@Arg(name = "intoDirection", description = "The slot in the other inventory that you're pulling from") ForgeDirection intoDirection
+		@Arg(name = "intoDirection", description = "The slot in the other inventory that you're pulling from") EnumFacing intoDirection
 	) {
 		Preconditions.checkNotNull(network, "Cannot find the network");
 
@@ -96,8 +96,8 @@ public class AdapterNetworkedInventory implements IPeripheralAdapter {
 
 		if (maxAmount == null) maxAmount = 64;
 		if (intoSlot == null) intoSlot = 0;
-		if (fromDirection == null) fromDirection = ForgeDirection.UNKNOWN;
-		if (intoDirection == null) intoDirection = ForgeDirection.UNKNOWN;
+		if (fromDirection == null) fromDirection = null;
+		if (intoDirection == null) intoDirection = null;
 
 		fromSlot -= 1;
 		intoSlot -= 1;

@@ -1,9 +1,9 @@
 package org.squiddev.cctweaks.items;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.registry.IModule;
 
@@ -14,7 +14,6 @@ public abstract class ItemBase extends Item implements IModule {
 		name = itemName;
 
 		setUnlocalizedName(CCTweaks.RESOURCE_DOMAIN + "." + itemName);
-		setTextureName(CCTweaks.RESOURCE_DOMAIN + ":" + itemName);
 
 		setCreativeTab(CCTweaks.getCreativeTab());
 		setMaxStackSize(stackSize);

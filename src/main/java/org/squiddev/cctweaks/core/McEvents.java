@@ -1,12 +1,12 @@
 package org.squiddev.cctweaks.core;
 
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 
@@ -68,7 +68,7 @@ public class McEvents {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onHarvestDrops(BlockEvent.HarvestDropsEvent event) {
 		if (blockConsumers.size() > 0) {
-			IDropConsumer consumer = blockConsumers.get(new WorldPosition(event.world, event.x, event.y, event.z));
+			IDropConsumer consumer = blockConsumers.get(new WorldPosition(event.world, event.pos));
 			if (consumer != null) {
 				for (ItemStack item : event.drops) {
 					if (event.world.rand.nextFloat() < event.dropChance) {

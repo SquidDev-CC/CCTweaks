@@ -5,6 +5,8 @@ import dan200.computercraft.shared.turtle.blocks.TileTurtle;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 /**
@@ -16,12 +18,12 @@ public abstract class ItemComputerAction extends ItemBase {
 	}
 
 	@Override
-	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (!player.isSneaking() || world.isRemote) {
 			return false;
 		}
 
-		TileEntity tile = world.getTileEntity(x, y, z);
+		TileEntity tile = world.getTileEntity(position);
 		if (tile == null) return false;
 
 		boolean result;
@@ -45,16 +47,16 @@ public abstract class ItemComputerAction extends ItemBase {
 		return result;
 	}
 
-	protected abstract boolean useComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side);
+	protected abstract boolean useComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, EnumFacing side);
 
-	protected boolean useTurtle(ItemStack stack, EntityPlayer player, TileTurtle computerTile, int side) {
+	protected boolean useTurtle(ItemStack stack, EntityPlayer player, TileTurtle computerTile, EnumFacing side) {
 		return useComputer(stack, player, computerTile, side);
 	}
 
 	/**
 	 * Custom action on other tile types
 	 */
-	protected boolean useGeneric(ItemStack stack, EntityPlayer player, TileEntity tile, int side) {
+	protected boolean useGeneric(ItemStack stack, EntityPlayer player, TileEntity tile, EnumFacing side) {
 		return false;
 	}
 }

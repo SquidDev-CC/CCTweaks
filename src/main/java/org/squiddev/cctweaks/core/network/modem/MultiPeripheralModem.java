@@ -2,7 +2,8 @@ package org.squiddev.cctweaks.core.network.modem;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.PeripheralUtil;
-import net.minecraft.util.Facing;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHidden;
@@ -23,20 +24,18 @@ public abstract class MultiPeripheralModem extends BasicModem {
 
 			IPeripheral[] peripherals = new IPeripheral[6];
 
-			World world = (World) position.getWorld();
-			int x = position.getX(), y = position.getY(), z = position.getZ();
+			World world = (World) position.getBlockAccess();
+			BlockPos blockPos = position.getPosition();
 
-			for (int dir = 0; dir < 6; dir++) {
-				IPeripheral peripheral = peripherals[dir] = PeripheralUtil.getPeripheral(
+			for (EnumFacing facing : EnumFacing.VALUES) {
+				IPeripheral peripheral = peripherals[facing.ordinal()] = PeripheralUtil.getPeripheral(
 					world,
-					x + Facing.offsetsXForSide[dir],
-					y + Facing.offsetsYForSide[dir],
-					z + Facing.offsetsZForSide[dir],
-					Facing.oppositeSide[dir]
+					blockPos.add(facing.getDirectionVec()),
+					facing.getOpposite()
 				);
 
 				if (peripheral instanceof IPeripheralHidden || (peripheral instanceof BasicModemPeripheral && ((BasicModemPeripheral) peripheral).modem instanceof MultiPeripheralModem)) {
-					peripherals[dir] = null;
+					peripherals[facing.ordinal()] = null;
 				}
 			}
 
@@ -45,7 +44,7 @@ public abstract class MultiPeripheralModem extends BasicModem {
 
 		@Override
 		protected World getWorld() {
-			return (World) MultiPeripheralModem.this.getPosition().getWorld();
+			return (World) getPosition().getBlockAccess();
 		}
 	};
 

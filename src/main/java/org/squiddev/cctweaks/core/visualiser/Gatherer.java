@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.visualiser;
 
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
@@ -11,7 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.squiddev.cctweaks.core.visualiser.VisualisationData.*;
+import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Connection;
+import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Node;
 
 /**
  * Converts a network into visualisation data.
@@ -29,7 +31,7 @@ public final class Gatherer {
 			IWorldPosition position = node instanceof IWorldNetworkNode ? ((IWorldNetworkNode) node).getPosition() : null;
 
 			// We only care about the position if we are in the current world
-			Position resultPosition = position != null && position.getWorld() == world ? new Position(position.getX(), position.getY(), position.getZ()) : null;
+			BlockPos resultPosition = position != null && position.getBlockAccess() == world ? position.getPosition() : null;
 
 			Node result = resultNodes[index] = new Node(node.toString(), resultPosition);
 			lookup.put(node, result);

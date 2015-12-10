@@ -1,6 +1,6 @@
 package org.squiddev.cctweaks.core.network.cable;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
 
@@ -10,8 +10,8 @@ public abstract class SingleModemCable extends CableWithInternalSidedParts {
 	public abstract DirectionalPeripheralModem getModem();
 
 	@Override
-	public boolean canConnectInternally(ForgeDirection dir) {
-		return getModem().getDirection() == dir.ordinal();
+	public boolean canConnectInternally(EnumFacing dir) {
+		return getModem().getDirection() == dir;
 	}
 
 	@Override

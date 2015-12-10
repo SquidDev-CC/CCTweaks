@@ -1,9 +1,7 @@
 package org.squiddev.cctweaks.items;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.shared.computer.blocks.BlockComputer;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.computer.items.ComputerItemFactory;
@@ -11,17 +9,22 @@ import dan200.computercraft.shared.pocket.items.PocketComputerItemFactory;
 import dan200.computercraft.shared.turtle.blocks.TileTurtle;
 import dan200.computercraft.shared.turtle.items.TurtleItemFactory;
 import dan200.computercraft.shared.util.ImpostorShapelessRecipe;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.RecipeSorter;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.utils.BlockNotifyFlags;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
@@ -34,14 +37,14 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 	}
 
 	@Override
-	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
-		return Config.Computer.computerUpgradeEnabled && super.onItemUseFirst(stack, player, world, x, y, z, side, hitX, hitY, hitZ);
+	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumFacing side, float hitX, float hitY, float hitZ) {
+		return Config.Computer.computerUpgradeEnabled && super.onItemUseFirst(stack, player, world, position, side, hitX, hitY, hitZ);
 	}
 
 	@Override
-	protected boolean useComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side) {
-		int x = computerTile.xCoord, y = computerTile.yCoord, z = computerTile.zCoord;
-		World world = computerTile.getWorldObj();
+	protected boolean useComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, EnumFacing side) {
+		BlockPos position = computerTile.getPos();
+		World world = computerTile.getWorld();
 
 		// Check we can copy the tile and it is a normal computer
 		if (computerTile.getFamily() != ComputerFamily.Normal || ComputerAccessor.tileCopy == null) {
@@ -49,35 +52,19 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		}
 
 		// Set metadata
-		int metadata = world.getBlockMetadata(x, y, z);
-		world.setBlock(x, y, z, ComputerCraft.Blocks.computer, metadata + 8, BlockNotifyFlags.ALL);
-
-		TileEntity newTile = world.getTileEntity(x, y, z);
-
-		if (newTile == null || !(newTile instanceof TileComputerBase)) {
+		IBlockState state = world.getBlockState(position);
+		if (ComputerAccessor.tileCopy == null || (Boolean) state.getValue(BlockComputer.Properties.ADVANCED)) {
 			return false;
 		}
 
-		// Why is it not public Dan?
-		TileComputerBase newComputer = (TileComputerBase) newTile;
-		try {
-			ComputerAccessor.tileCopy.invoke(newComputer, computerTile);
-		} catch (Exception e) {
-			DebugLogger.warn("Cannot copy tile in ItemComputerUpgrade", e);
-			return false;
-		}
-
-		// Setup computer
-		newComputer.createServerComputer().setWorld(world);
-		newComputer.updateBlock();
-
+		world.setBlockState(position, state.withProperty(BlockComputer.Properties.ADVANCED, true));
 		return true;
 	}
 
 	@Override
-	protected boolean useTurtle(ItemStack stack, EntityPlayer player, TileTurtle computerTile, int side) {
-		int x = computerTile.xCoord, y = computerTile.yCoord, z = computerTile.zCoord;
-		World world = computerTile.getWorldObj();
+	protected boolean useTurtle(ItemStack stack, EntityPlayer player, TileTurtle computerTile, EnumFacing side) {
+		BlockPos position = computerTile.getPos();
+		World world = computerTile.getWorld();
 
 		// Ensure it is a normal computer
 		if (computerTile.getFamily() != ComputerFamily.Normal) {
@@ -92,8 +79,8 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		}
 
 		// Set block as AdvancedTurtle
-		world.setBlock(x, y, z, ComputerCraft.Blocks.turtleAdvanced);
-		TileEntity newTile = world.getTileEntity(x, y, z);
+		world.setBlockState(position, ComputerCraft.Blocks.turtleAdvanced.getDefaultState());
+		TileEntity newTile = world.getTileEntity(position);
 
 		// Transfer state
 		if (newTile == null || !(newTile instanceof TileTurtle)) {
@@ -104,7 +91,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		newTurtle.transferStateFrom(computerTile);
 
 		newTurtle.createServerComputer().setWorld(world);
-		newTurtle.createServerComputer().setPosition(x, y, z);
+		newTurtle.createServerComputer().setPosition(position);
 		newTurtle.updateBlock();
 
 		return true;

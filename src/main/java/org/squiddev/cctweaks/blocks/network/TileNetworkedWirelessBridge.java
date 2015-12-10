@@ -4,6 +4,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
@@ -51,7 +52,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	}
 
 	@Override
-	public boolean onActivated(EntityPlayer player, int side) {
+	public boolean onActivated(EntityPlayer player, EnumFacing side) {
 		ItemStack stack = player.getHeldItem();
 		return stack != null && stack.getItem() instanceof IDataCard && onActivated(stack, (IDataCard) stack.getItem(), player);
 	}
@@ -84,12 +85,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	}
 
 	@Override
-	public boolean canUpdate() {
-		return false;
-	}
-
-	@Override
-	public IPeripheral getPeripheral(int side) {
+	public IPeripheral getPeripheral(EnumFacing side) {
 		return binding.getModem().modem;
 	}
 

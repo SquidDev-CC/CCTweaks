@@ -1,6 +1,6 @@
 package org.squiddev.cctweaks.integration;
 
-import cpw.mods.fml.common.ModAPIManager;
+import net.minecraftforge.fml.common.ModAPIManager;
 import org.squiddev.cctweaks.core.registry.Module;
 
 /**

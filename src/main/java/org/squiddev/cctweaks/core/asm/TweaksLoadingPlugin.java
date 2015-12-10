@@ -1,11 +1,11 @@
 package org.squiddev.cctweaks.core.asm;
 
 import com.google.common.eventbus.EventBus;
-import cpw.mods.fml.common.DummyModContainer;
-import cpw.mods.fml.common.LoadController;
-import cpw.mods.fml.common.ModMetadata;
-import cpw.mods.fml.relauncher.FMLInjectionData;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraftforge.fml.common.DummyModContainer;
+import net.minecraftforge.fml.common.LoadController;
+import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.relauncher.FMLInjectionData;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.Config;
 

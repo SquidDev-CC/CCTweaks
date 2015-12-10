@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.core.network.cable;
 
 import com.google.common.collect.Sets;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkHelpers;
 import org.squiddev.cctweaks.api.network.INetworkNode;
@@ -23,7 +23,7 @@ public abstract class BasicCable extends AbstractWorldNode {
 		int map = 0;
 
 		INetworkHelpers helpers = NetworkAPI.helpers();
-		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+		for (EnumFacing dir : EnumFacing.VALUES) {
 			if (canConnect(dir) && helpers.canConnect(getPosition(), dir)) {
 				map |= 1 << dir.ordinal();
 			}
@@ -69,7 +69,7 @@ public abstract class BasicCable extends AbstractWorldNode {
 		updateConnections();
 	}
 
-	public boolean doesConnect(ForgeDirection dir) {
+	public boolean doesConnect(EnumFacing dir) {
 		int flag = 1 << dir.ordinal();
 		return (connMap & flag) == flag;
 	}

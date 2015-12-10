@@ -1,5 +1,7 @@
 package org.squiddev.cctweaks.core.visualiser;
 
+import net.minecraft.util.BlockPos;
+
 /**
  * Stores data for drawing network graphs
  */
@@ -14,9 +16,9 @@ public final class VisualisationData {
 
 	public static class Node {
 		public final String name;
-		public final Position position;
+		public final BlockPos position;
 
-		public Node(String name, Position position) {
+		public Node(String name, BlockPos position) {
 			this.name = name;
 			this.position = position;
 		}
@@ -40,40 +42,6 @@ public final class VisualisationData {
 		@Override
 		public int hashCode() {
 			return 31 * name.hashCode() + (position != null ? position.hashCode() : 0);
-		}
-	}
-
-	public static class Position {
-		public final int x;
-		public final int y;
-		public final int z;
-
-		public Position(int x, int y, int z) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
-
-		@Override
-		public String toString() {
-			return String.format("(%s, %s, %s)", x, y, z);
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (!(o instanceof Position)) return false;
-
-			Position position = (Position) o;
-			return x == position.x && y == position.y && z == position.z;
-		}
-
-		@Override
-		public int hashCode() {
-			int result = x;
-			result = 31 * result + y;
-			result = 31 * result + z;
-			return result;
 		}
 	}
 

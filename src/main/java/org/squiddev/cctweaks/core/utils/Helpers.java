@@ -1,12 +1,12 @@
 package org.squiddev.cctweaks.core.utils;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.IDAssigner;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.io.File;
 

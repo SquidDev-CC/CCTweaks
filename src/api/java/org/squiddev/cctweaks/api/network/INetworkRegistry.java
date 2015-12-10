@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.api.network;
 
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
@@ -20,13 +21,11 @@ public interface INetworkRegistry {
 	/**
 	 * Check if this block is a node
 	 *
-	 * @param world The world to check in
-	 * @param x     X position of the block
-	 * @param y     Y position of the block
-	 * @param z     Z position of the block
+	 * @param world    The world to check in
+	 * @param position Position of the block
 	 * @return If this block is a node
 	 */
-	boolean isNode(IBlockAccess world, int x, int y, int z);
+	boolean isNode(IBlockAccess world, BlockPos position);
 
 	/**
 	 * Check if this tile is a node
@@ -47,13 +46,11 @@ public interface INetworkRegistry {
 	/**
 	 * Get the node for this position
 	 *
-	 * @param world The world to check in
-	 * @param x     X position of the block
-	 * @param y     Y position of the block
-	 * @param z     Z position of the block
+	 * @param world    The world to check in
+	 * @param position Position of the block
 	 * @return The node, or null if there is none
 	 */
-	IWorldNetworkNode getNode(IBlockAccess world, int x, int y, int z);
+	IWorldNetworkNode getNode(IBlockAccess world, BlockPos position);
 
 	/**
 	 * Get the node from this tile entity

@@ -29,7 +29,7 @@ public class TileDebugNode extends TileNetworked {
 		public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
 			DebugLogger.debug(
 				"Node invalidated at %s, %s, %s\n - Old: %s\n - New: %s",
-				xCoord, yCoord, zCoord,
+				pos.getX(), pos.getY(), pos.getZ(),
 				StringUtils.join(oldPeripherals.keySet(), ", "),
 				StringUtils.join(newPeripherals.keySet(), ", ")
 			);

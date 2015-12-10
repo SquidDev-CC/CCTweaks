@@ -7,21 +7,20 @@ import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 import dan200.computercraft.shared.util.PeripheralUtil;
+import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.CCTweaks;
+import org.apache.commons.lang3.tuple.Pair;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.turtle.IExtendedTurtleUpgrade;
-import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.lua.LuaHelpers;
@@ -29,23 +28,17 @@ import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
 import org.squiddev.cctweaks.core.network.modem.PeripheralCollection;
 import org.squiddev.cctweaks.core.peripheral.PeripheralProxy;
-import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
 
+import javax.vecmath.Matrix4f;
 import java.util.Map;
 
 /**
  * Turtle upgrade for the {@link TileNetworkedWirelessBridge} tile
  */
-public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrade, IExtendedTurtleUpgrade {
-	@Override
-	public int getUpgradeID() {
-		return Config.Network.WirelessBridge.turtleId;
-	}
-
-	@Override
-	public String getUnlocalisedAdjective() {
-		return "turtle." + CCTweaks.RESOURCE_DOMAIN + ".wirelessBridge.adjective";
+public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IExtendedTurtleUpgrade {
+	public TurtleUpgradeWirelessBridge() {
+		super("wirlessBridge", Config.Network.WirelessBridge.turtleId, new ItemStack(Registry.blockNetworked, 1, 1));
 	}
 
 	@Override
@@ -64,17 +57,13 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 	}
 
 	@Override
-	public TurtleCommandResult useTool(ITurtleAccess turtle, TurtleSide side, TurtleVerb verb, int direction) {
+	public TurtleCommandResult useTool(ITurtleAccess turtle, TurtleSide side, TurtleVerb verb, EnumFacing direction) {
 		return null;
 	}
 
 	@Override
-	public IIcon getIcon(ITurtleAccess turtle, TurtleSide side) {
-		return BlockNetworked.bridgeSmallIcon;
-	}
-
-	@Override
-	public void update(ITurtleAccess turtle, TurtleSide side) {
+	public Pair<IBakedModel, Matrix4f> getModel(ITurtleAccess iTurtleAccess, TurtleSide turtleSide) {
+		return null;
 	}
 
 	@Override
@@ -136,8 +125,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 				private final IPeripheral peripheral = new PeripheralProxy("turtle") {
 					@Override
 					protected IPeripheral createPeripheral() {
-						ChunkCoordinates pos = turtle.getPosition();
-						return PeripheralUtil.getPeripheral(turtle.getWorld(), pos.posX, pos.posY, pos.posZ, 0);
+						return PeripheralUtil.getPeripheral(turtle.getWorld(), turtle.getPosition(), EnumFacing.DOWN);
 					}
 				};
 
@@ -193,8 +181,8 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			}
 
 			@Override
-			public boolean canConnect(ForgeDirection side) {
-				return side == ForgeDirection.UNKNOWN;
+			public boolean canConnect(EnumFacing side) {
+				return side == null;
 			}
 		}
 
@@ -258,8 +246,8 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 							throw new LuaException("Expected string");
 						}
 
-						ChunkCoordinates coords = LuaHelpers.getRelative(direction, turtle.getDirection(), turtle.getPosition());
-						TileEntity tile = turtle.getWorld().getTileEntity(coords.posX, coords.posY, coords.posZ);
+						BlockPos coords = LuaHelpers.getRelative(direction, turtle.getDirection(), turtle.getPosition());
+						TileEntity tile = turtle.getWorld().getTileEntity(coords);
 
 						if (!(tile instanceof TileNetworkedWirelessBridge)) {
 							throw new LuaException("No wireless bridge here");
@@ -279,8 +267,8 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 							throw new LuaException("Expected string");
 						}
 
-						ChunkCoordinates coords = LuaHelpers.getRelative(direction, turtle.getDirection(), turtle.getPosition());
-						TileEntity tile = turtle.getWorld().getTileEntity(coords.posX, coords.posY, coords.posZ);
+						BlockPos coords = LuaHelpers.getRelative(direction, turtle.getDirection(), turtle.getPosition());
+						TileEntity tile = turtle.getWorld().getTileEntity(coords);
 
 						if (!(tile instanceof TileNetworkedWirelessBridge)) {
 							throw new LuaException("No wireless bridge here");

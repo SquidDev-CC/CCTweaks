@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.core.network;
 
-import codechicken.lib.vec.BlockCoord;
 import com.google.gson.Gson;
+import net.minecraft.util.BlockPos;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -54,7 +54,7 @@ public class PacketTest {
 		network.reset();
 		((IWorldNetworkNodeHost) network.getTileEntity(0, 0, 0)).getNode().getAttachedNetwork().invalidateNetwork();
 
-		for (Map.Entry<BlockCoord, KeyedNetworkNode> location : network) {
+		for (Map.Entry<BlockPos, KeyedNetworkNode> location : network) {
 			Integer count = data.counts.get(location.getValue().key);
 			if (count != null) {
 				assertEquals("Location " + location, count.intValue(), location.getValue().invalidated());
@@ -72,10 +72,10 @@ public class PacketTest {
 		INetworkNode node = ((IWorldNetworkNodeHost) network.getTileEntity(0, 0, 0)).getNode();
 		node.getAttachedNetwork().transmitPacket(node, new Packet(0, 0, null, null));
 
-		for (Map.Entry<BlockCoord, KeyedNetworkNode> location : network) {
+		for (Map.Entry<BlockPos, KeyedNetworkNode> location : network) {
 			Integer distance = data.distance.get(location.getValue().key);
 			if (distance != null) {
-				assertEquals("Location " + location, distance.intValue(), location.getValue().distance(), 0.01);
+				assertEquals("Location " + location, distance, location.getValue().distance(), 0.01);
 			}
 		}
 	}

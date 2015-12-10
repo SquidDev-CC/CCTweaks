@@ -247,13 +247,6 @@ public final class Config {
 		 */
 		@DefaultBoolean(true)
 		public static boolean openPeripheralInventories;
-
-		/**
-		 * Enable ChickenBones Multipart
-		 * (aka ForgeMultipart) integration.
-		 */
-		@DefaultBoolean(true)
-		public static boolean cbMultipart;
 	}
 
 	/**

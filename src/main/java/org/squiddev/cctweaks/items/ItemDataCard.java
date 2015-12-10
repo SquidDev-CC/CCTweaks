@@ -1,14 +1,16 @@
 package org.squiddev.cctweaks.items;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
@@ -47,12 +49,12 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 	}
 
 	@Override
-	public boolean doesSneakBypassUse(World world, int x, int y, int z, EntityPlayer player) {
+	public boolean doesSneakBypassUse(World world, BlockPos pos, EntityPlayer player) {
 		return true;
 	}
 
 	@Override
-	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (player.isSneaking() && !world.isRemote) {
 			((IDataCard) stack.getItem()).notifyPlayer(player, Messages.Cleared);
 			stack.setTagCompound(null);

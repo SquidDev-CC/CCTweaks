@@ -35,8 +35,8 @@ public class ItemDebugger extends ItemComputerAction {
 	}
 
 	@Override
-	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
-		return Config.Computer.debugWandEnabled && super.onItemUseFirst(stack, player, world, x, y, z, side, hitX, hitY, hitZ);
+	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumFacing side, float hitX, float hitY, float hitZ) {
+		return Config.Computer.debugWandEnabled && super.onItemUseFirst(stack, player, world, position, side, hitX, hitY, hitZ);
 	}
 
 	@Override
@@ -64,13 +64,13 @@ public class ItemDebugger extends ItemComputerAction {
 			if (player.getHeldItem() == stack) {
 				MovingObjectPosition position = getMovingObjectPositionFromPlayer(world, player, false);
 				if (position == null || position.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
-				handleWatcher(player, NetworkPlayerWatcher.update(player, position.blockX, position.blockY, position.blockZ), false);
+				handleWatcher(player, NetworkPlayerWatcher.update(player, position.getBlockPos()), false);
 			}
 		}
 	}
 
 	@Override
-	protected boolean useComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, int side) {
+	protected boolean useComputer(ItemStack stack, EntityPlayer player, TileComputerBase computerTile, EnumFacing side) {
 		ServerComputer serverComputer = computerTile.getServerComputer();
 		if (serverComputer == null) return false;
 
@@ -100,7 +100,7 @@ public class ItemDebugger extends ItemComputerAction {
 	}
 
 	@Override
-	protected boolean useGeneric(ItemStack stack, EntityPlayer player, TileEntity tile, int side) {
+	protected boolean useGeneric(ItemStack stack, EntityPlayer player, TileEntity tile, EnumFacing side) {
 		IWorldPosition position = new WorldPosition(tile);
 
 		player.addChatComponentMessage(
@@ -109,7 +109,7 @@ public class ItemDebugger extends ItemComputerAction {
 		);
 
 		{
-			IPeripheral peripheral = PeripheralUtil.getPeripheral(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord, side);
+			IPeripheral peripheral = PeripheralUtil.getPeripheral(tile.getWorld(), tile.getPos(), side);
 			if (peripheral != null) {
 				player.addChatMessage(withColor("Peripheral: ", EnumChatFormatting.AQUA).appendSibling(info(peripheral.getType())));
 			}

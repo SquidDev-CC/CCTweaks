@@ -10,7 +10,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.core.Config;
@@ -127,11 +126,6 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 			@Override
 			protected BasicModemPeripheral createPeripheral() {
 				return new PocketModemPeripheral(this);
-			}
-
-			@Override
-			public boolean canConnect(ForgeDirection side) {
-				return side == ForgeDirection.UNKNOWN;
 			}
 		}
 

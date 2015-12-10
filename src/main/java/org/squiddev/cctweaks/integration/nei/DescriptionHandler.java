@@ -1,15 +1,14 @@
 package org.squiddev.cctweaks.integration.nei;
 
-import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.api.IOverlayHandler;
 import codechicken.nei.api.IRecipeOverlayRenderer;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.ICraftingHandler;
 import codechicken.nei.recipe.IUsageHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 
@@ -71,12 +70,12 @@ public class DescriptionHandler implements ICraftingHandler, IUsageHandler {
 
 	@Override
 	public void drawForeground(int recipe) {
-		FontRenderer renderer = RenderManager.instance.getFontRenderer();
+		FontRenderer renderer = Minecraft.getMinecraft().getRenderManager().getFontRenderer();
 		List text = renderer.listFormattedStringToWidth(this.pages.get(recipe), WIDTH - 8);
 
 		for (int i = 0; i < text.size(); i++) {
 			String t = (String) text.get(i);
-			GuiDraw.drawString(t, WIDTH / 2 - GuiDraw.getStringWidth(t) / 2, 18 + i * 8, -12566464, false);
+			renderer.drawString(t, WIDTH / 2 - renderer.getStringWidth(t) / 2, 18 + i * 8, -12566464, false);
 		}
 	}
 

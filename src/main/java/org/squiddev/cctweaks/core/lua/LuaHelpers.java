@@ -3,8 +3,8 @@ package org.squiddev.cctweaks.core.lua;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.ILuaObject;
 import dan200.computercraft.api.lua.LuaException;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.Facing;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import org.luaj.vm2.Varargs;
 import org.objectweb.asm.ClassVisitor;
 import org.squiddev.cctweaks.api.lua.ArgumentDelegator;
@@ -22,15 +22,13 @@ public class LuaHelpers {
 	 * @return The coordinates
 	 * @throws LuaException
 	 */
-	public static ChunkCoordinates getRelative(String direction, int facing, ChunkCoordinates coords) throws LuaException {
+	public static BlockPos getRelative(String direction, EnumFacing facing, BlockPos coords) throws LuaException {
 		if (direction.equals("forward")) {
-			coords.posX += Facing.offsetsXForSide[facing];
-			coords.posY += Facing.offsetsYForSide[facing];
-			coords.posZ += Facing.offsetsZForSide[facing];
+			coords.add(facing.getDirectionVec());
 		} else if (direction.equals("up")) {
-			coords.posY += 1;
+			return coords.add(0, 1, 0);
 		} else if (direction.equals("down")) {
-			coords.posY -= 1;
+			return coords.add(0, -1, 0);
 		} else {
 			throw new LuaException("Unknown direction " + direction + ", expected 'up', 'down' or 'forward'");
 		}

@@ -27,7 +27,7 @@ repositories {
 
 	ivy {
 		name = "ComputerCraft"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2269/339/[module][revision](.[ext])"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2270/29/[module][revision](.[ext])"
 	}
 
 	ivy {
@@ -48,16 +48,15 @@ configurations {
 dependencies {
 	compile "ComputerCraft:ComputerCraft:${project.cc_version}"
 
-	compile "codechicken:ForgeMultipart:${project.mc_version}-${project.multipart_version}:dev"
-	compile "codechicken:CodeChickenLib:${project.mc_version}-${project.ccl_version}:dev"
-	compile "codechicken:NotEnoughItems:${project.mc_version}-${project.nei_version}:dev"
-	compile "codechicken:CodeChickenCore:${project.mc_version}-${project.ccc_version}:dev"
-	packaged "com.austinv11.collectiveframework:CollectiveFramework:${project.collectiveframework_verion}:deobf"
-	packaged "com.austinv11.peripheralsplusplus:PeripheralsPlusPlus:${project.peripheralspp_version}:deobf"
+	compile "codechicken:CodeChickenCore:${project.mc_version}-1.0.5.36:dev"
+	compile "codechicken:NotEnoughItems:${project.mc_version}-1.0.5.104:dev"
 
-	packaged "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev"
-	packaged "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
-	packaged "openperipheral:OpenPeripheralCore-API:${project.op_version}"
+	// For 1.7.10 but including anyway
+	packaged "CoFHLib:CoFHLib:[1.7.10]1.0.1-159-dev"
+	packaged "net.industrial-craft:industrialcraft-2:2.+:api"
+	packaged "com.austinv11.collectiveframework:CollectiveFramework:1.+:deobf"
+	packaged "com.austinv11.peripheralsplusplus:PeripheralsPlusPlus:1.+:deobf"
+	packaged "openperipheral:OpenPeripheralCore-API:3.2"
 
 	shade('org.squiddev:luaj.luajc:1.0.1') {
 		// We provide a custom LuaJ source with ComputerCraft

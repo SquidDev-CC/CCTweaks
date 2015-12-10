@@ -1,14 +1,16 @@
 package org.squiddev.cctweaks.client.render;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.IClientModule;
@@ -20,7 +22,8 @@ import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.squiddev.cctweaks.core.visualiser.VisualisationData.*;
+import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Connection;
+import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Node;
 
 /**
  * This is a helper to render a network when testing.
@@ -34,11 +37,13 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		++ticksInGame;
 		if (data == null) return;
 
-		ItemStack stack = Minecraft.getMinecraft().thePlayer.getHeldItem();
+		Minecraft minecraft = Minecraft.getMinecraft();
+		ItemStack stack = minecraft.thePlayer.getHeldItem();
 		if (stack == null || stack.getItem() != Registry.itemDebugger) return;
 
 		GL11.glPushMatrix();
-		GL11.glTranslated(-RenderManager.renderPosX, -RenderManager.renderPosY, -RenderManager.renderPosZ);
+		RenderManager renderManager = minecraft.getRenderManager();
+		GL11.glTranslated(-renderManager.viewerPosX, -renderManager.viewerPosY, -renderManager.viewerPosZ);
 
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -68,16 +73,14 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 			// We render a label of all nodes at this point.
 			if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
 				if (a.position != null) {
-					Position nodePosition = a.position;
-					if (nodePosition.x == position.blockX && nodePosition.y == position.blockY && nodePosition.z == position.blockZ) {
+					if (a.position.equals(position.getBlockPos())) {
 						nodes.add(a);
 						if (b.position == null) nodes.add(b);
 					}
 				}
 
 				if (b.position != null) {
-					Position nodePosition = b.position;
-					if (nodePosition.x == position.blockX && nodePosition.y == position.blockY && nodePosition.z == position.blockZ) {
+					if (b.position.equals(position.getBlockPos())) {
 						if (a.position == null) nodes.add(a);
 						nodes.add(b);
 					}
@@ -88,8 +91,8 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		// Custom handling for networks with 0 connections (single node networks)
 		if (data.connections.length == 0 && position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
 			for (Node node : data.nodes) {
-				Position nodePosition = node.position;
-				if (nodePosition != null && nodePosition.x == position.blockX && nodePosition.y == position.blockY && nodePosition.z == position.blockZ) {
+				BlockPos nodePosition = node.position;
+				if (nodePosition != null && nodePosition.equals(position.getBlockPos())) {
 					nodes.add(node);
 				}
 			}
@@ -98,11 +101,12 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		int counter = 0;
 		for (Node node : nodes) {
 			String name = node.position == null ? "\u00a78" + node.name : node.name;
-			renderLabel(position.blockX + 0.5, position.blockY + 1.5 + (counter++) * 0.4, position.blockZ + 0.5, name);
+			BlockPos pos = position.getBlockPos();
+			renderLabel(pos.getX() + 0.5, pos.getY() + 1.5 + (counter++) * 0.4, pos.getZ() + 0.5, name);
 		}
 	}
 
-	public void renderConnection(Position aNode, Position bNode, Color color, float thickness) {
+	public void renderConnection(BlockPos aNode, BlockPos bNode, Color color, float thickness) {
 		GL11.glPushMatrix();
 		GL11.glColor4ub((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue(), (byte) 255);
 
@@ -119,7 +123,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 	}
 
 	private void renderLabel(double x, double y, double z, String label) {
-		RenderManager renderManager = RenderManager.instance;
+		RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
 		FontRenderer fontrenderer = renderManager.getFontRenderer();
 		if (fontrenderer == null) return;
 
@@ -133,7 +137,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 		GL11.glDisable(GL11.GL_LIGHTING);
 
-		Tessellator tessellator = Tessellator.instance;
+		WorldRenderer tessellator = Tessellator.getInstance().getWorldRenderer();
 
 		int width = fontrenderer.getStringWidth(label);
 		int xOffset = width / 2;
@@ -145,7 +149,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		tessellator.addVertex(-xOffset - 1, 8, 0);
 		tessellator.addVertex(xOffset + 1, 8, 0);
 		tessellator.addVertex(xOffset + 1, -1, 0);
-		tessellator.draw();
+		tessellator.finishDrawing();
 
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		fontrenderer.drawString(label, -width / 2, 0, 0xFFFFFFFF);
@@ -156,12 +160,12 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		GL11.glPopMatrix();
 	}
 
-	private void renderLine(Position a, Position b) {
-		Tessellator tessellator = Tessellator.instance;
+	private void renderLine(BlockPos a, BlockPos b) {
+		WorldRenderer tessellator = Tessellator.getInstance().getWorldRenderer();
 		tessellator.startDrawing(GL11.GL_LINES);
-		tessellator.addVertex(a.x + 0.5, a.y + 0.5, a.z + 0.5);
-		tessellator.addVertex(b.x + 0.5, b.y + 0.5, b.z + 0.5);
-		tessellator.draw();
+		tessellator.addVertex(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5);
+		tessellator.addVertex(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
+		tessellator.finishDrawing();
 	}
 
 	@Override

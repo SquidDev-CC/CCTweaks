@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.network.mock;
 
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
@@ -11,8 +12,7 @@ public class NodeTile extends TileBase implements IWorldNetworkNodeHost {
 
 	public NodeTile(IBlockAccess world, int x, int z) {
 		this.world = world;
-		this.xCoord = x;
-		this.zCoord = z;
+		this.pos = new BlockPos(x, 0, z);
 	}
 
 	@Override
@@ -21,12 +21,12 @@ public class NodeTile extends TileBase implements IWorldNetworkNodeHost {
 	}
 
 	@Override
-	public IBlockAccess getWorld() {
+	public IBlockAccess getBlockAccess() {
 		return world;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Tile<x: %s, z: %s>(%s)", xCoord, zCoord, node);
+		return String.format("Tile<%s>(%s)", pos, node);
 	}
 }
