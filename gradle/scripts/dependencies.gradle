@@ -27,7 +27,7 @@ repositories {
 
 	ivy {
 		name = "ComputerCraft"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2270/29/[module][revision](.[ext])"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2270/164/[module][revision](.[ext])"
 	}
 
 	ivy {
@@ -48,6 +48,7 @@ configurations {
 dependencies {
 	compile "ComputerCraft:ComputerCraft:${project.cc_version}"
 
+	compile "codechicken:CodeChickenLib:${project.mc_version}-1.1.2.139:dev"
 	compile "codechicken:CodeChickenCore:${project.mc_version}-1.0.5.36:dev"
 	compile "codechicken:NotEnoughItems:${project.mc_version}-1.0.5.104:dev"
 
