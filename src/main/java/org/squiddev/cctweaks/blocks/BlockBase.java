@@ -5,19 +5,23 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.registry.IModule;
+import org.squiddev.cctweaks.core.registry.IClientModule;
+import org.squiddev.cctweaks.core.utils.Helpers;
 
 /**
  * Base class for all blocks
  */
-public abstract class BlockBase<T extends TileBase> extends BlockContainer implements IModule {
+public abstract class BlockBase<T extends TileBase> extends BlockContainer implements IClientModule {
 	public final String name;
 	public final Class<T> klass;
 
@@ -44,6 +48,11 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 		}
 
 		return null;
+	}
+
+	@Override
+	public int damageDropped(IBlockState state) {
+		return getMetaFromState(state);
 	}
 
 	@Override
@@ -98,5 +107,11 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 
 	@Override
 	public void postInit() {
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void clientInit() {
+		Helpers.setupModel(Item.getItemFromBlock(this), 0, name);
 	}
 }

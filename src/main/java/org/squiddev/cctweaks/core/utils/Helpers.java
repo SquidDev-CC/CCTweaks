@@ -1,12 +1,20 @@
 package org.squiddev.cctweaks.core.utils;
 
+import com.google.common.base.CaseFormat;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.IDAssigner;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.squiddev.cctweaks.CCTweaks;
 
 import java.io.File;
 
@@ -105,5 +113,18 @@ public class Helpers {
 
 	public static boolean equals(Object a, Object b) {
 		return a == b || (a != null && a.equals(b));
+	}
+
+	public static String snakeCase(String name) {
+		return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static void setupModel(Item item, int damage, String name) {
+		name = CCTweaks.RESOURCE_DOMAIN + ":" + name;
+
+		ModelResourceLocation res = new ModelResourceLocation(name, "inventory");
+		ModelBakery.addVariantName(item, name);
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, damage, res);
 	}
 }

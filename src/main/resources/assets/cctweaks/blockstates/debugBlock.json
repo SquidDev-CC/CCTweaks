@@ -1,0 +1,7 @@
+{
+	"variants": {
+		"type=peripheral": { "model": "cctweaks:debug_peripheral" },
+		"type=networked_peripheral": { "model": "cctweaks:debug_networked_peripheral" },
+		"type=node": { "model": "cctweaks:debug_node" }
+	}
+}

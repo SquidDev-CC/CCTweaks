@@ -1,43 +1,76 @@
 package org.squiddev.cctweaks.blocks.debug;
 
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.blocks.TileBase;
 import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.items.ItemMultiBlock;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * The base debug block that provides debug TileEntities
  */
 public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
-	public enum BlockDebugType {
+	public enum BlockDebugType implements IStringSerializable {
 		PERIPHERAL,
 		NETWORKED_PERIPHERAL,
-		NODE,
+		NODE;
+
+		private final String name;
+		private static final HashMap<String, BlockDebugType> NAME_LOOKUP = new HashMap<String, BlockDebugType>();
+		private static final BlockDebugType[] VALUES = values();
+
+		BlockDebugType() {
+			name = name().toLowerCase();
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
+
+		public static BlockDebugType byName(String name) {
+			return NAME_LOOKUP.get(name);
+		}
+
+		static {
+			for (BlockDebugType e : VALUES) {
+				NAME_LOOKUP.put(e.getName(), e);
+			}
+		}
 	}
 
 	public static final PropertyEnum TYPE = PropertyEnum.create("type", BlockDebugType.class);
 
 	public BlockDebug() {
 		super("debugBlock", TileBase.class);
+		setDefaultState(getBlockState().getBaseState().withProperty(TYPE, BlockDebugType.PERIPHERAL));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void getSubBlocks(Item item, CreativeTabs tab, List itemStacks) {
-		itemStacks.add(new ItemStack(this, 1, 0));
-		itemStacks.add(new ItemStack(this, 1, 1));
-		itemStacks.add(new ItemStack(this, 1, 2));
+		for (BlockDebugType type : BlockDebugType.VALUES) {
+			itemStacks.add(new ItemStack(this, 1, type.ordinal()));
+		}
 	}
 
 	@Override
@@ -57,14 +90,17 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
 		IBlockState state = super.getStateFromMeta(meta);
-
-		BlockDebugType[] values = BlockDebugType.values();
-		return state.withProperty(TYPE, values[meta >= values.length || meta < 0 ? 0 : meta]);
+		return state.withProperty(TYPE, BlockDebugType.VALUES[meta < 0 || meta >= BlockDebugType.VALUES.length ? 0 : meta]);
 	}
 
 	@Override
-	public int damageDropped(IBlockState state) {
+	public int getMetaFromState(IBlockState state) {
 		return ((BlockDebugType) state.getValue(TYPE)).ordinal();
+	}
+
+	@Override
+	protected BlockState createBlockState() {
+		return new BlockState(this, TYPE);
 	}
 
 	@Override
@@ -91,5 +127,12 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	@Override
 	public boolean canLoad() {
 		return Config.Testing.debugItems;
+	}
+
+	@Override
+	public void clientInit() {
+		for (BlockDebugType type : BlockDebugType.VALUES) {
+			Helpers.setupModel(Item.getItemFromBlock(this), type.ordinal(), "debug_" + type.getName());
+		}
 	}
 }

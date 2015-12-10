@@ -14,7 +14,7 @@ public abstract class BlockPeripheral_Patch extends BlockPeripheralBase {
 	@Override
 	public int getLightValue(IBlockAccess world, BlockPos pos) {
 		IBlockState block = world.getBlockState(pos);
-		if (block != this) return block.getBlock().getLightValue(world, pos);
+		if (block.getBlock() != this) return block.getBlock().getLightValue(world, pos);
 
 		PeripheralType type = getPeripheralType(world, pos);
 		if (type == PeripheralType.Monitor) return Config.Misc.monitorLight;

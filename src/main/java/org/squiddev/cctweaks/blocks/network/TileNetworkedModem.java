@@ -110,25 +110,6 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	}
 
 	@Override
-	protected void readDescription(NBTTagCompound tag) {
-		modem.setState(tag.getByte("modem_state"));
-		// Force a rerender
-		worldObj.markBlockForUpdate(pos);
-	}
-
-	@Override
-	protected boolean writeDescription(NBTTagCompound tag) {
-		tag.setByte("modem_state", modem.state);
-		return true;
-	}
-
-	@Override
-	public void markForUpdate() {
-		if (!worldObj.isRemote) modem.refreshState();
-		super.markForUpdate();
-	}
-
-	@Override
 	public IPeripheral getPeripheral(EnumFacing side) {
 		return modem.modem;
 	}
