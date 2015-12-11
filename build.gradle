@@ -5,6 +5,7 @@ apply from: 'gradle/scripts/dependencies.gradle'
 apply from: 'gradle/scripts/artifacts.gradle'
 // apply from: 'gradle/scripts/upload.gradle'
 apply from: 'gradle/scripts/documentation.gradle'
+apply from: 'gradle/scripts/jsonGen.gradle'
 
 group = "org.squiddev"
 archivesBaseName = "CCTweaks"

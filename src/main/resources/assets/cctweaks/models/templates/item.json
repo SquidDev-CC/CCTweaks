@@ -1,6 +1,6 @@
 {
 	"parent": "cctweaks:item/flat",
 	"textures": {
-		"layer0": "cctweaks:items/dataCard"
+		"layer0": "${texture}"
 	}
 }

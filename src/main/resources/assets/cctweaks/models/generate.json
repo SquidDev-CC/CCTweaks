@@ -1,0 +1,30 @@
+{
+	"templates": {
+		"item": { "item": "templates/item.json" },
+		"block": { "block": "templates/block.json" },
+		"both": {
+			"item": "templates/itemblock.json",
+			"block": "templates/block.json"
+		}
+	},
+	"simple": {
+		"item": {
+			"computerUpgrade": "cctweaks:items/computerUpgrade",
+			"dataCard": "cctweaks:items/dataCard",
+			"debugger": "cctweaks:items/debugger",
+			"toolHost": "cctweaks:items/toolHost"
+		},
+		"both": {
+			"debug_networked_peripheral": "cctweaks:blocks/debugNetworkedPeripheral",
+			"debug_node": "cctweaks:blocks/debugNode",
+			"debug_peripheral": "cctweaks:blocks/debugPeripheral",
+			"modem": "computercraft:blocks/wiredModemFace",
+			"wireless_bridge": "cctweaks:blocks/wirelessBridge"
+		},
+		"block": {
+			"modem_m": "computercraft:blocks/wiredModemFaceOn",
+			"modem_mp": "computercraft:blocks/wiredModemFacePeripheralOn",
+			"modem_p": "computercraft:blocks/wiredModemFacePeripheral"
+		}
+	}
+}

@@ -1,6 +1,0 @@
-{
-	"parent": "cctweaks:item/flat",
-	"textures": {
-		"layer0": "cctweaks:items/computerUpgrade"
-	}
-}
