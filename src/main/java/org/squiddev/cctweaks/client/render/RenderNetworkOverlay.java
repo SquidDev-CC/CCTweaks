@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.client.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -41,21 +42,21 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		ItemStack stack = minecraft.thePlayer.getHeldItem();
 		if (stack == null || stack.getItem() != Registry.itemDebugger) return;
 
-		GL11.glPushMatrix();
+		GlStateManager.pushMatrix();
 		RenderManager renderManager = minecraft.getRenderManager();
-		GL11.glTranslated(-renderManager.viewerPosX, -renderManager.viewerPosY, -renderManager.viewerPosZ);
+		GlStateManager.translate(-renderManager.viewerPosX, -renderManager.viewerPosY, -renderManager.viewerPosZ);
 
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.disableDepth();
+		GlStateManager.disableTexture2D();
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 		renderNetwork(data, new Color(Color.HSBtoRGB(ticksInGame % 200 / 200F, 0.6F, 1F)), 1f);
 
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glPopMatrix();
+		GlStateManager.enableDepth();
+		GlStateManager.enableTexture2D();
+		GlStateManager.disableBlend();
+		GlStateManager.popMatrix();
 	}
 
 	private void renderNetwork(VisualisationData data, Color color, float thickness) {
@@ -107,19 +108,18 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 	}
 
 	public void renderConnection(BlockPos aNode, BlockPos bNode, Color color, float thickness) {
-		GL11.glPushMatrix();
-		GL11.glColor4ub((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue(), (byte) 255);
+		GlStateManager.pushMatrix();
+		GlStateManager.scale(1, 1, 1);
 
-		GL11.glScalef(1, 1, 1);
-
+		GlStateManager.color(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, 1.0f);
 		GL11.glLineWidth(thickness);
 		renderLine(aNode, bNode);
 
+		GlStateManager.color(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, 64.0f / 255.0f);
 		GL11.glLineWidth(thickness * 3);
-		GL11.glColor4ub((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue(), (byte) 64);
 		renderLine(aNode, bNode);
 
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
 
 	private void renderLabel(double x, double y, double z, String label) {
@@ -127,45 +127,50 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		FontRenderer fontrenderer = renderManager.getFontRenderer();
 		if (fontrenderer == null) return;
 
+		GlStateManager.pushMatrix();
+		GlStateManager.disableLighting();
+
 		float scale = 0.02666667f;
-		GL11.glPushMatrix();
+		GlStateManager.translate(x, y, z);
+		GlStateManager.rotate(-renderManager.playerViewY, 0, 1, 0);
+		GlStateManager.rotate(renderManager.playerViewX, 1, 0, 0);
+		GlStateManager.scale(-scale, -scale, scale);
 
-		GL11.glTranslated(x, y, z);
-		GL11.glRotatef(-renderManager.playerViewY, 0, 1, 0);
-		GL11.glRotatef(renderManager.playerViewX, 1, 0, 0);
-		GL11.glScalef(-scale, -scale, scale);
-
-		GL11.glDisable(GL11.GL_LIGHTING);
-
-		WorldRenderer tessellator = Tessellator.getInstance().getWorldRenderer();
+		// Render label background
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer renderer = tessellator.getWorldRenderer();
 
 		int width = fontrenderer.getStringWidth(label);
 		int xOffset = width / 2;
 
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA(0, 0, 0, 65);
-		tessellator.addVertex(-xOffset - 1, -1, 0);
-		tessellator.addVertex(-xOffset - 1, 8, 0);
-		tessellator.addVertex(xOffset + 1, 8, 0);
-		tessellator.addVertex(xOffset + 1, -1, 0);
-		tessellator.finishDrawing();
+		GlStateManager.disableTexture2D();
+		renderer.startDrawingQuads();
 
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		renderer.setColorRGBA(0, 0, 0, 65);
+		renderer.addVertex(-xOffset - 1, -1, 0);
+		renderer.addVertex(-xOffset - 1, 8, 0);
+		renderer.addVertex(xOffset + 1, 8, 0);
+		renderer.addVertex(xOffset + 1, -1, 0);
+
+		tessellator.draw();
+		GlStateManager.enableTexture2D();
+
+		// Render label
 		fontrenderer.drawString(label, -width / 2, 0, 0xFFFFFFFF);
 
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glColor4f(1, 1, 1, 1);
-
-		GL11.glPopMatrix();
+		GlStateManager.enableLighting();
+		GlStateManager.popMatrix();
 	}
 
 	private void renderLine(BlockPos a, BlockPos b) {
-		WorldRenderer tessellator = Tessellator.getInstance().getWorldRenderer();
-		tessellator.startDrawing(GL11.GL_LINES);
-		tessellator.addVertex(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5);
-		tessellator.addVertex(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
-		tessellator.finishDrawing();
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer renderer = tessellator.getWorldRenderer();
+
+		renderer.startDrawing(GL11.GL_LINES);
+		renderer.addVertex(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5);
+		renderer.addVertex(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
+
+		tessellator.draw();
 	}
 
 	@Override
