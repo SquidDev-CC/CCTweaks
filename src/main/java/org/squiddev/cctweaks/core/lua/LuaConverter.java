@@ -4,7 +4,6 @@ import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -26,13 +25,13 @@ public class LuaConverter {
 			case LuaValue.TBOOLEAN:
 				return value.toboolean();
 			case LuaValue.TSTRING: {
+				LuaString string = (LuaString) value;
 				if (binary) {
-					LuaString string = (LuaString) value;
 					byte[] result = new byte[string.m_length];
 					System.arraycopy(string.m_bytes, string.m_offset, result, 0, string.m_length);
 					return result;
 				} else {
-					return value.toString();
+					return decodeString(string.m_bytes, string.m_offset, string.m_length);
 				}
 			}
 			case LuaValue.TTABLE: {
@@ -120,16 +119,16 @@ public class LuaConverter {
 	}
 
 	public static String decodeString(byte[] bytes) {
-		try {
-			return new String(bytes, "UTF8");
-		} catch (UnsupportedEncodingException e) {
-			try {
-				// Fall back. Shouldn't happen, but you never know
-				return new String(bytes, "ISO-8859-1");
-			} catch (UnsupportedEncodingException e1) {
-				// This should never be reached.
-				return new String(bytes);
-			}
+		return decodeString(bytes, 0, bytes.length);
+	}
+
+	public static String decodeString(byte[] bytes, int start, int length) {
+		char[] chars = new char[length];
+
+		for (int i = 0; i < chars.length; ++i) {
+			chars[i] = (char) (bytes[start + i] & 255);
 		}
+
+		return new String(chars);
 	}
 }

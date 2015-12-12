@@ -27,7 +27,7 @@ repositories {
 
 	ivy {
 		name = "ComputerCraft"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2270/164/[module][revision](.[ext])"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2270/344/[module][revision](.[ext])"
 	}
 
 	ivy {
