@@ -1,10 +1,11 @@
 package org.squiddev.cctweaks.core.visualiser;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
@@ -88,8 +89,8 @@ public class NetworkPlayerWatcher extends AbstractPacketHandler<VisualisationPac
 		watchers.clear();
 	}
 
-	public static Watcher update(EntityPlayer player, int x, int y, int z) {
-		INetworkNode node = NetworkAPI.registry().getNode(player.worldObj, x, y, z);
+	public static Watcher update(EntityPlayer player, BlockPos pos) {
+		INetworkNode node = NetworkAPI.registry().getNode(player.worldObj, pos);
 		Watcher old = watchers.get(player);
 
 		if (node == null) return old;

@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.network;
 
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
@@ -25,8 +26,8 @@ public final class NetworkRegistry implements INetworkRegistry {
 	}
 
 	@Override
-	public boolean isNode(IBlockAccess world, int x, int y, int z) {
-		return y >= 0 && isNode(world.getTileEntity(x, y, z));
+	public boolean isNode(IBlockAccess world, BlockPos position) {
+		return position.getY() >= 0 && isNode(world.getTileEntity(position));
 	}
 
 	@Override
@@ -48,13 +49,13 @@ public final class NetworkRegistry implements INetworkRegistry {
 
 	@Override
 	public boolean isNode(IWorldPosition position) {
-		return isNode(position.getWorld(), position.getX(), position.getY(), position.getZ());
+		return isNode(position.getBlockAccess(), position.getPosition());
 	}
 
 
 	@Override
-	public IWorldNetworkNode getNode(IBlockAccess world, int x, int y, int z) {
-		return y >= 0 ? getNode(world.getTileEntity(x, y, z)) : null;
+	public IWorldNetworkNode getNode(IBlockAccess world, BlockPos position) {
+		return position.getY() >= 0 ? getNode(world.getTileEntity(position)) : null;
 	}
 
 	@Override
@@ -78,6 +79,6 @@ public final class NetworkRegistry implements INetworkRegistry {
 
 	@Override
 	public IWorldNetworkNode getNode(IWorldPosition position) {
-		return getNode(position.getWorld(), position.getX(), position.getY(), position.getZ());
+		return getNode(position.getBlockAccess(), position.getPosition());
 	}
 }

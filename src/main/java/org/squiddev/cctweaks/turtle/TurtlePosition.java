@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.turtle;
 
 import dan200.computercraft.api.turtle.ITurtleAccess;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
@@ -15,22 +16,12 @@ public class TurtlePosition implements IWorldPosition {
 	}
 
 	@Override
-	public IBlockAccess getWorld() {
+	public IBlockAccess getBlockAccess() {
 		return turtle.getWorld();
 	}
 
 	@Override
-	public int getX() {
-		return turtle.getPosition().posX;
-	}
-
-	@Override
-	public int getY() {
-		return turtle.getPosition().posY;
-	}
-
-	@Override
-	public int getZ() {
-		return turtle.getPosition().posZ;
+	public BlockPos getPosition() {
+		return turtle.getPosition();
 	}
 }

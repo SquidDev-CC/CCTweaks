@@ -5,8 +5,10 @@ import com.google.common.collect.SetMultimap;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
-import net.minecraftforge.common.util.ForgeDirection;
-import org.squiddev.cctweaks.api.IWorldPosition;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractNode;
@@ -19,6 +21,8 @@ import java.util.Set;
 /**
  * Basic wired modem that handles peripherals and
  * computer interaction
+ *
+ * TODO: Inherit from AbstractWorldNode?
  */
 public abstract class BasicModem extends AbstractNode implements INetwork, IWorldNetworkNode {
 	public static final byte MODEM_ON = 1;
@@ -61,7 +65,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	}
 
 	@Override
-	public void transmit(int channel, int replyChannel, Object payload, double range, double xPos, double yPos, double zPos, Object senderObject) {
+	public void transmit(int channel, int replyChannel, Object payload, World world, Vec3 pos, double range, boolean interdimensional, Object senderObject) {
 		networkController.transmitPacket(this, new Packet(channel, replyChannel, payload, senderObject));
 	}
 
@@ -105,7 +109,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	public void receivePacket(Packet packet, double distanceTravelled) {
 		synchronized (receivers) {
 			for (IReceiver receiver : receivers.get(packet.channel)) {
-				receiver.receive(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
+				receiver.receiveSameDimension(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
 			}
 		}
 	}
@@ -199,7 +203,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	}
 
 	@Override
-	public boolean canConnect(ForgeDirection from) {
+	public boolean canConnect(EnumFacing from) {
 		return true;
 	}
 
@@ -249,7 +253,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 
 	@Override
 	public String toString() {
-		IWorldPosition position = getPosition();
+		BlockPos position = getPosition().getPosition();
 		return "Modem: " + super.toString() + String.format(" (%s, %s, %s)", position.getX(), position.getY(), position.getZ());
 	}
 }

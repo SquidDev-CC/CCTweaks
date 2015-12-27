@@ -1,6 +1,3 @@
-apply plugin: 'idea'
-apply plugin: 'eclipse'
-
 repositories {
 	mavenCentral()
 	jcenter()
@@ -27,7 +24,7 @@ repositories {
 
 	ivy {
 		name = "ComputerCraft"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2269/339/[module][revision](.[ext])"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2272/212/[module][revision](.[ext])"
 	}
 
 	ivy {
@@ -40,24 +37,22 @@ configurations {
 	shade
 	compile.extendsFrom shade
 
-	packaged
-
 	deployerJars
 }
 
 dependencies {
 	compile "ComputerCraft:ComputerCraft:${project.cc_version}"
 
-	compile "codechicken:ForgeMultipart:${project.mc_version}-${project.multipart_version}:dev"
-	compile "codechicken:CodeChickenLib:${project.mc_version}-${project.ccl_version}:dev"
-	compile "codechicken:NotEnoughItems:${project.mc_version}-${project.nei_version}:dev"
-	compile "codechicken:CodeChickenCore:${project.mc_version}-${project.ccc_version}:dev"
-	packaged "com.austinv11.collectiveframework:CollectiveFramework:${project.collectiveframework_verion}:deobf"
-	packaged "com.austinv11.peripheralsplusplus:PeripheralsPlusPlus:${project.peripheralspp_version}:deobf"
+	compile "codechicken:CodeChickenLib:${project.mc_version}-1.1.2.139:dev"
+	compile "codechicken:CodeChickenCore:${project.mc_version}-1.0.5.36:dev"
+	provided "codechicken:NotEnoughItems:${project.mc_version}-1.0.5.104:dev" // NEI crashes currently. Don't know why.
 
-	packaged "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev"
-	packaged "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
-	packaged "openperipheral:OpenPeripheralCore-API:${project.op_version}"
+	// For 1.7.10 but including anyway
+	provided "CoFHLib:CoFHLib:[1.7.10]1.0.1-159-dev"
+	provided "net.industrial-craft:industrialcraft-2:2.+:api"
+	provided "com.austinv11.collectiveframework:CollectiveFramework:1.+:deobf"
+	provided "com.austinv11.peripheralsplusplus:PeripheralsPlusPlus:1.+:deobf"
+	provided "openperipheral:OpenPeripheralCore-API:3.2"
 
 	shade('org.squiddev:luaj.luajc:1.0.1') {
 		// We provide a custom LuaJ source with ComputerCraft
@@ -66,14 +61,10 @@ dependencies {
 	}
 
 	shade('org.squiddev:Patcher:1.1.1.1') { exclude group: 'org.ow2.asm' }
-	packaged('org.squiddev:ConfigGen:1.1') { exclude group: 'net.minecraftforge' }
+	provided('org.squiddev:ConfigGen:1.1') { exclude group: 'net.minecraftforge' }
 
 	testCompile group: "junit", name: "junit", version: "4.+"
 
 	deployerJars "org.apache.maven.wagon:wagon-ftp:2.2"
 }
-sourceSets.main.compileClasspath += [configurations.packaged]
-
-idea.module.scopes.PROVIDED.plus += [configurations.packaged]
-eclipse.classpath.plusConfigurations += [configurations.packaged]
 

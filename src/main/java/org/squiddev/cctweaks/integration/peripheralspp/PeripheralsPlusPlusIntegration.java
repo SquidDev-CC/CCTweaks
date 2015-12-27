@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.integration.peripheralspp;
 
 import com.austinv11.peripheralsplusplus.hooks.ComputerCraftRegistry;
-import cpw.mods.fml.common.Optional;
+import net.minecraftforge.fml.common.Optional;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.ModIntegration;

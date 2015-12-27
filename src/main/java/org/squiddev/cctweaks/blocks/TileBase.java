@@ -6,6 +6,8 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
@@ -14,23 +16,8 @@ import org.squiddev.cctweaks.api.IWorldPosition;
  */
 public abstract class TileBase extends TileEntity implements IWorldPosition {
 	@Override
-	public int getX() {
-		return xCoord;
-	}
-
-	@Override
-	public int getY() {
-		return yCoord;
-	}
-
-	@Override
-	public int getZ() {
-		return zCoord;
-	}
-
-	@Override
-	public IBlockAccess getWorld() {
-		return worldObj;
+	public BlockPos getPosition() {
+		return getPos();
 	}
 
 	/**
@@ -89,16 +76,12 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	@Override
 	public final Packet getDescriptionPacket() {
 		NBTTagCompound tag = new NBTTagCompound();
-		return writeDescription(tag) ? new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag) : null;
+		return writeDescription(tag) ? new S35PacketUpdateTileEntity(pos, 0, tag) : null;
 	}
 
 	@Override
 	public final void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-		switch (packet.func_148853_f()) {
-			case 0:
-				readDescription(packet.func_148857_g());
-				break;
-		}
+		readDescription(packet.getNbtCompound());
 	}
 
 	/**
@@ -106,7 +89,7 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	 */
 	public void markForUpdate() {
 		markDirty();
-		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+		worldObj.markBlockForUpdate(pos);
 	}
 
 	/**
@@ -116,7 +99,7 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	 * @param side   The side the block is activated on
 	 * @return If the event succeeded
 	 */
-	public boolean onActivated(EntityPlayer player, int side) {
+	public boolean onActivated(EntityPlayer player, EnumFacing side) {
 		return false;
 	}
 
@@ -124,5 +107,10 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	 * Called when a neighbor tile/block changed
 	 */
 	public void onNeighborChanged() {
+	}
+
+	@Override
+	public IBlockAccess getBlockAccess() {
+		return worldObj;
 	}
 }

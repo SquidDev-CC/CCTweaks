@@ -1,13 +1,13 @@
 package org.squiddev.cctweaks.core.asm;
 
-import cpw.mods.fml.common.Loader;
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
+import org.apache.logging.log4j.Level;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
-import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.asm.binary.BinaryUtils;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
-import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.patcher.Logger;
 import org.squiddev.patcher.transformer.*;
 
@@ -51,7 +51,6 @@ public class ASMTransformer implements IClassTransformer {
 			new CustomTimeout(),
 			new InjectLuaJC(),
 			new WhitelistGlobals(),
-			new PatchTurtleRenderer(),
 			new CustomAPIs(),
 
 			// Networking
@@ -62,23 +61,6 @@ public class ASMTransformer implements IClassTransformer {
 			new ClassMerger(
 				"dan200.computercraft.shared.peripheral.modem.TileCable",
 				"org.squiddev.cctweaks.core.patch.TileCable_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.shared.peripheral.common.ItemCable",
-				"org.squiddev.cctweaks.core.patch.ItemCable_Patch"
-			) {
-				/**
-				 * The item cable patch just implements multipart support.
-				 * If multipart is not loaded, then we cannot patch this without errors
-				 */
-				@Override
-				public boolean matches(String className) {
-					return super.matches(className) && Loader.isModLoaded(MultipartIntegration.NAME) && Config.Integration.cbMultipart;
-				}
-			},
-			new ClassMerger(
-				"dan200.computercraft.client.proxy.ComputerCraftProxyClient$CableBlockRenderingHandler",
-				"org.squiddev.cctweaks.core.patch.CableBlockRenderingHandler_Patch"
 			),
 			new ClassMerger(
 				"dan200.computercraft.core.apis.PeripheralAPI",
@@ -130,12 +112,42 @@ public class ASMTransformer implements IClassTransformer {
 		};
 	}
 
+	private boolean loadedCC = false;
+	private String[] message;
+
+	private void checkCC() {
+		loadedCC = true;
+		for (ModContainer x : Loader.instance().getModList()) {
+			if (x.getName().equals("ComputerCraft") && !x.getVersion().equals("${cc_version}")) {
+				message = new String[]{
+					"CCTweaks ${mod_version} was tested against ComputerCraft ${cc_version} but is running against " + x.getVersion() + ".",
+					"Some CCTweaks/ComputerCraft features may not work correctly - please check CCTweaks for updates.",
+					"If you encounter issues then try to reproduce without CCTweaks installed, then report to the appropriate mod author.",
+				};
+				DebugLogger.major(Level.WARN, message);
+			}
+		}
+	}
+
 	@Override
 	public byte[] transform(String className, String s2, byte[] bytes) {
+		if (!loadedCC && className.startsWith("dan200.computercraft.")) checkCC();
+
 		try {
 			return patches.transform(className, bytes);
 		} catch (Exception e) {
-			DebugLogger.error("Cannot patch " + className + ", falling back to default", e);
+			String contents = "Cannot patch " + className + ", falling back to default";
+			if (message != null) {
+				DebugLogger.beginMajor(Level.ERROR);
+				DebugLogger.error(contents, e);
+				for (String line : message) {
+					DebugLogger.error(line);
+				}
+				DebugLogger.endMajor(Level.ERROR);
+			} else {
+				DebugLogger.error(contents, e);
+			}
+
 			return bytes;
 		}
 	}

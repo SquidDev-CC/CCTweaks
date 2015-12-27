@@ -1,20 +1,27 @@
 package org.squiddev.cctweaks.blocks;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.registry.IModule;
+import org.squiddev.cctweaks.core.registry.IClientModule;
+import org.squiddev.cctweaks.core.utils.Helpers;
 
 /**
  * Base class for all blocks
  */
-public abstract class BlockBase<T extends TileBase> extends BlockContainer implements IModule {
+public abstract class BlockBase<T extends TileBase> extends BlockContainer implements IClientModule {
 	public final String name;
 	public final Class<T> klass;
 
@@ -25,8 +32,7 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 		name = blockName;
 
 		setHardness(2);
-		setBlockName(CCTweaks.RESOURCE_DOMAIN + "." + blockName);
-		setBlockTextureName(CCTweaks.RESOURCE_DOMAIN + ":" + blockName);
+		setUnlocalizedName(CCTweaks.RESOURCE_DOMAIN + "." + blockName);
 		setCreativeTab(CCTweaks.getCreativeTab());
 	}
 
@@ -35,8 +41,8 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 	}
 
 	@SuppressWarnings("unchecked")
-	public T getTile(IBlockAccess world, int x, int y, int z) {
-		TileEntity tile = world.getTileEntity(x, y, z);
+	public T getTile(IBlockAccess world, BlockPos pos) {
+		TileEntity tile = world.getTileEntity(pos);
 		if (tile != null && klass.isInstance(tile)) {
 			return (T) tile;
 		}
@@ -45,35 +51,47 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 	}
 
 	@Override
-	public void breakBlock(World world, int x, int y, int z, Block block, int damage) {
-		T tile = getTile(world, x, y, z);
+	public int damageDropped(IBlockState state) {
+		return getMetaFromState(state);
+	}
 
-		super.breakBlock(world, x, y, z, block, damage);
+	@Override
+	public int getRenderType() {
+		return 3;
+	}
+
+	@Override
+	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+		T tile = getTile(world, pos);
+
+		super.breakBlock(world, pos, state);
 
 		if (tile != null) tile.destroy();
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-		TileBase tile = getTile(world, x, y, z);
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+		TileBase tile = getTile(world, pos);
 		return tile != null && tile.onActivated(player, side);
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-		super.onNeighborBlockChange(world, x, y, z, block);
+	public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighborBlock) {
+		super.onNeighborBlockChange(world, pos, state, neighborBlock);
+
 		if (world.isRemote) return;
 
-		TileBase tile = getTile(world, x, y, z);
+		TileBase tile = getTile(world, pos);
 		if (tile != null) tile.onNeighborChanged();
 	}
 
 	@Override
-	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
-		super.onNeighborChange(world, x, y, z, tileX, tileY, tileZ);
+	public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
+		super.onNeighborChange(world, pos, neighbor);
+
 		if (world instanceof World && ((World) world).isRemote) return;
 
-		TileBase tile = getTile(world, x, y, z);
+		TileBase tile = getTile(world, pos);
 		if (tile != null) tile.onNeighborChanged();
 	}
 
@@ -94,5 +112,11 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 
 	@Override
 	public void postInit() {
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void clientInit() {
+		Helpers.setupModel(Item.getItemFromBlock(this), 0, name);
 	}
 }

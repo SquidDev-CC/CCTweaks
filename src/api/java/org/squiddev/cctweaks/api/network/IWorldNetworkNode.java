@@ -1,6 +1,6 @@
 package org.squiddev.cctweaks.api.network;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
 /**
@@ -22,5 +22,5 @@ public interface IWorldNetworkNode extends INetworkNode {
 	 * @param direction The direction to check
 	 * @return If the node can connect
 	 */
-	boolean canConnect(ForgeDirection direction);
+	boolean canConnect(EnumFacing direction);
 }

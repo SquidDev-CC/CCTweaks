@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.utils;
 
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
@@ -9,39 +10,25 @@ import org.squiddev.cctweaks.api.IWorldPosition;
  */
 public class WorldPosition implements IWorldPosition {
 	protected final IBlockAccess world;
-	protected final int x;
-	protected final int y;
-	protected final int z;
+	protected final BlockPos pos;
 
 	public WorldPosition(TileEntity tile) {
-		this(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord);
+		this(tile.getWorld(), tile.getPos());
 	}
 
-	public WorldPosition(IBlockAccess world, int x, int y, int z) {
+	public WorldPosition(IBlockAccess world, BlockPos pos) {
 		this.world = world;
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.pos = pos;
 	}
 
 	@Override
-	public IBlockAccess getWorld() {
+	public IBlockAccess getBlockAccess() {
 		return world;
 	}
 
 	@Override
-	public int getX() {
-		return x;
-	}
-
-	@Override
-	public int getY() {
-		return y;
-	}
-
-	@Override
-	public int getZ() {
-		return z;
+	public BlockPos getPosition() {
+		return pos;
 	}
 
 	@Override
@@ -51,18 +38,11 @@ public class WorldPosition implements IWorldPosition {
 
 		IWorldPosition that = (IWorldPosition) o;
 
-		if (x != that.getX()) return false;
-		if (y != that.getY()) return false;
-		if (z != that.getZ()) return false;
-		return world.equals(that.getWorld());
+		return pos.equals(that.getPosition()) && world.equals(that.getBlockAccess());
 	}
 
 	@Override
 	public int hashCode() {
-		int result = world.hashCode();
-		result = 31 * result + x;
-		result = 31 * result + y;
-		result = 31 * result + z;
-		return result;
+		return world.hashCode() * 31 + pos.hashCode();
 	}
 }

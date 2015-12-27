@@ -11,11 +11,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.management.ItemInWorldManager;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.Facing;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import org.apache.commons.lang3.tuple.Pair;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.McEvents;
@@ -24,22 +25,27 @@ import org.squiddev.cctweaks.core.utils.WorldPosition;
 
 /**
  * Handles various turtle actions.
- *
- * Emulates large parts of {@link ItemInWorldManager}
  */
 public class ToolHostPlayer extends TurtlePlayer {
 	private final ITurtleAccess turtle;
 
-	private ChunkCoordinates digPosition;
+	private BlockPos digPosition;
 	private Block digBlock;
+	private int currentDamage = -1;
+	private int currentDamageState = -1;
+
+	/**
+	 * A copy of the active stack for applying/removing attributes
+	 */
+	private ItemStack activeStack;
 
 	private final McEvents.IDropConsumer consumer = new McEvents.IDropConsumer() {
 		@Override
 		public void consumeDrop(ItemStack drop) {
 			ItemStack remainder = InventoryUtil.storeItems(drop, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
 			if (remainder != null) {
-				ChunkCoordinates position = getPlayerCoordinates();
-				WorldUtil.dropItemStack(remainder, worldObj, position.posX, position.posY, position.posZ, Facing.oppositeSide[turtle.getDirection()]);
+				BlockPos position = getPlayerCoordinates();
+				WorldUtil.dropItemStack(remainder, worldObj, position, turtle.getDirection().getOpposite());
 			}
 		}
 	};
@@ -51,17 +57,16 @@ public class ToolHostPlayer extends TurtlePlayer {
 		playerNetServerHandler = new FakeNetHandler(this);
 	}
 
-	public TurtleCommandResult attack(int direction) {
+	public TurtleCommandResult attack(EnumFacing direction) {
 		updateInformation(direction);
 
 		Vec3 rayDir = getLook(1.0f);
-		Vec3 rayStart = Vec3
-			.createVectorHelper(posX, posY, posZ)
-			.addVector(rayDir.xCoord * 0.4, rayDir.yCoord * 0.4, rayDir.zCoord * 0.4);
+		Vec3 rayStart = new Vec3(posX, posY, posZ);
 
-		Entity hitEntity = WorldUtil.rayTraceEntities(turtle.getWorld(), rayStart, rayDir, 1.1);
+		Pair<Entity, Vec3> hit = WorldUtil.rayTraceEntities(turtle.getWorld(), rayStart, rayDir, 1.5);
 
-		if (hitEntity != null) {
+		if (hit != null) {
+			Entity hitEntity = hit.getLeft();
 			loadInventory(getItem());
 
 			McEvents.addEntityConsumer(hitEntity, consumer);
@@ -75,27 +80,27 @@ public class ToolHostPlayer extends TurtlePlayer {
 		return TurtleCommandResult.failure("Nothing to attack here");
 	}
 
-	public TurtleCommandResult dig(int direction) {
+	private void setState(Block block, BlockPos pos) {
+		theItemInWorldManager.cancelDestroyingBlock();
+		theItemInWorldManager.durabilityRemainingOnBlock = -1;
+
+		digPosition = pos;
+		digBlock = block;
+		currentDamage = -1;
+		currentDamageState = -1;
+	}
+
+	public TurtleCommandResult dig(EnumFacing direction) {
 		updateInformation(direction);
 
-		ChunkCoordinates pos = getPlayerCoordinates();
-		pos.posX += Facing.offsetsXForSide[direction];
-		pos.posY += Facing.offsetsYForSide[direction];
-		pos.posZ += Facing.offsetsZForSide[direction];
-		int x = pos.posX, y = pos.posY, z = pos.posZ;
+		BlockPos pos = getPlayerCoordinates().offset(direction);
 		World world = turtle.getWorld();
-		Block block = world.getBlock(x, y, z);
+		Block block = world.getBlockState(pos).getBlock();
 
-		if (block != digBlock || !pos.equals(digPosition)) {
-			theItemInWorldManager.cancelDestroyingBlock(x, y, z);
-			theItemInWorldManager.durabilityRemainingOnBlock = -1;
+		if (block != digBlock || !pos.equals(digPosition)) setState(block, pos);
 
-			digPosition = pos;
-			digBlock = block;
-		}
-
-		if (!world.isAirBlock(x, y, z) && !block.getMaterial().isLiquid()) {
-			if (block == Blocks.bedrock || block.getBlockHardness(world, x, y, z) <= -1) {
+		if (!world.isAirBlock(pos) && !block.getMaterial().isLiquid()) {
+			if (block == Blocks.bedrock || block.getBlockHardness(world, pos) <= -1) {
 				return TurtleCommandResult.failure("Unbreakable block detected");
 			}
 
@@ -103,19 +108,27 @@ public class ToolHostPlayer extends TurtlePlayer {
 
 			ItemInWorldManager manager = theItemInWorldManager;
 			for (int i = 0; i < Config.Turtle.ToolHost.digFactor; i++) {
-				if (manager.durabilityRemainingOnBlock == -1) {
-					manager.onBlockClicked(x, y, z, Facing.oppositeSide[direction]);
+				if (currentDamageState == -1) {
+					// TODO: Migrate checks to here
+					manager.onBlockClicked(pos, direction.getOpposite());
+					currentDamageState = manager.durabilityRemainingOnBlock;
 				} else {
-					manager.updateBlockRemoving();
-					if (manager.durabilityRemainingOnBlock >= 9) {
+					currentDamage++;
+					float hardness = block.getPlayerRelativeBlockHardness(this, world, pos) * (currentDamage + 1);
+					int hardnessState = (int) (hardness * 10);
 
-						IWorldPosition position = new WorldPosition(world, x, y, z);
+					if (hardnessState != currentDamageState) {
+						world.sendBlockBreakProgress(getEntityId(), pos, hardnessState);
+						currentDamageState = hardnessState;
+					}
+
+					if (hardness >= 1) {
+						IWorldPosition position = new WorldPosition(world, pos);
 						McEvents.addBlockConsumer(position, consumer);
-						manager.uncheckedTryHarvestBlock(x, y, z);
+						manager.tryHarvestBlock(pos);
 						McEvents.removeBlockConsumer(position);
 
-						manager.durabilityRemainingOnBlock = -1;
-
+						setState(null, null);
 						break;
 					}
 				}
@@ -129,9 +142,43 @@ public class ToolHostPlayer extends TurtlePlayer {
 		return TurtleCommandResult.failure("Nothing to dig here");
 	}
 
-	@Override
-	public ChunkCoordinates getPlayerCoordinates() {
+	public BlockPos getPlayerCoordinates() {
 		return turtle.getPosition();
+	}
+
+	@Override
+	public Vec3 getPositionVector() {
+		return turtle.getVisualPosition(0);
+	}
+
+	@Override
+	public void loadInventory(ItemStack currentStack) {
+		// Copy properties over
+		if (currentStack != null) {
+			getAttributeMap().applyAttributeModifiers(currentStack.getAttributeModifiers());
+			activeStack = currentStack.copy();
+		}
+
+		super.loadInventory(currentStack);
+	}
+
+	@Override
+	public ItemStack unloadInventory(ITurtleAccess turtle) {
+		// Revert to old properties
+		if (activeStack != null) {
+			getAttributeMap().removeAttributeModifiers(activeStack.getAttributeModifiers());
+			activeStack = null;
+		}
+
+		return super.unloadInventory(turtle);
+	}
+
+	public void loadInventory() {
+		loadInventory(getItem());
+	}
+
+	public void unloadInventory() {
+		unloadInventory(turtle);
 	}
 
 	/**
@@ -144,17 +191,15 @@ public class ToolHostPlayer extends TurtlePlayer {
 	/**
 	 * Update the player information
 	 */
-	public void updateInformation(int direction) {
-		ChunkCoordinates position = turtle.getPosition();
+	public void updateInformation(EnumFacing direction) {
+		BlockPos position = turtle.getPosition();
 
 		setPositionAndRotation(
-			position.posX + 0.5 + 0.51 * Facing.offsetsXForSide[direction],
-			position.posY - 1.1 + 0.51 * Facing.offsetsYForSide[direction],
-			position.posZ + 0.5 + 0.51 * Facing.offsetsZForSide[direction],
-			direction > 2 ? DirectionUtil.toYawAngle(direction) : DirectionUtil.toYawAngle(turtle.getDirection()),
-			direction > 2 ? 0 : DirectionUtil.toPitchAngle(direction)
+			position.getX() + 0.5 + 0.48 * direction.getFrontOffsetX(),
+			position.getY() + 0.5 + 0.48 * direction.getFrontOffsetY(),
+			position.getZ() + 0.5 + 0.48 * direction.getFrontOffsetZ(),
+			direction.getAxis() != EnumFacing.Axis.Y ? DirectionUtil.toYawAngle(direction) : DirectionUtil.toYawAngle(turtle.getDirection()),
+			direction.getAxis() != EnumFacing.Axis.Y ? 0 : DirectionUtil.toPitchAngle(direction)
 		);
-
-		ySize = -1.1f;
 	}
 }

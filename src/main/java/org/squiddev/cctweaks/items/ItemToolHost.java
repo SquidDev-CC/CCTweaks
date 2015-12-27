@@ -1,10 +1,10 @@
 package org.squiddev.cctweaks.items;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeToolHost;
 

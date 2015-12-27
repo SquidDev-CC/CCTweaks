@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import org.squiddev.cctweaks.api.IWorldPosition;
+import net.minecraft.util.BlockPos;
 import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
@@ -287,8 +287,8 @@ public class NetworkController implements INetworkController {
 				INetworkNode otherNode = otherPoint.node;
 				double distance = nodePair.distance;
 				if (node instanceof IWorldNetworkNode && otherNode instanceof IWorldNetworkNode) {
-					IWorldPosition position = ((IWorldNetworkNode) node).getPosition();
-					IWorldPosition otherPosition = ((IWorldNetworkNode) otherNode).getPosition();
+					BlockPos position = ((IWorldNetworkNode) node).getPosition().getPosition();
+					BlockPos otherPosition = ((IWorldNetworkNode) otherNode).getPosition().getPosition();
 
 					int dx = position.getX() - otherPosition.getX();
 					int dy = position.getY() - otherPosition.getY();

@@ -1,5 +1,4 @@
 apply plugin: 'maven'
-apply plugin: 'curseforge'
 
 uploadArchives {
 	repositories {
@@ -47,12 +46,17 @@ uploadArchives {
 	}
 }
 
-curse {
-	projectId = '232180'
+curseforge {
 	apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''
-	releaseType = 'release'
 
-	additionalArtifact devJar
+	project {
+		id = '232180'
+		releaseType = 'release'
+		changelog = ''
+		addArtifact devJar
 
-	relatedProject 'computercraft' : 'requiredLibrary'
+		relations {
+			requiredLibrary 'computercraft'
+		}
+	}
 }

@@ -41,11 +41,11 @@ public class TurtleBrain_Patch extends TurtleBrain {
 
 		if (upgrade != null) m_upgrades.put(side, upgrade);
 
-		if (m_owner.getWorldObj() != null) {
+		if (m_owner.getWorld() != null) {
 			updatePeripherals(m_owner.createServerComputer());
 			m_owner.updateBlock();
 
-			if (!m_owner.getWorldObj().isRemote) {
+			if (!m_owner.getWorld().isRemote) {
 				TurtleSide otherSide = side == TurtleSide.Left ? TurtleSide.Right : TurtleSide.Left;
 				ITurtleUpgrade other = getUpgrade(otherSide);
 				if (other != null && other instanceof IExtendedTurtleUpgrade) {

@@ -1,8 +1,9 @@
 package org.squiddev.cctweaks.core.network;
 
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.FmlEvents;
@@ -15,40 +16,17 @@ import java.util.Set;
  * Helper methods on networks
  */
 public final class NetworkHelpers implements INetworkHelpers {
-	/**
-	 * Check if a block is a cable and can be connected to
-	 *
-	 * @param world     World the node lies in
-	 * @param x         X position of the node we are checking from
-	 * @param y         Y position of the node we are checking from
-	 * @param z         Z position of the node we are checking from
-	 * @param direction Direction we are checking in
-	 * @return If the target block is a node and can be connected to
-	 */
 	@Override
-	public boolean canConnect(IBlockAccess world, int x, int y, int z, ForgeDirection direction) {
-		x += direction.offsetX;
-		y += direction.offsetY;
-		z += direction.offsetZ;
-
-		IWorldNetworkNode node = NetworkAPI.registry().getNode(world, x, y, z);
+	public boolean canConnect(IBlockAccess world, BlockPos position, EnumFacing direction) {
+		IWorldNetworkNode node = NetworkAPI.registry().getNode(world, position.offset(direction));
 		return node != null && node.canConnect(direction.getOpposite());
 	}
 
 	@Override
-	public boolean canConnect(IWorldPosition pos, ForgeDirection direction) {
-		return canConnect(pos.getWorld(), pos.getX(), pos.getY(), pos.getZ(), direction);
+	public boolean canConnect(IWorldPosition pos, EnumFacing direction) {
+		return canConnect(pos.getBlockAccess(), pos.getPosition(), direction);
 	}
 
-	/**
-	 * Get adjacent nodes that can be connected to
-	 *
-	 * Checks the current node can connect, and adjacent node can be connected to
-	 * in that direction
-	 *
-	 * @param node The current node
-	 * @return The adjacent nodes
-	 */
 	@Override
 	public Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node) {
 		return getAdjacentNodes(node, true);
@@ -58,13 +36,14 @@ public final class NetworkHelpers implements INetworkHelpers {
 	public Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node, boolean checkExists) {
 		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
 		IWorldPosition position = node.getPosition();
-		World world = checkExists && position.getWorld() instanceof World ? (World) position.getWorld() : null;
+		BlockPos blockPos = position.getPosition();
+		World world = checkExists && position.getBlockAccess() instanceof World ? (World) position.getBlockAccess() : null;
 
-		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+		for (EnumFacing direction : EnumFacing.VALUES) {
 			if (node.canConnect(direction)) {
-				int x = position.getX() + direction.offsetX, y = position.getY() + direction.offsetY, z = position.getZ() + direction.offsetZ;
-				if (world == null || world.blockExists(x, y, z)) {
-					IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(position.getWorld(), x, y, z);
+				BlockPos pos = blockPos.offset(direction);
+				if (world == null || world.isBlockLoaded(pos)) {
+					IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(position.getBlockAccess(), pos);
 
 					if (neighbour != null && neighbour.canConnect(direction.getOpposite())) {
 						nodes.add(neighbour);
@@ -76,24 +55,11 @@ public final class NetworkHelpers implements INetworkHelpers {
 		return nodes;
 	}
 
-	/**
-	 * Connect to adjacent nodes, or create a network.
-	 *
-	 * Uses {@link #getAdjacentNodes(IWorldNetworkNode)} and {@link #joinOrCreateNetwork(INetworkNode, Set)}
-	 *
-	 * @param node The node to scan with
-	 */
 	@Override
 	public void joinOrCreateNetwork(IWorldNetworkNode node) {
 		joinOrCreateNetwork(node, getAdjacentNodes(node));
 	}
 
-	/**
-	 * Attempt to connect to any node, or create a network if it cannot
-	 *
-	 * @param node        The node to scan with
-	 * @param connections The nodes that can connect
-	 */
 	@Override
 	public void joinOrCreateNetwork(INetworkNode node, Set<? extends INetworkNode> connections) {
 		for (INetworkNode neighbour : connections) {
@@ -111,12 +77,6 @@ public final class NetworkHelpers implements INetworkHelpers {
 		}
 	}
 
-	/**
-	 * Creates a new network for the node.
-	 * It will be removed from the current network.
-	 *
-	 * @param node The node to create the network with
-	 */
 	@Override
 	public void joinNewNetwork(INetworkNode node) {
 		if (node.getAttachedNetwork() != null) {
@@ -125,11 +85,6 @@ public final class NetworkHelpers implements INetworkHelpers {
 		new NetworkController(node);
 	}
 
-	/**
-	 * Schedule calling {@link #joinOrCreateNetwork(IWorldNetworkNode)} next tick
-	 *
-	 * @param node The node to schedule
-	 */
 	@Override
 	public void scheduleJoin(final IWorldNetworkNode node) {
 		if (node == null) throw new IllegalArgumentException("node cannot be null");
@@ -141,11 +96,6 @@ public final class NetworkHelpers implements INetworkHelpers {
 		});
 	}
 
-	/**
-	 * Schedule calling {@link AbstractWorldNode#connect()} next tick
-	 *
-	 * @param node The node to schedule
-	 */
 	public static void scheduleConnect(final AbstractWorldNode node) {
 		if (node == null) throw new IllegalArgumentException("node cannot be null");
 		FmlEvents.schedule(new Runnable() {

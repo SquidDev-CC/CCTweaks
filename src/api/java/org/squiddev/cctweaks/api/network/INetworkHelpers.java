@@ -1,7 +1,8 @@
 package org.squiddev.cctweaks.api.network;
 
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
 import java.util.Set;
@@ -14,13 +15,11 @@ public interface INetworkHelpers {
 	 * Check if an adjacent block is a node and accepts connections.
 	 *
 	 * @param world     World the node lies in
-	 * @param x         X position of the node we are checking from
-	 * @param y         Y position of the node we are checking from
-	 * @param z         Z position of the node we are checking from
+	 * @param position  Position of the node we are checking from
 	 * @param direction Direction we are checking in
 	 * @return If the target block is a node and can be connected to
 	 */
-	boolean canConnect(IBlockAccess world, int x, int y, int z, ForgeDirection direction);
+	boolean canConnect(IBlockAccess world, BlockPos position, EnumFacing direction);
 
 	/**
 	 * Check if an adjacent block is a node and accepts connections.
@@ -29,7 +28,7 @@ public interface INetworkHelpers {
 	 * @param direction Direction we are checking in
 	 * @return If the target block is a node and can be connected to
 	 */
-	boolean canConnect(IWorldPosition pos, ForgeDirection direction);
+	boolean canConnect(IWorldPosition pos, EnumFacing direction);
 
 	/**
 	 * Get adjacent nodes that can be connected to

@@ -1,14 +1,17 @@
 package org.squiddev.cctweaks.client.render;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.IClientModule;
@@ -20,7 +23,8 @@ import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.squiddev.cctweaks.core.visualiser.VisualisationData.*;
+import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Connection;
+import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Node;
 
 /**
  * This is a helper to render a network when testing.
@@ -34,23 +38,25 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		++ticksInGame;
 		if (data == null) return;
 
-		ItemStack stack = Minecraft.getMinecraft().thePlayer.getHeldItem();
+		Minecraft minecraft = Minecraft.getMinecraft();
+		ItemStack stack = minecraft.thePlayer.getHeldItem();
 		if (stack == null || stack.getItem() != Registry.itemDebugger) return;
 
-		GL11.glPushMatrix();
-		GL11.glTranslated(-RenderManager.renderPosX, -RenderManager.renderPosY, -RenderManager.renderPosZ);
+		GlStateManager.pushMatrix();
+		RenderManager renderManager = minecraft.getRenderManager();
+		GlStateManager.translate(-renderManager.viewerPosX, -renderManager.viewerPosY, -renderManager.viewerPosZ);
 
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.disableDepth();
+		GlStateManager.disableTexture2D();
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 		renderNetwork(data, new Color(Color.HSBtoRGB(ticksInGame % 200 / 200F, 0.6F, 1F)), 1f);
 
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glPopMatrix();
+		GlStateManager.enableDepth();
+		GlStateManager.enableTexture2D();
+		GlStateManager.disableBlend();
+		GlStateManager.popMatrix();
 	}
 
 	private void renderNetwork(VisualisationData data, Color color, float thickness) {
@@ -68,16 +74,14 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 			// We render a label of all nodes at this point.
 			if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
 				if (a.position != null) {
-					Position nodePosition = a.position;
-					if (nodePosition.x == position.blockX && nodePosition.y == position.blockY && nodePosition.z == position.blockZ) {
+					if (a.position.equals(position.getBlockPos())) {
 						nodes.add(a);
 						if (b.position == null) nodes.add(b);
 					}
 				}
 
 				if (b.position != null) {
-					Position nodePosition = b.position;
-					if (nodePosition.x == position.blockX && nodePosition.y == position.blockY && nodePosition.z == position.blockZ) {
+					if (b.position.equals(position.getBlockPos())) {
 						if (a.position == null) nodes.add(a);
 						nodes.add(b);
 					}
@@ -88,8 +92,8 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		// Custom handling for networks with 0 connections (single node networks)
 		if (data.connections.length == 0 && position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
 			for (Node node : data.nodes) {
-				Position nodePosition = node.position;
-				if (nodePosition != null && nodePosition.x == position.blockX && nodePosition.y == position.blockY && nodePosition.z == position.blockZ) {
+				BlockPos nodePosition = node.position;
+				if (nodePosition != null && nodePosition.equals(position.getBlockPos())) {
 					nodes.add(node);
 				}
 			}
@@ -98,69 +102,74 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		int counter = 0;
 		for (Node node : nodes) {
 			String name = node.position == null ? "\u00a78" + node.name : node.name;
-			renderLabel(position.blockX + 0.5, position.blockY + 1.5 + (counter++) * 0.4, position.blockZ + 0.5, name);
+			BlockPos pos = position.getBlockPos();
+			renderLabel(pos.getX() + 0.5, pos.getY() + 1.5 + (counter++) * 0.4, pos.getZ() + 0.5, name);
 		}
 	}
 
-	public void renderConnection(Position aNode, Position bNode, Color color, float thickness) {
-		GL11.glPushMatrix();
-		GL11.glColor4ub((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue(), (byte) 255);
+	public void renderConnection(BlockPos aNode, BlockPos bNode, Color color, float thickness) {
+		GlStateManager.pushMatrix();
+		GlStateManager.scale(1, 1, 1);
 
-		GL11.glScalef(1, 1, 1);
-
+		GlStateManager.color(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, 1.0f);
 		GL11.glLineWidth(thickness);
 		renderLine(aNode, bNode);
 
+		GlStateManager.color(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, 64.0f / 255.0f);
 		GL11.glLineWidth(thickness * 3);
-		GL11.glColor4ub((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue(), (byte) 64);
 		renderLine(aNode, bNode);
 
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
 
 	private void renderLabel(double x, double y, double z, String label) {
-		RenderManager renderManager = RenderManager.instance;
+		RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
 		FontRenderer fontrenderer = renderManager.getFontRenderer();
 		if (fontrenderer == null) return;
 
+		GlStateManager.pushMatrix();
+		GlStateManager.disableLighting();
+
 		float scale = 0.02666667f;
-		GL11.glPushMatrix();
+		GlStateManager.translate(x, y, z);
+		GlStateManager.rotate(-renderManager.playerViewY, 0, 1, 0);
+		GlStateManager.rotate(renderManager.playerViewX, 1, 0, 0);
+		GlStateManager.scale(-scale, -scale, scale);
 
-		GL11.glTranslated(x, y, z);
-		GL11.glRotatef(-renderManager.playerViewY, 0, 1, 0);
-		GL11.glRotatef(renderManager.playerViewX, 1, 0, 0);
-		GL11.glScalef(-scale, -scale, scale);
-
-		GL11.glDisable(GL11.GL_LIGHTING);
-
-		Tessellator tessellator = Tessellator.instance;
+		// Render label background
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer renderer = tessellator.getWorldRenderer();
 
 		int width = fontrenderer.getStringWidth(label);
 		int xOffset = width / 2;
 
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA(0, 0, 0, 65);
-		tessellator.addVertex(-xOffset - 1, -1, 0);
-		tessellator.addVertex(-xOffset - 1, 8, 0);
-		tessellator.addVertex(xOffset + 1, 8, 0);
-		tessellator.addVertex(xOffset + 1, -1, 0);
-		tessellator.draw();
+		GlStateManager.disableTexture2D();
+		renderer.startDrawingQuads();
 
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		renderer.setColorRGBA(0, 0, 0, 65);
+		renderer.addVertex(-xOffset - 1, -1, 0);
+		renderer.addVertex(-xOffset - 1, 8, 0);
+		renderer.addVertex(xOffset + 1, 8, 0);
+		renderer.addVertex(xOffset + 1, -1, 0);
+
+		tessellator.draw();
+		GlStateManager.enableTexture2D();
+
+		// Render label
 		fontrenderer.drawString(label, -width / 2, 0, 0xFFFFFFFF);
 
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glColor4f(1, 1, 1, 1);
-
-		GL11.glPopMatrix();
+		GlStateManager.enableLighting();
+		GlStateManager.popMatrix();
 	}
 
-	private void renderLine(Position a, Position b) {
-		Tessellator tessellator = Tessellator.instance;
-		tessellator.startDrawing(GL11.GL_LINES);
-		tessellator.addVertex(a.x + 0.5, a.y + 0.5, a.z + 0.5);
-		tessellator.addVertex(b.x + 0.5, b.y + 0.5, b.z + 0.5);
+	private void renderLine(BlockPos a, BlockPos b) {
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer renderer = tessellator.getWorldRenderer();
+
+		renderer.startDrawing(GL11.GL_LINES);
+		renderer.addVertex(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5);
+		renderer.addVertex(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
+
 		tessellator.draw();
 	}
 

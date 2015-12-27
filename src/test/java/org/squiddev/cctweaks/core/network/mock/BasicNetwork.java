@@ -1,13 +1,14 @@
 package org.squiddev.cctweaks.core.network.mock;
 
-import codechicken.lib.vec.BlockCoord;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.core.network.PacketTest;
@@ -20,9 +21,9 @@ import java.util.Map;
 /**
  * A basic network
  */
-public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockCoord, KeyedNetworkNode>> {
-	protected final Map<BlockCoord, TileEntity> world = new HashMap<BlockCoord, TileEntity>();
-	protected final Map<BlockCoord, KeyedNetworkNode> nodes = new HashMap<BlockCoord, KeyedNetworkNode>();
+public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockPos, KeyedNetworkNode>> {
+	protected final Map<BlockPos, TileEntity> world = new HashMap<BlockPos, TileEntity>();
+	protected final Map<BlockPos, KeyedNetworkNode> nodes = new HashMap<BlockPos, KeyedNetworkNode>();
 
 	public final int width;
 	public final int height;
@@ -38,9 +39,8 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockCoord
 				KeyedNetworkNode node = parse(tile, row.charAt(x));
 				if (node != null) {
 					tile.node = node;
-					BlockCoord coord = new BlockCoord(x, 0, z);
-					world.put(coord, tile);
-					nodes.put(coord, node);
+					world.put(tile.getPos(), tile);
+					nodes.put(tile.getPos(), node);
 				}
 			}
 		}
@@ -80,60 +80,53 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockCoord
 	}
 
 	public void dump() {
-		SetMultimap<INetworkController, BlockCoord> networks = MultimapBuilder.hashKeys().hashSetValues().build();
+		SetMultimap<INetworkController, BlockPos> networks = MultimapBuilder.hashKeys().hashSetValues().build();
 
-		for (Map.Entry<BlockCoord, KeyedNetworkNode> location : this) {
+		for (Map.Entry<BlockPos, KeyedNetworkNode> location : this) {
 			networks.put(location.getValue().getAttachedNetwork(), location.getKey());
 		}
 
-		for (Map.Entry<INetworkController, Collection<BlockCoord>> entry : networks.asMap().entrySet()) {
+		for (Map.Entry<INetworkController, Collection<BlockPos>> entry : networks.asMap().entrySet()) {
 			System.out.println(entry.getKey());
-			for (BlockCoord pos : entry.getValue()) {
+			for (BlockPos pos : entry.getValue()) {
 				System.out.println(" - " + pos);
 			}
 		}
 	}
 
 	@Override
+	public TileEntity getTileEntity(BlockPos pos) {
+		return world.get(pos);
+	}
+
 	public TileEntity getTileEntity(int x, int y, int z) {
-		return world.get(new BlockCoord(x, y, z));
+		return getTileEntity(new BlockPos(x, y, z));
 	}
 
 	@Override
-	public Iterator<Map.Entry<BlockCoord, KeyedNetworkNode>> iterator() {
-		return nodes.entrySet().iterator();
-	}
-
-	@Override
-	public int getHeight() {
-		return 1;
-	}
-
-	@Override
-	public int getLightBrightnessForSkyBlocks(int x, int y, int z, int side) {
+	public int getCombinedLight(BlockPos pos, int p_175626_2_) {
 		return 0;
 	}
 
 	@Override
-	public int getBlockMetadata(int x, int y, int z) {
-		return 0;
-	}
-
-	@Override
-	public int isBlockProvidingPowerTo(int x, int y, int z, int side) {
-		return 0;
-	}
-
-	@Override
-	public boolean isAirBlock(int x, int y, int z) {
-		return getTileEntity(x, y, z) != null;
-	}
-
-	@Override
-	public BiomeGenBase getBiomeGenForCoords(int x, int z) {
+	public IBlockState getBlockState(BlockPos pos) {
 		return null;
 	}
 
+	@Override
+	public boolean isAirBlock(BlockPos pos) {
+		return false;
+	}
+
+	@Override
+	public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
+		return null;
+	}
+
+	@Override
+	public Iterator<Map.Entry<BlockPos, KeyedNetworkNode>> iterator() {
+		return nodes.entrySet().iterator();
+	}
 
 	@Override
 	public boolean extendedLevelsInChunkCache() {
@@ -141,12 +134,17 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockCoord
 	}
 
 	@Override
-	public boolean isSideSolid(int x, int y, int z, ForgeDirection side, boolean _default) {
-		return true;
+	public int getStrongPower(BlockPos pos, EnumFacing direction) {
+		return 0;
 	}
 
 	@Override
-	public Block getBlock(int x, int y, int z) {
-		return null;
+	public WorldType getWorldType() {
+		return WorldType.DEBUG_WORLD;
+	}
+
+	@Override
+	public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
+		return false;
 	}
 }

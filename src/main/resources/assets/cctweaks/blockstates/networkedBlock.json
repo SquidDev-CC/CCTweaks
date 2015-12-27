@@ -1,0 +1,12 @@
+{
+	"variants": {
+		"modem_on=false,peripheral_on=false,type=modem": { "model": "cctweaks:modem" },
+		"modem_on=true,peripheral_on=false,type=modem": { "model": "cctweaks:modem_m" },
+		"modem_on=false,peripheral_on=true,type=modem": { "model": "cctweaks:modem_p" },
+		"modem_on=true,peripheral_on=true,type=modem": { "model": "cctweaks:modem_mp" },
+		"modem_on=true,peripheral_on=true,type=wireless_bridge": { "model": "cctweaks:wireless_bridge" },
+		"modem_on=true,peripheral_on=false,type=wireless_bridge": { "model": "cctweaks:wireless_bridge" },
+		"modem_on=false,peripheral_on=true,type=wireless_bridge": { "model": "cctweaks:wireless_bridge" },
+		"modem_on=false,peripheral_on=false,type=wireless_bridge": { "model": "cctweaks:wireless_bridge" }
+	}
+}

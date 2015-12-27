@@ -28,7 +28,7 @@ public class NetworkBinding extends AbstractWorldNode {
 	 * Add the position to the bindings
 	 */
 	public void add() {
-		if (getPosition().getWorld() != null) NetworkBindings.addNode(id, this);
+		if (getPosition().getBlockAccess() != null) NetworkBindings.addNode(id, this);
 	}
 
 	/**

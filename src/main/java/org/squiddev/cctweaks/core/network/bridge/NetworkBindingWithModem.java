@@ -39,6 +39,11 @@ public class NetworkBindingWithModem extends NetworkBinding {
 		public BindingModemPeripheral(BindingModem modem) {
 			super(modem);
 		}
+
+		@Override
+		protected boolean isInterdimensional() {
+			return true;
+		}
 	}
 
 	public BindingModem createModem() {

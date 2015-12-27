@@ -26,14 +26,17 @@ package org.squiddev.cctweaks.core.utils;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.Set;
 
@@ -68,23 +71,20 @@ public class InventoryUtils {
 	}
 
 	private static IInventory doubleChestFix(TileEntity te) {
-		final World world = te.getWorldObj();
-		final int x = te.xCoord;
-		final int y = te.yCoord;
-		final int z = te.zCoord;
+		final World world = te.getWorld();
+		final BlockPos position = te.getPos();
+
 		final Block block = te.getBlockType();
-		if (world.getBlock(x - 1, y, z) == block) {
-			return new InventoryLargeChest("Large chest", (IInventory) world.getTileEntity(x - 1, y, z), (IInventory) te);
+
+		if (block == Blocks.chest || block == Blocks.trapped_chest) {
+			for (EnumFacing facing : EnumFacing.VALUES) {
+				BlockPos offset = position.offset(facing);
+				if (world.getBlockState(offset).getBlock() == block) {
+					return new InventoryLargeChest("Large chest", (ILockableContainer) world.getTileEntity(offset), (ILockableContainer) te);
+				}
+			}
 		}
-		if (world.getBlock(x + 1, y, z) == block) {
-			return new InventoryLargeChest("Large chest", (IInventory) te, (IInventory) world.getTileEntity(x + 1, y, z));
-		}
-		if (world.getBlock(x, y, z - 1) == block) {
-			return new InventoryLargeChest("Large chest", (IInventory) world.getTileEntity(x, y, z - 1), (IInventory) te);
-		}
-		if (world.getBlock(x, y, z + 1) == block) {
-			return new InventoryLargeChest("Large chest", (IInventory) te, (IInventory) world.getTileEntity(x, y, z + 1));
-		}
+
 		return (te instanceof IInventory) ? (IInventory) te : null;
 	}
 
@@ -93,18 +93,15 @@ public class InventoryUtils {
 		return inventory;
 	}
 
-	public static boolean insertItemIntoInventory(IInventory inventory, ItemStack stack, ForgeDirection side, int intoSlot) {
+	public static boolean insertItemIntoInventory(IInventory inventory, ItemStack stack, EnumFacing side, int intoSlot) {
 		if (stack == null) return false;
-
-		final int sideId = side.ordinal();
-
 		final Set<Integer> attemptSlots = Sets.newTreeSet();
 
 		// if it's a sided inventory, get all the accessible slots
-		final boolean isSidedInventory = inventory instanceof ISidedInventory && side != ForgeDirection.UNKNOWN;
+		final boolean isSidedInventory = side != null && inventory instanceof ISidedInventory;
 
 		if (isSidedInventory) {
-			int[] accessibleSlots = ((ISidedInventory) inventory).getAccessibleSlotsFromSide(sideId);
+			int[] accessibleSlots = ((ISidedInventory) inventory).getSlotsForFace(side);
 			for (int slot : accessibleSlots) {
 				attemptSlots.add(slot);
 			}
@@ -122,7 +119,7 @@ public class InventoryUtils {
 		boolean result = false;
 		for (Integer slot : attemptSlots) {
 			if (stack.stackSize <= 0) break;
-			if (isSidedInventory && !((ISidedInventory) inventory).canInsertItem(slot, stack, sideId)) continue;
+			if (isSidedInventory && !((ISidedInventory) inventory).canInsertItem(slot, stack, side)) continue;
 			result |= tryInsertStack(inventory, slot, stack);
 		}
 
@@ -139,24 +136,24 @@ public class InventoryUtils {
 	 *
 	 * @param fromInventory The inventory the item is coming from
 	 * @param fromSlot      The slot the item is coming from
-	 * @param fromDirection The direction to remove from. Pass {@link ForgeDirection#UNKNOWN} if not applicable.
+	 * @param fromDirection The direction to remove from. Pass {@code null} if not applicable.
 	 * @param toInventory   The inventory you want the item to be put into
 	 * @param toSlot        The target slot. Pass -1 for any slot
-	 * @param toDirection   The direction to insert into. Pass {@link ForgeDirection#UNKNOWN} if not applicable
+	 * @param toDirection   The direction to insert into. Pass {@code null} if not applicable
 	 * @param maxAmount     The maximum amount you wish to pass
 	 * @return The amount of items moved
 	 */
 	public static int moveItemInto(
-		IInventory fromInventory, int fromSlot, ForgeDirection fromDirection,
-		IInventory toInventory, int toSlot, ForgeDirection toDirection,
+		IInventory fromInventory, int fromSlot, EnumFacing fromDirection,
+		IInventory toInventory, int toSlot, EnumFacing toDirection,
 		int maxAmount
 	) {
 		ItemStack sourceStack = fromInventory.getStackInSlot(fromSlot);
 		if (sourceStack == null || maxAmount <= 0) return 0;
 
 		// Check if this is an ISidedInventory.
-		final boolean isSidedInventory = fromInventory instanceof ISidedInventory && fromDirection != ForgeDirection.UNKNOWN;
-		if (isSidedInventory && !((ISidedInventory) fromInventory).canExtractItem(fromSlot, sourceStack, fromDirection.ordinal())) {
+		final boolean isSidedInventory = fromInventory instanceof ISidedInventory && fromDirection != null;
+		if (isSidedInventory && !((ISidedInventory) fromInventory).canExtractItem(fromSlot, sourceStack, fromDirection)) {
 			return 0;
 		}
 

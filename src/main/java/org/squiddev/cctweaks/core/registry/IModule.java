@@ -12,17 +12,17 @@ public interface IModule {
 	boolean canLoad();
 
 	/**
-	 * @see cpw.mods.fml.common.Mod.EventHandler
+	 * @see net.minecraftforge.fml.common.Mod.EventHandler
 	 */
 	void preInit();
 
 	/**
-	 * @see cpw.mods.fml.common.Mod.EventHandler
+	 * @see net.minecraftforge.fml.common.Mod.EventHandler
 	 */
 	void init();
 
 	/**
-	 * @see cpw.mods.fml.common.Mod.EventHandler
+	 * @see net.minecraftforge.fml.common.Mod.EventHandler
 	 */
 	void postInit();
 }

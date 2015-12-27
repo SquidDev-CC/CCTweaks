@@ -105,4 +105,16 @@ public class CraftingComputerUpgrade implements IRecipe {
 	public ItemStack getRecipeOutput() {
 		return null;
 	}
+
+	@Override
+	public ItemStack[] getRemainingItems(InventoryCrafting inventory) {
+		ItemStack[] result = new ItemStack[inventory.getSizeInventory()];
+
+		for (int i = 0; i < result.length; ++i) {
+			ItemStack itemstack = inventory.getStackInSlot(i);
+			result[i] = net.minecraftforge.common.ForgeHooks.getContainerItem(itemstack);
+		}
+
+		return result;
+	}
 }

@@ -6,7 +6,7 @@ task sourcesJar(type: Jar, dependsOn:classes) {
 // Build the Javadocs for the API
 task javadocAPI(type: Javadoc) {
 	source = sourceSets.api.java
-	classpath = configurations.compile
+	classpath = configurations.compile + configurations.provided + configurations.runtime
 }
 
 // Package Javadocs into a Jar

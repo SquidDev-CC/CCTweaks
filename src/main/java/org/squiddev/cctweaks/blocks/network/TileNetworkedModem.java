@@ -3,7 +3,9 @@ package org.squiddev.cctweaks.blocks.network;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
@@ -20,7 +22,7 @@ import java.util.Set;
 /**
  * A full block implementation of a modem
  */
-public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, IWorldNetworkNodeHost {
+public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, IWorldNetworkNodeHost, IUpdatePlayerListBox {
 	public final MultiPeripheralModem modem = new MultiPeripheralModem() {
 		@Override
 		public IWorldPosition getPosition() {
@@ -35,7 +37,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	}
 
 	@Override
-	public void updateEntity() {
+	public void update() {
 		if (worldObj.isRemote) return;
 
 		if (modem.modem.pollChanged()) markForUpdate();
@@ -50,7 +52,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	}
 
 	@Override
-	public boolean onActivated(EntityPlayer player, int side) {
+	public boolean onActivated(EntityPlayer player, EnumFacing side) {
 		if (player.isSneaking()) return false;
 		if (worldObj.isRemote) return true;
 
@@ -102,16 +104,10 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	}
 
 	@Override
-	public void destroy() {
-		super.destroy();
-		modem.destroy();
-	}
-
-	@Override
 	protected void readDescription(NBTTagCompound tag) {
 		modem.setState(tag.getByte("modem_state"));
 		// Force a rerender
-		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+		worldObj.markBlockForUpdate(pos);
 	}
 
 	@Override
@@ -127,7 +123,13 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	}
 
 	@Override
-	public IPeripheral getPeripheral(int side) {
+	public void destroy() {
+		super.destroy();
+		modem.destroy();
+	}
+
+	@Override
+	public IPeripheral getPeripheral(EnumFacing side) {
 		return modem.modem;
 	}
 

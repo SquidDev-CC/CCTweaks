@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.network;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
@@ -13,7 +14,7 @@ import java.util.Set;
  */
 public abstract class AbstractWorldNode extends AbstractNode implements IWorldNetworkNode {
 	@Override
-	public boolean canConnect(ForgeDirection direction) {
+	public boolean canConnect(EnumFacing direction) {
 		return true;
 	}
 
@@ -47,6 +48,7 @@ public abstract class AbstractWorldNode extends AbstractNode implements IWorldNe
 	@Override
 	public String toString() {
 		IWorldPosition position = getPosition();
-		return super.toString() + String.format(" (%s, %s, %s)", position.getX(), position.getY(), position.getZ());
+		BlockPos pos = position.getPosition();
+		return super.toString() + String.format(" (%s, %s, %s)", pos.getX(), pos.getY(), pos.getZ());
 	}
 }

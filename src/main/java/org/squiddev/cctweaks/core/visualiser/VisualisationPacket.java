@@ -1,11 +1,12 @@
 package org.squiddev.cctweaks.core.visualiser;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.client.render.RenderNetworkOverlay;
@@ -15,7 +16,8 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.squiddev.cctweaks.core.visualiser.VisualisationData.*;
+import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Connection;
+import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Node;
 
 /**
  * Handles transmitting/receiving the network
@@ -87,7 +89,7 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 			DebugLogger.debug("Reading " + nodeSize + " nodes");
 			for (int i = 0; i < nodeSize; i++) {
 				String name = ByteBufUtils.readUTF8String(buffer);
-				Position position = buffer.readByte() == 1 ? new Position(buffer.readInt(), buffer.readInt(), buffer.readInt()) : null;
+				BlockPos position = buffer.readByte() == 1 ? new BlockPos(buffer.readInt(), buffer.readInt(), buffer.readInt()) : null;
 
 				nodes[i] = new Node(name, position);
 			}
@@ -131,12 +133,12 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 
 				ByteBufUtils.writeUTF8String(buffer, node.name);
 
-				Position position = node.position;
+				BlockPos position = node.position;
 				if (position != null) {
 					buffer.writeByte(1);
-					buffer.writeInt(position.x);
-					buffer.writeInt(position.y);
-					buffer.writeInt(position.z);
+					buffer.writeInt(position.getX());
+					buffer.writeInt(position.getY());
+					buffer.writeInt(position.getZ());
 				} else {
 					buffer.writeByte(0);
 				}

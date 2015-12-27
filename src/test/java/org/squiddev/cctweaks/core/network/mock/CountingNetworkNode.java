@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.core.network.mock;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractWorldNode;
@@ -38,8 +38,8 @@ public class CountingNetworkNode extends AbstractWorldNode {
 	}
 
 	@Override
-	public boolean canConnect(ForgeDirection direction) {
-		return direction.ordinal() >= 2 && canVisit[direction.ordinal() - 2];
+	public boolean canConnect(EnumFacing direction) {
+		return direction.getAxis() != EnumFacing.Axis.Y && canVisit[direction.ordinal() - 2];
 	}
 
 	@Override
