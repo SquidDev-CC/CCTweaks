@@ -16,6 +16,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import org.apache.commons.lang3.tuple.Pair;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.McEvents;
@@ -57,9 +58,10 @@ public class ToolHostPlayer extends TurtlePlayer {
 		Vec3 rayDir = getLook(1.0f);
 		Vec3 rayStart = new Vec3(posX + rayDir.xCoord * 0.4, posY + rayDir.yCoord * 0.4, posZ + rayDir.zCoord * 0.4);
 
-		Entity hitEntity = WorldUtil.rayTraceEntities(turtle.getWorld(), rayStart, rayDir, 1.1);
+		Pair<Entity, Vec3> hit = WorldUtil.rayTraceEntities(turtle.getWorld(), rayStart, rayDir, 1.1);
 
-		if (hitEntity != null) {
+		if (hit != null) {
+			Entity hitEntity = hit.getLeft();
 			loadInventory(getItem());
 
 			McEvents.addEntityConsumer(hitEntity, consumer);

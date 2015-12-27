@@ -136,13 +136,14 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 		if (Config.Network.WirelessBridge.crafting) {
 			Helpers.alternateCrafting(new ItemStack(this, 1, 0), 'C', 'M',
 				"GMG",
-				"CDC",
+				"CAC",
 				"GMG",
 
 				'G', Items.gold_ingot,
 				'D', Items.diamond,
 				'C', PeripheralItemFactory.create(PeripheralType.Cable, null, 1),
-				'M', PeripheralItemFactory.create(PeripheralType.WirelessModem, null, 1)
+				'M', PeripheralItemFactory.create(PeripheralType.WiredModem, null, 1),
+				'A', PeripheralItemFactory.create(PeripheralType.AdvancedModem, null, 1)
 			);
 		}
 

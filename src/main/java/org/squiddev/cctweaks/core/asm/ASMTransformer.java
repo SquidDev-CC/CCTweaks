@@ -1,6 +1,9 @@
 package org.squiddev.cctweaks.core.asm;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
+import org.apache.logging.log4j.Level;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.asm.binary.BinaryUtils;
@@ -109,12 +112,42 @@ public class ASMTransformer implements IClassTransformer {
 		};
 	}
 
+	private boolean loadedCC = false;
+	private String[] message;
+
+	private void checkCC() {
+		loadedCC = true;
+		for (ModContainer x : Loader.instance().getModList()) {
+			if (x.getName().equals("ComputerCraft") && !x.getVersion().equals("${cc_version}")) {
+				message = new String[]{
+					"CCTweaks ${mod_version} was tested against ComputerCraft ${cc_version} but is running against " + x.getVersion() + ".",
+					"Some CCTweaks/ComputerCraft features may not work correctly - please check CCTweaks for updates.",
+					"If you encounter issues then try to reproduce without CCTweaks installed, then report to the appropriate mod author.",
+				};
+				DebugLogger.major(Level.WARN, message);
+			}
+		}
+	}
+
 	@Override
 	public byte[] transform(String className, String s2, byte[] bytes) {
+		if (!loadedCC && className.startsWith("dan200.computercraft.")) checkCC();
+
 		try {
 			return patches.transform(className, bytes);
 		} catch (Exception e) {
-			DebugLogger.error("Cannot patch " + className + ", falling back to default", e);
+			String contents = "Cannot patch " + className + ", falling back to default";
+			if (message != null) {
+				DebugLogger.beginMajor(Level.ERROR);
+				DebugLogger.error(contents, e);
+				for (String line : message) {
+					DebugLogger.error(line);
+				}
+				DebugLogger.endMajor(Level.ERROR);
+			} else {
+				DebugLogger.error(contents, e);
+			}
+
 			return bytes;
 		}
 	}

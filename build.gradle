@@ -18,6 +18,7 @@ minecraft {
 
 	replace '${mod_version}', project.mod_version
 	replace '${mc_version}', project.mc_version
+	replace '${cc_version}', project.cc_version
 }
 
 jar {

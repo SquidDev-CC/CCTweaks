@@ -8,6 +8,7 @@ import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.lua.IArguments;
 import org.squiddev.cctweaks.api.lua.IBinaryHandler;
 import org.squiddev.cctweaks.api.lua.IPeripheralWithArguments;
@@ -31,6 +32,11 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	}
 
 	@Override
+	protected World getWorld() {
+		return (World) modem.getPosition().getBlockAccess();
+	}
+
+	@Override
 	protected Vec3 getPosition() {
 		BlockPos position = modem.getPosition().getPosition();
 		return new Vec3(position.getX(), position.getY(), position.getZ());
@@ -39,6 +45,11 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	@Override
 	protected double getTransmitRange() {
 		return 256;
+	}
+
+	@Override
+	protected boolean isInterdimensional() {
+		return false;
 	}
 
 	@Override

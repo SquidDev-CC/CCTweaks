@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -150,5 +151,25 @@ public class DebugLogger {
 
 	public static void warn(String message, Throwable t) {
 		logger.warn(message, t);
+	}
+
+	private static final String SEPARATOR = StringUtils.repeat('#', 100);
+
+	public static void beginMajor(Level level) {
+		logger.log(level, SEPARATOR);
+		logger.log(level, "");
+	}
+
+	public static void endMajor(Level level) {
+		logger.log(level, "");
+		logger.log(level, SEPARATOR);
+	}
+
+	public static void major(Level level, String... message) {
+		beginMajor(level);
+		for (String line : message) {
+			logger.log(level, line);
+		}
+		endMajor(level);
 	}
 }

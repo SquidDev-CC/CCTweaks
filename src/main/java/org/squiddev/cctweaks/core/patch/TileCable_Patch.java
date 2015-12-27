@@ -7,11 +7,9 @@ import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.FmlEvents;
@@ -256,8 +254,8 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	}
 
 	@Override
-	public void transmit(int channel, int replyChannel, Object payload, double range, double xPos, double yPos, double zPos, Object senderObject) {
-		getModem().transmit(channel, replyChannel, payload, range, xPos, yPos, zPos, senderObject);
+	public void transmit(int channel, int replyChannel, Object payload, World world, Vec3 pos, double range, boolean interdimensional, Object senderObject) {
+		getModem().transmit(channel, replyChannel, payload, world, pos, range, interdimensional, senderObject);
 	}
 
 	@Deprecated
