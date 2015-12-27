@@ -10,11 +10,14 @@ buildscript {
 		classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
 	}
 }
+plugins {
+	id 'com.matthewprenger.cursegradle' version '1.0.5'
+}
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 apply from: 'gradle/scripts/dependencies.gradle'
 apply from: 'gradle/scripts/artifacts.gradle'
-// apply from: 'gradle/scripts/upload.gradle'
+apply from: 'gradle/scripts/upload.gradle'
 apply from: 'gradle/scripts/documentation.gradle'
 apply from: 'gradle/scripts/jsonGen.gradle'
 
