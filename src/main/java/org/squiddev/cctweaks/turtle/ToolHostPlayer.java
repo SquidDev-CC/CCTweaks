@@ -25,14 +25,14 @@ import org.squiddev.cctweaks.core.utils.WorldPosition;
 
 /**
  * Handles various turtle actions.
- *
- * Emulates large parts of {@link ItemInWorldManager}
  */
 public class ToolHostPlayer extends TurtlePlayer {
 	private final ITurtleAccess turtle;
 
 	private BlockPos digPosition;
 	private Block digBlock;
+	private int currentDamage = -1;
+	private int currentDamageState = -1;
 
 	private final McEvents.IDropConsumer consumer = new McEvents.IDropConsumer() {
 		@Override
@@ -75,6 +75,16 @@ public class ToolHostPlayer extends TurtlePlayer {
 		return TurtleCommandResult.failure("Nothing to attack here");
 	}
 
+	private void setState(Block block, BlockPos pos) {
+		theItemInWorldManager.cancelDestroyingBlock();
+		theItemInWorldManager.durabilityRemainingOnBlock = -1;
+
+		digPosition = pos;
+		digBlock = block;
+		currentDamage = -1;
+		currentDamageState = -1;
+	}
+
 	public TurtleCommandResult dig(EnumFacing direction) {
 		updateInformation(direction);
 
@@ -82,13 +92,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 		World world = turtle.getWorld();
 		Block block = world.getBlockState(pos).getBlock();
 
-		if (block != digBlock || !pos.equals(digPosition)) {
-			theItemInWorldManager.cancelDestroyingBlock();
-			theItemInWorldManager.durabilityRemainingOnBlock = -1;
-
-			digPosition = pos;
-			digBlock = block;
-		}
+		if (block != digBlock || !pos.equals(digPosition)) setState(block, pos);
 
 		if (!world.isAirBlock(pos) && !block.getMaterial().isLiquid()) {
 			if (block == Blocks.bedrock || block.getBlockHardness(world, pos) <= -1) {
@@ -99,19 +103,27 @@ public class ToolHostPlayer extends TurtlePlayer {
 
 			ItemInWorldManager manager = theItemInWorldManager;
 			for (int i = 0; i < Config.Turtle.ToolHost.digFactor; i++) {
-				if (manager.durabilityRemainingOnBlock == -1) {
+				if (currentDamageState == -1) {
+					// TODO: Migrate checks to here
 					manager.onBlockClicked(pos, direction.getOpposite());
+					currentDamageState = manager.durabilityRemainingOnBlock;
 				} else {
-					manager.updateBlockRemoving();
-					if (manager.durabilityRemainingOnBlock >= 9) {
+					currentDamage++;
+					float hardness = block.getPlayerRelativeBlockHardness(this, world, pos) * (currentDamage + 1);
+					int hardnessState = (int) (hardness * 10);
 
+					if (hardnessState != currentDamageState) {
+						world.sendBlockBreakProgress(getEntityId(), pos, hardnessState);
+						currentDamageState = hardnessState;
+					}
+
+					if (hardness >= 1) {
 						IWorldPosition position = new WorldPosition(world, pos);
 						McEvents.addBlockConsumer(position, consumer);
 						manager.tryHarvestBlock(pos);
 						McEvents.removeBlockConsumer(position);
 
-						manager.durabilityRemainingOnBlock = -1;
-
+						setState(null, null);
 						break;
 					}
 				}
