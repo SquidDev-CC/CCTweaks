@@ -34,6 +34,11 @@ public class ToolHostPlayer extends TurtlePlayer {
 	private int currentDamage = -1;
 	private int currentDamageState = -1;
 
+	/**
+	 * A copy of the active stack for applying/removing attributes
+	 */
+	private ItemStack activeStack;
+
 	private final McEvents.IDropConsumer consumer = new McEvents.IDropConsumer() {
 		@Override
 		public void consumeDrop(ItemStack drop) {
@@ -56,9 +61,9 @@ public class ToolHostPlayer extends TurtlePlayer {
 		updateInformation(direction);
 
 		Vec3 rayDir = getLook(1.0f);
-		Vec3 rayStart = new Vec3(posX + rayDir.xCoord * 0.4, posY + rayDir.yCoord * 0.4, posZ + rayDir.zCoord * 0.4);
+		Vec3 rayStart = new Vec3(posX, posY, posZ);
 
-		Pair<Entity, Vec3> hit = WorldUtil.rayTraceEntities(turtle.getWorld(), rayStart, rayDir, 1.1);
+		Pair<Entity, Vec3> hit = WorldUtil.rayTraceEntities(turtle.getWorld(), rayStart, rayDir, 1.5);
 
 		if (hit != null) {
 			Entity hitEntity = hit.getLeft();
@@ -146,6 +151,36 @@ public class ToolHostPlayer extends TurtlePlayer {
 		return turtle.getVisualPosition(0);
 	}
 
+	@Override
+	public void loadInventory(ItemStack currentStack) {
+		// Copy properties over
+		if (currentStack != null) {
+			getAttributeMap().applyAttributeModifiers(currentStack.getAttributeModifiers());
+			activeStack = currentStack.copy();
+		}
+
+		super.loadInventory(currentStack);
+	}
+
+	@Override
+	public ItemStack unloadInventory(ITurtleAccess turtle) {
+		// Revert to old properties
+		if (activeStack != null) {
+			getAttributeMap().removeAttributeModifiers(activeStack.getAttributeModifiers());
+			activeStack = null;
+		}
+
+		return super.unloadInventory(turtle);
+	}
+
+	public void loadInventory() {
+		loadInventory(getItem());
+	}
+
+	public void unloadInventory() {
+		unloadInventory(turtle);
+	}
+
 	/**
 	 * Basically just {@link #getHeldItem()}
 	 */
@@ -160,9 +195,9 @@ public class ToolHostPlayer extends TurtlePlayer {
 		BlockPos position = turtle.getPosition();
 
 		setPositionAndRotation(
-			position.getX() + 0.5 + 0.51 * direction.getFrontOffsetX(),
-			position.getY() - 1.1 + 0.51 * direction.getFrontOffsetY(),
-			position.getZ() + 0.5 + 0.51 * direction.getFrontOffsetZ(),
+			position.getX() + 0.5 + 0.48 * direction.getFrontOffsetX(),
+			position.getY() + 0.5 + 0.48 * direction.getFrontOffsetY(),
+			position.getZ() + 0.5 + 0.48 * direction.getFrontOffsetZ(),
 			direction.getAxis() != EnumFacing.Axis.Y ? DirectionUtil.toYawAngle(direction) : DirectionUtil.toYawAngle(turtle.getDirection()),
 			direction.getAxis() != EnumFacing.Axis.Y ? 0 : DirectionUtil.toPitchAngle(direction)
 		);
