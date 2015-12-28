@@ -1,47 +1,32 @@
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
-uploadArchives {
-	repositories {
-		if (!project.hasProperty("ftpHost")) {
-			mavenLocal()
-		} else {
-			mavenDeployer {
-				configuration = configurations.deployerJars
-				repository(url: ftpHost) {
-					authentication(userName: ftpUser, password: ftpPass)
-				}
+bintray {
+	user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+	key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+	publications = ['mavenJava']
+	pkg {
+		repo = 'maven'
+		name = 'CCTweaks'
+		licenses = ['MIT']
+		vcsUrl = 'https://github.com/SquidDev-CC/CCTweaks'
 
-				pom.project {
-					name 'CCTweaks'
-					packaging 'jar'
-					description 'Random additions to ComputerCraft'
-					url 'https://github.com/SquidDev-CC/CC-Tweaks'
+		version {
+			name = project.version
+			desc = 'Random additions to ComputerCraft'
+			released = new Date()
+		}
+	}
+}
 
-					scm {
-						url 'scm:git@github.com:SquidDev-CC/CC-Tweaks.git'
-						connection 'scm:git@github.com:SquidDev-CC/CC-Tweaks.git'
-						developerConnection 'scm:git@github.com:SquidDev-CC/CC-Tweaks.git'
-					}
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifact jar
+			artifact devJar
 
-					licenses {
-						license {
-							name 'MIT License'
-							url 'http://opensource.org/licenses/mit-license.php'
-							distribution 'repo'
-						}
-					}
-
-					developers {
-						developer {
-							id 'SquidDev'
-							name 'SquidDev'
-						}
-					}
-				}
-				pom*.whenConfigured { pom ->
-					pom.dependencies.clear()
-				}
-			}
+			artifact apiJar
+			artifact sourcesJar
+			artifact javadocJar
 		}
 	}
 }
