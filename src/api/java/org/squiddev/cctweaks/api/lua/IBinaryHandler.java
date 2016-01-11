@@ -12,6 +12,9 @@ package org.squiddev.cctweaks.api.lua;
  * and so try to avoid accepting binary data from that.
  *
  * You can always return {@code byte[]} instead of string from any context and it will be converted correctly.
+ *
+ * @deprecated Use {@link ILuaObjectWithArguments} or {@link IPeripheralWithArguments} instead.
  */
+@Deprecated
 public interface IBinaryHandler {
 }

@@ -1,5 +1,6 @@
 buildscript {
 	repositories {
+		mavenCentral()
 		jcenter()
 		maven {
 			name = "forge"
@@ -25,10 +26,11 @@ apply from: 'gradle/scripts/jsonGen.gradle'
 group = "org.squiddev"
 archivesBaseName = "CCTweaks"
 version = mc_version + "-" + mod_version
+buildDir = "build-${mc_version}"
 
 minecraft {
 	version = project.mc_version + "-" + project.forge_version
-	runDir = "run"
+	runDir = "run-${project.mc_version}"
 	mappings = "snapshot_20141130"
 
 	replace '${mod_version}', project.mod_version

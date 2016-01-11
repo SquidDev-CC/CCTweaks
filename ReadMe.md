@@ -1,4 +1,4 @@
-# CCTweaks [![Build Status](https://travis-ci.org/SquidDev-CC/CC-Tweaks.svg?branch=master)](https://travis-ci.org/SquidDev-CC/CC-Tweaks)
+# CCTweaks [![Build Status](https://travis-ci.org/SquidDev-CC/CC-Tweaks.svg?branch=minecraft-1.8)](https://travis-ci.org/SquidDev-CC/CC-Tweaks)
 Miscellaneous things for ComputerCraft
 
 ## Features
