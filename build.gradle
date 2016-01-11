@@ -28,6 +28,7 @@ apply from: 'gradle/scripts/documentation.gradle'
 group = "org.squiddev"
 archivesBaseName = "CCTweaks"
 version = mc_version + "-" + mod_version
+buildDir = "build-${mc_version}"
 
 minecraft {
 	version = project.mc_version + "-" + project.forge_version + "-" + project.mc_version
