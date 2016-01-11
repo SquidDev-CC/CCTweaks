@@ -15,6 +15,7 @@ plugins {
 	id 'com.matthewprenger.cursegradle' version '1.0.5'
 	id "com.jfrog.bintray" version "1.4"
 }
+buildDir = "build-${mc_version}"
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 apply from: 'gradle/scripts/dependencies.gradle'
@@ -26,7 +27,6 @@ apply from: 'gradle/scripts/jsonGen.gradle'
 group = "org.squiddev"
 archivesBaseName = "CCTweaks"
 version = mc_version + "-" + mod_version
-buildDir = "build-${mc_version}"
 
 minecraft {
 	version = project.mc_version + "-" + project.forge_version
