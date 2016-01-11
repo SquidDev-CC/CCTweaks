@@ -1,6 +1,7 @@
 buildscript {
 	repositories {
 		mavenCentral()
+		jcenter()
 		maven {
 			name = "forge"
 			url = "http://files.minecraftforge.net/maven"
@@ -13,6 +14,9 @@ buildscript {
 	dependencies {
 		classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
 	}
+}
+plugins {
+	id "com.jfrog.bintray" version "1.4"
 }
 
 apply plugin: 'forge'
@@ -27,10 +31,11 @@ version = mc_version + "-" + mod_version
 
 minecraft {
 	version = project.mc_version + "-" + project.forge_version + "-" + project.mc_version
-	runDir = "eclipse"
+	runDir = "run-${project.mc_version}"
 
 	replace '${mod_version}', project.mod_version
 	replace '${mc_version}', project.mc_version
+	replace '${cc_version}', project.cc_version
 }
 
 jar {

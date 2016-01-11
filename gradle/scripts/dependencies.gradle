@@ -12,7 +12,7 @@ repositories {
 
 	maven {
 		name = "squiddev"
-		url = "http://maven.bonzodandd.co.uk"
+		url = "https://dl.bintray.com/squiddev/maven"
 	}
 
 	maven {

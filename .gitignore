@@ -56,7 +56,7 @@ $RECYCLE.BIN/
 # =========================
 # Forge Files
 # =========================
-
+/run-*/
 /bin/
 /lib/ # Include libs manually
 

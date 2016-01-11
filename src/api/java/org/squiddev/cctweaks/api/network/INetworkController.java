@@ -66,6 +66,8 @@ public interface INetworkController {
 	/**
 	 * A more lightweight version of {@link #invalidateNetwork()}, this invalidates the
 	 * peripherals for one node.
+	 *
+	 * @param node The node to invalidate.
 	 */
 	void invalidateNode(INetworkNode node);
 

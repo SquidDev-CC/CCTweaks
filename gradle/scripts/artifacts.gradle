@@ -1,4 +1,4 @@
-task sourcesJar(type: Jar, dependsOn:classes) {
+task sourcesJar(type: Jar, dependsOn: classes) {
 	from sourceSets.api.allSource
 	classifier = "sources"
 }
@@ -6,11 +6,11 @@ task sourcesJar(type: Jar, dependsOn:classes) {
 // Build the Javadocs for the API
 task javadocAPI(type: Javadoc) {
 	source = sourceSets.api.java
-	classpath = configurations.compile
+	classpath = sourceSets.api.compileClasspath
 }
 
 // Package Javadocs into a Jar
-task javadocJar(type: Jar, dependsOn:javadocAPI) {
+task javadocJar(type: Jar, dependsOn: javadocAPI) {
 	from javadocAPI.destinationDir
 	classifier = "javadoc"
 }
@@ -45,14 +45,4 @@ task devJar(type: Jar) {
 	classifier = 'dev'
 
 	exclude("assets/**/docs")
-}
-
-// All the artifacts to build
-artifacts {
-	archives jar
-	archives devJar
-
-	archives apiJar
-	archives sourcesJar
-	archives javadocJar
 }
