@@ -19,11 +19,9 @@ import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
  * https://github.com/OpenMods/OpenPeripheral/blob/master/src/main/java/openperipheral/interfaces/cc/ModuleComputerCraft.java#L33-L37
  */
 public class PatchOpenModule implements IPatcher {
-	public final String className = "openperipheral.interfaces.cc.ModuleComputerCraft";
-
 	@Override
 	public boolean matches(String className) {
-		return className.equals(this.className);
+		return className.equals("openperipheral.interfaces.cc.ModuleComputerCraft");
 	}
 
 	@Override

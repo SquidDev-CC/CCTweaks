@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.asm;
 
+import dan200.computercraft.shared.computer.core.ServerComputer;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -14,10 +15,12 @@ import static org.objectweb.asm.Opcodes.*;
 
 /**
  * Allow a turtle upgrade being both a peripheral and a turtle tool
+ *
+ * @see dan200.computercraft.shared.turtle.core.TurtleBrain#updatePeripherals(ServerComputer)
  */
 public class TurtleBrainAlsoPeripheral implements IPatcher {
-	public static final String EXTENDED_UPGRADE = "org/squiddev/cctweaks/api/turtle/IExtendedTurtleUpgrade";
-	public static final int SLOT = 6;
+	private static final String EXTENDED_UPGRADE = "org/squiddev/cctweaks/api/turtle/IExtendedTurtleUpgrade";
+	private static final int SLOT = 6;
 
 	@Override
 	public boolean matches(String className) {
@@ -55,6 +58,6 @@ public class TurtleBrainAlsoPeripheral implements IPatcher {
 
 				visitor.visitLabel(add);
 			}
-		};
+		}.onMethod("updatePeripherals").once().mustFind();
 	}
 }
