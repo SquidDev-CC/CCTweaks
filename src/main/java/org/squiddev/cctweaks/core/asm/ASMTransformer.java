@@ -108,6 +108,7 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.peripheral.printer.PrinterPeripheral",
 				"org.squiddev.cctweaks.core.patch.targeted.PrinterPeripheral_Patch"
 			),
+			new TurtleBrainAlsoPeripheral(),
 		});
 		BinaryUtils.inject(patches);
 
