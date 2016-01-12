@@ -132,4 +132,18 @@ public class LuaConverter {
 			}
 		}
 	}
+
+	public static byte[] toBytes(String string) {
+		try {
+			return string.getBytes("UTF8");
+		} catch (UnsupportedEncodingException e) {
+			try {
+				// Fall back. Shouldn't happen, but you never know
+				return string.getBytes("ISO-8859-1");
+			} catch (UnsupportedEncodingException e1) {
+				// This should never be reached.
+				return string.getBytes();
+			}
+		}
+	}
 }

@@ -12,7 +12,7 @@ import static org.objectweb.asm.Opcodes.*;
 public class CustomAPIs implements IPatcher {
 	@Override
 	public boolean matches(String className) {
-		return className.equals("dan200/computercraft/core/computer/Computer");
+		return className.equals("dan200.computercraft.core.computer.Computer");
 	}
 
 	@Override
@@ -25,9 +25,9 @@ public class CustomAPIs implements IPatcher {
 					visitor = new MethodVisitor(ASM5, visitor) {
 						@Override
 						public void visitCode() {
-							super.visitCode();
 							mv.visitVarInsn(ALOAD, 0);
 							mv.visitMethodInsn(INVOKESTATIC, "org/squiddev/cctweaks/core/lua/LuaEnvironment", "inject", "(Ldan200/computercraft/core/computer/Computer;)V", false);
+							super.visitCode();
 						}
 					};
 				}

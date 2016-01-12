@@ -4,6 +4,7 @@ import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.ILuaObject;
 import dan200.computercraft.api.lua.LuaException;
 import org.squiddev.cctweaks.api.lua.IBinaryHandler;
+import org.squiddev.cctweaks.core.lua.LuaConverter;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class WriterObject implements ILuaObject, IBinaryHandler {
 	private void write(Object[] args, boolean newLine) throws LuaException {
 		byte[] result;
 		if (args.length > 0 && args[0] != null) {
-			result = args[0] instanceof byte[] ? (byte[]) args[0] : args[0].toString().getBytes();
+			result = args[0] instanceof byte[] ? (byte[]) args[0] : LuaConverter.toBytes(args[0].toString());
 		} else {
 			result = new byte[0];
 		}

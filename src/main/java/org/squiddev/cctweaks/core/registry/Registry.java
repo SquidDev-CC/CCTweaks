@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.blocks.debug.BlockDebug;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.client.render.RenderNetworkOverlay;
+import org.squiddev.cctweaks.core.lua.ApiModule;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHostProvider;
 import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
@@ -53,6 +54,7 @@ public final class Registry {
 		addModule(new OpenPeripheralIntegration());
 
 		addModule(new PeripheralHostProvider());
+		addModule(new ApiModule());
 
 		addModule(new DefaultTurtleProviders());
 		addModule(new TurtleUpgradeWirelessBridge());

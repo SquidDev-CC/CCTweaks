@@ -20,7 +20,7 @@ public interface ILuaObjectWithArguments extends ILuaObject {
 	 * @param method    The method index to call
 	 * @param arguments An instance of {@link IArguments}, representing the arguments passed into peripheral.call().
 	 * @return An array of objects, representing values you wish to return to the lua program.
-	 * @throws LuaException If the wrong arguments are supplied to your method.
+	 * @throws LuaException         If the wrong arguments are supplied to your method.
 	 * @throws InterruptedException If the computer is terminated.
 	 * @see #callMethod(ILuaContext, int, Object[])
 	 */

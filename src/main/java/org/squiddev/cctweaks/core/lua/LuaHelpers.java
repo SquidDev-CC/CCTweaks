@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.lua;
 
+import com.google.common.base.Strings;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.ILuaObject;
 import dan200.computercraft.api.lua.LuaException;
@@ -47,5 +48,17 @@ public class LuaHelpers {
 	 */
 	public static Object[] delegateLuaObject(ILuaObject object, ILuaContext context, int method, Varargs arguments) throws LuaException, InterruptedException {
 		return ArgumentDelegator.delegateLuaObject(object, context, method, new VarargArguments(arguments));
+	}
+
+	/**
+	 * Wraps an exception, defaulting to another string on an empty message
+	 *
+	 * @param e   The exception to wrap
+	 * @param def The default message
+	 * @return The created exception
+	 */
+	public static LuaException rewriteException(Throwable e, String def) {
+		String message = e.getMessage();
+		return new LuaException(Strings.isNullOrEmpty(message) ? def : message);
 	}
 }

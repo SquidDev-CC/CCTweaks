@@ -15,9 +15,12 @@ buildscript {
 		classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
 	}
 }
+
 plugins {
 	id "com.jfrog.bintray" version "1.4"
 }
+
+buildDir = "build-${mc_version}"
 
 apply plugin: 'forge'
 apply from: 'gradle/scripts/dependencies.gradle'
@@ -28,7 +31,6 @@ apply from: 'gradle/scripts/documentation.gradle'
 group = "org.squiddev"
 archivesBaseName = "CCTweaks"
 version = mc_version + "-" + mod_version
-buildDir = "build-${mc_version}"
 
 minecraft {
 	version = project.mc_version + "-" + project.forge_version + "-" + project.mc_version
