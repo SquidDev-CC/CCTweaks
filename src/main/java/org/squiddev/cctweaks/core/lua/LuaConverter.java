@@ -4,7 +4,8 @@ import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -119,31 +120,34 @@ public class LuaConverter {
 		}
 	}
 
-	public static String decodeString(byte[] bytes) {
-		try {
-			return new String(bytes, "UTF8");
-		} catch (UnsupportedEncodingException e) {
+	private static Charset CHARSET;
+
+	public static Charset getCharset() {
+		if (CHARSET == null) {
 			try {
-				// Fall back. Shouldn't happen, but you never know
-				return new String(bytes, "ISO-8859-1");
-			} catch (UnsupportedEncodingException e1) {
-				// This should never be reached.
-				return new String(bytes);
+				CHARSET = Charset.forName("UTF8");
+			} catch (UnsupportedCharsetException e) {
+				try {
+					// Fall back. Shouldn't happen, but you never know
+					CHARSET = Charset.forName("ISO-8859-1");
+				} catch (UnsupportedCharsetException e1) {
+					CHARSET = Charset.defaultCharset();
+				}
 			}
 		}
+
+		return CHARSET;
+	}
+
+	public static String decodeString(byte[] bytes) {
+		return new String(bytes, getCharset());
+	}
+
+	public static String decodeString(byte[] bytes, int offset, int length) {
+		return new String(bytes, offset, length, getCharset());
 	}
 
 	public static byte[] toBytes(String string) {
-		try {
-			return string.getBytes("UTF8");
-		} catch (UnsupportedEncodingException e) {
-			try {
-				// Fall back. Shouldn't happen, but you never know
-				return string.getBytes("ISO-8859-1");
-			} catch (UnsupportedEncodingException e1) {
-				// This should never be reached.
-				return string.getBytes();
-			}
-		}
+		return string.getBytes(getCharset());
 	}
 }

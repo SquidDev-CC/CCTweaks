@@ -82,7 +82,7 @@ public class AddAdditionalData implements IPatcher {
 				// this.toValue(entry.getValue())
 				visitor.visitVarInsn(ALOAD, 0);
 				visitor.visitVarInsn(ALOAD, ENTRY_SLOT);
-				visitor.visitMethodInsn(INVOKEINTERFACE, "java/util/Map$Entry", "getKey", "()Ljava/lang/Object;", true);
+				visitor.visitMethodInsn(INVOKEINTERFACE, "java/util/Map$Entry", "getValue", "()Ljava/lang/Object;", true);
 				visitor.visitMethodInsn(INVOKESPECIAL, "dan200/computercraft/core/lua/LuaJLuaMachine", "toValue", "(Ljava/lang/Object;)Lorg/luaj/vm2/LuaValue;", false);
 
 				// Actual table.set(key, val)

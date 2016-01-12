@@ -12,7 +12,9 @@ import dan200.computercraft.core.filesystem.FileSystem;
 import dan200.computercraft.core.filesystem.FileSystemException;
 import org.squiddev.cctweaks.api.lua.*;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class LuaEnvironment implements ILuaEnvironment {
@@ -44,7 +46,7 @@ public class LuaEnvironment implements ILuaEnvironment {
 		}
 	}
 
-	private static class LuaAPI implements ILuaAPI, ILuaObjectWithArguments {
+	private static class LuaAPI implements ILuaAPI, ILuaObjectWithArguments, IExtendedLuaObject {
 		private final org.squiddev.cctweaks.api.lua.ILuaAPI api;
 		private final ILuaAPIFactory factory;
 
@@ -86,6 +88,11 @@ public class LuaEnvironment implements ILuaEnvironment {
 		@Override
 		public Object[] callMethod(ILuaContext context, int method, IArguments arguments) throws LuaException, InterruptedException {
 			return ArgumentDelegator.delegateLuaObject(api, context, method, arguments);
+		}
+
+		@Override
+		public Map<Object, Object> getAdditionalData() {
+			return api instanceof IExtendedLuaObject ? ((IExtendedLuaObject) api).getAdditionalData() : Collections.emptyMap();
 		}
 	}
 
