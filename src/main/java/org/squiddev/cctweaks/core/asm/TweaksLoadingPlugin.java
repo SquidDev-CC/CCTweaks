@@ -15,6 +15,7 @@ import java.util.Map;
 
 @IFMLLoadingPlugin.TransformerExclusions({"org.squiddev.cctweaks.core.asm.", "org.squiddev.cctweaks.core.Config", "org.squiddev.patcher"})
 @IFMLLoadingPlugin.MCVersion("${mc_version}")
+@IFMLLoadingPlugin.SortingIndex(1001) // After runtime deobsfucation
 public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
 	public static File minecraftDir;
 
