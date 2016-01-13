@@ -25,13 +25,8 @@ class DocumentationParser extends DefaultTask {
 		StringBuilder lang = languages[language];
 		if (lang == null) languages[language] = lang = new StringBuilder().append("\n#Auto generated files\n");
 
-		String key = matcher.group(3) + "." + matcher.group(1) + "." + matcher.group(4) + ".information.";
-
-		int counter = 0;
-		for (String contents in file.getText().split(/\n-{3,}|\*{3,}\n/)) {
-			lang.append(key + counter + "=" + State.parse(contents).replace("\n\n", "\\n").replace("\n", " ").replace(" +", " ").trim() + "\n");
-			counter++;
-		}
+		String key = matcher.group(3) + "." + matcher.group(1) + "." + matcher.group(4) + ".information";
+		lang.append(key + "=" + State.parse(file.getText()).replace("\n{2,}", "\\n").replace("\n", " ").replace(" +", " ").trim() + "\n");
 	}
 }
 

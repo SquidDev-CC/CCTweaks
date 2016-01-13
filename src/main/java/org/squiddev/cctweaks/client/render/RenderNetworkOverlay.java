@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
@@ -144,13 +145,13 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		int xOffset = width / 2;
 
 		GlStateManager.disableTexture2D();
-		renderer.startDrawingQuads();
+		GlStateManager.color(0, 0, 0, 65 / 225.0f);
 
-		renderer.setColorRGBA(0, 0, 0, 65);
-		renderer.addVertex(-xOffset - 1, -1, 0);
-		renderer.addVertex(-xOffset - 1, 8, 0);
-		renderer.addVertex(xOffset + 1, 8, 0);
-		renderer.addVertex(xOffset + 1, -1, 0);
+		renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+		renderer.pos(-xOffset - 1, -1, 0);
+		renderer.pos(-xOffset - 1, 8, 0);
+		renderer.pos(xOffset + 1, 8, 0);
+		renderer.pos(xOffset + 1, -1, 0);
 
 		tessellator.draw();
 		GlStateManager.enableTexture2D();
@@ -166,9 +167,9 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer renderer = tessellator.getWorldRenderer();
 
-		renderer.startDrawing(GL11.GL_LINES);
-		renderer.addVertex(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5);
-		renderer.addVertex(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
+		renderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+		renderer.putPosition(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5);
+		renderer.putPosition(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
 
 		tessellator.draw();
 	}

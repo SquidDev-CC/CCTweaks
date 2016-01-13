@@ -22,9 +22,12 @@ repositories {
 		url "http://repo.openmods.info/artifactory/openmods"
 	}
 
+	maven { url "http://maven.amadornes.com/" }
+	maven { url "http://dvs1.progwml6.com/files/maven" }
+
 	ivy {
 		name = "ComputerCraft"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2272/212/[module][revision](.[ext])"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2275/77/[module][revision](.[ext])"
 	}
 
 	ivy {
@@ -42,10 +45,8 @@ configurations {
 
 dependencies {
 	compile "ComputerCraft:ComputerCraft:${project.cc_version}"
-
-	compile "codechicken:CodeChickenLib:${project.mc_version}-1.1.2.139:dev"
-	compile "codechicken:CodeChickenCore:${project.mc_version}-1.0.5.36:dev"
-	provided "codechicken:NotEnoughItems:${project.mc_version}-1.0.5.104:dev" // NEI crashes currently. Don't know why.
+	deobfCompile "MCMultiPart:MCMultiPart:1.0.4:universal"
+	deobfCompile "mezz.jei:jei_${project.mc_version}:2.16.2.78"
 
 	// For 1.7.10 but including anyway
 	provided "CoFHLib:CoFHLib:[1.7.10]1.0.1-159-dev"

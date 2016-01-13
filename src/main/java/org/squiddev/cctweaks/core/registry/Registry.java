@@ -29,6 +29,7 @@ public final class Registry {
 	public static final ItemToolHost itemToolHost;
 
 	public static final BlockNetworked blockNetworked;
+	public static final BlockDebug blockDebug;
 
 	private static final Set<IModule> modules = new HashSet<IModule>();
 
@@ -44,7 +45,7 @@ public final class Registry {
 		addModule(itemDataCard = new ItemDataCard());
 		addModule(blockNetworked = new BlockNetworked());
 
-		addModule(new BlockDebug());
+		addModule(blockDebug = new BlockDebug());
 
 		addModule(new PeripheralHostProvider());
 
