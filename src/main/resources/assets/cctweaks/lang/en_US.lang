@@ -54,6 +54,7 @@ gui.config.cctweaks.network.wirelessbridge.pocketId=Pocket Upgrade Id
 
 gui.config.cctweaks.integration=Integration
 gui.config.cctweaks.integration.openPeripheralInventories=OpenPeripheral Inventories
+gui.config.cctweaks.integration.mcMultipart=MC Multipart Support
 
 gui.config.cctweaks.testing=Testing
 gui.config.cctweaks.testing.debug=Debug Logging

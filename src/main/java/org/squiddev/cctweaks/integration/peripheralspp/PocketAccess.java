@@ -125,7 +125,7 @@ public class PocketAccess implements IPocketAccess {
 		peripherals.put(upgrade, peripheral);
 
 		for (int i = 0; i < list.tagCount(); i++) {
-			int id = (int) list.getDouble(i);
+			int id = (int) list.getDoubleAt(i);
 			IPeripheral single = cached.get(id);
 			if (single != null) peripherals.put(id, single);
 		}

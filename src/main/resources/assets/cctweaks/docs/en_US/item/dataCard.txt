@@ -5,7 +5,5 @@ Shift right-click a device to store data, right-click
 to load data. You can always shift right-click any other block
 to wipe his mind, but you wouldn't do that would you?
 
-***
-
 Its primary use is binding two ${**}Wireless Bridges${**}
 together.

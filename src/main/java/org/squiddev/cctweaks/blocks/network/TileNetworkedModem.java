@@ -3,9 +3,9 @@ package org.squiddev.cctweaks.blocks.network;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * A full block implementation of a modem
  */
-public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, IWorldNetworkNodeHost, IUpdatePlayerListBox {
+public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, IWorldNetworkNodeHost, ITickable {
 	public final MultiPeripheralModem modem = new MultiPeripheralModem() {
 		@Override
 		public IWorldPosition getPosition() {
