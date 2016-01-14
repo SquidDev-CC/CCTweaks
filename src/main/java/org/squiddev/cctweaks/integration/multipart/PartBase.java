@@ -11,11 +11,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import org.squiddev.cctweaks.api.IWorldPosition;
 
 import java.util.Collections;
 import java.util.List;
 
-public abstract class PartBase extends Multipart implements IHitEffectsPart, IOccludingPart {
+public abstract class PartBase extends Multipart implements IHitEffectsPart, IOccludingPart, IWorldPosition {
 	public abstract Block getBlock();
 
 	public ItemStack getStack() {
@@ -52,5 +55,15 @@ public abstract class PartBase extends Multipart implements IHitEffectsPart, IOc
 	@Override
 	public boolean addHitEffects(PartMOP partMOP, AdvancedEffectRenderer advancedEffectRenderer) {
 		return true;
+	}
+
+	@Override
+	public final IBlockAccess getBlockAccess() {
+		return getWorld();
+	}
+
+	@Override
+	public final BlockPos getPosition() {
+		return getPos();
 	}
 }

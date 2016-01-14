@@ -10,6 +10,7 @@ import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
 import org.squiddev.cctweaks.integration.IndustrialCraftIntegration;
 import org.squiddev.cctweaks.integration.RedstoneFluxIntegration;
+import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.cctweaks.items.ItemComputerUpgrade;
 import org.squiddev.cctweaks.items.ItemDataCard;
 import org.squiddev.cctweaks.items.ItemDebugger;
@@ -53,6 +54,7 @@ public final class Registry {
 		addModule(new TurtleUpgradeWirelessBridge());
 		addModule(new RedstoneFluxIntegration());
 		addModule(new IndustrialCraftIntegration());
+		addModule(new MultipartIntegration());
 
 		addModule(new NetworkPlayerWatcher());
 		addModule(new RenderNetworkOverlay());
@@ -148,6 +150,11 @@ public final class Registry {
 		public void init() {
 			super.init();
 			base.clientInit();
+		}
+
+		@Override
+		public String toString() {
+			return base.toString();
 		}
 	}
 }

@@ -124,7 +124,7 @@ public class Helpers {
 		name = CCTweaks.RESOURCE_DOMAIN + ":" + name;
 
 		ModelResourceLocation res = new ModelResourceLocation(name, "inventory");
-		ModelBakery.addVariantName(item, name);
+		ModelBakery.registerItemVariants(item, res);
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, damage, res);
 	}
 }

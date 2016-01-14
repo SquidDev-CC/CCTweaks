@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.network.cable;
 
 import net.minecraft.util.EnumFacing;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 public abstract class CableWithInternalSidedParts extends BasicCable {
 	private int internalConnMap;
@@ -16,19 +17,25 @@ public abstract class CableWithInternalSidedParts extends BasicCable {
 		return doesConnect(direction) || doesConnectInternally(direction);
 	}
 
-	protected void updateInternalConnectionMap() {
-		internalConnMap = 0;
+	protected boolean updateInternalConnectionMap() {
+		DebugLogger.debug("Updating internal state for " + this);
+		int map = 0;
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			if (canConnectInternally(dir)) {
-				internalConnMap |= 1 << dir.ordinal();
+				map |= 1 << dir.ordinal();
 			}
+		}
+
+		if (map != internalConnMap) {
+			internalConnMap = map;
+			return true;
+		} else {
+			return false;
 		}
 	}
 
 	@Override
 	public boolean updateConnections() {
-		int internal = internalConnMap;
-		updateInternalConnectionMap();
-		return super.updateConnections() || internal != internalConnMap;
+		return updateInternalConnectionMap() | super.updateConnections();
 	}
 }

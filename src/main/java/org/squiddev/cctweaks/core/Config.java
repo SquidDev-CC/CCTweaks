@@ -246,6 +246,7 @@ public final class Config {
 		 * MC Multipart integration
 		 */
 		@DefaultBoolean(true)
+		@RequiresRestart
 		public static boolean mcMultipart;
 	}
 
