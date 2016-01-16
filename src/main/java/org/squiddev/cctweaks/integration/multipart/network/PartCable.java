@@ -3,19 +3,16 @@ package org.squiddev.cctweaks.integration.multipart.network;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.BlockCable;
-import dan200.computercraft.shared.peripheral.common.BlockCableModemVariant;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.microblock.ISideHollowConnect;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.PartSlot;
-import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
@@ -49,6 +46,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 	private final CableImpl cable = new CableImpl();
 	private int canConnectMap = 0;
 
+	//region Basic getters
 	@Override
 	public int getHollowSize(EnumFacing enumFacing) {
 		return 4;
@@ -76,7 +74,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 
 	@Override
 	public String getModelPath() {
-		return "computercraft:CC-Cable";
+		return "cctweaks:cable";
 	}
 
 	@Override
@@ -103,6 +101,34 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 	public void addOcclusionBoxes(List<AxisAlignedBB> list) {
 		list.add(BOXES[6]);
 	}
+
+	@Override
+	public BlockState createBlockState() {
+		return new BlockState(
+			MCMultiPartMod.multipart,
+			BlockCable.Properties.NORTH,
+			BlockCable.Properties.SOUTH,
+			BlockCable.Properties.EAST,
+			BlockCable.Properties.WEST,
+			BlockCable.Properties.UP,
+			BlockCable.Properties.DOWN
+		);
+	}
+
+	@Override
+	public IBlockState getExtendedState(IBlockState state) {
+		rebuildCanConnectMap();
+		cable.updateConnectionMaps();
+		return state
+			.withProperty(BlockCable.Properties.NORTH, cable.doesConnectVisually(EnumFacing.NORTH))
+			.withProperty(BlockCable.Properties.SOUTH, cable.doesConnectVisually(EnumFacing.SOUTH))
+			.withProperty(BlockCable.Properties.EAST, cable.doesConnectVisually(EnumFacing.EAST))
+			.withProperty(BlockCable.Properties.WEST, cable.doesConnectVisually(EnumFacing.WEST))
+			.withProperty(BlockCable.Properties.UP, cable.doesConnectVisually(EnumFacing.UP))
+			.withProperty(BlockCable.Properties.DOWN, cable.doesConnectVisually(EnumFacing.DOWN));
+	}
+
+	//endregion
 
 	/**
 	 * Rebuild the cache of occluded sides
@@ -154,12 +180,6 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 	}
 
 	@Override
-	public void harvest(EntityPlayer player, PartMOP hit) {
-		if (!getWorld().isRemote) cable.destroy();
-		super.harvest(player, hit);
-	}
-
-	@Override
 	public void onUnloaded() {
 		if (!getWorld().isRemote) cable.destroy();
 		super.onUnloaded();
@@ -172,39 +192,11 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 	}
 
 	private void updateConnections() {
-		boolean changed = getWorld().isRemote ? cable.updateConnectionMaps() : cable.updateConnections();
-		if (changed) getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
-	}
-
-	@Override
-	public BlockState createBlockState() {
-		return new BlockState(
-			MCMultiPartMod.multipart,
-			BlockCable.Properties.NORTH,
-			BlockCable.Properties.SOUTH,
-			BlockCable.Properties.EAST,
-			BlockCable.Properties.WEST,
-			BlockCable.Properties.UP,
-			BlockCable.Properties.DOWN,
-			BlockCable.Properties.CABLE,
-			BlockCable.Properties.MODEM
-		);
-	}
-
-	@Override
-	public IBlockState getExtendedState(IBlockState state) {
-		rebuildCanConnectMap();
-		cable.updateConnectionMaps();
-		// TODO: Custom copy of the blockstate JSON? We will probably need/want it when we have modems
-		return state
-			.withProperty(BlockCable.Properties.NORTH, cable.doesConnectVisually(EnumFacing.NORTH))
-			.withProperty(BlockCable.Properties.SOUTH, cable.doesConnectVisually(EnumFacing.SOUTH))
-			.withProperty(BlockCable.Properties.EAST, cable.doesConnectVisually(EnumFacing.EAST))
-			.withProperty(BlockCable.Properties.WEST, cable.doesConnectVisually(EnumFacing.WEST))
-			.withProperty(BlockCable.Properties.UP, cable.doesConnectVisually(EnumFacing.UP))
-			.withProperty(BlockCable.Properties.DOWN, cable.doesConnectVisually(EnumFacing.DOWN))
-			.withProperty(BlockCable.Properties.CABLE, true)
-			.withProperty(BlockCable.Properties.MODEM, BlockCableModemVariant.None);
+		if (getWorld().isRemote) {
+			cable.updateConnectionMaps();
+		} else {
+			cable.updateConnections();
+		}
 	}
 
 	private class CableImpl extends CableWithInternalSidedParts {

@@ -1,0 +1,62 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "computercraft:cable_core"
+	},
+	"variants": {
+		"up": {
+			"true": {
+				"submodel": {
+					"up": { "model": "computercraft:cable_arm", "x": 90 }
+				}
+			},
+			"false": {
+			}
+		},
+		"down": {
+			"true": {
+				"submodel": {
+					"down": { "model": "computercraft:cable_arm", "x": 270 }
+				}
+			},
+			"false": {
+			}
+		},
+		"north": {
+			"true": {
+				"submodel": {
+					"north": { "model": "computercraft:cable_arm", "y": 180 }
+				}
+			},
+			"false": {
+			}
+		},
+		"south": {
+			"true": {
+				"submodel": {
+					"south": { "model": "computercraft:cable_arm" }
+				}
+			},
+			"false": {
+			}
+		},
+		"west": {
+			"true": {
+				"submodel": {
+					"west": { "model": "computercraft:cable_arm", "y": 90 }
+				}
+			},
+			"false": {
+			}
+		},
+		"east": {
+			"true": {
+				"submodel": {
+					"east": { "model": "computercraft:cable_arm", "y": 270 }
+				}
+			},
+			"false": {
+			}
+		}
+	}
+}

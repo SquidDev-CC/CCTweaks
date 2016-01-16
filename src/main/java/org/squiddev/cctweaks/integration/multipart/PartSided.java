@@ -18,6 +18,14 @@ public abstract class PartSided extends PartBase implements ISlottedPart {
 	private EnumFacing side;
 	private EnumSet<PartSlot> slot;
 
+	public PartSided() {
+		this(EnumFacing.NORTH);
+	}
+
+	public PartSided(EnumFacing facing) {
+		setSide(facing);
+	}
+
 	@Override
 	public EnumFacing[] getValidRotations() {
 		return EnumFacing.VALUES;
