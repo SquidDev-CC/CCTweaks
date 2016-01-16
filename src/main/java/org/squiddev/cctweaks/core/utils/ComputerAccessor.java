@@ -84,7 +84,7 @@ public final class ComputerAccessor {
 			luaMachineGlobals = LuaJLuaMachine.class.getDeclaredField("m_globals");
 			luaMachineGlobals.setAccessible(true);
 
-			cableModem = TileCable.class.getDeclaredField("getModem");
+			cableModem = TileCable.class.getDeclaredField("modem");
 			cableModem.setAccessible(true);
 
 			pocketServerComputer = ItemPocketComputer.class.getDeclaredMethod("createServerComputer", World.class, IInventory.class, ItemStack.class);

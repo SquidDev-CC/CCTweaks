@@ -74,13 +74,13 @@ public class MultipartConverter implements IPartConverter.IPartConverter2, IPart
 		}
 
 		EnumFacing facing = modem == null ? EnumFacing.DOWN : modem.getSide();
-		PeripheralType type = cable ? PeripheralType.WiredModem : PeripheralType.Cable;
+		PeripheralType type = cable ? PeripheralType.Cable : PeripheralType.WiredModem;
 		if (cable && modem != null) type = PeripheralType.WiredModemWithCable;
 
 		World world = container.getWorldIn();
 		BlockPos pos = container.getPosIn();
 
-		world.setBlockState(pos, ComputerCraft.Blocks.cable.getDefaultBlockState(type, facing));
+		world.setBlockState(pos, ComputerCraft.Blocks.cable.getDefaultBlockState(type, facing.getOpposite()));
 
 		TileEntity tile = world.getTileEntity(pos);
 		if (tile instanceof TileCable) {
