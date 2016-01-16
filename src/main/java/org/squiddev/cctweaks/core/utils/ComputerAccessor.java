@@ -10,6 +10,7 @@ import dan200.computercraft.shared.turtle.blocks.TileTurtle;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import org.squiddev.cctweaks.core.patch.TileCable_Patch;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -55,9 +56,9 @@ public final class ComputerAccessor {
 	/**
 	 * The peripheral ID of a wired modem
 	 *
-	 * @see TileCable#m_attachedPeripheralID
+	 * @see TileCable_Patch#getModem()
 	 */
-	public static Field cablePeripheralId;
+	public static Field cableModem;
 
 	/**
 	 * Get the computer for pocket computers
@@ -83,8 +84,8 @@ public final class ComputerAccessor {
 			luaMachineGlobals = LuaJLuaMachine.class.getDeclaredField("m_globals");
 			luaMachineGlobals.setAccessible(true);
 
-			cablePeripheralId = TileCable.class.getDeclaredField("m_attachedPeripheralID");
-			cablePeripheralId.setAccessible(true);
+			cableModem = TileCable.class.getDeclaredField("getModem");
+			cableModem.setAccessible(true);
 
 			pocketServerComputer = ItemPocketComputer.class.getDeclaredMethod("createServerComputer", World.class, IInventory.class, ItemStack.class);
 			pocketServerComputer.setAccessible(true);

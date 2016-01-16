@@ -46,7 +46,7 @@ public class NetworkBindingWithModem extends NetworkBinding {
 		}
 	}
 
-	public BindingModem createModem() {
+	protected BindingModem createModem() {
 		return new BindingModem();
 	}
 

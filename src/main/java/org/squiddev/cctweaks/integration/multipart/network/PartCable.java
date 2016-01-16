@@ -117,8 +117,10 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 
 	@Override
 	public IBlockState getExtendedState(IBlockState state) {
-		rebuildCanConnectMap();
-		cable.updateConnectionMaps();
+		if (getContainer() != null) {
+			rebuildCanConnectMap();
+			cable.updateConnectionMaps();
+		}
 		return state
 			.withProperty(BlockCable.Properties.NORTH, cable.doesConnectVisually(EnumFacing.NORTH))
 			.withProperty(BlockCable.Properties.SOUTH, cable.doesConnectVisually(EnumFacing.SOUTH))
@@ -134,7 +136,10 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 	 * Rebuild the cache of occluded sides
 	 */
 	private void rebuildCanConnectMap() {
-		int map = 0;
+		/**
+		 * See the comment in {@link CableImpl#canConnect(EnumFacing)}
+		 */
+		int map = 1 << 7;
 		for (EnumFacing side : EnumFacing.VALUES) {
 			if (MultipartHelpers.extendIn(this, BOXES[side.ordinal()], side)) map |= 1 << side.ordinal();
 		}
@@ -227,6 +232,14 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 
 		@Override
 		public boolean canConnect(EnumFacing direction) {
+			/**
+			 * When initially rendering this the flag may not have been set.
+			 *
+			 * The {@link #rebuildCanConnectMap()} method sets the 7th bit to be 1, to ensure
+			 * that this isn't 0. Yep. Kinda hacky indeed.
+			 */
+			if (canConnectMap == 0) rebuildCanConnectMap();
+
 			int flag = 1 << direction.ordinal();
 			return (canConnectMap & flag) == flag;
 		}

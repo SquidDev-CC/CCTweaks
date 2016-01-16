@@ -22,6 +22,9 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
+import org.squiddev.cctweaks.core.network.modem.SinglePeripheralModem;
+import org.squiddev.cctweaks.core.utils.ComputerAccessor;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.integration.multipart.PartSided;
 
@@ -46,24 +49,24 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	 * Occlusion for collision detection
 	 */
 	public static final AxisAlignedBB[] OCCLUSION = new AxisAlignedBB[]{
-		new AxisAlignedBB(0.125, 0.0, 0.125, 0.875, 0.125, 0.875D),
-		new AxisAlignedBB(0.125, 0.875, 0.125, 0.875, 1.0, 0.875D),
-		new AxisAlignedBB(0.125, 0.125, 0.0, 0.875, 0.875, 0.125D),
-		new AxisAlignedBB(0.125, 0.125, 0.875, 0.875, 0.875, 1.0D),
-		new AxisAlignedBB(0.0, 0.125, 0.125, 0.125, 0.875, 0.875D),
-		new AxisAlignedBB(0.875, 0.125, 0.125, 1.0, 0.875, 0.875D),
-	};
-
-	/**
-	 * Slightly smaller bounds
-	 */
-	public static final AxisAlignedBB[] BOUNDS = new AxisAlignedBB[]{
 		new AxisAlignedBB(0.125, 0.0, 0.125, 0.875, 0.1875, 0.875),
 		new AxisAlignedBB(0.125, 0.8125, 0.125, 0.875, 1.0, 0.875),
 		new AxisAlignedBB(0.125, 0.125, 0.0, 0.875, 0.875, 0.1875),
 		new AxisAlignedBB(0.125, 0.125, 0.8125, 0.875, 0.875, 1.0),
 		new AxisAlignedBB(0.0, 0.125, 0.125, 0.1875, 0.875, 0.875),
 		new AxisAlignedBB(0.8125, 0.125, 0.125, 1.0, 0.875, 0.875),
+	};
+
+	/**
+	 * Slightly smaller bounds
+	 */
+	public static final AxisAlignedBB[] BOUNDS = new AxisAlignedBB[]{
+		new AxisAlignedBB(0.125, 0.0, 0.125, 0.875, 0.125, 0.875D),
+		new AxisAlignedBB(0.125, 0.875, 0.125, 0.875, 1.0, 0.875D),
+		new AxisAlignedBB(0.125, 0.125, 0.0, 0.875, 0.875, 0.125D),
+		new AxisAlignedBB(0.125, 0.125, 0.875, 0.875, 0.875, 1.0D),
+		new AxisAlignedBB(0.0, 0.125, 0.125, 0.125, 0.875, 0.875D),
+		new AxisAlignedBB(0.875, 0.125, 0.125, 1.0, 0.875, 0.875D),
 	};
 
 	public PartModem() {
@@ -74,11 +77,21 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 		setSide(facing);
 	}
 
-	public PartModem(TileCable cable) {
-		this(cable.getDirection());
+	public PartModem(TileCable modem) {
+		this(modem.getDirection());
+		try {
+			SinglePeripheralModem peripheralModem = (SinglePeripheralModem) ComputerAccessor.cableModem.get(modem);
+
+			this.modem.id = peripheralModem.id;
+			this.modem.setPeripheralEnabled(peripheralModem.isEnabled());
+
+			// TODO: Can we keep parts of the original node?
+		} catch (Exception e) {
+			DebugLogger.error("Cannot get modem from tile", e);
+		}
 	}
 
-	private final WiredModem modem = new WiredModem();
+	public final WiredModem modem = new WiredModem();
 
 	//region Basic getters
 	@Override
