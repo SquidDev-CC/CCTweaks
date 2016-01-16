@@ -207,7 +207,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 			for (IMultipart part : getContainer().getParts()) {
 				if (part != PartCable.this) {
 					INetworkNode node = MultipartHelpers.getNode(part);
-					if (part != null) nodes.add(node);
+					if (node != null) nodes.add(node);
 				}
 			}
 
