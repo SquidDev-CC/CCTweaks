@@ -88,9 +88,8 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void getSubBlocks(Item item, CreativeTabs tab, List itemStacks) {
+	public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> itemStacks) {
 		itemStacks.add(new ItemStack(this, 1, 0));
 		itemStacks.add(new ItemStack(this, 1, 1));
 	}

@@ -148,10 +148,10 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		GlStateManager.color(0, 0, 0, 65 / 225.0f);
 
 		renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-		renderer.pos(-xOffset - 1, -1, 0);
-		renderer.pos(-xOffset - 1, 8, 0);
-		renderer.pos(xOffset + 1, 8, 0);
-		renderer.pos(xOffset + 1, -1, 0);
+		renderer.pos(-xOffset - 1, -1, 0).endVertex();
+		renderer.pos(-xOffset - 1, 8, 0).endVertex();
+		renderer.pos(xOffset + 1, 8, 0).endVertex();
+		renderer.pos(xOffset + 1, -1, 0).endVertex();
 
 		tessellator.draw();
 		GlStateManager.enableTexture2D();
@@ -168,8 +168,8 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		WorldRenderer renderer = tessellator.getWorldRenderer();
 
 		renderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		renderer.pos(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5);
-		renderer.pos(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
+		renderer.pos(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5).endVertex();
+		renderer.pos(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5).endVertex();
 
 		tessellator.draw();
 	}
