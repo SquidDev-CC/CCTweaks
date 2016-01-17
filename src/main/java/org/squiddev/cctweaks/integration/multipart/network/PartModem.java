@@ -28,6 +28,7 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.integration.multipart.PartSided;
 
+import java.util.Collections;
 import java.util.List;
 
 public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeripheralHost, ITickable {
@@ -148,15 +149,24 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
-		super.writeToNBT(tag);
 		tag.setBoolean("modem_enabled", modem.isEnabled());
 		tag.setInteger("modem_id", modem.id);
+		super.writeToNBT(tag);
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
 		modem.id = tag.getInteger("modem_id");
+	}
+
+	@Override
+	public Iterable<String> getFields() {
+		return Collections.singletonList("modem_enabled");
+	}
+
+	@Override
+	public void readLazyNBT(NBTTagCompound tag) {
 		modem.setPeripheralEnabled(tag.getBoolean("modem_enabled"));
 	}
 

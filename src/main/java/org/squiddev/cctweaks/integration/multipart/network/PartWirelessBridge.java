@@ -13,10 +13,13 @@ import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
+import org.squiddev.cctweaks.core.network.NetworkHelpers;
+import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.integration.multipart.PartSided;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHost, IPeripheralHost {
@@ -112,19 +115,24 @@ public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHo
 	@Override
 	public void onLoaded() {
 		super.onLoaded();
-		if (!getWorld().isRemote) binding.connect();
+		if (!getWorld().isRemote) NetworkHelpers.scheduleConnect(binding);
 	}
+
+	@Override
+	public void readLazyNBT(NBTTagCompound tag) {
+		binding.load(tag);
+	}
+
+	@Override
+	public Iterable<String> getFields() {
+		return Arrays.asList(NetworkBinding.LSB, NetworkBinding.MSB);
+	}
+
 
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
-		super.writeToNBT(tag);
 		binding.save(tag);
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		super.readFromNBT(tag);
-		binding.load(tag);
+		super.writeToNBT(tag);
 	}
 
 	@Override

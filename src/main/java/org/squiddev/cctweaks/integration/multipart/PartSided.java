@@ -12,7 +12,7 @@ import net.minecraft.util.EnumFacing;
 
 import java.util.EnumSet;
 
-public abstract class PartSided extends PartBase implements ISlottedPart {
+public abstract class PartSided extends PartLazyNBT implements ISlottedPart {
 	public static final PropertyDirection SIDE = PropertyDirection.create("side");
 
 	private EnumFacing side;
