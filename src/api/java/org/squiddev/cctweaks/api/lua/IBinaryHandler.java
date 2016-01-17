@@ -13,8 +13,8 @@ package org.squiddev.cctweaks.api.lua;
  *
  * You can always return {@code byte[]} instead of string from any context and it will be converted correctly.
  *
- * @deprecated Use {@link ILuaObjectWithArguments} or {@link IPeripheralWithArguments} instead.
+ * Try to use {@link ILuaObjectWithArguments} or {@link IPeripheralWithArguments} instead, as usage of this class
+ * is discouraged.
  */
-@Deprecated
 public interface IBinaryHandler {
 }

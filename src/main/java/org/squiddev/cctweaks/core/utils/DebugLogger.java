@@ -23,11 +23,19 @@ public class DebugLogger {
 		}
 	}
 
+	public static void trace(String message, int max) {
+		try {
+			throw new RuntimeException();
+		} catch (RuntimeException e) {
+			debug(message + "\n\tat " + StringUtils.join(e.getStackTrace(), "\n\tat ", 1, max + 1));
+		}
+	}
+
 	public static void trace(String message) {
 		try {
 			throw new RuntimeException();
 		} catch (RuntimeException e) {
-			debug(message + "\n\tat " + StringUtils.join(new Exception().getStackTrace(), "\n\tat "));
+			debug(message + "\n\tat " + StringUtils.join(e.getStackTrace(), "\n\tat "));
 		}
 	}
 
@@ -35,7 +43,7 @@ public class DebugLogger {
 		try {
 			throw new RuntimeException();
 		} catch (RuntimeException e) {
-			debug(String.format(message, params) + "\n\tat " + StringUtils.join(new Exception().getStackTrace(), "\n\tat "));
+			debug(String.format(message, params) + "\n\tat " + StringUtils.join(e.getStackTrace(), "\n\tat "));
 		}
 	}
 

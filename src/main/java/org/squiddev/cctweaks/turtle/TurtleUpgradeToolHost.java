@@ -4,6 +4,8 @@ import dan200.computercraft.api.turtle.*;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.Registry;
@@ -53,6 +55,8 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 
 
 	@Override
+	@SideOnly(Side.CLIENT)
+	@SuppressWarnings("deprecation")
 	public Pair<IBakedModel, Matrix4f> getModel(ITurtleAccess access, TurtleSide side) {
 		ItemStack stack = getItem(access);
 		if (stack == null) return super.getModel(access, side);

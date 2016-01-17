@@ -16,19 +16,24 @@ public abstract class CableWithInternalSidedParts extends BasicCable {
 		return doesConnect(direction) || doesConnectInternally(direction);
 	}
 
-	protected void updateInternalConnectionMap() {
-		internalConnMap = 0;
+	protected boolean updateInternalConnectionMap() {
+		int map = 0;
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			if (canConnectInternally(dir)) {
-				internalConnMap |= 1 << dir.ordinal();
+				map |= 1 << dir.ordinal();
 			}
+		}
+
+		if (map != internalConnMap) {
+			internalConnMap = map;
+			return true;
+		} else {
+			return false;
 		}
 	}
 
 	@Override
 	public boolean updateConnections() {
-		int internal = internalConnMap;
-		updateInternalConnectionMap();
-		return super.updateConnections() || internal != internalConnMap;
+		return updateInternalConnectionMap() | super.updateConnections();
 	}
 }

@@ -25,13 +25,25 @@ class DocumentationParser extends DefaultTask {
 		StringBuilder lang = languages[language];
 		if (lang == null) languages[language] = lang = new StringBuilder().append("\n#Auto generated files\n");
 
-		String key = matcher.group(3) + "." + matcher.group(1) + "." + matcher.group(4) + ".information.";
+		String key = matcher.group(3) + "." + matcher.group(1) + "." + matcher.group(4) + ".information";
 
 		int counter = 0;
 		for (String contents in file.getText().split(/\n-{3,}|\*{3,}\n/)) {
-			lang.append(key + counter + "=" + State.parse(contents).replace("\n\n", "\\n").replace("\n", " ").replace(" +", " ").trim() + "\n");
+			String rewritten = State.parse(contents)
+				.replaceAll("\n\n+", "\\\\n")
+				.replaceAll("[\n ]+", " ")
+				.trim();
+			lang.append(key + "." + counter + "=" + rewritten + "\n");
 			counter++;
 		}
+
+		// Single line JEI
+		String rewritten = State.parse(file.getText())
+			.replaceAll(/\n-{3,}|\*{3,}\n/, "\n")
+			.replaceAll("\n\n+", "\\\\n")
+			.replaceAll("[\n ]+", " ")
+			.trim()
+		lang.append(key + "=" + rewritten + "\n");
 	}
 }
 

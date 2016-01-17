@@ -19,7 +19,7 @@ public abstract class BasicCable extends AbstractWorldNode {
 	private int connMap;
 	private Set<INetworkNode> connections = Collections.emptySet();
 
-	protected void updateConnectionMap() {
+	protected boolean updateConnectionMap() {
 		int map = 0;
 
 		INetworkHelpers helpers = NetworkAPI.helpers();
@@ -29,7 +29,12 @@ public abstract class BasicCable extends AbstractWorldNode {
 			}
 		}
 
-		connMap = map;
+		if (connMap != map) {
+			connMap = map;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -58,9 +63,7 @@ public abstract class BasicCable extends AbstractWorldNode {
 			}
 		}
 
-		int map = connMap;
-		updateConnectionMap();
-		return map != connMap;
+		return updateConnectionMap();
 	}
 
 	@Override
