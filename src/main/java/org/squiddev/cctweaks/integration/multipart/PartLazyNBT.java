@@ -1,16 +1,13 @@
-package org.squiddev.cctweaks.blocks;
+package org.squiddev.cctweaks.integration.multipart;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.core.FmlEvents;
 
 /**
- * A tile entity that lazy loads NBT.
- *
- * We need this as some things need to happen once the world
- * has been loaded (such as peripherals).
+ * Multipart equivalent of {@link org.squiddev.cctweaks.blocks.TileLazyNBT}
  */
-public abstract class TileLazyNBT extends TileBase {
+public abstract class PartLazyNBT extends PartBase {
 	private NBTTagCompound lazyTag;
 
 	/**
@@ -30,26 +27,25 @@ public abstract class TileLazyNBT extends TileBase {
 	public abstract Iterable<String> getFields();
 
 	@Override
-	public void create() {
-		super.create();
-		/**
-		 * TODO: Can we move this into {@link #onLoad()}?
-		 */
-		FmlEvents.schedule(new Runnable() {
-			@Override
-			public void run() {
-				if (lazyTag != null) {
-					readLazyNBT(lazyTag);
-					lazyTag = null;
+	public void onLoaded() {
+		super.onLoaded();
+		if (!getWorld().isRemote) {
+			FmlEvents.schedule(new Runnable() {
+				@Override
+				public void run() {
+					if (lazyTag != null) {
+						readLazyNBT(lazyTag);
+						lazyTag = null;
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
-		if (worldObj == null) {
+		if (getWorld() == null) {
 			lazyTag = tag;
 		} else {
 			readLazyNBT(tag);

@@ -6,8 +6,10 @@ import net.minecraftforge.fml.common.ModContainer;
 import org.apache.logging.log4j.Level;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
+import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.asm.binary.BinaryUtils;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.patcher.Logger;
 import org.squiddev.patcher.transformer.*;
 
@@ -66,6 +68,19 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.core.apis.PeripheralAPI",
 				"org.squiddev.cctweaks.core.patch.PeripheralAPI_Patch"
 			),
+			new ClassMerger(
+				"dan200.computercraft.shared.peripheral.common.ItemCable",
+				"org.squiddev.cctweaks.core.patch.ItemCable_Patch"
+			) {
+				/**
+				 * The item cable patch just implements multipart support.
+				 * If multipart is not loaded, then we cannot patch this without errors
+				 */
+				@Override
+				public boolean matches(String className) {
+					return super.matches(className) && Loader.isModLoaded(MultipartIntegration.MOD_NAME) && Config.Integration.mcMultipart;
+				}
+			},
 
 			// Open peripheral
 			new ClassMerger(

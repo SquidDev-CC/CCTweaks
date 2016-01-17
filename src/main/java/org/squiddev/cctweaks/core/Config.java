@@ -241,6 +241,13 @@ public final class Config {
 		 */
 		@DefaultBoolean(true)
 		public static boolean openPeripheralInventories;
+
+		/**
+		 * MC Multipart integration
+		 */
+		@DefaultBoolean(true)
+		@RequiresRestart
+		public static boolean mcMultipart;
 	}
 
 	/**

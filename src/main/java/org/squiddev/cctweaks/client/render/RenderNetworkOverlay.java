@@ -168,8 +168,8 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		WorldRenderer renderer = tessellator.getWorldRenderer();
 
 		renderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		renderer.putPosition(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5);
-		renderer.putPosition(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
+		renderer.pos(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5);
+		renderer.pos(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
 
 		tessellator.draw();
 	}

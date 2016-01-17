@@ -1,0 +1,19 @@
+{
+	"forge_marker": 1,
+	"variants": {
+		"side": {
+			"up": { "x": 270 },
+			"down": { "x": 90 },
+			"north": { },
+			"south": { "y": 180 },
+			"west": { "y": 270 },
+			"east": { "y": 90 }
+		},
+		"modem": {
+			"off": { "model": "computercraft:wired_modem_off" },
+			"on": { "model": "computercraft:wired_modem_on" },
+			"off_peripheral": { "model": "computercraft:wired_modem_off_peripheral" },
+			"on_peripheral": { "model": "computercraft:wired_modem_on_peripheral" }
+		}
+	}
+}
