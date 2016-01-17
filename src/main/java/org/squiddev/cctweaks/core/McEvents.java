@@ -5,13 +5,18 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * Main event handler
@@ -23,6 +28,8 @@ public class McEvents {
 
 	private static final Map<IWorldPosition, IDropConsumer> blockConsumers = new HashMap<IWorldPosition, IDropConsumer>();
 	private static final Map<Entity, IDropConsumer> entityConsumers = new HashMap<Entity, IDropConsumer>();
+	private static final Queue<Runnable> serverQueue = new LinkedList<Runnable>();
+	private static final Queue<Runnable> clientQueue = new LinkedList<Runnable>();
 
 	/**
 	 * Add a consumer for entity drops
@@ -89,6 +96,49 @@ public class McEvents {
 				consumer.consumeDrop(item.getEntityItem());
 			}
 			event.drops.clear();
+		}
+	}
+
+	public static void schedule(Runnable runnable) {
+		synchronized (serverQueue) {
+			serverQueue.add(runnable);
+		}
+	}
+
+	public static void scheduleClient(Runnable runnable) {
+		synchronized (clientQueue) {
+			clientQueue.add(runnable);
+		}
+	}
+
+	@SubscribeEvent
+	public void onServerTick(TickEvent.ServerTickEvent event) {
+		if (event.phase == TickEvent.Phase.START) {
+			synchronized (serverQueue) {
+				Runnable scheduled;
+				while ((scheduled = serverQueue.poll()) != null) {
+					scheduled.run();
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onClientTick(TickEvent.ClientTickEvent event) {
+		if (event.phase == TickEvent.Phase.START) {
+			synchronized (clientQueue) {
+				Runnable scheduled;
+				while ((scheduled = clientQueue.poll()) != null) {
+					scheduled.run();
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
+		if (eventArgs.modID.equals(CCTweaks.ID)) {
+			Config.sync();
 		}
 	}
 }

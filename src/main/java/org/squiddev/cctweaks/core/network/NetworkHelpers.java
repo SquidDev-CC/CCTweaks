@@ -6,7 +6,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
-import org.squiddev.cctweaks.core.FmlEvents;
+import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.controller.NetworkController;
 
 import java.util.HashSet;
@@ -88,7 +88,7 @@ public final class NetworkHelpers implements INetworkHelpers {
 	@Override
 	public void scheduleJoin(final IWorldNetworkNode node) {
 		if (node == null) throw new IllegalArgumentException("node cannot be null");
-		FmlEvents.schedule(new Runnable() {
+		McEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
 				joinOrCreateNetwork(node);
@@ -98,7 +98,7 @@ public final class NetworkHelpers implements INetworkHelpers {
 
 	public static void scheduleConnect(final AbstractWorldNode node) {
 		if (node == null) throw new IllegalArgumentException("node cannot be null");
-		FmlEvents.schedule(new Runnable() {
+		McEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
 				node.connect();

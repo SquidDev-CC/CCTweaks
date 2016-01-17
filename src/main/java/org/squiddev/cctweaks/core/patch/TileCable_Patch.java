@@ -12,7 +12,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
-import org.squiddev.cctweaks.core.FmlEvents;
+import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.cable.SingleModemCable;
 import org.squiddev.cctweaks.core.network.modem.DirectionalPeripheralModem;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -128,7 +128,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	public void validate() {
 		super.validate();
 		if (!worldObj.isRemote) {
-			FmlEvents.schedule(new Runnable() {
+			McEvents.schedule(new Runnable() {
 				@MergeVisitor.Rewrite
 				protected boolean ANNOTATION;
 

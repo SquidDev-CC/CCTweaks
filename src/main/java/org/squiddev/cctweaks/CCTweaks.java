@@ -10,7 +10,6 @@ import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
-import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindings;
 import org.squiddev.cctweaks.core.registry.Registry;
@@ -35,7 +34,6 @@ public class CCTweaks {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		FMLCommonHandler.instance().bus().register(new FmlEvents());
 		MinecraftForge.EVENT_BUS.register(new McEvents());
 
 		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(ID);

@@ -41,7 +41,7 @@ public class MultipartConverter implements IPartConverter.IPartConverter2, IPart
 			case WiredModem:
 				return Collections.singleton(new PartModem(cable));
 			case WiredModemWithCable:
-				return Arrays.asList(new PartCable(), new PartModem(cable));
+				return Arrays.<IMultipart>asList(new PartCable(), new PartModem(cable));
 			default:
 				return Collections.emptySet();
 		}

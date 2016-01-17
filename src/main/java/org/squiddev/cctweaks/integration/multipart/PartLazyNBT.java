@@ -2,7 +2,7 @@ package org.squiddev.cctweaks.integration.multipart;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import org.squiddev.cctweaks.core.FmlEvents;
+import org.squiddev.cctweaks.core.McEvents;
 
 /**
  * Multipart equivalent of {@link org.squiddev.cctweaks.blocks.TileLazyNBT}
@@ -30,7 +30,7 @@ public abstract class PartLazyNBT extends PartBase {
 	public void onLoaded() {
 		super.onLoaded();
 		if (!getWorld().isRemote) {
-			FmlEvents.schedule(new Runnable() {
+			McEvents.schedule(new Runnable() {
 				@Override
 				public void run() {
 					if (lazyTag != null) {

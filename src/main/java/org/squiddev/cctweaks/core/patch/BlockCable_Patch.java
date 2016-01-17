@@ -20,8 +20,9 @@ public final class BlockCable_Patch extends BlockCable {
 		return NetworkAPI.registry().isNode(world, position);
 	}
 
+	@SuppressWarnings("unchecked")
 	private boolean doesConnect(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing dir) {
-		if ((Boolean) state.getValue(Properties.CABLE)) {
+		if (state.getValue(Properties.CABLE)) {
 			if (((BlockCableModemVariant) state.getValue(Properties.MODEM)).getFacing() == dir) {
 				return true;
 			} else {

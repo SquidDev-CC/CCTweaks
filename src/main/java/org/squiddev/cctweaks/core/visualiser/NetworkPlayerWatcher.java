@@ -3,7 +3,7 @@ package org.squiddev.cctweaks.core.visualiser;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.squiddev.cctweaks.api.network.INetworkController;
@@ -106,7 +106,7 @@ public class NetworkPlayerWatcher extends AbstractPacketHandler<VisualisationPac
 	@Override
 	public void preInit() {
 		super.preInit();
-		FMLCommonHandler.instance().bus().register(this);
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@SubscribeEvent
