@@ -48,6 +48,8 @@ dependencies {
 	deobfCompile "MCMultiPart:MCMultiPart:1.0.4:universal"
 	deobfCompile "mezz.jei:jei_${project.mc_version}:2.16.2.78"
 
+	deobfCompile "mezz.jei:jei_${project.mc_version}:2.14.0.139"
+
 	// For 1.7.10 but including anyway
 	provided "CoFHLib:CoFHLib:[1.7.10]1.0.1-159-dev"
 	provided "net.industrial-craft:industrialcraft-2:2.+:api"

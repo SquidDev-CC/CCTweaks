@@ -27,6 +27,7 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 	private final ItemStack stack;
 
 	@SideOnly(Side.CLIENT)
+	@SuppressWarnings("deprecation")
 	private IBakedModel model;
 
 	public TurtleUpgradeBase(String name, int id, Item item) {
@@ -63,6 +64,8 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
+	@SuppressWarnings("deprecation")
 	public Pair<IBakedModel, Matrix4f> getModel(ITurtleAccess access, TurtleSide side) {
 		float xOffset = side == TurtleSide.Left ? -0.40625F : 0.40625F;
 		Matrix4f transform = new Matrix4f(0.0F, 0.0F, -1.0F, 1.0F + xOffset, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 1.0F);

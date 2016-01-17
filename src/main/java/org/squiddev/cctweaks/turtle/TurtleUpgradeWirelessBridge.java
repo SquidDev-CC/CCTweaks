@@ -8,12 +8,16 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 import dan200.computercraft.shared.util.PeripheralUtil;
 import net.minecraft.client.resources.model.IBakedModel;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
@@ -37,8 +41,16 @@ import java.util.Map;
  * Turtle upgrade for the {@link TileNetworkedWirelessBridge} tile
  */
 public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IExtendedTurtleUpgrade {
+	@SideOnly(Side.CLIENT)
+	@SuppressWarnings("deprecation")
+	private IBakedModel modelLeft;
+
+	@SideOnly(Side.CLIENT)
+	@SuppressWarnings("deprecation")
+	private IBakedModel modelRight;
+
 	public TurtleUpgradeWirelessBridge() {
-		super("wirlessBridge", Config.Network.WirelessBridge.turtleId, new ItemStack(Registry.blockNetworked, 1, 1));
+		super("wirelessBridge", Config.Network.WirelessBridge.turtleId, new ItemStack(Registry.blockNetworked, 1, 1));
 	}
 
 	@Override
@@ -48,7 +60,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 
 	@Override
 	public ItemStack getCraftingItem() {
-		return Config.Network.WirelessBridge.turtleEnabled ? new ItemStack(Registry.blockNetworked, 0) : null;
+		return Config.Network.WirelessBridge.turtleEnabled ? new ItemStack(Registry.blockNetworked, 1, 0) : null;
 	}
 
 	@Override
@@ -62,8 +74,16 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 	}
 
 	@Override
-	public Pair<IBakedModel, Matrix4f> getModel(ITurtleAccess iTurtleAccess, TurtleSide turtleSide) {
-		return null;
+	@SideOnly(Side.CLIENT)
+	@SuppressWarnings("deprecation")
+	public Pair<IBakedModel, Matrix4f> getModel(ITurtleAccess access, TurtleSide side) {
+		if (modelLeft == null) {
+			ModelManager manager = getMesher().getModelManager();
+			modelLeft = manager.getModel(new ModelResourceLocation("cctweaks:wireless_bridge_turtle_left", "inventory"));
+			modelRight = manager.getModel(new ModelResourceLocation("cctweaks:wireless_bridge_turtle_right", "inventory"));
+		}
+
+		return Pair.of(side == TurtleSide.Left ? modelLeft : modelRight, null);
 	}
 
 	@Override
