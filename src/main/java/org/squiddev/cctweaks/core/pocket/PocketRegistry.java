@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.pocket;
 
 import com.google.common.base.Preconditions;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.api.pocket.IPocketRegistry;
@@ -39,7 +40,7 @@ public final class PocketRegistry implements IPocketRegistry {
 		legacyUpgrades.put(id, upgrade);
 	}
 
-	public IPocketUpgrade getUpgrade(ItemStack stack) {
+	public IPocketUpgrade getUpgrade(ItemStack stack, IInventory inventory) {
 		if (!stack.hasTagCompound()) return null;
 
 		NBTTagCompound tag = stack.getTagCompound();
@@ -48,6 +49,24 @@ public final class PocketRegistry implements IPocketRegistry {
 		int id = tag.getShort("upgrade");
 		if (id == 0 || id == 1) return null;
 
+		return getUpgradeInternal(tag, id, inventory);
+	}
+
+	public String getUpgradeAdjective(ItemStack stack, IInventory inventory) {
+		if (!stack.hasTagCompound()) return null;
+
+		NBTTagCompound tag = stack.getTagCompound();
+		if (!tag.hasKey("upgrade")) return null;
+
+		int id = tag.getShort("upgrade");
+		if (id == 0) return null;
+		if (id == 1) return "upgrade.computercraft:wireless_modem.adjective";
+
+		IPocketUpgrade upgrade = getUpgradeInternal(tag, id, inventory);
+		return upgrade == null ? null : upgrade.getUnlocalisedAdjective();
+	}
+
+	private IPocketUpgrade getUpgradeInternal(NBTTagCompound tag, int id, IInventory inventory) {
 		IPocketUpgrade upgrade;
 		if (id == FLAG) {
 			upgrade = upgrades.get(tag.getString("upgrade_name"));
@@ -63,6 +82,8 @@ public final class PocketRegistry implements IPocketRegistry {
 			DebugLogger.warn("Unknown upgrade with id=%s and name=\"%s\"", id, tag.getString("upgrade_name"));
 			tag.setInteger("upgrade", 0);
 			tag.removeTag("upgrade_name");
+
+			if (inventory != null) inventory.markDirty();
 
 			return null;
 		}
