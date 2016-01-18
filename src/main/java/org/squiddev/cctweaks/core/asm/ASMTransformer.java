@@ -103,6 +103,13 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.peripheral.printer.PrinterPeripheral",
 				"org.squiddev.cctweaks.core.patch.targeted.PrinterPeripheral_Patch"
 			),
+
+			// Pocket upgrades
+			new PocketUpgrades(),
+			new ClassMerger(
+				"dan200.computercraft.shared.pocket.items.ItemPocketComputer",
+				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"
+			),
 		});
 		BinaryUtils.inject(patches);
 
