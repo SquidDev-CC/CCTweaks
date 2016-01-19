@@ -15,6 +15,7 @@ import org.squiddev.cctweaks.items.ItemComputerUpgrade;
 import org.squiddev.cctweaks.items.ItemDataCard;
 import org.squiddev.cctweaks.items.ItemDebugger;
 import org.squiddev.cctweaks.items.ItemToolHost;
+import org.squiddev.cctweaks.pocket.PocketWirelessBinding;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
 
 import java.util.HashSet;
@@ -48,10 +49,15 @@ public final class Registry {
 
 		addModule(blockDebug = new BlockDebug());
 
+		// CC Providers
 		addModule(new PeripheralHostProvider());
-
-		addModule(new DefaultTurtleProviders());
 		addModule(new TurtleUpgradeWirelessBridge());
+
+		// CCTweaks providers
+		addModule(new DefaultTurtleProviders());
+		addModule(new PocketWirelessBinding());
+
+		// Integration
 		addModule(new RedstoneFluxIntegration());
 		addModule(new IndustrialCraftIntegration());
 
@@ -59,6 +65,7 @@ public final class Registry {
 		addModule(new RenderNetworkOverlay());
 
 		addModule(new ModelLoader());
+
 	}
 
 	public static void addModule(IModule module) {

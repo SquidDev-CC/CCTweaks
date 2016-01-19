@@ -66,7 +66,7 @@ public abstract class DynamicPeripheralCollection<T> {
 	/**
 	 * Get the list of peripherals
 	 *
-	 * @return The list of peripherals. This must have a constant size
+	 * @return The list of peripherals.
 	 */
 	protected abstract Map<T, IPeripheral> getPeripherals();
 

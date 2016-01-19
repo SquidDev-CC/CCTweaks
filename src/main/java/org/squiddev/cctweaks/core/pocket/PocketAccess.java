@@ -16,7 +16,7 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
-import java.util.Set;
+import java.util.Map;
 
 public final class PocketAccess implements IPocketAccess {
 	protected IPocketUpgrade upgrade;
@@ -103,7 +103,7 @@ public final class PocketAccess implements IPocketAccess {
 	}
 
 	@Override
-	public Set<ResourceLocation> getUpgrades() {
-		return Collections.singleton(upgrade.getUpgradeID());
+	public Map<ResourceLocation, IPeripheral> getUpgrades() {
+		return Collections.singletonMap(upgrade.getUpgradeID(), peripheral);
 	}
 }
