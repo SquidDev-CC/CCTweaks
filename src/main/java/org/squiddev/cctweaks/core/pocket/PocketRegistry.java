@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.pocket;
 
 import com.google.common.base.Preconditions;
+import dan200.computercraft.shared.util.InventoryUtil;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class PocketRegistry implements IPocketRegistry {
-	public static final int FLAG = 0xFF;
+	public static final short FLAG = 0xFF;
 
 	public static final PocketRegistry instance = new PocketRegistry();
 
@@ -89,5 +90,15 @@ public final class PocketRegistry implements IPocketRegistry {
 		}
 
 		return upgrade;
+	}
+
+	public IPocketUpgrade getFromItemStack(ItemStack stack) {
+		for (IPocketUpgrade entry : upgrades.values()) {
+			if (InventoryUtil.areItemsStackable(stack, entry.getCraftingItem())) {
+				return entry;
+			}
+		}
+
+		return null;
 	}
 }

@@ -22,7 +22,7 @@ import org.squiddev.patcher.visitors.MergeVisitor;
 public class ItemPocketComputer_Patch extends ItemPocketComputer {
 	@MergeVisitor.Stub
 	private ServerComputer createServerComputer(World world, IInventory inventory, ItemStack stack) {
-		return null;
+		throw new RuntimeException("Not implemented");
 	}
 
 	@Override
@@ -43,6 +43,8 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer {
 	public String getItemStackDisplayName(ItemStack stack) {
 		String baseName = getUnlocalizedName(stack);
 		String adjective = PocketRegistry.instance.getUpgradeAdjective(stack, null);
-		return adjective == null ? StatCollector.translateToLocal(baseName + ".name") : StatCollector.translateToLocalFormatted(baseName + ".upgraded.name", adjective);
+
+		if (adjective == null) return StatCollector.translateToLocal(baseName + ".name");
+		return StatCollector.translateToLocal(baseName + ".upgraded.name").replace("%s", StatCollector.translateToLocal(adjective));
 	}
 }

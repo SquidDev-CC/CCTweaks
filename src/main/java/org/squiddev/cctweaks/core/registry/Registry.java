@@ -7,6 +7,7 @@ import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.client.ModelLoader;
 import org.squiddev.cctweaks.client.render.RenderNetworkOverlay;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHostProvider;
+import org.squiddev.cctweaks.core.pocket.CraftingPocketUpgrade;
 import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
 import org.squiddev.cctweaks.integration.IndustrialCraftIntegration;
@@ -56,6 +57,7 @@ public final class Registry {
 		// CCTweaks providers
 		addModule(new DefaultTurtleProviders());
 		addModule(new PocketWirelessBinding());
+		addModule(new CraftingPocketUpgrade());
 
 		// Integration
 		addModule(new RedstoneFluxIntegration());

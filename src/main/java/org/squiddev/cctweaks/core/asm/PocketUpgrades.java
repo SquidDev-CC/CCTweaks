@@ -1,9 +1,11 @@
 package org.squiddev.cctweaks.core.asm;
 
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 import org.squiddev.patcher.transformer.IPatcher;
 import org.squiddev.patcher.visitors.FindingVisitor;
 
@@ -30,29 +32,24 @@ public class PocketUpgrades implements IPatcher {
 				public void handle(InsnList nodes, MethodVisitor visitor) {
 					visitor.visitVarInsn(ALOAD, 0);
 					visitor.visitMethodInsn(INVOKESTATIC, "org/squiddev/cctweaks/core/pocket/PocketHooks", "destroy", "(Ldan200/computercraft/shared/computer/core/ServerComputer;)V", false);
+
 					nodes.accept(visitor);
 				}
 			}.onMethod("unload").once().mustFind();
 		} else {
 			ClassVisitor visitor = new FindingVisitor(delegate,
-				new TypeInsnNode(INSTANCEOF, "dan200/computercraft/shared/pocket/peripherals/PocketModemPeripheral"),
-				new JumpInsnNode(IFEQ, null)
+				new VarInsnNode(ALOAD, 7),
+				new InsnNode(ICONST_2),
+				new MethodInsnNode(INVOKEVIRTUAL, "dan200/computercraft/shared/computer/core/ServerComputer", "getPeripheral", "(I)Ldan200/computercraft/api/peripheral/IPeripheral;", false)
 			) {
 				@Override
 				public void handle(InsnList nodes, MethodVisitor visitor) {
-					Label finish = ((JumpInsnNode) nodes.getLast()).label.getLabel();
-					Label modem = new Label();
-
-					visitor.visitTypeInsn(INSTANCEOF, "dan200/computercraft/shared/pocket/peripherals/PocketModemPeripheral");
-					visitor.visitJumpInsn(IFNE, modem);
-
 					visitor.visitVarInsn(ALOAD, 3);
 					visitor.visitVarInsn(ALOAD, 1);
 					visitor.visitVarInsn(ALOAD, 7);
 					visitor.visitMethodInsn(INVOKESTATIC, "org/squiddev/cctweaks/core/pocket/PocketHooks", "update", "(Lnet/minecraft/entity/Entity;Lnet/minecraft/item/ItemStack;Ldan200/computercraft/shared/computer/core/ServerComputer;)V", false);
 
-					visitor.visitJumpInsn(GOTO, finish);
-					visitor.visitLabel(modem);
+					nodes.accept(visitor);
 				}
 			}.onMethod("func_77663_a").onMethod("onUpdate").once().mustFind();
 
@@ -65,9 +62,8 @@ public class PocketUpgrades implements IPatcher {
 
 					visitor.visitVarInsn(ALOAD, 2);
 					visitor.visitVarInsn(ALOAD, 3);
-					visitor.visitVarInsn(ALOAD, 4);
+					visitor.visitVarInsn(ALOAD, 7);
 					visitor.visitMethodInsn(INVOKESTATIC, "org/squiddev/cctweaks/core/pocket/PocketHooks", "create", "(Lnet/minecraft/inventory/IInventory;Lnet/minecraft/item/ItemStack;Ldan200/computercraft/shared/computer/core/ServerComputer;)V", false);
-
 				}
 			}.onMethod("createServerComputer").once().mustFind();
 
