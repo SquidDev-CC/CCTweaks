@@ -45,11 +45,9 @@ public class ModelLoader extends Module implements IClientModule {
 	private void loadModel(ModelBakeEvent event, String name) {
 		try {
 			IModel e = event.modelLoader.getModel(new ResourceLocation(CCTweaks.RESOURCE_DOMAIN, "block/" + name));
-			DebugLogger.debug("Textures are " + e.getTextures());
 			IFlexibleBakedModel bakedModel = e.bake(e.getDefaultState(), DefaultVertexFormats.ITEM, new Function<ResourceLocation, TextureAtlasSprite>() {
 				@Override
 				public TextureAtlasSprite apply(ResourceLocation location) {
-					DebugLogger.debug("Looking for " + location);
 					return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
 				}
 			});
