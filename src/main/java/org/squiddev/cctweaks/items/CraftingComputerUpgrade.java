@@ -14,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 
 /**
  * Handles crafting with ComputerUpgrades
@@ -103,7 +104,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 
 	@Override
 	public ItemStack getRecipeOutput() {
-		return null;
+		return ComputerItemFactory.create(-1, null, ComputerFamily.Advanced);
 	}
 
 	@Override
@@ -111,8 +112,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 		ItemStack[] result = new ItemStack[inventory.getSizeInventory()];
 
 		for (int i = 0; i < result.length; ++i) {
-			ItemStack itemstack = inventory.getStackInSlot(i);
-			result[i] = net.minecraftforge.common.ForgeHooks.getContainerItem(itemstack);
+			result[i] = ForgeHooks.getContainerItem(inventory.getStackInSlot(i));
 		}
 
 		return result;
