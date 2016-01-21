@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.core.lua;
 import dan200.computercraft.api.filesystem.IMount;
 import dan200.computercraft.api.filesystem.IWritableMount;
 import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.lua.ILuaTask;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.core.apis.IAPIEnvironment;
@@ -32,6 +33,37 @@ public class LuaEnvironment implements ILuaEnvironment {
 	public void registerAPI(ILuaAPIFactory factory) {
 		if (factory == null) throw new IllegalArgumentException("factory cannot be null");
 		providers.add(factory);
+	}
+
+	@Override
+	public long issueTask(IComputerAccess access, ILuaContext context, ILuaTask task, int delay) throws LuaException {
+		long id = DelayedTasks.getNextId();
+		if (!DelayedTasks.addTask(access, context, task, delay, id)) throw new LuaException("Too many tasks");
+
+		return id;
+	}
+
+	@Override
+	public Object[] executeTask(IComputerAccess access, ILuaContext context, ILuaTask task, int delay) throws LuaException, InterruptedException {
+		long id = issueTask(access, context, task, delay);
+
+		Object[] response;
+		do {
+			response = context.pullEvent("task_complete");
+		}
+		while (response.length < 3 || !(response[1] instanceof Number) || !(response[2] instanceof Boolean) || (long) ((Number) response[1]).intValue() != id);
+
+		Object[] returnValues = new Object[response.length - 3];
+		if (!(Boolean) response[2]) {
+			if (response.length >= 4 && response[3] instanceof String) {
+				throw new LuaException((String) response[3]);
+			} else {
+				throw new LuaException();
+			}
+		} else {
+			System.arraycopy(response, 3, returnValues, 0, returnValues.length);
+			return returnValues;
+		}
 	}
 
 	public static void inject(Computer computer) {
@@ -192,6 +224,68 @@ public class LuaEnvironment implements ILuaEnvironment {
 		@Override
 		public String getAttachmentName() {
 			return environment.getLabel();
+		}
+	}
+
+	private static final class LuaTask {
+		private int remaining;
+
+		private final IComputerAccess access;
+		private final ILuaContext context;
+
+		public final ILuaTask task;
+		public final IExtendedLuaTask extendedTask;
+		private final long id;
+
+		private LuaTask(IComputerAccess access, ILuaContext context, ILuaTask task, int delay, long id) {
+			this.id = id;
+			this.access = access;
+			this.context = context;
+
+			this.task = task;
+			this.extendedTask = task instanceof IExtendedLuaTask ? (IExtendedLuaTask) task : null;
+			remaining = delay;
+		}
+
+		private void yieldSuccess(Object[] result) {
+			if (result != null) {
+				Object[] eventArguments = new Object[result.length + 2];
+				eventArguments[0] = id;
+				eventArguments[1] = true;
+
+				System.arraycopy(result, 0, eventArguments, 2, result.length);
+				access.queueEvent("task_complete", eventArguments);
+			} else {
+				access.queueEvent("task_complete", new Object[]{id, true});
+			}
+		}
+
+		private void yieldFailure(String message) {
+			access.queueEvent("task_complete", new Object[]{id, false, message});
+		}
+
+		public boolean update() {
+			if (remaining == 0) {
+				try {
+					yieldSuccess(task.execute());
+				} catch (LuaException e) {
+					yieldFailure(e.getMessage());
+				} catch (Throwable e) {
+					yieldFailure("Java Exception Thrown: " + e.toString());
+				}
+
+				return true;
+			} else if (extendedTask != null) {
+				try {
+					extendedTask.update();
+				} catch (LuaException e) {
+					yieldFailure(e.getMessage());
+				} catch (Throwable e) {
+					yieldFailure("Java Exception Thrown: " + e.toString());
+				}
+			}
+
+			return false;
 		}
 	}
 }
