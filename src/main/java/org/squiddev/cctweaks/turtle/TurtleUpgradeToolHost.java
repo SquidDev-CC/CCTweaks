@@ -1,5 +1,7 @@
 package org.squiddev.cctweaks.turtle;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 import net.minecraft.item.ItemStack;
@@ -68,6 +70,11 @@ public class TurtleUpgradeToolHost implements ITurtleUpgrade {
 		return player;
 	}
 
+	@SideOnly(Side.CLIENT)
+	public IIcon defaultIcon() {
+		return Registry.itemToolHost.getIconFromDamage(0);
+	}
+
 	@Override
 	public IIcon getIcon(ITurtleAccess turtle, TurtleSide side) {
 		ItemStack item;
@@ -84,7 +91,7 @@ public class TurtleUpgradeToolHost implements ITurtleUpgrade {
 			return icon;
 		}
 
-		return Registry.itemToolHost.getIconFromDamage(0);
+		return defaultIcon();
 	}
 
 	@Override

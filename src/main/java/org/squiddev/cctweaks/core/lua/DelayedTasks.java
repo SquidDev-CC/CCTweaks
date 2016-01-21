@@ -6,9 +6,15 @@ import dan200.computercraft.api.lua.ILuaTask;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import org.squiddev.cctweaks.api.lua.IExtendedLuaTask;
+import org.squiddev.cctweaks.api.lua.ILuaEnvironment;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 /**
- * Delaying version of {@link dan200.computercraft.core.computer.MainThread}
+ * Delaying version of {@link dan200.computercraft.core.computer.MainThread}.
+ *
+ * The implementation of this is a bit odd. It involves a linked list rather than
+ * a normal ArrayList as we need to remove any item, whilst still allowing new tasks
+ * to be added.
  */
 public class DelayedTasks {
 	private static final int MAX_TASKS_TOTAL = 50000;
@@ -33,7 +39,8 @@ public class DelayedTasks {
 	private static boolean addTask(LuaTask task) {
 		synchronized (lock) {
 			if (taskCount < MAX_TASKS_TOTAL) {
-				last.next = task;
+				if (last != null) last.next = task;
+				if (first == null) first = task;
 				last = task;
 				taskCount++;
 				return true;
@@ -105,9 +112,9 @@ public class DelayedTasks {
 				eventArguments[1] = true;
 
 				System.arraycopy(result, 0, eventArguments, 2, result.length);
-				access.queueEvent("task_complete", eventArguments);
+				access.queueEvent(ILuaEnvironment.EVENT_NAME, eventArguments);
 			} else {
-				access.queueEvent("task_complete", new Object[]{id, true});
+				access.queueEvent(ILuaEnvironment.EVENT_NAME, new Object[]{id, true});
 			}
 		}
 
@@ -122,6 +129,7 @@ public class DelayedTasks {
 				} catch (LuaException e) {
 					yieldFailure(e.getMessage());
 				} catch (Throwable e) {
+					DebugLogger.error("Error in task: ", e);
 					yieldFailure("Java Exception Thrown: " + e.toString());
 				}
 
@@ -135,6 +143,7 @@ public class DelayedTasks {
 					} catch (LuaException e) {
 						yieldFailure(e.getMessage());
 					} catch (Throwable e) {
+						DebugLogger.error("Error in task: ", e);
 						yieldFailure("Java Exception Thrown: " + e.toString());
 					}
 				}

@@ -9,6 +9,7 @@ import dan200.computercraft.shared.util.WorldUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.ChunkCoordinates;
@@ -121,8 +122,6 @@ public class ToolHostPlayer extends TurtlePlayer {
 				}
 			}
 
-			unloadInventory(turtle);
-
 			return TurtleCommandResult.success();
 		}
 
@@ -156,5 +155,13 @@ public class ToolHostPlayer extends TurtlePlayer {
 		);
 
 		ySize = -1.1f;
+	}
+
+	public void loadWholeInventory() {
+		IInventory turtleInventory = turtle.getInventory();
+		int size = turtleInventory.getSizeInventory();
+		for (int i = 0; i < size; i++) {
+			inventory.setInventorySlotContents(i, turtleInventory.getStackInSlot(i));
+		}
 	}
 }

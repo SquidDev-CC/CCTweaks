@@ -152,6 +152,12 @@ public final class Config {
 			public static boolean enabled;
 
 			/**
+			 * Enable the Tool Manipulator
+			 */
+			@DefaultBoolean(true)
+			public static boolean advanced;
+
+			/**
 			 * Enable crafting the Tool Host
 			 */
 			@DefaultBoolean(true)
@@ -165,6 +171,14 @@ public final class Config {
 			@RequiresRestart
 			@Range(min = 0)
 			public static int upgradeId;
+
+			/**
+			 * Upgrade Id for Tool Manipulator
+			 */
+			@DefaultInt(333)
+			@RequiresRestart
+			@Range(min = 0)
+			public static int advancedUpgradeId;
 
 			/**
 			 * The dig speed factor for tool hosts.
