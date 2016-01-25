@@ -342,6 +342,25 @@ public final class Config {
 			@Range(min = 1)
 			public static int maxRead;
 		}
+
+		/**
+		 * Basic data manipulation
+		 */
+		public static final class Data {
+			/**
+			 * If the data API is enabled
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart(mc = false, world = true)
+			public static boolean enabled;
+
+			/**
+			 * Maximum number of bytes to process.
+			 * The default is 1MiB
+			 */
+			@DefaultInt(1048576)
+			public static int limit;
+		}
 	}
 
 	/**

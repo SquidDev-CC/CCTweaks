@@ -25,5 +25,7 @@ public class ApiModule extends Module {
 				return new String[]{"socket"};
 			}
 		});
+
+		environment.registerAPI(new DataAPI());
 	}
 }

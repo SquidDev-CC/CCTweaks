@@ -76,3 +76,6 @@ gui.config.cctweaks.apis.socket.whitelist=Whitelist
 gui.config.cctweaks.apis.socket.maxTcpConnections=Max Connections
 gui.config.cctweaks.apis.socket.threads=Number of Threads
 gui.config.cctweaks.apis.socket.maxRead=Max read length
+gui.config.cctweaks.apis.data=Data
+gui.config.cctweaks.apis.data.enabled=Enabled
+gui.config.cctweaks.apis.data.limit=Limit
