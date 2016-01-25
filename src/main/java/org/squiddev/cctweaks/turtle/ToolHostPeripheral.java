@@ -88,7 +88,7 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 			public Object[] execute() throws LuaException {
 				ItemStack stack = setupStack();
 				stack.getItem().onPlayerStoppedUsing(stack, access.getWorld(), player, duration);
-				player.unloadInventory(access);
+				player.unloadWholeInventory();
 
 				return null;
 			}
@@ -96,7 +96,7 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 			@Override
 			public void update() throws LuaException {
 				setupStack().useItemRightClick(access.getWorld(), player);
-				player.unloadInventory(access);
+				player.unloadWholeInventory();
 			}
 		}, duration);
 	}

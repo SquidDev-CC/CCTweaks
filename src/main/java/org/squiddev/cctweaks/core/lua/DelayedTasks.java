@@ -1,7 +1,6 @@
 package org.squiddev.cctweaks.core.lua;
 
 import com.google.common.base.Preconditions;
-import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.ILuaTask;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
@@ -50,13 +49,12 @@ public class DelayedTasks {
 		}
 	}
 
-	public static boolean addTask(IComputerAccess access, ILuaContext context, ILuaTask task, int delay, long id) {
+	public static boolean addTask(IComputerAccess access, ILuaTask task, int delay, long id) {
 		Preconditions.checkNotNull(access, "access cannot be null");
-		Preconditions.checkNotNull(context, "context cannot be null");
 		Preconditions.checkNotNull(task, "task cannot be null");
 		if (delay < 0) throw new IllegalArgumentException("delay must be >= 0");
 
-		return addTask(new LuaTask(access, context, task, delay, id));
+		return addTask(new LuaTask(access, task, delay, id));
 	}
 
 	public static void update() {
@@ -68,7 +66,11 @@ public class DelayedTasks {
 			if (task.update()) {
 				synchronized (lock) {
 					taskCount--;
-					(previous == null ? first : previous).next = task.next;
+					if (previous == null) {
+						first = task.next;
+					} else {
+						previous.next = task.next;
+					}
 					if (task == last) last = null;
 				}
 			} else {
@@ -83,22 +85,48 @@ public class DelayedTasks {
 		}
 	}
 
+	public static void reset() {
+		first = null;
+		last = null;
+		taskCount = 0;
+		lastTask = 0;
+	}
+
+	public static void cancel(long id) {
+		synchronized (lock) {
+			LuaTask previous = null;
+			LuaTask task = first;
+			while (task != null) {
+				if (task.id == id) {
+					if (previous == null) {
+						first = task.next;
+					} else {
+						previous.next = task.next;
+					}
+					taskCount--;
+					return;
+				}
+
+				previous = task;
+				task = task.next;
+			}
+		}
+	}
+
 	private static final class LuaTask {
 		public LuaTask next;
 
 		private int remaining;
 
 		private final IComputerAccess access;
-		private final ILuaContext context;
 
 		public final ILuaTask task;
 		public final IExtendedLuaTask extendedTask;
 		private final long id;
 
-		private LuaTask(IComputerAccess access, ILuaContext context, ILuaTask task, int delay, long id) {
+		private LuaTask(IComputerAccess access, ILuaTask task, int delay, long id) {
 			this.id = id;
 			this.access = access;
-			this.context = context;
 
 			this.task = task;
 			this.extendedTask = task instanceof IExtendedLuaTask ? (IExtendedLuaTask) task : null;
@@ -123,7 +151,14 @@ public class DelayedTasks {
 		}
 
 		public boolean update() {
+			if (remaining < 0) {
+				DebugLogger.error("Task has negative time remaining!");
+				return true;
+			}
+
 			if (remaining == 0) {
+				remaining--;
+
 				try {
 					yieldSuccess(task.execute());
 				} catch (LuaException e) {

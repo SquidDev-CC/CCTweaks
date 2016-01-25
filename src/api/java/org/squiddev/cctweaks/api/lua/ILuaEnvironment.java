@@ -27,14 +27,13 @@ public interface ILuaEnvironment {
 	 * Like {@link ILuaContext#issueMainThreadTask(ILuaTask)} this is rate limited to 1000 tasks per tick, so use
 	 * this method with care.
 	 *
-	 * @param access  The computer access object
-	 * @param context The current lua context
-	 * @param task    The task to run
-	 * @param delay   Time in ticks to wait before running
+	 * @param access The computer access object
+	 * @param task   The task to run
+	 * @param delay  Time in ticks to wait before running
 	 * @return The task ID. You can pull an event with name {@link #EVENT_NAME} to wait for this task.
 	 * @throws LuaException When there are too many tasks (>50000).
 	 */
-	long issueTask(IComputerAccess access, ILuaContext context, ILuaTask task, int delay) throws LuaException;
+	long issueTask(IComputerAccess access, ILuaTask task, int delay) throws LuaException;
 
 	/**
 	 * Issue a task to be run on the main thread and wait for its completion

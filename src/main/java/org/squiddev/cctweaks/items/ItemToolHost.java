@@ -5,13 +5,17 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeToolHost;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeToolManipulator;
+
+import java.util.List;
 
 /**
  * Simply a holder item for the turtle tool host
@@ -23,6 +27,13 @@ public class ItemToolHost extends ItemBase {
 	public ItemToolHost() {
 		super("toolHost");
 		setHasSubtypes(true);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void getSubItems(Item item, CreativeTabs tab, List list) {
+		list.add(new ItemStack(this, 1, 0));
+		list.add(new ItemStack(this, 1, 1));
 	}
 
 	@Override

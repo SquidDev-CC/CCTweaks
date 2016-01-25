@@ -36,22 +36,30 @@ public class LuaEnvironment implements ILuaEnvironment {
 	}
 
 	@Override
-	public long issueTask(IComputerAccess access, ILuaContext context, ILuaTask task, int delay) throws LuaException {
+	public long issueTask(IComputerAccess access, ILuaTask task, int delay) throws LuaException {
 		long id = DelayedTasks.getNextId();
-		if (!DelayedTasks.addTask(access, context, task, delay, id)) throw new LuaException("Too many tasks");
+		if (!DelayedTasks.addTask(access, task, delay, id)) throw new LuaException("Too many tasks");
 
 		return id;
 	}
 
 	@Override
 	public Object[] executeTask(IComputerAccess access, ILuaContext context, ILuaTask task, int delay) throws LuaException, InterruptedException {
-		long id = issueTask(access, context, task, delay);
+		long id = issueTask(access, task, delay);
 
 		Object[] response;
-		do {
-			response = context.pullEvent(ILuaEnvironment.EVENT_NAME);
+		try {
+			do {
+				response = context.pullEvent(ILuaEnvironment.EVENT_NAME);
+			}
+			while (response.length < 3 || !(response[1] instanceof Number) || !(response[2] instanceof Boolean) || (long) ((Number) response[1]).intValue() != id);
+		} catch (InterruptedException e) {
+			DelayedTasks.cancel(id);
+			throw e;
+		} catch (LuaException e) {
+			DelayedTasks.cancel(id);
+			throw e;
 		}
-		while (response.length < 3 || !(response[1] instanceof Number) || !(response[2] instanceof Boolean) || (long) ((Number) response[1]).intValue() != id);
 
 		Object[] returnValues = new Object[response.length - 3];
 		if (!(Boolean) response[2]) {

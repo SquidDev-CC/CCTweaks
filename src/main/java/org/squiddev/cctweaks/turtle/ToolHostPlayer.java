@@ -160,8 +160,26 @@ public class ToolHostPlayer extends TurtlePlayer {
 	public void loadWholeInventory() {
 		IInventory turtleInventory = turtle.getInventory();
 		int size = turtleInventory.getSizeInventory();
+		int largerSize = inventory.getSizeInventory();
+
 		for (int i = 0; i < size; i++) {
 			inventory.setInventorySlotContents(i, turtleInventory.getStackInSlot(i));
+		}
+		for (int i = size; i < largerSize; i++) {
+			inventory.setInventorySlotContents(i, null);
+		}
+	}
+
+	public void unloadWholeInventory() {
+		IInventory turtleInventory = turtle.getInventory();
+		int size = turtleInventory.getSizeInventory();
+		int largerSize = inventory.getSizeInventory();
+
+		for (int i = 0; i < size; i++) {
+			turtleInventory.setInventorySlotContents(i, inventory.getStackInSlot(i));
+		}
+		for (int i = size; i < largerSize; i++) {
+			consumer.consumeDrop(inventory.getStackInSlot(i));
 		}
 	}
 }
