@@ -57,14 +57,14 @@ public class ItemPart extends ItemBase {
 
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
-		BlockBase block = getBlock(stack.getItemDamage());
+		BlockBase<?> block = getBlock(stack.getItemDamage());
 
 		if (block == null) return super.getUnlocalizedName(stack);
 		if (block instanceof IMultiBlock) return ((IMultiBlock) block).getUnlocalizedName(stack.getItemDamage());
 		return block.getUnlocalizedName();
 	}
 
-	public static BlockBase getBlock(int damage) {
+	public static BlockBase<?> getBlock(int damage) {
 		switch (damage) {
 			case 0:
 				return Registry.blockNetworked;
@@ -92,7 +92,7 @@ public class ItemPart extends ItemBase {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void getSubItems(Item item, CreativeTabs tab, List itemStacks) {
 		// Wireless bridge
 		itemStacks.add(new ItemStack(this, 1, 0));
@@ -125,7 +125,7 @@ public class ItemPart extends ItemBase {
 		@Override
 		public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
 			int damage = item.getItemDamage();
-			BlockBase block = getBlock(damage);
+			BlockBase<?> block = getBlock(damage);
 			if (block == null) return;
 
 			GL11.glPushMatrix();

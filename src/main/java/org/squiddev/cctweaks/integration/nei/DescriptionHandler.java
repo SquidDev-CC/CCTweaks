@@ -72,7 +72,7 @@ public class DescriptionHandler implements ICraftingHandler, IUsageHandler {
 	@Override
 	public void drawForeground(int recipe) {
 		FontRenderer renderer = RenderManager.instance.getFontRenderer();
-		List text = renderer.listFormattedStringToWidth(this.pages.get(recipe), WIDTH - 8);
+		List<?> text = renderer.listFormattedStringToWidth(this.pages.get(recipe), WIDTH - 8);
 
 		for (int i = 0; i < text.size(); i++) {
 			String t = (String) text.get(i);

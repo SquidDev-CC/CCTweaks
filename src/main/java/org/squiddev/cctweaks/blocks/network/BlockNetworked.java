@@ -53,8 +53,8 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void getSubBlocks(Item item, CreativeTabs tab, List itemStacks) {
 		// Wireless bridge
 		itemStacks.add(new ItemStack(this, 1, 0));

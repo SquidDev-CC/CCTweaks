@@ -28,7 +28,7 @@ public class UnorderedPair<X, Y> {
 			return true;
 		}
 		if (other instanceof UnorderedPair) {
-			UnorderedPair pair = (UnorderedPair) other;
+			UnorderedPair<?, ?> pair = (UnorderedPair) other;
 			if (x.equals(pair.x) && y.equals(pair.y)) {
 				return true;
 			} else if (y.equals(pair.x) && x.equals(pair.y)) {

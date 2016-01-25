@@ -96,7 +96,7 @@ public class LuaConverter {
 			Map<Object, Object> newMap = new HashMap<Object, Object>();
 			tables.put(value, newMap);
 
-			Map map = (Map) value;
+			Map<?, ?> map = (Map) value;
 
 			for (Object key : map.keySet()) {
 				newMap.put(toString(key, tables), toString(map.get(key), tables));

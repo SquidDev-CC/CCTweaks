@@ -193,7 +193,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			}
 
 			@Override
-			protected BasicModemPeripheral createPeripheral() {
+			protected BasicModemPeripheral<?> createPeripheral() {
 				return new TurtleModemPeripheral(this);
 			}
 

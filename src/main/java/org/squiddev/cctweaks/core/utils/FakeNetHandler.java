@@ -40,6 +40,7 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 		}
 
 		@Override
+		@SuppressWarnings("rawtypes")
 		public void scheduleOutboundPacket(Packet packet, GenericFutureListener... listener) {
 		}
 

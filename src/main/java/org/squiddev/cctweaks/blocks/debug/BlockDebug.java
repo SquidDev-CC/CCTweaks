@@ -31,8 +31,8 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 		super("debugBlock", TileBase.class);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void getSubBlocks(Item item, CreativeTabs tab, List itemStacks) {
 		itemStacks.add(new ItemStack(this, 1, 0));
 		itemStacks.add(new ItemStack(this, 1, 1));

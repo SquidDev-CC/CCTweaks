@@ -39,7 +39,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	/**
 	 * The modem to use
 	 */
-	public final BasicModemPeripheral modem = createPeripheral();
+	public final BasicModemPeripheral<?> modem = createPeripheral();
 
 	/**
 	 * The state of the modem
@@ -189,7 +189,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	 *
 	 * @return The created peripheral
 	 */
-	protected BasicModemPeripheral createPeripheral() {
+	protected BasicModemPeripheral<?> createPeripheral() {
 		return new BasicModemPeripheral<BasicModem>(this);
 	}
 

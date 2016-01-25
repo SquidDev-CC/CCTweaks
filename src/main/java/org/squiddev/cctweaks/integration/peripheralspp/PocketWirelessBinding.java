@@ -125,7 +125,7 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 			}
 
 			@Override
-			protected BasicModemPeripheral createPeripheral() {
+			protected BasicModemPeripheral<?> createPeripheral() {
 				return new PocketModemPeripheral(this);
 			}
 

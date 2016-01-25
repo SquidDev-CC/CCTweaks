@@ -95,3 +95,9 @@ test {
 		events "passed", "skipped", "failed", "standardOut", "standardError"
 	}
 }
+
+gradle.projectsEvaluated {
+	tasks.withType(JavaCompile) {
+		options.compilerArgs << "-Xlint"
+	}
+}
