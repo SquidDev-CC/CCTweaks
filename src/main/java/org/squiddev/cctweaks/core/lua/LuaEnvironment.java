@@ -19,6 +19,12 @@ import java.util.Map;
 import java.util.Set;
 
 public class LuaEnvironment implements ILuaEnvironment {
+	private final ILuaTask sleepTask = new ILuaTask() {
+		@Override
+		public Object[] execute() throws LuaException {
+			return null;
+		}
+	};
 	/**
 	 * The instance of the Lua environment - this exists as ASM is easier this way
 	 */
@@ -72,6 +78,11 @@ public class LuaEnvironment implements ILuaEnvironment {
 			System.arraycopy(response, 3, returnValues, 0, returnValues.length);
 			return returnValues;
 		}
+	}
+
+	@Override
+	public void sleep(IComputerAccess access, ILuaContext context, int delay) throws LuaException, InterruptedException {
+		executeTask(access, context, sleepTask, delay);
 	}
 
 	public static void inject(Computer computer) {

@@ -49,7 +49,19 @@ public interface ILuaEnvironment {
 	 * @param task    The task to run
 	 * @param delay   Time in ticks to wait before running
 	 * @return The return values of this task.
-	 * @throws LuaException When there are too many tasks (>50000).
+	 * @throws LuaException         When there are too many tasks (>50000) on when terminated
+	 * @throws InterruptedException When terminated
 	 */
 	Object[] executeTask(IComputerAccess access, ILuaContext context, ILuaTask task, int delay) throws LuaException, InterruptedException;
+
+	/**
+	 * Sleep the Lua thread for a duration
+	 *
+	 * @param access  The computer access object
+	 * @param context The current lua context
+	 * @param delay   Time in ticks to wait before running
+	 * @throws LuaException         When there are too many tasks (>50000) on when terminated
+	 * @throws InterruptedException When terminated
+	 */
+	void sleep(IComputerAccess access, ILuaContext context, int delay) throws LuaException, InterruptedException;
 }
