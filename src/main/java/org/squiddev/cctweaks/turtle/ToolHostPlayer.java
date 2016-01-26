@@ -33,8 +33,9 @@ public class ToolHostPlayer extends TurtlePlayer {
 
 	private ChunkCoordinates digPosition;
 	private Block digBlock;
+	public ItemStack itemInUse;
 
-	private final McEvents.IDropConsumer consumer = new McEvents.IDropConsumer() {
+	public final McEvents.IDropConsumer consumer = new McEvents.IDropConsumer() {
 		@Override
 		public void consumeDrop(ItemStack drop) {
 			ItemStack remainder = InventoryUtil.storeItems(drop, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
@@ -176,10 +177,23 @@ public class ToolHostPlayer extends TurtlePlayer {
 		int largerSize = inventory.getSizeInventory();
 
 		for (int i = 0; i < size; i++) {
-			turtleInventory.setInventorySlotContents(i, inventory.getStackInSlot(i));
+			ItemStack stack = inventory.getStackInSlot(i);
+			turtleInventory.setInventorySlotContents(i, stack == null || stack.stackSize <= 0 ? null : stack);
 		}
 		for (int i = size; i < largerSize; i++) {
 			consumer.consumeDrop(inventory.getStackInSlot(i));
 		}
+	}
+
+	@Override
+	public void setItemInUse(ItemStack stack, int duration) {
+		super.setItemInUse(stack, duration);
+		itemInUse = stack;
+	}
+
+	@Override
+	public void clearItemInUse() {
+		super.clearItemInUse();
+		itemInUse = null;
 	}
 }
