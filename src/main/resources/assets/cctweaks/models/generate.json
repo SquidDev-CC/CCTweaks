@@ -12,7 +12,8 @@
 			"computerUpgrade": "cctweaks:items/computerUpgrade",
 			"dataCard": "cctweaks:items/dataCard",
 			"debugger": "cctweaks:items/debugger",
-			"toolHost": "cctweaks:items/toolHost"
+			"toolHost": "cctweaks:items/toolHost",
+			"toolHostAdvanced": "cctweaks:items/toolHostAdvanced"
 		},
 		"both": {
 			"debug_networked_peripheral": "cctweaks:blocks/debugNetworkedPeripheral",

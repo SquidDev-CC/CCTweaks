@@ -65,8 +65,8 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 		setDefaultState(getBlockState().getBaseState().withProperty(TYPE, BlockDebugType.PERIPHERAL));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void getSubBlocks(Item item, CreativeTabs tab, List itemStacks) {
 		for (BlockDebugType type : BlockDebugType.VALUES) {
 			itemStacks.add(new ItemStack(this, 1, type.ordinal()));

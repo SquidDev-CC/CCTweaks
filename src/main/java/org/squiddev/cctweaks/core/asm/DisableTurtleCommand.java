@@ -13,8 +13,8 @@ import static org.objectweb.asm.Opcodes.*;
  * every time the event is called
  */
 public class DisableTurtleCommand implements IPatcher {
-	protected static final String PREFIX = "dan200.computercraft.shared.turtle.core.Turtle";
-	protected static final String SUFFIX = "Command";
+	private static final String PREFIX = "dan200.computercraft.shared.turtle.core.Turtle";
+	private static final String SUFFIX = "Command";
 
 	@Override
 	public boolean matches(String className) {

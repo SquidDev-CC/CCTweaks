@@ -9,6 +9,7 @@ import dan200.computercraft.shared.util.WorldUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.BlockPos;
@@ -31,6 +32,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 
 	private BlockPos digPosition;
 	private Block digBlock;
+
 	private int currentDamage = -1;
 	private int currentDamageState = -1;
 
@@ -39,7 +41,9 @@ public class ToolHostPlayer extends TurtlePlayer {
 	 */
 	private ItemStack activeStack;
 
-	private final McEvents.IDropConsumer consumer = new McEvents.IDropConsumer() {
+	public ItemStack itemInUse;
+
+	public final McEvents.IDropConsumer consumer = new McEvents.IDropConsumer() {
 		@Override
 		public void consumeDrop(ItemStack drop) {
 			ItemStack remainder = InventoryUtil.storeItems(drop, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
@@ -134,8 +138,6 @@ public class ToolHostPlayer extends TurtlePlayer {
 				}
 			}
 
-			unloadInventory(turtle);
-
 			return TurtleCommandResult.success();
 		}
 
@@ -201,5 +203,44 @@ public class ToolHostPlayer extends TurtlePlayer {
 			direction.getAxis() != EnumFacing.Axis.Y ? DirectionUtil.toYawAngle(direction) : DirectionUtil.toYawAngle(turtle.getDirection()),
 			direction.getAxis() != EnumFacing.Axis.Y ? 0 : DirectionUtil.toPitchAngle(direction)
 		);
+	}
+
+	public void loadWholeInventory() {
+		IInventory turtleInventory = turtle.getInventory();
+		int size = turtleInventory.getSizeInventory();
+		int largerSize = inventory.getSizeInventory();
+
+		for (int i = 0; i < size; i++) {
+			inventory.setInventorySlotContents(i, turtleInventory.getStackInSlot(i));
+		}
+		for (int i = size; i < largerSize; i++) {
+			inventory.setInventorySlotContents(i, null);
+		}
+	}
+
+	public void unloadWholeInventory() {
+		IInventory turtleInventory = turtle.getInventory();
+		int size = turtleInventory.getSizeInventory();
+		int largerSize = inventory.getSizeInventory();
+
+		for (int i = 0; i < size; i++) {
+			ItemStack stack = inventory.getStackInSlot(i);
+			turtleInventory.setInventorySlotContents(i, stack == null || stack.stackSize <= 0 ? null : stack);
+		}
+		for (int i = size; i < largerSize; i++) {
+			consumer.consumeDrop(inventory.getStackInSlot(i));
+		}
+	}
+
+	@Override
+	public void setItemInUse(ItemStack stack, int duration) {
+		super.setItemInUse(stack, duration);
+		itemInUse = stack;
+	}
+
+	@Override
+	public void clearItemInUse() {
+		super.clearItemInUse();
+		itemInUse = null;
 	}
 }

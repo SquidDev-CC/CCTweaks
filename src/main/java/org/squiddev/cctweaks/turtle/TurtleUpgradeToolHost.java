@@ -1,16 +1,11 @@
 package org.squiddev.cctweaks.turtle;
 
 import dan200.computercraft.api.turtle.*;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.lang3.tuple.Pair;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.Registry;
 
-import javax.vecmath.Matrix4f;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -21,7 +16,11 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 	protected static final Map<ITurtleAccess, ToolHostPlayer> players = new WeakHashMap<ITurtleAccess, ToolHostPlayer>();
 
 	public TurtleUpgradeToolHost() {
-		super("toolHost", Config.Turtle.ToolHost.upgradeId, Registry.itemToolHost);
+		this("toolHost", Config.Turtle.ToolHost.upgradeId, new ItemStack(Registry.itemToolHost, 1, 0));
+	}
+
+	public TurtleUpgradeToolHost(String name, int id, ItemStack stack) {
+		super(name, id, stack);
 	}
 
 	@Override
@@ -51,19 +50,5 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 		ToolHostPlayer player = players.get(turtle);
 		if (player == null) players.put(turtle, player = new ToolHostPlayer(turtle));
 		return player;
-	}
-
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	@SuppressWarnings("deprecation")
-	public Pair<IBakedModel, Matrix4f> getModel(ITurtleAccess access, TurtleSide side) {
-		ItemStack stack = getItem(access);
-		if (stack == null) return super.getModel(access, side);
-
-		float xOffset = side == TurtleSide.Left ? -0.40625F : 0.40625F;
-		Matrix4f transform = new Matrix4f(0.0F, 0.0F, -1.0F, 1.0F + xOffset, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 1.0F);
-
-		return Pair.of(getMesher().getItemModel(stack), transform);
 	}
 }

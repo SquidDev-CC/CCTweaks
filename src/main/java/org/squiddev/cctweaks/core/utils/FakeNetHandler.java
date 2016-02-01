@@ -37,7 +37,6 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 		public void setNetHandler(INetHandler handler) {
 		}
 
-
 		@Override
 		public void processReceivedPackets() {
 		}

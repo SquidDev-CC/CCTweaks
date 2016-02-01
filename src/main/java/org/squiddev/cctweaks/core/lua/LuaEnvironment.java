@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.core.lua;
 import dan200.computercraft.api.filesystem.IMount;
 import dan200.computercraft.api.filesystem.IWritableMount;
 import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.lua.ILuaTask;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.core.apis.IAPIEnvironment;
@@ -12,10 +13,18 @@ import dan200.computercraft.core.filesystem.FileSystem;
 import dan200.computercraft.core.filesystem.FileSystemException;
 import org.squiddev.cctweaks.api.lua.*;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class LuaEnvironment implements ILuaEnvironment {
+	private final ILuaTask sleepTask = new ILuaTask() {
+		@Override
+		public Object[] execute() throws LuaException {
+			return null;
+		}
+	};
 	/**
 	 * The instance of the Lua environment - this exists as ASM is easier this way
 	 */
@@ -32,6 +41,50 @@ public class LuaEnvironment implements ILuaEnvironment {
 		providers.add(factory);
 	}
 
+	@Override
+	public long issueTask(IComputerAccess access, ILuaTask task, int delay) throws LuaException {
+		long id = DelayedTasks.getNextId();
+		if (!DelayedTasks.addTask(access, task, delay, id)) throw new LuaException("Too many tasks");
+
+		return id;
+	}
+
+	@Override
+	public Object[] executeTask(IComputerAccess access, ILuaContext context, ILuaTask task, int delay) throws LuaException, InterruptedException {
+		long id = issueTask(access, task, delay);
+
+		Object[] response;
+		try {
+			do {
+				response = context.pullEvent(ILuaEnvironment.EVENT_NAME);
+			}
+			while (response.length < 3 || !(response[1] instanceof Number) || !(response[2] instanceof Boolean) || (long) ((Number) response[1]).intValue() != id);
+		} catch (InterruptedException e) {
+			DelayedTasks.cancel(id);
+			throw e;
+		} catch (LuaException e) {
+			DelayedTasks.cancel(id);
+			throw e;
+		}
+
+		Object[] returnValues = new Object[response.length - 3];
+		if (!(Boolean) response[2]) {
+			if (response.length >= 4 && response[3] instanceof String) {
+				throw new LuaException((String) response[3]);
+			} else {
+				throw new LuaException();
+			}
+		} else {
+			System.arraycopy(response, 3, returnValues, 0, returnValues.length);
+			return returnValues;
+		}
+	}
+
+	@Override
+	public void sleep(IComputerAccess access, ILuaContext context, int delay) throws LuaException, InterruptedException {
+		executeTask(access, context, sleepTask, delay);
+	}
+
 	public static void inject(Computer computer) {
 		if (instance.providers.size() == 0) return;
 
@@ -44,7 +97,7 @@ public class LuaEnvironment implements ILuaEnvironment {
 		}
 	}
 
-	private static class LuaAPI implements ILuaAPI, ILuaObjectWithArguments {
+	private static class LuaAPI implements ILuaAPI, ILuaObjectWithArguments, IExtendedLuaObject {
 		private final org.squiddev.cctweaks.api.lua.ILuaAPI api;
 		private final ILuaAPIFactory factory;
 
@@ -86,6 +139,11 @@ public class LuaEnvironment implements ILuaEnvironment {
 		@Override
 		public Object[] callMethod(ILuaContext context, int method, IArguments arguments) throws LuaException, InterruptedException {
 			return ArgumentDelegator.delegateLuaObject(api, context, method, arguments);
+		}
+
+		@Override
+		public Map<Object, Object> getAdditionalData() {
+			return api instanceof IExtendedLuaObject ? ((IExtendedLuaObject) api).getAdditionalData() : Collections.emptyMap();
 		}
 	}
 

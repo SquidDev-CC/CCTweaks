@@ -4,6 +4,7 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.core.lua.DelayedTasks;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -40,6 +41,7 @@ public final class FmlEvents {
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.START) {
+			DelayedTasks.update();
 			synchronized (serverQueue) {
 				Runnable scheduled;
 				while ((scheduled = serverQueue.poll()) != null) {

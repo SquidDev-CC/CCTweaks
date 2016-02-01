@@ -103,6 +103,11 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 		}
 	}
 
+	@Override
+	public boolean alsoPeripheral() {
+		return true;
+	}
+
 	public static class TurtleBinding extends NetworkBindingWithModem {
 		public final ITurtleAccess turtle;
 		public final TurtleSide side;
@@ -196,7 +201,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 			}
 
 			@Override
-			protected BasicModemPeripheral createPeripheral() {
+			protected BasicModemPeripheral<?> createPeripheral() {
 				return new TurtleModemPeripheral(this);
 			}
 
@@ -305,6 +310,15 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 			}
 
 			@Override
+			public boolean equals(IPeripheral other) {
+				if (other == this) return true;
+				if (!(other instanceof TurtleModemPeripheral)) return false;
+
+				TurtleModemPeripheral otherModem = (TurtleModemPeripheral) other;
+				return otherModem.getTurtle().equals(otherModem.getTurtle());
+			}
+
+			@Override
 			public synchronized void attach(IComputerAccess computer) {
 				TurtleBinding.this.connect();
 				super.attach(computer);
@@ -314,6 +328,10 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 			public synchronized void detach(IComputerAccess computer) {
 				super.detach(computer);
 				TurtleBinding.this.destroy();
+			}
+
+			public ITurtleAccess getTurtle() {
+				return turtle;
 			}
 
 			@Override

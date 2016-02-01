@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.McEvents;
+import org.squiddev.cctweaks.core.lua.DelayedTasks;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindings;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
@@ -56,6 +57,7 @@ public class CCTweaks {
 	@EventHandler
 	public void onServerStart(FMLServerStartedEvent event) {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+			DelayedTasks.reset();
 			NetworkBindings.reset();
 			NetworkPlayerWatcher.reset();
 		}
@@ -64,6 +66,7 @@ public class CCTweaks {
 	@EventHandler
 	public void onServerStopped(FMLServerStoppedEvent event) {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+			DelayedTasks.reset();
 			NetworkBindings.reset();
 			NetworkPlayerWatcher.reset();
 		}
