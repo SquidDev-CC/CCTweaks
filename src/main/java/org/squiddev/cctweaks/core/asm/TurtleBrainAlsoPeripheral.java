@@ -20,44 +20,60 @@ import static org.objectweb.asm.Opcodes.*;
  */
 public class TurtleBrainAlsoPeripheral implements IPatcher {
 	private static final String EXTENDED_UPGRADE = "org/squiddev/cctweaks/api/turtle/IExtendedTurtleUpgrade";
-	private static final int SLOT = 6;
 
 	@Override
 	public boolean matches(String className) {
-		return className.equals("dan200.computercraft.shared.turtle.core.TurtleBrain");
+		return className.equals("dan200.computercraft.shared.turtle.core.TurtleBrain") || className.equals("dan200.computercraft.shared.turtle.blocks.TileTurtle");
 	}
 
 	@Override
 	public ClassVisitor patch(String className, ClassVisitor delegate) throws Exception {
-		return new FindingVisitor(delegate,
-			new MethodInsnNode(INVOKEINTERFACE, "dan200/computercraft/api/turtle/ITurtleUpgrade", "getType", "()Ldan200/computercraft/api/turtle/TurtleUpgradeType;", true),
-			new FieldInsnNode(GETSTATIC, "dan200/computercraft/api/turtle/TurtleUpgradeType", "Peripheral", "Ldan200/computercraft/api/turtle/TurtleUpgradeType;"),
-			new JumpInsnNode(IF_ACMPNE, null)
-		) {
-			@Override
-			public void handle(InsnList nodes, MethodVisitor visitor) {
-				Label add = new Label();
+		if (className.equals("dan200.computercraft.shared.turtle.core.TurtleBrain")) {
+			return new FindingVisitor(delegate,
+				new MethodInsnNode(INVOKEINTERFACE, "dan200/computercraft/api/turtle/ITurtleUpgrade", "getType", "()Ldan200/computercraft/api/turtle/TurtleUpgradeType;", true),
+				new FieldInsnNode(GETSTATIC, "dan200/computercraft/api/turtle/TurtleUpgradeType", "Peripheral", "Ldan200/computercraft/api/turtle/TurtleUpgradeType;"),
+				new JumpInsnNode(IF_ACMPNE, null)
+			) {
+				@Override
+				public void handle(InsnList nodes, MethodVisitor visitor) {
+					inject(visitor, nodes, 6);
+				}
+			}.onMethod("updatePeripherals").once().mustFind();
+		} else {
+			return new FindingVisitor(delegate,
+				new MethodInsnNode(INVOKEINTERFACE, "dan200/computercraft/api/turtle/ITurtleUpgrade", "getType", "()Ldan200/computercraft/api/turtle/TurtleUpgradeType;", true),
+				new FieldInsnNode(GETSTATIC, "dan200/computercraft/api/turtle/TurtleUpgradeType", "Peripheral", "Ldan200/computercraft/api/turtle/TurtleUpgradeType;"),
+				new JumpInsnNode(IF_ACMPNE, null)
+			) {
+				@Override
+				public void handle(InsnList nodes, MethodVisitor visitor) {
+					inject(visitor, nodes, 2);
+				}
+			}.onMethod("hasPeripheralUpgradeOnSide").once().mustFind();
+		}
+	}
 
-				JumpInsnNode jump = (JumpInsnNode) nodes.getLast();
-				nodes.remove(jump);
-				Label exit = jump.label.getLabel();
+	private static void inject(MethodVisitor visitor, InsnList nodes, int slot) {
+		Label add = new Label();
 
-				// if(upgrade.getType() == TurtleUpgradeType.Peripheral)
-				nodes.accept(visitor);
-				visitor.visitJumpInsn(IF_ACMPEQ, add);
+		JumpInsnNode jump = (JumpInsnNode) nodes.getLast();
+		nodes.remove(jump);
+		Label exit = jump.label.getLabel();
 
-				// if(upgrade instanceof EXTENDED_UPGRADE && upgrade.alsoPeripheral())
-				visitor.visitVarInsn(ALOAD, SLOT);
-				visitor.visitTypeInsn(INSTANCEOF, EXTENDED_UPGRADE);
-				visitor.visitJumpInsn(IFEQ, exit);
+		// if(upgrade.getType() == TurtleUpgradeType.Peripheral)
+		nodes.accept(visitor);
+		visitor.visitJumpInsn(IF_ACMPEQ, add);
 
-				visitor.visitVarInsn(ALOAD, SLOT);
-				visitor.visitTypeInsn(CHECKCAST, EXTENDED_UPGRADE);
-				visitor.visitMethodInsn(INVOKEINTERFACE, EXTENDED_UPGRADE, "alsoPeripheral", "()Z", true);
-				visitor.visitJumpInsn(IFEQ, exit);
+		// if(upgrade instanceof EXTENDED_UPGRADE && upgrade.alsoPeripheral())
+		visitor.visitVarInsn(ALOAD, slot);
+		visitor.visitTypeInsn(INSTANCEOF, EXTENDED_UPGRADE);
+		visitor.visitJumpInsn(IFEQ, exit);
 
-				visitor.visitLabel(add);
-			}
-		}.onMethod("updatePeripherals").once().mustFind();
+		visitor.visitVarInsn(ALOAD, slot);
+		visitor.visitTypeInsn(CHECKCAST, EXTENDED_UPGRADE);
+		visitor.visitMethodInsn(INVOKEINTERFACE, EXTENDED_UPGRADE, "alsoPeripheral", "()Z", true);
+		visitor.visitJumpInsn(IFEQ, exit);
+
+		visitor.visitLabel(add);
 	}
 }

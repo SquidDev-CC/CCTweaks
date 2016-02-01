@@ -6,8 +6,6 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.client.IItemRenderer;
-import net.minecraftforge.client.MinecraftForgeClient;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.Registry;
@@ -70,28 +68,10 @@ public class TurtleUpgradeToolHost implements ITurtleUpgrade {
 		return player;
 	}
 
-	@SideOnly(Side.CLIENT)
-	public IIcon defaultIcon() {
-		return Registry.itemToolHost.getIconFromDamage(0);
-	}
-
 	@Override
+	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(ITurtleAccess turtle, TurtleSide side) {
-		ItemStack item;
-		IIcon icon;
-
-		// Sometimes the turtle is null (if in the inventory).
-		// Also, we should only render if the icon is an item - not a block and if there isn't a custom renderer
-		if (
-			turtle != null && (item = getItem(turtle)) != null &&
-				MinecraftForgeClient.getItemRenderer(item, IItemRenderer.ItemRenderType.INVENTORY) == null &&
-				!item.getItem().requiresMultipleRenderPasses() &&
-				item.getItemSpriteNumber() == 1 && (icon = item.getItem().getIcon(item, 0)) != null
-			) {
-			return icon;
-		}
-
-		return defaultIcon();
+		return Registry.itemToolHost.getIconFromDamage(0);
 	}
 
 	@Override

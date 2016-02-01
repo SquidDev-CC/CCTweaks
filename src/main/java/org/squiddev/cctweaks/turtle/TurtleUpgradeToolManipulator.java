@@ -1,5 +1,7 @@
 package org.squiddev.cctweaks.turtle;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.api.turtle.ITurtleUpgrade;
@@ -11,10 +13,12 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.turtle.IExtendedTurtleUpgrade;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.Registry;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implements IExtendedTurtleUpgrade {
 	@Override
 	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
+		DebugLogger.debug("Creating peripherals with " + players.size() + " players");
 		return new ToolHostPeripheral(turtle, getPlayer(turtle));
 	}
 
@@ -39,7 +43,8 @@ public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implemen
 	}
 
 	@Override
-	public IIcon defaultIcon() {
+	@SideOnly(Side.CLIENT)
+	public IIcon getIcon(ITurtleAccess turtle, TurtleSide side) {
 		return Registry.itemToolHost.getIconFromDamage(1);
 	}
 
