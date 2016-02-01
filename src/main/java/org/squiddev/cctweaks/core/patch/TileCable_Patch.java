@@ -5,6 +5,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
@@ -125,6 +126,11 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	}
 
 	@Override
+	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+		return oldState.getBlock() != newState.getBlock();
+	}
+
+	@Override
 	public void validate() {
 		super.validate();
 		if (!worldObj.isRemote) {
@@ -153,7 +159,8 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 		// TODO: Break the modem if we change
 		if (type == PeripheralType.WiredModemWithCable) {
 			if (getModem().updateEnabled()) {
-				modem.getAttachedNetwork().invalidateNode(modem);
+				INetworkController controller = getModem().getAttachedNetwork();
+				if (controller != null) controller.invalidateNode(modem);
 				updateAnim();
 			}
 		}
@@ -181,7 +188,8 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", periphName));
 					}
 
-					getModem().getAttachedNetwork().invalidateNode(modem);
+					INetworkController controller = getModem().getAttachedNetwork();
+					if (controller != null) controller.invalidateNode(modem);
 					updateAnim();
 					return true;
 				}
@@ -287,13 +295,19 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	public void networkChanged() {
 		getCable().updateConnections();
 		if (!worldObj.isRemote) {
-			getModem().getAttachedNetwork().invalidateNode(modem);
+			INetworkController controller = getModem().getAttachedNetwork();
+			if (controller != null) controller.invalidateNode(modem);
 		}
 	}
 
 	@Deprecated
 	private void dispatchPacket(Packet packet) {
-		getModem().getAttachedNetwork().transmitPacket(modem, packet);
+		INetworkController controller = getModem().getAttachedNetwork();
+		if (controller != null) {
+			controller.transmitPacket(modem, packet);
+		} else {
+			DebugLogger.warn("Discarding packet as not connected to a network");
+		}
 	}
 
 	@Deprecated

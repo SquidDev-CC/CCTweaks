@@ -99,7 +99,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
 		list.add(StatCollector.translateToLocal("gui.tooltip.cctweaks.computerUpgrade.normal"));
 	}

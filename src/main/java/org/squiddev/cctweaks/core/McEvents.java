@@ -126,6 +126,7 @@ public class McEvents {
 	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event) {
 		if (event.phase == TickEvent.Phase.START) {
+			DelayedTasks.update();
 			synchronized (clientQueue) {
 				Runnable scheduled;
 				while ((scheduled = clientQueue.poll()) != null) {

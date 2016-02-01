@@ -53,11 +53,9 @@ dependencies {
 	// For 1.7.10 but including anyway
 	provided "CoFHLib:CoFHLib:[1.7.10]1.0.1-159-dev"
 	provided "net.industrial-craft:industrialcraft-2:2.+:api"
-	provided "com.austinv11.collectiveframework:CollectiveFramework:1.+:deobf"
-	provided "com.austinv11.peripheralsplusplus:PeripheralsPlusPlus:1.+:deobf"
 	provided "openperipheral:OpenPeripheralCore-API:3.2"
 
-	shade('org.squiddev:luaj.luajc:1.0.1') {
+	shade('org.squiddev:luaj.luajc:1.0.3') {
 		// We provide a custom LuaJ source with ComputerCraft
 		exclude group: 'org.ow2.asm'
 		exclude group: 'org.luaj'

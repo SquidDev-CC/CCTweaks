@@ -11,6 +11,7 @@ buildscript {
 		classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
 	}
 }
+
 plugins {
 	id 'com.matthewprenger.cursegradle' version '1.0.5'
 	id "com.jfrog.bintray" version "1.4"
@@ -95,6 +96,6 @@ test {
 
 gradle.projectsEvaluated {
 	tasks.withType(JavaCompile) {
-		options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+		options.compilerArgs << "-Xlint"
 	}
 }

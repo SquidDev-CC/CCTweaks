@@ -11,13 +11,15 @@ import org.squiddev.cctweaks.core.asm.binary.BinaryUtils;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.patcher.Logger;
-import org.squiddev.patcher.transformer.*;
+import org.squiddev.patcher.transformer.ClassMerger;
+import org.squiddev.patcher.transformer.ClassReplacer;
+import org.squiddev.patcher.transformer.IPatcher;
+import org.squiddev.patcher.transformer.ISource;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 
 public class ASMTransformer implements IClassTransformer {
-	protected final TransformationChain patches = new TransformationChain();
+	protected final CustomChain patches = new CustomChain();
 
 	protected void add(Object[] patchers) {
 		for (Object patcher : patchers) {
@@ -32,11 +34,11 @@ public class ASMTransformer implements IClassTransformer {
 			This probably includes *_Rewrite as well as many of the binary handlers as only exist
 			because they need to stub classes that we patch anyway.
 		 */
+		patches.addPatchFile("org.luaj.vm2.lib.DebugLib");
+		patches.addPatchFile("org.luaj.vm2.lib.StringLib");
 
 		add(new Object[]{
 			// General stuff
-			new ClassReplaceSource("org.luaj.vm2.lib.DebugLib"),
-			new ClassReplaceSource("org.luaj.vm2.lib.StringLib"),
 			new ClassReplacer(
 				"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
 				"org.squiddev.cctweaks.core.patch.TurtleRefuelCommand_Rewrite"
@@ -103,6 +105,15 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.peripheral.printer.PrinterPeripheral",
 				"org.squiddev.cctweaks.core.patch.targeted.PrinterPeripheral_Patch"
 			),
+
+			// Pocket upgrades
+			new PocketUpgrades(),
+			new ClassMerger(
+				"dan200.computercraft.shared.pocket.items.ItemPocketComputer",
+				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"
+			),
+			new TurtleBrainAlsoPeripheral(),
+			new AddAdditionalData(),
 		});
 		BinaryUtils.inject(patches);
 
@@ -149,7 +160,9 @@ public class ASMTransformer implements IClassTransformer {
 		if (!loadedCC && className.startsWith("dan200.computercraft.")) checkCC();
 
 		try {
-			return patches.transform(className, bytes);
+			byte[] rewritten = patches.transform(className, bytes);
+			if (rewritten != bytes) writeDump(className, bytes);
+			return rewritten;
 		} catch (Exception e) {
 			String contents = "Cannot patch " + className + ", falling back to default";
 			if (message != null) {
@@ -171,5 +184,30 @@ public class ASMTransformer implements IClassTransformer {
 		StringWriter writer = new StringWriter();
 		new ClassReader(bytes).accept(new TraceClassVisitor(new PrintWriter(writer)), 0);
 		DebugLogger.debug("Dump for " + className + "\n" + writer.toString());
+	}
+
+	public void writeDump(String className, byte[] bytes) {
+		if (Config.Testing.dumpAsm) {
+			File file = new File(TweaksLoadingPlugin.dump, className.replace('.', '/') + ".class");
+			File directory = file.getParentFile();
+			if (directory.exists() || directory.mkdirs()) {
+				try {
+					OutputStream stream = new FileOutputStream(file);
+					try {
+						stream.write(bytes);
+					} catch (IOException e) {
+						DebugLogger.error("Cannot write " + file, e);
+					} finally {
+						stream.close();
+					}
+				} catch (FileNotFoundException e) {
+					DebugLogger.error("Cannot write " + file, e);
+				} catch (IOException e) {
+					DebugLogger.error("Cannot write " + file, e);
+				}
+			} else {
+				DebugLogger.error("Cannot create folder for " + file);
+			}
+		}
 	}
 }

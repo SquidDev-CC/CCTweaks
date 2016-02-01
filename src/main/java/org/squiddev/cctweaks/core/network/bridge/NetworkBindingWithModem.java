@@ -30,7 +30,7 @@ public class NetworkBindingWithModem extends NetworkBinding {
 		}
 
 		@Override
-		protected BasicModemPeripheral createPeripheral() {
+		protected BasicModemPeripheral<?> createPeripheral() {
 			return new BindingModemPeripheral(this);
 		}
 	}

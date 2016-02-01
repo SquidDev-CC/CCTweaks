@@ -24,8 +24,8 @@ import static org.objectweb.asm.Opcodes.*;
  * to make sure it doesn't break anything
  */
 public class PatchOpenPeripheralAdapter implements IPatcher {
-	public static final String CLASS_NAME = "openperipheral.interfaces.cc.wrappers.AdapterPeripheral";
-	public static final String CLASS_TYPE = CLASS_NAME.replace('.', '/');
+	private static final String CLASS_NAME = "openperipheral.interfaces.cc.wrappers.AdapterPeripheral";
+	private static final String CLASS_TYPE = CLASS_NAME.replace('.', '/');
 
 	@Override
 	public boolean matches(String className) {

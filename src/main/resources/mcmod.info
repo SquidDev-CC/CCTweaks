@@ -6,7 +6,7 @@
 		"version": "${mod_version}",
 		"mcversion": "${mc_version}",
 		"url": "https://github.com/SquidDev-CC/CC-Tweaks",
-		"credits": "Dan200, Forge team",
+		"credits": "Dan200, Forge team, Luaj.org",
 		"authorList": [
 			"SquidDev",
 			"ElvishJerricco"

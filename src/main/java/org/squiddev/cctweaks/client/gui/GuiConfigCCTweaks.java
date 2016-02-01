@@ -16,6 +16,7 @@ public class GuiConfigCCTweaks extends GuiConfig {
 		super(screen, getConfigElements(), CCTweaks.ID, false, false, CCTweaks.NAME);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private static List<IConfigElement> getConfigElements() {
 		ArrayList<IConfigElement> elements = new ArrayList<IConfigElement>();
 		for (String category : Config.configuration.getCategoryNames()) {

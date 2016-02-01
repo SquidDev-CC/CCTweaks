@@ -64,7 +64,7 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean extraInfo) {

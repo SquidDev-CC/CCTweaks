@@ -1,30 +1,34 @@
-package org.squiddev.cctweaks.integration.peripheralspp;
+package org.squiddev.cctweaks.pocket;
 
-import com.austinv11.peripheralsplusplus.hooks.IPocketComputerUpgrade;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
+import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.IDataCard;
+import org.squiddev.cctweaks.api.pocket.IPocketAccess;
+import org.squiddev.cctweaks.api.pocket.IPocketRegistry;
+import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
 import org.squiddev.cctweaks.core.network.modem.DynamicPeripheralCollection;
+import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.utils.EntityPosition;
 
 import java.util.Map;
 
-public class PocketWirelessBinding implements IPocketComputerUpgrade {
+public class PocketWirelessBinding extends Module implements IPocketUpgrade {
 	@Override
-	public int getUpgradeID() {
-		return Config.Network.WirelessBridge.pocketId;
+	public ResourceLocation getUpgradeID() {
+		return new ResourceLocation("cctweaks:wirelessBridge");
 	}
 
 	@Override
@@ -38,25 +42,21 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 	}
 
 	@Override
-	public IPeripheral createPeripheral(Entity entity, ItemStack stack) {
-		return Config.Network.WirelessBridge.pocketEnabled ? new PocketBinding(new PocketAccess(entity, stack)).getModem().modem : null;
+	public IPeripheral createPeripheral(IPocketAccess access) {
+		return Config.Network.WirelessBridge.pocketEnabled ? new PocketBinding(access).getModem().modem : null;
 	}
 
 	@Override
-	public void update(Entity entity, ItemStack stack, IPeripheral peripheral) {
+	public void update(IPocketAccess access, IPeripheral peripheral) {
 		if (peripheral instanceof PocketBinding.PocketModemPeripheral) {
 			PocketBinding binding = ((PocketBinding.PocketModemPeripheral) peripheral).getBinding();
-
-			PocketAccess access = ((PocketAccess) binding.pocket);
-			access.entity = entity;
-			access.stack = stack;
 
 			binding.update(); // Update entity and save
 		}
 	}
 
 	@Override
-	public boolean onRightClick(World world, EntityPlayer entity, ItemStack itemStack, IPeripheral peripheral) {
+	public boolean onRightClick(World world, IPocketAccess access, IPeripheral peripheral) {
 		return false;
 	}
 
@@ -106,9 +106,9 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 		 * Custom modem that allows modifying bindings
 		 */
 		public class PocketModem extends BindingModem {
-			protected final DynamicPeripheralCollection<Integer> peripherals = new DynamicPeripheralCollection<Integer>() {
+			protected final DynamicPeripheralCollection<ResourceLocation> peripherals = new DynamicPeripheralCollection<ResourceLocation>() {
 				@Override
-				protected Map<Integer, IPeripheral> getPeripherals() {
+				protected Map<ResourceLocation, IPeripheral> getPeripherals() {
 					return pocket.getUpgrades();
 				}
 
@@ -124,7 +124,7 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 			}
 
 			@Override
-			protected BasicModemPeripheral createPeripheral() {
+			protected BasicModemPeripheral<?> createPeripheral() {
 				return new PocketModemPeripheral(this);
 			}
 		}
@@ -214,5 +214,17 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 				return PocketBinding.this;
 			}
 		}
+	}
+
+	@Override
+	public boolean canLoad() {
+		return Config.Network.WirelessBridge.pocketEnabled;
+	}
+
+	@Override
+	public void preInit() {
+		IPocketRegistry registry = CCTweaksAPI.instance().pocketRegistry();
+		registry.addUpgrade(this);
+		registry.addLegacyUpgrade(Config.Network.WirelessBridge.pocketId, this);
 	}
 }

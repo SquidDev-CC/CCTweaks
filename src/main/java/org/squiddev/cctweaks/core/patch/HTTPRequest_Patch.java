@@ -87,8 +87,8 @@ public class HTTPRequest_Patch {
 						}
 
 						if (headers != null) {
-							for (Map.Entry header : headers.entrySet()) {
-								connection.setRequestProperty((String) header.getKey(), (String) header.getValue());
+							for (Map.Entry<String, String> header : headers.entrySet()) {
+								connection.setRequestProperty(header.getKey(), header.getValue());
 							}
 						}
 

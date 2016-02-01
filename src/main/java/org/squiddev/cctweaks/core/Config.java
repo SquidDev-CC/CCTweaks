@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core;
 
 import net.minecraftforge.common.config.Configuration;
+import org.squiddev.cctweaks.core.lua.socket.AddressMatcher;
 import org.squiddev.configgen.*;
 
 import java.io.File;
@@ -16,6 +17,9 @@ public final class Config {
 	public static Configuration configuration;
 	public static Set<String> turtleDisabledActions;
 	public static Set<String> globalWhitelist;
+
+	public static AddressMatcher socketWhitelist;
+	public static AddressMatcher socketBlacklist;
 
 	public static void init(File file) {
 		ConfigLoader.init(file);
@@ -41,6 +45,9 @@ public final class Config {
 
 		Network.WirelessBridge.crafting &= Network.WirelessBridge.enabled;
 		Network.WirelessBridge.turtleEnabled &= Network.WirelessBridge.enabled;
+
+		socketWhitelist = new AddressMatcher(APIs.Socket.whitelist);
+		socketBlacklist = new AddressMatcher(APIs.Socket.blacklist);
 	}
 
 	/**
@@ -139,6 +146,12 @@ public final class Config {
 			public static boolean enabled;
 
 			/**
+			 * Enable the Tool Manipulator
+			 */
+			@DefaultBoolean(true)
+			public static boolean advanced;
+
+			/**
 			 * Enable crafting the Tool Host
 			 */
 			@DefaultBoolean(true)
@@ -152,6 +165,14 @@ public final class Config {
 			@RequiresRestart
 			@Range(min = 0)
 			public static int upgradeId;
+
+			/**
+			 * Upgrade Id for Tool Manipulator
+			 */
+			@DefaultInt(333)
+			@RequiresRestart
+			@Range(min = 0)
+			public static int advancedUpgradeId;
 
 			/**
 			 * The dig speed factor for tool hosts.
@@ -272,6 +293,85 @@ public final class Config {
 	}
 
 	/**
+	 * Custom APIs for computers
+	 */
+	public static final class APIs {
+		/**
+		 * TCP connections from the socket API
+		 */
+		public static final class Socket {
+			/**
+			 * Enable TCP connections.
+			 * When enabled, the socket API becomes available on
+			 * all computers.
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart(mc = false, world = true)
+			public static boolean enabled;
+
+			/**
+			 * Blacklisted domain names.
+			 *
+			 * Entries are either domain names (www.example.com) or IP addresses in
+			 * string format (10.0.0.3), optionally in CIDR notation to make it easier
+			 * to define address ranges (1.0.0.0/8). Domains are resolved to their
+			 * actual IP once on startup, future requests are resolved and compared
+			 * to the resolved addresses.
+			 */
+			@DefaultString({"127.0.0.0/8", "10.0.0.0/8", "192.168.0.0/16", "172.16.0.0/12"})
+			public static String[] blacklist;
+
+			/**
+			 * Whitelisted domain names.
+			 * If something is mentioned in both the blacklist and whitelist then
+			 * the blacklist takes priority.
+			 */
+			public static String[] whitelist;
+
+			/**
+			 * Maximum TCP connections a computer can have at any time
+			 */
+			@DefaultInt(4)
+			@Range(min = 1)
+			public static int maxTcpConnections;
+
+			/**
+			 * Number of threads to use for processing name lookups.
+			 */
+			@DefaultInt(4)
+			@Range(min = 1)
+			@RequiresRestart
+			public static int threads;
+
+			/**
+			 * Maximum number of characters to read from a socket.
+			 */
+			@DefaultInt(2048)
+			@Range(min = 1)
+			public static int maxRead;
+		}
+
+		/**
+		 * Basic data manipulation
+		 */
+		public static final class Data {
+			/**
+			 * If the data API is enabled
+			 */
+			@DefaultBoolean(true)
+			@RequiresRestart(mc = false, world = true)
+			public static boolean enabled;
+
+			/**
+			 * Maximum number of bytes to process.
+			 * The default is 1MiB
+			 */
+			@DefaultInt(1048576)
+			public static int limit;
+		}
+	}
+
+	/**
 	 * Only used when testing and developing the mod.
 	 * Nothing to see here, move along...
 	 */
@@ -309,5 +409,11 @@ public final class Config {
 		 */
 		@DefaultBoolean(false)
 		public static boolean extendedControllerValidation;
+
+		/**
+		 * Dump the modified class files to asm/CCTweaks
+		 */
+		@DefaultBoolean(false)
+		public static boolean dumpAsm;
 	}
 }

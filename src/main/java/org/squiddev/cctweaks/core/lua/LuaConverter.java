@@ -94,7 +94,7 @@ public class LuaConverter {
 			Map<Object, Object> newMap = new HashMap<Object, Object>();
 			tables.put(value, newMap);
 
-			Map map = (Map) value;
+			Map<?, ?> map = (Map) value;
 
 			for (Object key : map.keySet()) {
 				newMap.put(toString(key, tables), toString(map.get(key), tables));
@@ -130,5 +130,15 @@ public class LuaConverter {
 		}
 
 		return new String(chars);
+	}
+
+	public static byte[] toBytes(String string) {
+		byte[] chars = new byte[string.length()];
+
+		for (int i = 0; i < chars.length; ++i) {
+			// chars[i] = (char) (bytes[start + i] & 255);
+		}
+
+		return chars;
 	}
 }
