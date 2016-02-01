@@ -2,6 +2,7 @@ item.cctweaks.computerUpgrade.name=Computer Upgrade
 item.cctweaks.debugger.name=Debug Wand
 item.cctweaks.dataCard.name=Data Card
 item.cctweaks.toolHost.name=Tool Host
+item.cctweaks.toolHost.advanced.name=Tool Manipulator
 
 tile.cctweaks.networkedBlock.wirelessBridge.name=Wireless Bridge
 tile.cctweaks.networkedBlock.wiredModem.name=Wired Modem
@@ -19,7 +20,8 @@ chat.cctweaks.data.messages.Stored=Settings stored
 chat.cctweaks.data.messages.Cleared=Settings cleared
 
 turtle.cctweaks.wirelessBridge.adjective=Networked
-turtle.cctweaks.toolHost.adjective=Ambidextrous
+turtle.cctweaks.toolHost.adjective=Gripping
+turtle.cctweaks.toolHost.advanced.adjective=Manipulative
 pocket.cctweaks.wirelessBridge.adjective=Networked
 
 gui.config.cctweaks.computer=Computer
@@ -37,10 +39,12 @@ gui.config.cctweaks.turtle.euRefuelAmount=EU Refuel Amount
 gui.config.cctweaks.turtle.disabledActions=Disabled Actions
 gui.config.cctweaks.turtle.funNames=Fun names
 
-gui.config.cctweaks.turtle.toolhost=Toolhost
+gui.config.cctweaks.turtle.toolhost=Tool Host
 gui.config.cctweaks.turtle.toolhost.enabled=Enabled
+gui.config.cctweaks.turtle.toolhost.advanced=Enabled Advanced
 gui.config.cctweaks.turtle.toolhost.crafting=Enable Crafting
 gui.config.cctweaks.turtle.toolhost.upgradeId=Upgrade ID
+gui.config.cctweaks.turtle.toolhost.advancedUpgradeId=Advanced Upgrade ID
 gui.config.cctweaks.turtle.toolhost.digFactor=Dig speed factor
 
 gui.config.cctweaks.network=Network

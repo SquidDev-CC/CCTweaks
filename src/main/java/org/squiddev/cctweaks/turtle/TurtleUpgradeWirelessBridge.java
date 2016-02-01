@@ -55,7 +55,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 
 	@Override
 	public ItemStack getCraftingItem() {
-		return Config.Network.WirelessBridge.turtleEnabled ? new ItemStack(Registry.blockNetworked, 0) : null;
+		return Config.Network.WirelessBridge.turtleEnabled ? new ItemStack(Registry.blockNetworked, 1, 0) : null;
 	}
 
 	@Override
@@ -302,6 +302,15 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			}
 
 			@Override
+			public boolean equals(IPeripheral other) {
+				if (other == this) return true;
+				if (!(other instanceof TurtleModemPeripheral)) return false;
+
+				TurtleModemPeripheral otherModem = (TurtleModemPeripheral) other;
+				return otherModem.getTurtle().equals(otherModem.getTurtle());
+			}
+
+			@Override
 			public synchronized void attach(IComputerAccess computer) {
 				TurtleBinding.this.connect();
 				super.attach(computer);
@@ -311,6 +320,10 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 			public synchronized void detach(IComputerAccess computer) {
 				super.detach(computer);
 				TurtleBinding.this.destroy();
+			}
+
+			public ITurtleAccess getTurtle() {
+				return turtle;
 			}
 
 			@Override
