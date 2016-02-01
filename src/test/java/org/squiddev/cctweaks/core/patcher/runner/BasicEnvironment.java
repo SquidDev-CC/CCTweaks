@@ -54,6 +54,11 @@ public class BasicEnvironment implements IComputerEnvironment {
 	}
 
 	@Override
+	public String getHostString() {
+		return "CCTweaks test runner";
+	}
+
+	@Override
 	public IMount createResourceMount(String domain, String subPath) {
 		subPath = "assets/" + domain + "/" + subPath;
 
