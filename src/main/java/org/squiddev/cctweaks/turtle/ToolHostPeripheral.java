@@ -120,7 +120,6 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 
 	public Object[] doUse(DelayedTask task, EnumFacing direction, boolean sneak, int duration) throws LuaException, InterruptedException {
 		player.updateInformation(direction);
-		player.posY += 1.5;
 		player.loadWholeInventory();
 		player.setSneaking(sneak);
 
