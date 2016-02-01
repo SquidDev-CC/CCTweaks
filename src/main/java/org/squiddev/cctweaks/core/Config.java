@@ -415,5 +415,11 @@ public final class Config {
 		 */
 		@DefaultBoolean(false)
 		public static boolean extendedControllerValidation;
+
+		/**
+		 * Dump the modified class files to asm/CCTweaks
+		 */
+		@DefaultBoolean(false)
+		public static boolean dumpAsm;
 	}
 }

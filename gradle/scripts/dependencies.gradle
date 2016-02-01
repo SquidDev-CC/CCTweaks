@@ -59,7 +59,7 @@ dependencies {
 	packaged "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
 	packaged "openperipheral:OpenPeripheralCore-API:${project.op_version}"
 
-	shade('org.squiddev:luaj.luajc:1.0.1') {
+	shade('org.squiddev:luaj.luajc:1.0.3') {
 		// We provide a custom LuaJ source with ComputerCraft
 		exclude group: 'org.ow2.asm'
 		exclude group: 'org.luaj'

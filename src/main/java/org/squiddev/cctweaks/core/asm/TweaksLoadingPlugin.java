@@ -8,6 +8,7 @@ import cpw.mods.fml.relauncher.FMLInjectionData;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.io.File;
 import java.util.Arrays;
@@ -17,11 +18,17 @@ import java.util.Map;
 @IFMLLoadingPlugin.MCVersion("${mc_version}")
 public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
 	public static File minecraftDir;
+	public static File dump;
 
 	public TweaksLoadingPlugin() {
 		if (minecraftDir == null) {
 			minecraftDir = (File) FMLInjectionData.data()[6];
 			Config.init(new File(new File(minecraftDir, "config"), CCTweaks.ID + ".cfg"));
+
+			dump = new File(new File(TweaksLoadingPlugin.minecraftDir, "asm"), CCTweaks.NAME);
+			if (Config.Testing.dumpAsm && !dump.exists() && !dump.mkdirs()) {
+				DebugLogger.error("Cannot create ASM dump folder");
+			}
 		}
 	}
 

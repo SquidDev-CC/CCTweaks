@@ -264,6 +264,11 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 	}
 
 	@Override
+	public int hashCode() {
+		return access.hashCode();
+	}
+
+	@Override
 	public boolean equals(IPeripheral other) {
 		return equals((Object) other);
 	}

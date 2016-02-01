@@ -67,6 +67,7 @@ gui.config.cctweaks.testing.debug=Debug Logging
 gui.config.cctweaks.testing.debugItems=Debug Items
 gui.config.cctweaks.testing.deprecatedWarnings=Deprecated Warnings
 gui.config.cctweaks.testing.extendedControllerValidation=Extended Controller Validation
+gui.config.cctweaks.testing.dumpAsm=Dump ASM
 
 gui.config.cctweaks.misc=Miscellaneous
 gui.config.cctweaks.misc.monitorLight=Monitor Light
