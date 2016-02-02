@@ -116,14 +116,14 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 	}
 
 	public Object[] doUse(DelayedTask task, int direction, boolean sneak, int duration) throws LuaException, InterruptedException {
-		player.updateInformation(direction);
+		player.updateInformation(access, direction);
 		player.posY += 1.5;
-		player.loadWholeInventory();
+		player.loadWholeInventory(access);
 		player.setSneaking(sneak);
 
 		ForgeDirection fDirection = ForgeDirection.VALID_DIRECTIONS[direction];
 		MovingObjectPosition hit = findHit(fDirection, 0.65);
-		ItemStack stack = player.getItem();
+		ItemStack stack = player.getItem(access);
 		World world = player.worldObj;
 
 		try {
@@ -175,7 +175,7 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 			}
 		} finally {
 			player.clearItemInUse();
-			player.unloadWholeInventory();
+			player.unloadWholeInventory(access);
 			player.setSneaking(false);
 		}
 
