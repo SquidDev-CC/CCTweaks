@@ -113,7 +113,7 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return ((BlockNetworkedType) state.getValue(TYPE)).ordinal();
+		return state.getValue(TYPE).ordinal();
 	}
 
 	@Override

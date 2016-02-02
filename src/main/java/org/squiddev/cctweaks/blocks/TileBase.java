@@ -74,7 +74,7 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	}
 
 	@Override
-	public final Packet getDescriptionPacket() {
+	public final Packet<?> getDescriptionPacket() {
 		NBTTagCompound tag = new NBTTagCompound();
 		return writeDescription(tag) ? new S35PacketUpdateTileEntity(pos, 0, tag) : null;
 	}

@@ -94,7 +94,7 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return ((BlockDebugType) state.getValue(TYPE)).ordinal();
+		return state.getValue(TYPE).ordinal();
 	}
 
 	@Override

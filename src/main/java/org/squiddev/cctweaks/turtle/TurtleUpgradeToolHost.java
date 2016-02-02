@@ -42,10 +42,6 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 		return null;
 	}
 
-	public static ItemStack getItem(ITurtleAccess turtle) {
-		return turtle == null ? null : turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
-	}
-
 	public static ToolHostPlayer getPlayer(ITurtleAccess turtle) {
 		ToolHostPlayer player = players.get(turtle);
 		if (player == null) players.put(turtle, player = new ToolHostPlayer(turtle));

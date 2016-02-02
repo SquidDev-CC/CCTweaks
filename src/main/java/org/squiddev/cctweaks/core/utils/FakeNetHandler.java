@@ -118,6 +118,7 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes")
 	public void sendPacket(final Packet packet) {
 
 	}

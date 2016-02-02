@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.core.lua.DelayedTasks;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 
 import java.util.HashMap;

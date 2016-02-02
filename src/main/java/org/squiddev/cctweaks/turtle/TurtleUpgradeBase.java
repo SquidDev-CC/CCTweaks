@@ -57,7 +57,6 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 		return "turtle." + CCTweaks.RESOURCE_DOMAIN + "." + name + ".adjective";
 	}
 
-
 	@Override
 	public ItemStack getCraftingItem() {
 		return stack;

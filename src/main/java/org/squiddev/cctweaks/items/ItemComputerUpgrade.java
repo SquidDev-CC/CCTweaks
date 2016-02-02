@@ -53,7 +53,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 
 		// Set metadata
 		IBlockState state = world.getBlockState(position);
-		if (ComputerAccessor.tileCopy == null || (Boolean) state.getValue(BlockComputer.Properties.ADVANCED)) {
+		if (ComputerAccessor.tileCopy == null || state.getValue(BlockComputer.Properties.ADVANCED)) {
 			return false;
 		}
 
