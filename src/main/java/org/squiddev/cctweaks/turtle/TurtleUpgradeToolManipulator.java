@@ -13,7 +13,7 @@ import org.squiddev.cctweaks.core.registry.Registry;
 
 public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implements IExtendedTurtleUpgrade {
 	public TurtleUpgradeToolManipulator() {
-		super("toolManipulator", Config.Turtle.ToolHost.advancedUpgradeId, new ItemStack(Registry.itemToolHost, 1, 0));
+		super("toolManipulator", Config.Turtle.ToolHost.advancedUpgradeId, new ItemStack(Registry.itemToolHost, 1, 1));
 	}
 
 	@Override
@@ -29,11 +29,6 @@ public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implemen
 	@Override
 	public TurtleUpgradeType getType() {
 		return TurtleUpgradeType.Tool;
-	}
-
-	@Override
-	public ItemStack getCraftingItem() {
-		return new ItemStack(Registry.itemToolHost, 1, 1);
 	}
 
 	@Override

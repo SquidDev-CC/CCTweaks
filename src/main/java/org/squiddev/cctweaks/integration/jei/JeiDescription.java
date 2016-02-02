@@ -20,6 +20,21 @@ public final class JeiDescription {
 		if (stack.canLoad()) registerDescription(registry, new ItemStack(stack, meta));
 	}
 
+	public static void registerDescription(IModRegistry registry, ItemBase item) {
+		if (item.canLoad()) {
+			List<ItemStack> stacks = new ArrayList<ItemStack>();
+			item.getSubItems(null, null, stacks);
+
+			if (stacks.size() == 0) {
+				registerDescription(registry, new ItemStack(item));
+			} else {
+				for (ItemStack stack : stacks) {
+					registerDescription(registry, stack);
+				}
+			}
+		}
+	}
+
 	public static void registerDescription(IModRegistry registry, BlockBase<?> block) {
 		if (block.canLoad()) {
 			List<ItemStack> stacks = new ArrayList<ItemStack>();

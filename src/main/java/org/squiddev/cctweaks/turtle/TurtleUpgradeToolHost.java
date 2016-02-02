@@ -34,9 +34,9 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 
 		switch (verb) {
 			case Attack:
-				return getPlayer(turtle).attack(direction);
+				return getPlayer(turtle).attack(turtle, direction);
 			case Dig:
-				return getPlayer(turtle).dig(direction);
+				return getPlayer(turtle).dig(turtle, direction);
 		}
 
 		return null;
