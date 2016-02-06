@@ -20,7 +20,7 @@ public class JeiCCTweaks implements IModPlugin {
 	public void register(IModRegistry registry) {
 		registerGenericDescription(registry, Registry.itemComputerUpgrade);
 		registerGenericDescription(registry, Registry.itemDebugger);
-		registerGenericDescription(registry, Registry.itemToolHost);
+		registerDescription(registry, Registry.itemToolHost);
 		registerGenericDescription(registry, Registry.itemDataCard);
 
 		registerGenericDescription(registry, Registry.blockDebug);

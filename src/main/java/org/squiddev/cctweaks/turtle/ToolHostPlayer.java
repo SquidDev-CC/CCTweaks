@@ -28,7 +28,8 @@ import org.squiddev.cctweaks.core.utils.WorldPosition;
  * Handles various turtle actions.
  */
 public class ToolHostPlayer extends TurtlePlayer {
-	private final ITurtleAccess turtle;
+	private BlockPos coordinates;
+	private Vec3 positionVector;
 
 	private BlockPos digPosition;
 	private Block digBlock;
@@ -43,37 +44,36 @@ public class ToolHostPlayer extends TurtlePlayer {
 
 	public ItemStack itemInUse;
 
-	public final McEvents.IDropConsumer consumer = new McEvents.IDropConsumer() {
-		@Override
-		public void consumeDrop(ItemStack drop) {
-			ItemStack remainder = InventoryUtil.storeItems(drop, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
-			if (remainder != null) {
-				BlockPos position = getPlayerCoordinates();
-				WorldUtil.dropItemStack(remainder, worldObj, position, turtle.getDirection().getOpposite());
-			}
-		}
-	};
-
 	public ToolHostPlayer(ITurtleAccess turtle) {
 		super((WorldServer) turtle.getWorld());
-		this.turtle = turtle;
-
 		playerNetServerHandler = new FakeNetHandler(this);
 	}
 
-	public TurtleCommandResult attack(EnumFacing direction) {
-		updateInformation(direction);
+	public McEvents.IDropConsumer getConsumer(final ITurtleAccess turtle) {
+		return new McEvents.IDropConsumer() {
+			@Override
+			public void consumeDrop(ItemStack drop) {
+				ItemStack remainder = InventoryUtil.storeItems(drop, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
+				if (remainder != null) {
+					BlockPos position = turtle.getPosition();
+					WorldUtil.dropItemStack(remainder, worldObj, position, turtle.getDirection().getOpposite());
+				}
+			}
+		};
+	}
+
+	public TurtleCommandResult attack(ITurtleAccess turtle, EnumFacing direction) {
+		updateInformation(turtle, direction);
 
 		Vec3 rayDir = getLook(1.0f);
 		Vec3 rayStart = new Vec3(posX, posY, posZ);
 
 		Pair<Entity, Vec3> hit = WorldUtil.rayTraceEntities(turtle.getWorld(), rayStart, rayDir, 1.5);
-
 		if (hit != null) {
 			Entity hitEntity = hit.getLeft();
-			loadInventory(getItem());
+			loadInventory(getItem(turtle));
 
-			McEvents.addEntityConsumer(hitEntity, consumer);
+			McEvents.addEntityConsumer(hitEntity, getConsumer(turtle));
 			attackTargetEntityWithCurrentItem(hitEntity);
 			McEvents.removeEntityConsumer(hitEntity);
 
@@ -94,10 +94,10 @@ public class ToolHostPlayer extends TurtlePlayer {
 		currentDamageState = -1;
 	}
 
-	public TurtleCommandResult dig(EnumFacing direction) {
-		updateInformation(direction);
+	public TurtleCommandResult dig(ITurtleAccess turtle, EnumFacing direction) {
+		updateInformation(turtle, direction);
 
-		BlockPos pos = getPlayerCoordinates().offset(direction);
+		BlockPos pos = turtle.getPosition().offset(direction);
 		World world = turtle.getWorld();
 		Block block = world.getBlockState(pos).getBlock();
 
@@ -108,7 +108,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 				return TurtleCommandResult.failure("Unbreakable block detected");
 			}
 
-			loadInventory(getItem());
+			loadInventory(getItem(turtle));
 
 			ItemInWorldManager manager = theItemInWorldManager;
 			for (int i = 0; i < Config.Turtle.ToolHost.digFactor; i++) {
@@ -128,7 +128,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 
 					if (hardness >= 1) {
 						IWorldPosition position = new WorldPosition(world, pos);
-						McEvents.addBlockConsumer(position, consumer);
+						McEvents.addBlockConsumer(position, getConsumer(turtle));
 						manager.tryHarvestBlock(pos);
 						McEvents.removeBlockConsumer(position);
 
@@ -144,13 +144,9 @@ public class ToolHostPlayer extends TurtlePlayer {
 		return TurtleCommandResult.failure("Nothing to dig here");
 	}
 
-	public BlockPos getPlayerCoordinates() {
-		return turtle.getPosition();
-	}
-
 	@Override
 	public Vec3 getPositionVector() {
-		return turtle.getVisualPosition(0);
+		return positionVector;
 	}
 
 	@Override
@@ -175,26 +171,23 @@ public class ToolHostPlayer extends TurtlePlayer {
 		return super.unloadInventory(turtle);
 	}
 
-	public void loadInventory() {
-		loadInventory(getItem());
-	}
-
-	public void unloadInventory() {
-		unloadInventory(turtle);
+	public void loadInventory(ITurtleAccess turtle) {
+		loadInventory(getItem(turtle));
 	}
 
 	/**
 	 * Basically just {@link #getHeldItem()}
 	 */
-	public ItemStack getItem() {
+	public ItemStack getItem(ITurtleAccess turtle) {
 		return turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
 	}
 
 	/**
 	 * Update the player information
 	 */
-	public void updateInformation(EnumFacing direction) {
+	public void updateInformation(ITurtleAccess turtle, EnumFacing direction) {
 		BlockPos position = turtle.getPosition();
+		positionVector =turtle.getVisualPosition(0);
 
 		setPositionAndRotation(
 			position.getX() + 0.5 + 0.48 * direction.getFrontOffsetX(),
@@ -205,7 +198,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 		);
 	}
 
-	public void loadWholeInventory() {
+	public void loadWholeInventory(ITurtleAccess turtle) {
 		IInventory turtleInventory = turtle.getInventory();
 		int size = turtleInventory.getSizeInventory();
 		int largerSize = inventory.getSizeInventory();
@@ -218,7 +211,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 		}
 	}
 
-	public void unloadWholeInventory() {
+	public void unloadWholeInventory(ITurtleAccess turtle) {
 		IInventory turtleInventory = turtle.getInventory();
 		int size = turtleInventory.getSizeInventory();
 		int largerSize = inventory.getSizeInventory();
@@ -227,6 +220,8 @@ public class ToolHostPlayer extends TurtlePlayer {
 			ItemStack stack = inventory.getStackInSlot(i);
 			turtleInventory.setInventorySlotContents(i, stack == null || stack.stackSize <= 0 ? null : stack);
 		}
+
+		McEvents.IDropConsumer consumer = getConsumer(turtle);
 		for (int i = size; i < largerSize; i++) {
 			consumer.consumeDrop(inventory.getStackInSlot(i));
 		}
