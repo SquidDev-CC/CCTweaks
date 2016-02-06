@@ -1,62 +1,34 @@
 package org.squiddev.cctweaks.core.lua;
 
-import org.luaj.vm2.*;
-import org.luaj.vm2.compiler.LuaC;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
-import org.squiddev.luaj.luajc.JavaLoader;
-
-import java.io.IOException;
-import java.io.InputStream;
+import org.squiddev.luaj.luajc.CompileOptions;
+import org.squiddev.luaj.luajc.ErrorHandler;
+import org.squiddev.luaj.luajc.LuaJC;
+import org.squiddev.luaj.luajc.analysis.ProtoInfo;
 
 /**
- * A version of LuaJC that falls
+ * A version of LuaJC that falls back to normal Lua interpretation
  */
-public class FallbackLuaJC implements LoadState.LuaCompiler {
-	protected static FallbackLuaJC instance;
-
-	public static FallbackLuaJC getInstance() {
-		if (instance == null) {
-			instance = new FallbackLuaJC();
-		}
-
-		return instance;
-	}
-
+public final class FallbackLuaJC {
 	public static void install() {
-		LoadState.compiler = getInstance();
+		LuaJC.install(new CompileOptions(
+			CompileOptions.PREFIX,
+			CompileOptions.THRESHOLD,
+			Config.Computer.luaJCVerify,
+			handler
+		));
 	}
 
-	@Override
-	public LuaFunction load(InputStream stream, String name, LuaValue env) throws IOException {
-		Prototype p = LuaC.compile(stream, name);
-		String className = toStandardJavaClassName(name);
-		JavaLoader loader = new JavaLoader(env);
-		loader.verifySources = Config.Computer.luaJCVerify;
-		try {
-			return loader.load(p, className, name);
-		} catch (RuntimeException e) {
-			if (e.getMessage().length() > 1000 && !Config.Computer.luaJCVerify) {
-				e = new RuntimeException(e.getMessage().substring(0, 1000) + "...");
-			}
-
+	private static final ErrorHandler handler = new ErrorHandler() {
+		@Override
+		public void handleError(ProtoInfo info, Throwable throwable) {
 			DebugLogger.error(
-				"Could not compile " + name + ". Falling back to normal Lua.\n"
-					+ "Please report this at https://github.com/SquidDev/luaj.luajc/issues along with the following exception",
-				e
+				"There was an error when compiling " + info.loader.filename + info.name + ".\n" +
+					"Please report this error message to http://github.com/SquidDev/luaj.luajc\n" +
+					info.toString(),
+				throwable
 			);
-			return new LuaClosure(p, env);
 		}
-	}
-
-	private static String toStandardJavaClassName(String chunkName) {
-		String stub = chunkName.endsWith(".lua") ? chunkName.substring(0, chunkName.length() - 4) : chunkName;
-		String className = stub.replace('/', '.').replaceAll("[^a-zA-Z0-9_]", "_");
-		char c = className.charAt(0);
-		if (c != 95 && !Character.isJavaIdentifierStart(c)) {
-			className = "_" + className;
-		}
-
-		return className + "_LuaCompiled";
-	}
+	};
 }

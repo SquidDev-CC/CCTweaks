@@ -91,7 +91,8 @@ public final class Config {
 		public static int computerThreadTimeout;
 
 		/**
-		 * Compile Lua bytecode to Java bytecode
+		 * Compile Lua bytecode to Java bytecode.
+		 * This speeds up code execution.
 		 */
 		@DefaultBoolean(false)
 		@RequiresRestart(mc = false, world = true)
