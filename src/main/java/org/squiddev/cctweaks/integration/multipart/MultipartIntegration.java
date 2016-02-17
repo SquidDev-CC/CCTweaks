@@ -7,11 +7,13 @@ import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.MultipartRegistry;
 import mcmultipart.multipart.PartSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
@@ -30,7 +32,7 @@ import org.squiddev.cctweaks.integration.multipart.network.PartWirelessBridge;
 public class MultipartIntegration extends ModIntegration implements IClientModule {
 	public static final String MOD_NAME = "mcmultipart";
 
-	private final ItemCustomPart itemPart = new ItemCustomPart();
+	private Item itemPart;
 
 	public MultipartIntegration() {
 		super(MOD_NAME);
@@ -42,7 +44,10 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 	}
 
 	@Override
+	@Optional.Method(modid = MOD_NAME)
 	public void preInit() {
+		itemPart = new ItemCustomPart();
+
 		GameRegistry.registerItem(itemPart, "itemPart");
 		Helpers.twoWayCrafting(new ItemStack(Registry.blockNetworked, 1, 0), new ItemStack(itemPart, 1, 0));
 
