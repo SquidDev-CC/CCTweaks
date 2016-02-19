@@ -72,8 +72,8 @@ dependencies {
 
 	deployerJars "org.apache.maven.wagon:wagon-ftp:2.2"
 }
-sourceSets.main.compileClasspath += [configurations.packaged]
+sourceSets.main.compileClasspath += configurations.packaged
 
-idea.module.scopes.PROVIDED.plus += [configurations.packaged]
-eclipse.classpath.plusConfigurations += [configurations.packaged]
+idea.module.scopes.PROVIDED.plus += configurations.packaged
+eclipse.classpath.plusConfigurations += configurations.packaged
 

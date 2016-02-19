@@ -1,7 +1,6 @@
 package org.squiddev.cctweaks.turtle;
 
 import dan200.computercraft.api.lua.ILuaContext;
-import dan200.computercraft.api.lua.ILuaTask;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
@@ -20,9 +19,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.cctweaks.core.lua.DelayedTask;
 
 public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeripheral {
 	private final ITurtleAccess access;
@@ -41,31 +39,25 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 	@Override
 	public String[] getMethodNames() {
 		return new String[]{
-			"use", "useUp", "useDown",
+			"use", "useUp", "useDown"
 		};
 	}
 
 	@Override
 	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] args) throws LuaException, InterruptedException {
-		try {
-			switch (method) {
-				case 0:
-					return use(computer, context, InteractDirection.Forward, args);
-				case 1:
-					return use(computer, context, InteractDirection.Up, args);
-				case 2:
-					return use(computer, context, InteractDirection.Down, args);
-			}
-		} catch (LuaException e) {
-			throw e;
-		} catch (Exception e) {
-			DebugLogger.debug("Error in use", e);
-			throw new LuaException(e.toString());
+		switch (method) {
+			case 0:
+				return use(computer, context, InteractDirection.Forward, args);
+			case 1:
+				return use(computer, context, InteractDirection.Up, args);
+			case 2:
+				return use(computer, context, InteractDirection.Down, args);
 		}
 
 		return null;
 	}
 
+	//region Use
 	public Object[] use(IComputerAccess computer, ILuaContext context, InteractDirection direction, Object[] args) throws LuaException, InterruptedException {
 		final int duration;
 		final boolean sneak;
@@ -89,33 +81,15 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 
 		final int dir = direction.toWorldDir(access);
 
-		DelayedTask task = new DelayedTask() {
+		return new DelayedTask() {
 			@Override
 			public Object[] execute() throws LuaException {
-				try {
-					return doUse(this, dir, sneak, duration);
-				} catch (InterruptedException e) {
-					throw new LuaException("Terminated");
-				} catch (LuaException e) {
-					e.printStackTrace();
-					throw e;
-				} catch (Exception e) {
-					DebugLogger.error("Unknown error", e);
-					throw new LuaException(e.toString());
-				}
+				return doUse(this, dir, sneak, duration);
 			}
-		};
-		Object[] result = context.executeMainThreadTask(task);
-		if (task.delay > 0) CCTweaksAPI.instance().luaEnvironment().sleep(computer, context, task.delay);
-
-		return result;
+		}.execute(computer, context);
 	}
 
-	private abstract class DelayedTask implements ILuaTask {
-		public int delay = -1;
-	}
-
-	public Object[] doUse(DelayedTask task, int direction, boolean sneak, int duration) throws LuaException, InterruptedException {
+	public Object[] doUse(DelayedTask task, int direction, boolean sneak, int duration) throws LuaException {
 		player.updateInformation(access, direction);
 		player.posY += 1.5;
 		player.loadWholeInventory(access);
@@ -246,6 +220,8 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 
 		return null;
 	}
+	//endregion
+
 
 	@Override
 	public void attach(IComputerAccess computer) {
@@ -257,10 +233,7 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 
 	@Override
 	public boolean equals(Object other) {
-		if (other == this) return true;
-		if (!(other instanceof ToolHostPeripheral)) return false;
-
-		return access.equals(((ToolHostPeripheral) other).access);
+		return other == this || (other instanceof ToolHostPeripheral && access.equals(((ToolHostPeripheral) other).access));
 	}
 
 	@Override
