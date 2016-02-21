@@ -17,6 +17,7 @@ import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.registry.Registry;
+import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.cctweaks.integration.multipart.PartSided;
 
 import java.util.Arrays;
@@ -24,12 +25,12 @@ import java.util.List;
 
 public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHost, IPeripheralHost {
 	public static final AxisAlignedBB[] BOUNDS = new AxisAlignedBB[]{
-		new AxisAlignedBB(0.125, 0.0, 0.125, 0.875, 0.1875, 0.875),
-		new AxisAlignedBB(0.125, 0.8125, 0.125, 0.875, 1.0, 0.875),
-		new AxisAlignedBB(0.125, 0.125, 0.0, 0.875, 0.875, 0.1875),
-		new AxisAlignedBB(0.125, 0.125, 0.8125, 0.875, 0.875, 1.0),
-		new AxisAlignedBB(0.0, 0.125, 0.125, 0.1875, 0.875, 0.875),
-		new AxisAlignedBB(0.8125, 0.125, 0.125, 1.0, 0.875, 0.875),
+		new AxisAlignedBB(0.125, 0.0, 0.125, 0.875, 0.125, 0.875D),
+		new AxisAlignedBB(0.125, 0.875, 0.125, 0.875, 1.0, 0.875D),
+		new AxisAlignedBB(0.125, 0.125, 0.0, 0.875, 0.875, 0.125D),
+		new AxisAlignedBB(0.125, 0.125, 0.875, 0.875, 0.875, 1.0D),
+		new AxisAlignedBB(0.0, 0.125, 0.125, 0.125, 0.875, 0.875D),
+		new AxisAlignedBB(0.875, 0.125, 0.125, 1.0, 0.875, 0.875D),
 	};
 
 	private final NetworkBindingWithModem binding = new NetworkBindingWithModem(this);
@@ -49,7 +50,7 @@ public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHo
 
 	@Override
 	public ItemStack getStack() {
-		return new ItemStack(Registry.blockNetworked, 1, 0);
+		return new ItemStack(MultipartIntegration.itemPart, 1, 0);
 	}
 
 	@Override

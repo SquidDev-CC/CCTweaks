@@ -20,7 +20,7 @@ public class ItemCustomPart extends ItemMultiPart {
 	public String getUnlocalizedName(ItemStack stack) {
 		switch (stack.getItemDamage()) {
 			case 0:
-				return CCTweaks.RESOURCE_DOMAIN + ".networkedBlock.wirelessBridge";
+				return "tile." + CCTweaks.RESOURCE_DOMAIN + ".networkedBlock.wirelessBridge";
 		}
 		return super.getUnlocalizedName(stack);
 	}

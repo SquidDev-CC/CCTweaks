@@ -32,7 +32,7 @@ import org.squiddev.cctweaks.integration.multipart.network.PartWirelessBridge;
 public class MultipartIntegration extends ModIntegration implements IClientModule {
 	public static final String MOD_NAME = "mcmultipart";
 
-	private Item itemPart;
+	public static Item itemPart;
 
 	public MultipartIntegration() {
 		super(MOD_NAME);
