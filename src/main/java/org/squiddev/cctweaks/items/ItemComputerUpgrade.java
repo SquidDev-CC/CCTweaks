@@ -10,12 +10,16 @@ import dan200.computercraft.shared.computer.items.ComputerItemFactory;
 import dan200.computercraft.shared.pocket.items.PocketComputerItemFactory;
 import dan200.computercraft.shared.turtle.blocks.TileTurtle;
 import dan200.computercraft.shared.turtle.items.TurtleItemFactory;
+import dan200.computercraft.shared.util.ImpostorRecipe;
 import dan200.computercraft.shared.util.ImpostorShapelessRecipe;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.RecipeSorter;
@@ -24,6 +28,7 @@ import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.BlockNotifyFlags;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.cctweaks.core.utils.InventoryUtils;
 
 import java.util.List;
 
@@ -83,6 +88,17 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		if (computerTile.getFamily() != ComputerFamily.Normal) {
 			return false;
 		}
+
+		if (!player.capabilities.isCreativeMode) {
+			int remaining = InventoryUtils.extractItems(player.inventory, Items.gold_ingot, 7);
+			if (remaining > 0) {
+				player.addChatMessage(new ChatComponentText("7 gold required. Need " + remaining + " more.").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_RED)));
+				return false;
+			}
+
+			player.inventoryContainer.detectAndSendChanges();
+		}
+
 		// If we set the turtle as moved, the destroy method won't drop the items
 		try {
 			ComputerAccessor.turtleTileMoved.setBoolean(computerTile, true);
@@ -143,12 +159,14 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 			));
 
 			// Turtle (Is is silly to include every possible upgrade so we just do the normal one)
-			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
-				TurtleItemFactory.create(-1, null, null, ComputerFamily.Advanced, null, null, 0, null, null),
-				new Object[]{
-					TurtleItemFactory.create(-1, null, null, ComputerFamily.Normal, null, null, 0, null, null),
-					stack
-				}
+			ItemStack gold = new ItemStack(Items.gold_ingot);
+			GameRegistry.addRecipe(new ImpostorRecipe(3, 3,
+				new ItemStack[]{
+					gold, gold, gold,
+					gold, TurtleItemFactory.create(-1, null, null, ComputerFamily.Normal, null, null, 0, null, null), gold,
+					gold, stack, gold,
+				},
+				TurtleItemFactory.create(-1, null, null, ComputerFamily.Advanced, null, null, 0, null, null)
 			));
 
 			// Non-wireless pocket computer

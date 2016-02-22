@@ -103,7 +103,7 @@ public class ItemDebugger extends ItemComputerAction {
 	protected boolean useGeneric(ItemStack stack, EntityPlayer player, TileEntity tile, int side) {
 		IWorldPosition position = new WorldPosition(tile);
 
-		player.addChatComponentMessage(
+		player.addChatMessage(
 			withColor("Tile: ", EnumChatFormatting.DARK_PURPLE)
 				.appendSibling(info(tile.getClass().getSimpleName() + ": " + tile.getBlockType().getLocalizedName()))
 		);
@@ -119,7 +119,7 @@ public class ItemDebugger extends ItemComputerAction {
 			INetworkNode node = NetworkAPI.registry().getNode(tile);
 			INetworkController controller = node != null ? node.getAttachedNetwork() : null;
 			if (controller != null) {
-				player.addChatComponentMessage(withColor("Network", EnumChatFormatting.LIGHT_PURPLE));
+				player.addChatMessage(withColor("Network", EnumChatFormatting.LIGHT_PURPLE));
 				Set<INetworkNode> nodes = controller.getNodesOnNetwork();
 				player.addChatMessage(withColor(" Size: ", EnumChatFormatting.AQUA).appendSibling(info(nodes.size() + " nodes")));
 

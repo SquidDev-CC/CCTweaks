@@ -29,12 +29,15 @@ import net.minecraft.block.Block;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.InventoryLargeChest;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 
@@ -206,6 +209,56 @@ public class InventoryUtils {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Extract n items
+	 *
+	 * @param inventory The inventory to extract from
+	 * @param item      The item to extract
+	 * @param count     The number to extract
+	 * @return Number of items remaining
+	 */
+	public static int extractItems(IInventory inventory, Item item, final int count) {
+		List<Integer> items = new ArrayList<Integer>();
+
+		int remaining = count;
+
+		int invSize = inventory.getSizeInventory();
+		for (int i = 0; i < invSize; i++) {
+			ItemStack stack = inventory.getStackInSlot(i);
+			if (stack != null && stack.getItem() == item && stack.stackSize > 0) {
+				items.add(i);
+
+				int size = stack.stackSize;
+				if (size > remaining) {
+					remaining = 0;
+				} else {
+					remaining -= stack.stackSize;
+				}
+
+				if (remaining <= 0) break;
+			}
+		}
+
+		if (remaining > 0) return remaining;
+
+		remaining = count;
+		for (int i : items) {
+			ItemStack stack = inventory.getStackInSlot(i);
+			if (stack.stackSize <= remaining) {
+				remaining -= stack.stackSize;
+				inventory.setInventorySlotContents(i, null);
+			} else {
+				stack.stackSize -= remaining;
+				inventory.setInventorySlotContents(i, stack);
+				remaining = 0;
+			}
+		}
+
+		inventory.markDirty();
+
+		return 0;
 	}
 
 }
