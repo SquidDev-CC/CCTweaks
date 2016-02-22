@@ -124,17 +124,12 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 						}
 						break;
 					case BLOCK: {
-						int x = hit.blockX;
-						int y = hit.blockY;
-						int z = hit.blockZ;
-						if (!world.getBlock(x, y, z).isAir(world, x, y, z)) {
-							if (ForgeEventFactory.onPlayerInteract(player, PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK, x, y, z, hit.sideHit, world).isCanceled()) {
-								return new Object[]{true, "block", "interact"};
-							}
+						// When right next to a block the hit direction gets inverted. Try both to see if one works.
+						Object[] result = tryUseOnBlock(world, hit, stack, hit.sideHit);
+						if (result != null) return result;
 
-							Object[] result = onPlayerRightClick(stack, x, y, z, hit.sideHit, hit.hitVec);
-							if (result != null) return result;
-						}
+						result = tryUseOnBlock(world, hit, stack, ForgeDirection.OPPOSITES[hit.sideHit]);
+						if (result != null) return result;
 					}
 				}
 			}
@@ -169,6 +164,22 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 		}
 
 		return new Object[]{false};
+	}
+
+	public Object[] tryUseOnBlock(World world, MovingObjectPosition hit, ItemStack stack, int side) {
+		int x = hit.blockX;
+		int y = hit.blockY;
+		int z = hit.blockZ;
+		if (!world.getBlock(x, y, z).isAir(world, x, y, z)) {
+			if (ForgeEventFactory.onPlayerInteract(player, PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK, x, y, z, side, world).isCanceled()) {
+				return new Object[]{true, "block", "interact"};
+			}
+
+			Object[] result = onPlayerRightClick(stack, x, y, z, side, hit.hitVec);
+			if (result != null) return result;
+		}
+
+		return null;
 	}
 
 	public MovingObjectPosition findHit(ForgeDirection facing, double range) {
