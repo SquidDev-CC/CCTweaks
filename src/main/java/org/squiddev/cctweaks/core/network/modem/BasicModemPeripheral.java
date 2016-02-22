@@ -25,9 +25,12 @@ import java.util.Map;
  */
 public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted, IBinaryHandler, IPeripheralWithArguments {
 	public final T modem;
+	private final int methodLength;
+	protected boolean changed;
 
 	public BasicModemPeripheral(T modem) {
 		this.modem = modem;
+		methodLength = super.getMethodNames().length;
 	}
 
 	@Override
@@ -69,8 +72,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 
 	@Override
 	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
-		String[] methods = super.getMethodNames();
-		switch (method - methods.length) {
+		switch (method - methodLength) {
 			case 0: { // getNamesRemote
 				int idx = 1;
 				Map<Object, Object> table = new HashMap<Object, Object>();
@@ -120,8 +122,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 
 	@Override
 	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, IArguments arguments) throws LuaException, InterruptedException {
-		String[] methods = super.getMethodNames();
-		if (method - methods.length == 4) {
+		if (method - methodLength == 4) {
 			// This is kinda ugly. Sorry!
 			String remoteName = arguments.getString(0);
 			String methodName = arguments.getString(1);
@@ -169,6 +170,17 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 
 		throw new LuaException("Expected string");
 
+	}
+
+	@Override
+	public synchronized boolean pollChanged() {
+		boolean changed = super.pollChanged();
+		if (this.changed) {
+			this.changed = false;
+			return true;
+		} else {
+			return changed;
+		}
 	}
 
 	@Override
