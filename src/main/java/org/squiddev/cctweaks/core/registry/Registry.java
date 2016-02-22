@@ -10,6 +10,7 @@ import org.squiddev.cctweaks.core.peripheral.PeripheralHostProvider;
 import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
 import org.squiddev.cctweaks.integration.IndustrialCraftIntegration;
+import org.squiddev.cctweaks.integration.PortalGunIntegration;
 import org.squiddev.cctweaks.integration.RedstoneFluxIntegration;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.cctweaks.integration.openperipheral.OpenPeripheralIntegration;
@@ -61,6 +62,7 @@ public final class Registry {
 		addModule(new RedstoneFluxIntegration());
 		addModule(new IndustrialCraftIntegration());
 		addModule(new PeripheralsPlusPlusIntegration());
+		addModule(new PortalGunIntegration());
 
 		addModule(new NetworkPlayerWatcher());
 		addModule(new RenderNetworkOverlay());

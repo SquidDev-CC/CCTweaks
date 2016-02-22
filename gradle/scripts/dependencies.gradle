@@ -34,6 +34,16 @@ repositories {
 		name = "CoFHLib"
 		artifactPattern "http://addons-origin.cursecdn.com/files/2235/558/[module]-[revision](.[ext])"
 	}
+
+	ivy {
+		name = "PortalGun"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2266/997/[module]-[revision](.[ext])"
+	}
+
+	ivy {
+		name = "IChunUtil"
+		artifactPattern "http://addons-origin.cursecdn.com/files/2233/5/[module]-[revision](.[ext])"
+	}
 }
 
 configurations {
@@ -56,6 +66,8 @@ dependencies {
 	packaged "com.austinv11.peripheralsplusplus:PeripheralsPlusPlus:${project.peripheralspp_version}:deobf"
 
 	packaged "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev"
+	packaged "curseMods:PortalGun:4.0.0-beta-6"
+	packaged "curseMods:iChunUtil:4.2.2"
 	packaged "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
 	packaged "openperipheral:OpenPeripheralCore-API:${project.op_version}"
 
@@ -74,6 +86,6 @@ dependencies {
 }
 sourceSets.main.compileClasspath += configurations.packaged
 
-idea.module.scopes.PROVIDED.plus += configurations.packaged
-eclipse.classpath.plusConfigurations += configurations.packaged
+idea.module.scopes.PROVIDED.plus += [configurations.packaged]
+eclipse.classpath.plusConfigurations += [configurations.packaged]
 

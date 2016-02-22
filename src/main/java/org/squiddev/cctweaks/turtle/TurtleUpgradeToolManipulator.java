@@ -19,7 +19,7 @@ public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implemen
 	@Override
 	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
 		DebugLogger.debug("Creating peripherals with " + players.size() + " players");
-		return new ToolHostPeripheral(turtle, getPlayer(turtle));
+		return new ToolHostPeripheral(turtle, getPlayer(turtle), side);
 	}
 
 	@Override

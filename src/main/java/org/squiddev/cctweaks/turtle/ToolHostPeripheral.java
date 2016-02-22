@@ -4,7 +4,7 @@ import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.api.turtle.ITurtleAccess;
+import dan200.computercraft.api.turtle.*;
 import dan200.computercraft.shared.turtle.core.InteractDirection;
 import dan200.computercraft.shared.util.WorldUtil;
 import net.minecraft.entity.Entity;
@@ -21,14 +21,17 @@ import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
 import org.squiddev.cctweaks.core.lua.DelayedTask;
+import org.squiddev.cctweaks.core.turtle.TurtleRegistry;
 
 public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeripheral {
 	private final ITurtleAccess access;
 	private final ToolHostPlayer player;
+	private final TurtleSide side;
 
-	public ToolHostPeripheral(ITurtleAccess access, ToolHostPlayer player) {
+	public ToolHostPeripheral(ITurtleAccess access, ToolHostPlayer player, TurtleSide side) {
 		this.access = access;
 		this.player = player;
+		this.side = side;
 	}
 
 	@Override
@@ -39,7 +42,8 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 	@Override
 	public String[] getMethodNames() {
 		return new String[]{
-			"use", "useUp", "useDown"
+			"use", "useUp", "useDown",
+			"swing", "swingUp", "swingDown",
 		};
 	}
 
@@ -52,13 +56,19 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 				return use(computer, context, InteractDirection.Up, args);
 			case 2:
 				return use(computer, context, InteractDirection.Down, args);
+			case 3:
+				return swing(computer, context, InteractDirection.Forward, args);
+			case 4:
+				return swing(computer, context, InteractDirection.Up, args);
+			case 5:
+				return swing(computer, context, InteractDirection.Down, args);
 		}
 
 		return null;
 	}
 
 	//region Use
-	public Object[] use(IComputerAccess computer, ILuaContext context, InteractDirection direction, Object[] args) throws LuaException, InterruptedException {
+	public Object[] use(final IComputerAccess computer, ILuaContext context, InteractDirection direction, Object[] args) throws LuaException, InterruptedException {
 		final int duration;
 		final boolean sneak;
 		if (args.length <= 0 || args[0] == null) {
@@ -84,12 +94,12 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 		return new DelayedTask() {
 			@Override
 			public Object[] execute() throws LuaException {
-				return doUse(this, dir, sneak, duration);
+				return doUse(this, computer, dir, sneak, duration);
 			}
 		}.execute(computer, context);
 	}
 
-	public Object[] doUse(DelayedTask task, int direction, boolean sneak, int duration) throws LuaException {
+	public Object[] doUse(DelayedTask task, IComputerAccess computer, int direction, boolean sneak, int duration) throws LuaException {
 		player.updateInformation(access, direction);
 		player.posY += 1.5;
 		player.loadWholeInventory(access);
@@ -101,6 +111,11 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 		World world = player.worldObj;
 
 		try {
+			if (stack != null) {
+				TurtleCommandResult result = TurtleRegistry.instance.use(access, computer, player, stack, fDirection, hit);
+				if (result != null) return toObjectArray(result);
+			}
+
 			if (hit != null) {
 				switch (hit.typeOfHit) {
 					case ENTITY:
@@ -222,6 +237,75 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 	}
 	//endregion
 
+	//region Swing
+	public Object[] swing(final IComputerAccess computer, ILuaContext context, InteractDirection direction, Object[] args) throws LuaException, InterruptedException {
+		final boolean sneak;
+
+		if (args.length <= 0 || args[0] == null) {
+			sneak = false;
+		} else if (args[0] instanceof Boolean) {
+			sneak = (Boolean) args[0];
+		} else {
+			throw new LuaException("Expected boolean");
+		}
+
+		final int dir = direction.toWorldDir(access);
+
+		return access.executeCommand(context, new ITurtleCommand() {
+			@Override
+			public TurtleCommandResult execute(ITurtleAccess iTurtleAccess) {
+				try {
+					return doSwing(computer, dir, sneak);
+				} catch (LuaException e) {
+					return TurtleCommandResult.failure(e.getMessage());
+				}
+			}
+		});
+	}
+
+	public TurtleCommandResult doSwing(IComputerAccess computer, int direction, boolean sneak) throws LuaException {
+		player.updateInformation(access, direction);
+		player.posY += 1.5;
+		player.loadWholeInventory(access);
+		player.setSneaking(sneak);
+
+		ForgeDirection fDirection = ForgeDirection.VALID_DIRECTIONS[direction];
+		ItemStack stack = player.getItem(access);
+		TurtleAnimation animation = side == TurtleSide.Left ? TurtleAnimation.SwingLeftTool : TurtleAnimation.SwingRightTool;
+		MovingObjectPosition hit = findHit(fDirection, 0.65);
+
+		try {
+			if (stack != null) {
+				TurtleCommandResult result = TurtleRegistry.instance.swing(access, computer, player, stack, fDirection, hit);
+				if (result != null) {
+					if (result.isSuccess()) access.playAnimation(animation);
+					return result;
+				}
+			}
+
+			if (hit != null) {
+				switch (hit.typeOfHit) {
+					case ENTITY: {
+						TurtleCommandResult result = player.attack(access, direction);
+						if (result.isSuccess()) access.playAnimation(animation);
+						return result;
+					}
+					case BLOCK: {
+						TurtleCommandResult result = player.dig(access, direction);
+						if (result.isSuccess()) access.playAnimation(animation);
+						return result;
+					}
+				}
+			}
+		} finally {
+			player.clearItemInUse();
+			player.unloadWholeInventory(access);
+			player.setSneaking(false);
+		}
+
+		return TurtleCommandResult.failure("Nothing to do here");
+	}
+	//endregion
 
 	@Override
 	public void attach(IComputerAccess computer) {
@@ -244,5 +328,22 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 	@Override
 	public boolean equals(IPeripheral other) {
 		return equals((Object) other);
+	}
+
+	public static Object[] toObjectArray(TurtleCommandResult result) {
+		if (result.isSuccess()) {
+			Object[] resultVals = result.getResults();
+			if (resultVals == null) {
+				return new Object[]{true};
+			} else {
+				Object[] returnVals = new Object[resultVals.length + 1];
+				returnVals[0] = true;
+				System.arraycopy(resultVals, 0, returnVals, 1, resultVals.length);
+				return returnVals;
+			}
+		} else {
+			String message = result.getErrorMessage();
+			return message == null ? new Object[]{false} : new Object[]{false, result.getErrorMessage()};
+		}
 	}
 }
