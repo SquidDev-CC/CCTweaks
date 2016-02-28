@@ -10,7 +10,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
-import org.squiddev.cctweaks.api.turtle.ITurtleInteraction;
+import org.squiddev.cctweaks.api.turtle.AbstractTurtleInteraction;
 import org.squiddev.cctweaks.api.turtle.ITurtleRegistry;
 import portalgun.common.core.EntityHelper;
 import portalgun.common.item.ItemPortalGun;
@@ -31,7 +31,7 @@ public class PortalGunIntegration extends ModIntegration {
 	public void init() {
 		ITurtleRegistry registry = CCTweaksAPI.instance().turtleRegistry();
 
-		registry.registerInteraction(new ITurtleInteraction() {
+		registry.registerInteraction(new AbstractTurtleInteraction() {
 			@Override
 			public TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, ForgeDirection direction, MovingObjectPosition hit) throws LuaException {
 				if (!(stack.getItem() instanceof ItemPortalGun)) return null;

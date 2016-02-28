@@ -62,4 +62,34 @@ public class TurtleRegistry implements ITurtleRegistry, ITurtleInteraction {
 
 		return null;
 	}
+
+	@Override
+	public boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, ForgeDirection direction, MovingObjectPosition hit) {
+		for (ITurtleInteraction interaction : itemInteractions.get(stack.getItem())) {
+			boolean result = interaction.canUse(turtle, player, stack, direction, hit);
+			if (result) return true;
+		}
+
+		for (ITurtleInteraction interaction : genericInteractions) {
+			boolean result = interaction.canUse(turtle, player, stack, direction, hit);
+			if (result) return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean canSwing(ITurtleAccess turtle, FakePlayer player, ItemStack stack, ForgeDirection direction, MovingObjectPosition hit) {
+		for (ITurtleInteraction interaction : itemInteractions.get(stack.getItem())) {
+			boolean result = interaction.canSwing(turtle, player, stack, direction, hit);
+			if (result) return true;
+		}
+
+		for (ITurtleInteraction interaction : genericInteractions) {
+			boolean result = interaction.canSwing(turtle, player, stack, direction, hit);
+			if (result) return true;
+		}
+
+		return false;
+	}
 }

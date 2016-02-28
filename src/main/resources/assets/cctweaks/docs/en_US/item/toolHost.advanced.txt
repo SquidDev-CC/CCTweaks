@@ -2,7 +2,12 @@ Further study shows that the ${**}Tool Host${**}
 can be extended to support right clicking.
 
 Wrapping the upgrade as a peripheral allows you to
-right click with it.
+left and right click with it.
 
 You can control duration and if the turtle is sneaking
 by passing additional arguments.
+
+***
+
+Additional methods are added to see if a tool can be used
+on a particular block or entity.

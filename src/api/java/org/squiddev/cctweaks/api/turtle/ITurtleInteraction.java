@@ -33,6 +33,18 @@ public interface ITurtleInteraction {
 	TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, ForgeDirection direction, MovingObjectPosition hit) throws LuaException;
 
 	/**
+	 * Is the tool appropriate for this job
+	 *
+	 * @param turtle    The turtle swinging the tool
+	 * @param player    The turtle player,
+	 * @param stack     The item to be swung
+	 * @param direction The direction to swing in
+	 * @param hit       Place the item was used at. May be {@code null}.
+	 * @return If the tool is appropriate: can it attack or dig the block?
+	 */
+	boolean canSwing(ITurtleAccess turtle, FakePlayer player, ItemStack stack, ForgeDirection direction, MovingObjectPosition hit);
+
+	/**
 	 * Use (right click) a tool
 	 *
 	 * The code is already being run in the main thread, and so you cannot yield.
@@ -46,4 +58,16 @@ public interface ITurtleInteraction {
 	 * @return Result of interaction, or {@code null} if no action could be taken
 	 */
 	TurtleCommandResult use(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, ForgeDirection direction, MovingObjectPosition hit) throws LuaException;
+
+	/**
+	 * Is the tool appropriate for this job
+	 *
+	 * @param turtle    The turtle swinging the tool
+	 * @param player    The turtle player,
+	 * @param stack     The item to be swung
+	 * @param direction The direction to swing in
+	 * @param hit       Place the item was used at. May be {@code null}.
+	 * @return If the tool can be right clicked.
+	 */
+	boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, ForgeDirection direction, MovingObjectPosition hit);
 }

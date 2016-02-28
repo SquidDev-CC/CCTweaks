@@ -1,14 +1,19 @@
 package org.squiddev.cctweaks.turtle;
 
+import com.google.common.collect.Multimap;
 import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.lua.ILuaTask;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 import dan200.computercraft.shared.turtle.core.InteractDirection;
 import dan200.computercraft.shared.util.WorldUtil;
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
@@ -23,12 +28,12 @@ import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
 import org.squiddev.cctweaks.core.lua.DelayedTask;
 import org.squiddev.cctweaks.core.turtle.TurtleRegistry;
 
-public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeripheral {
+public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatiblePeripheral {
 	private final ITurtleAccess access;
 	private final ToolHostPlayer player;
 	private final TurtleSide side;
 
-	public ToolHostPeripheral(ITurtleAccess access, ToolHostPlayer player, TurtleSide side) {
+	public ToolManipulatorPeripheral(ITurtleAccess access, ToolHostPlayer player, TurtleSide side) {
 		this.access = access;
 		this.player = player;
 		this.side = side;
@@ -43,7 +48,9 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 	public String[] getMethodNames() {
 		return new String[]{
 			"use", "useUp", "useDown",
+			"canUse", "canUseUp", "canUseDown",
 			"swing", "swingUp", "swingDown",
+			"canSwing", "canSwingUp", "canSwingDown",
 		};
 	}
 
@@ -57,11 +64,23 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 			case 2:
 				return use(computer, context, InteractDirection.Down, args);
 			case 3:
-				return swing(computer, context, InteractDirection.Forward, args);
+				return canUse(computer, context, InteractDirection.Forward, args);
 			case 4:
-				return swing(computer, context, InteractDirection.Up, args);
+				return canUse(computer, context, InteractDirection.Up, args);
 			case 5:
+				return canUse(computer, context, InteractDirection.Down, args);
+			case 6:
+				return swing(computer, context, InteractDirection.Forward, args);
+			case 7:
+				return swing(computer, context, InteractDirection.Up, args);
+			case 8:
 				return swing(computer, context, InteractDirection.Down, args);
+			case 9:
+				return canSwing(computer, context, InteractDirection.Forward, args);
+			case 10:
+				return canSwing(computer, context, InteractDirection.Up, args);
+			case 11:
+				return canSwing(computer, context, InteractDirection.Down, args);
 		}
 
 		return null;
@@ -182,33 +201,6 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 		return null;
 	}
 
-	public MovingObjectPosition findHit(ForgeDirection facing, double range) {
-		Vec3 origin = Vec3.createVectorHelper(
-			player.posX,
-			player.posY,
-			player.posZ
-		);
-		Vec3 blockCenter = origin.addVector(
-			facing.offsetX * 0.51,
-			facing.offsetY * 0.51,
-			facing.offsetZ * 0.51
-		);
-		Vec3 target = blockCenter.addVector(
-			facing.offsetX * range,
-			facing.offsetY * range,
-			facing.offsetZ * range
-		);
-
-		MovingObjectPosition hit = player.worldObj.rayTraceBlocks(origin, target);
-		Entity entity = WorldUtil.rayTraceEntities(player.worldObj, origin, target, 1.1);
-
-		if (entity instanceof EntityLivingBase && (hit == null || origin.squareDistanceTo(blockCenter) > player.getDistanceSqToEntity(entity))) {
-			return new MovingObjectPosition(entity);
-		} else {
-			return hit;
-		}
-	}
-
 	public Object[] onPlayerRightClick(ItemStack stack, int x, int y, int z, int side, Vec3 look) {
 		float xCoord = (float) look.xCoord - (float) x;
 		float yCoord = (float) look.yCoord - (float) y;
@@ -318,6 +310,104 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 	}
 	//endregion
 
+	//region Can use
+	public Object[] canUse(final IComputerAccess computer, ILuaContext context, InteractDirection dir, Object[] args) throws LuaException, InterruptedException {
+		final int direction = dir.toWorldDir(access);
+		return context.executeMainThreadTask(new ILuaTask() {
+			@Override
+			public Object[] execute() throws LuaException {
+				player.updateInformation(access, direction);
+				player.posY += 1.5;
+				player.loadWholeInventory(access);
+
+				ItemStack stack = player.getHeldItem();
+				ForgeDirection fDirection = ForgeDirection.VALID_DIRECTIONS[direction];
+				MovingObjectPosition hit = findHit(fDirection, 0.65);
+
+				try {
+					if (stack != null) {
+						boolean result = TurtleRegistry.instance.canUse(access, player, stack, fDirection, hit);
+						if (result) return new Object[]{true};
+					}
+
+					return new Object[]{false};
+				} finally {
+					player.unloadWholeInventory(access);
+				}
+			}
+		});
+	}
+
+	public Object[] canSwing(final IComputerAccess computer, ILuaContext context, InteractDirection dir, Object[] args) throws LuaException, InterruptedException {
+		final int direction = dir.toWorldDir(access);
+		return context.executeMainThreadTask(new ILuaTask() {
+			@Override
+			public Object[] execute() throws LuaException {
+				player.updateInformation(access, direction);
+				player.posY += 1.5;
+				player.loadWholeInventory(access);
+
+				ItemStack stack = player.getHeldItem();
+				ForgeDirection fDirection = ForgeDirection.VALID_DIRECTIONS[direction];
+				MovingObjectPosition hit = findHit(fDirection, 0.65);
+
+				try {
+					if (stack != null) {
+						boolean result = TurtleRegistry.instance.canSwing(access, player, stack, fDirection, hit);
+						if (result) return new Object[]{true};
+
+						if (hit.entityHit != null) {
+							@SuppressWarnings("unchecked") Multimap<String, AttributeModifier> map = stack.getAttributeModifiers();
+							for (AttributeModifier modifier : map.get(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName())) {
+								if (modifier.getAmount() > 0) {
+									return new Object[]{true};
+								}
+							}
+						}
+					}
+
+					if (hit.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+						Block block = access.getWorld().getBlock(hit.blockX, hit.blockY, hit.blockZ);
+						int meta = access.getWorld().getBlockMetadata(hit.blockX, hit.blockY, hit.blockZ);
+						if (block.canHarvestBlock(player, meta)) return new Object[]{true};
+					}
+
+					return new Object[]{false};
+				} finally {
+					player.unloadWholeInventory(access);
+				}
+			}
+		});
+	}
+	//endregion
+
+	public MovingObjectPosition findHit(ForgeDirection facing, double range) {
+		Vec3 origin = Vec3.createVectorHelper(
+			player.posX,
+			player.posY,
+			player.posZ
+		);
+		Vec3 blockCenter = origin.addVector(
+			facing.offsetX * 0.51,
+			facing.offsetY * 0.51,
+			facing.offsetZ * 0.51
+		);
+		Vec3 target = blockCenter.addVector(
+			facing.offsetX * range,
+			facing.offsetY * range,
+			facing.offsetZ * range
+		);
+
+		MovingObjectPosition hit = player.worldObj.rayTraceBlocks(origin, target);
+		Entity entity = WorldUtil.rayTraceEntities(player.worldObj, origin, target, 1.1);
+
+		if (entity instanceof EntityLivingBase && (hit == null || origin.squareDistanceTo(blockCenter) > player.getDistanceSqToEntity(entity))) {
+			return new MovingObjectPosition(entity);
+		} else {
+			return hit;
+		}
+	}
+
 	@Override
 	public void attach(IComputerAccess computer) {
 	}
@@ -328,7 +418,7 @@ public class ToolHostPeripheral implements IPeripheral, INetworkCompatiblePeriph
 
 	@Override
 	public boolean equals(Object other) {
-		return other == this || (other instanceof ToolHostPeripheral && access.equals(((ToolHostPeripheral) other).access));
+		return other == this || (other instanceof ToolManipulatorPeripheral && access.equals(((ToolManipulatorPeripheral) other).access));
 	}
 
 	@Override
