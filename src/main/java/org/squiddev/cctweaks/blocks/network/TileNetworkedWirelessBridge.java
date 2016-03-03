@@ -9,6 +9,7 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileLazyNBT;
+import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
@@ -20,7 +21,23 @@ import java.util.UUID;
  * Bind networks together
  */
 public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeripheralHost, IWorldNetworkNodeHost {
-	protected final NetworkBindingWithModem binding = new NetworkBindingWithModem(this);
+	protected final NetworkBindingWithModem binding = new NetworkBindingWithModem(this) {
+		private boolean dirty = false;
+
+		@Override
+		public void markDirty() {
+			if (!dirty) {
+				FmlEvents.schedule(new Runnable() {
+					@Override
+					public void run() {
+						dirty = false;
+						TileNetworkedWirelessBridge.this.markDirty();
+					}
+				});
+				dirty = true;
+			}
+		}
+	};
 
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
@@ -35,7 +52,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 
 	@Override
 	public Iterable<String> getFields() {
-		return Arrays.asList(NetworkBinding.LSB, NetworkBinding.MSB);
+		return Arrays.asList(NetworkBinding.LSB, NetworkBinding.MSB, NetworkBinding.ID);
 	}
 
 	@Override
@@ -75,11 +92,11 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	}
 
 	public UUID getBindingId() {
-		return binding.getId();
+		return binding.getUuid();
 	}
 
 	public void setBindingId(UUID id) {
-		binding.setId(id);
+		binding.setUuid(id);
 		markDirty();
 	}
 

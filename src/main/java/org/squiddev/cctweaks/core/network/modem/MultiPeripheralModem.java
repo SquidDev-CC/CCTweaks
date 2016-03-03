@@ -35,8 +35,10 @@ public abstract class MultiPeripheralModem extends BasicModem {
 					Facing.oppositeSide[dir]
 				);
 
-				if (peripheral instanceof IPeripheralHidden || (peripheral instanceof BasicModemPeripheral && ((BasicModemPeripheral) peripheral).modem instanceof MultiPeripheralModem)) {
+				if ((peripheral instanceof BasicModemPeripheral && ((BasicModemPeripheral) peripheral).modem instanceof MultiPeripheralModem)) {
 					peripherals[dir] = null;
+				} else if (peripheral instanceof IPeripheralHidden) {
+					peripherals[dir] = ((IPeripheralHidden) peripheral).getNetworkPeripheral();
 				}
 			}
 

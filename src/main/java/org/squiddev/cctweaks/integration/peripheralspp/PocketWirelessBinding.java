@@ -80,6 +80,11 @@ public class PocketWirelessBinding implements IPocketComputerUpgrade {
 		}
 
 		@Override
+		public void markDirty() {
+			save();
+		}
+
+		@Override
 		public void connect() {
 			load(pocket.getUpgradeNBTData());
 			super.connect();

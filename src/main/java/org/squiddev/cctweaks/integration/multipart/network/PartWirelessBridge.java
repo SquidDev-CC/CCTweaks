@@ -20,6 +20,7 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
+import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
@@ -37,7 +38,23 @@ public class PartWirelessBridge extends PartSidedNetwork implements IPeripheralH
 	@SideOnly(Side.CLIENT)
 	public static BridgeRenderer renderBlocks;
 
-	protected final NetworkBindingWithModem binding = new NetworkBindingWithModem(this);
+	protected final NetworkBindingWithModem binding = new NetworkBindingWithModem(this) {
+		private boolean dirty = false;
+
+		@Override
+		public void markDirty() {
+			if (!dirty) {
+				FmlEvents.schedule(new Runnable() {
+					@Override
+					public void run() {
+						dirty = false;
+						tile().markDirty();
+					}
+				});
+				dirty = true;
+			}
+		}
+	};
 
 	public PartWirelessBridge(int direction) {
 		this.direction = (byte) direction;
@@ -66,7 +83,7 @@ public class PartWirelessBridge extends PartSidedNetwork implements IPeripheralH
 
 	@Override
 	public Iterable<String> getFields() {
-		return Arrays.asList(NetworkBinding.LSB, NetworkBinding.MSB);
+		return Arrays.asList(NetworkBinding.LSB, NetworkBinding.MSB, NetworkBinding.ID);
 	}
 
 	@Override

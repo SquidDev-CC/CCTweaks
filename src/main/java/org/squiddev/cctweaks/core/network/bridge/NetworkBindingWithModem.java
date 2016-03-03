@@ -1,5 +1,9 @@
 package org.squiddev.cctweaks.core.network.bridge;
 
+import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.lua.LuaException;
+import dan200.computercraft.api.peripheral.IComputerAccess;
+import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHidden;
@@ -16,7 +20,7 @@ import java.util.Set;
  * This is so there can be a direct computer -> binding connection
  * but users do not get confused that bindings normally peripherals.
  */
-public class NetworkBindingWithModem extends NetworkBinding {
+public abstract class NetworkBindingWithModem extends NetworkBinding {
 	public NetworkBindingWithModem(IWorldPosition position) {
 		super(position);
 	}
@@ -36,8 +40,41 @@ public class NetworkBindingWithModem extends NetworkBinding {
 	}
 
 	protected class BindingModemPeripheral extends BasicModemPeripheral<BindingModem> implements IPeripheralHidden {
+		private final String[] methodNames;
+		private final int methodOffset;
+		private final NetworkBindingPeripheral bindingPeripheral = new NetworkBindingPeripheral(NetworkBindingWithModem.this);
+
 		public BindingModemPeripheral(BindingModem modem) {
+
 			super(modem);
+			String[] methods = super.getMethodNames();
+			String[] otherMethods = bindingPeripheral.getMethodNames();
+			String[] newMethods = new String[methods.length + otherMethods.length];
+			System.arraycopy(methods, 0, newMethods, 0, methods.length);
+			System.arraycopy(otherMethods, 0, newMethods, methods.length, otherMethods.length);
+
+			methodNames = newMethods;
+			methodOffset = methods.length;
+		}
+
+		@Override
+		public String[] getMethodNames() {
+			return methodNames;
+		}
+
+		@Override
+		public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
+			int offset = method - methodOffset;
+			if (offset >= 0) {
+				return bindingPeripheral.callMethod(computer, context, offset, arguments);
+			}
+
+			return super.callMethod(computer, context, method, arguments);
+		}
+
+		@Override
+		public IPeripheral getNetworkPeripheral() {
+			return bindingPeripheral;
 		}
 	}
 
@@ -67,4 +104,6 @@ public class NetworkBindingWithModem extends NetworkBinding {
 	public BasicModem getModem() {
 		return modem;
 	}
+
+	public abstract void markDirty();
 }

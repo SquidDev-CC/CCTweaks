@@ -120,6 +120,11 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 		}
 
 		@Override
+		public void markDirty() {
+			save();
+		}
+
+		@Override
 		public void connect() {
 			load(turtle.getUpgradeNBTData(side));
 			getModem().load();
@@ -271,7 +276,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 						}
 
 						TileNetworkedWirelessBridge bridge = (TileNetworkedWirelessBridge) tile;
-						bridge.setBindingId(TurtleBinding.this.getId());
+						bridge.setBindingId(TurtleBinding.this.getUuid());
 						break;
 					}
 					case 3: {
@@ -292,7 +297,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 						}
 
 						TileNetworkedWirelessBridge bridge = (TileNetworkedWirelessBridge) tile;
-						TurtleBinding.this.setId(bridge.getBindingId());
+						TurtleBinding.this.setUuid(bridge.getBindingId());
 						TurtleBinding.this.save();
 						break;
 					}
