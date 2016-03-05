@@ -56,18 +56,18 @@ configurations {
 dependencies {
 	compile "ComputerCraft:ComputerCraft:${project.cc_version}"
 
-	compile "codechicken:ForgeMultipart:${project.mc_version}-${project.multipart_version}:dev"
-	compile "codechicken:CodeChickenLib:${project.mc_version}-${project.ccl_version}:dev"
-	compile "codechicken:NotEnoughItems:${project.mc_version}-${project.nei_version}:dev"
-	compile "codechicken:CodeChickenCore:${project.mc_version}-${project.ccc_version}:dev"
-	packaged "com.austinv11.collectiveframework:CollectiveFramework:${project.collectiveframework_verion}:deobf"
-	packaged "com.austinv11.peripheralsplusplus:PeripheralsPlusPlus:${project.peripheralspp_version}:deobf"
+	compile "codechicken:ForgeMultipart:${project.mc_version}-1.2.0.345:dev"
+	compile "codechicken:CodeChickenLib:${project.mc_version}-1.1.3.127:dev"
+	compile "codechicken:NotEnoughItems:${project.mc_version}-1.0.3.+:dev"
+	compile "codechicken:CodeChickenCore:${project.mc_version}-1.0.4.29:dev"
+	packaged "com.austinv11.collectiveframework:CollectiveFramework:1.+:deobf"
+	packaged "com.austinv11.peripheralsplusplus:PeripheralsPlusPlus:1.+:deobf"
 
-	packaged "CoFHLib:CoFHLib:[${project.mc_version}]${project.cofhlib_version}-dev"
+	packaged "CoFHLib:CoFHLib:[${project.mc_version}]1.0.1-159-dev"
 	packaged "curseMods:PortalGun:4.0.0-beta-6"
 	packaged "curseMods:iChunUtil:4.2.2"
-	packaged "net.industrial-craft:industrialcraft-2:${project.api_ic2_version}:api"
-	packaged "openperipheral:OpenPeripheralCore-API:${project.op_version}"
+	packaged "net.industrial-craft:industrialcraft-2:2.+:api"
+	packaged "openperipheral:OpenPeripheralCore-API:3.2"
 
 	shade 'org.squiddev:Cobalt:0.1'
 	shade('org.squiddev:luaj.luajc:1.0.5') {
