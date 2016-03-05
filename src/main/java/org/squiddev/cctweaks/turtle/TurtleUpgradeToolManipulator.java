@@ -18,7 +18,7 @@ public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implemen
 
 	@Override
 	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
-		return new ToolHostPeripheral(turtle, getPlayer(turtle));
+		return new ToolManipulatorPeripheral(turtle, getPlayer(turtle), side);
 	}
 
 	@Override

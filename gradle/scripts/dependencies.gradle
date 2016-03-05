@@ -40,7 +40,7 @@ configurations {
 	shade
 	compile.extendsFrom shade
 
-	deployerJars
+	packaged
 }
 
 dependencies {
@@ -55,8 +55,9 @@ dependencies {
 	provided "net.industrial-craft:industrialcraft-2:2.+:api"
 	provided "openperipheral:OpenPeripheralCore-API:3.2"
 
+	shade 'org.squiddev:Cobalt:0.1'
 	shade('org.squiddev:luaj.luajc:1.0.5') {
-		// We provide a custom LuaJ source with ComputerCraft
+		// A custom LuaJ source is provided with ComputerCraft
 		exclude group: 'org.ow2.asm'
 		exclude group: 'org.luaj'
 	}
@@ -65,7 +66,5 @@ dependencies {
 	provided('org.squiddev:ConfigGen:1.1') { exclude group: 'net.minecraftforge' }
 
 	testCompile group: "junit", name: "junit", version: "4.+"
-
-	deployerJars "org.apache.maven.wagon:wagon-ftp:2.2"
 }
 

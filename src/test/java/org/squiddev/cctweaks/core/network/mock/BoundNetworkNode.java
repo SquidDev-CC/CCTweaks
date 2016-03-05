@@ -13,7 +13,7 @@ public class BoundNetworkNode extends KeyedNetworkNode {
 
 	public BoundNetworkNode(IWorldPosition position, String character) {
 		super(position, character);
-		binding.setId(id);
+		binding.setUuid(id);
 	}
 
 	@Override

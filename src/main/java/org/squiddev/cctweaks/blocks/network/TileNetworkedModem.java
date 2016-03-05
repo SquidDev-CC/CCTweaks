@@ -13,6 +13,9 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileLazyNBT;
+import org.squiddev.cctweaks.core.network.modem.BasicModem;
+import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
+import org.squiddev.cctweaks.core.network.modem.ControllableModemPeripheral;
 import org.squiddev.cctweaks.core.network.modem.MultiPeripheralModem;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
@@ -27,6 +30,11 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 		@Override
 		public IWorldPosition getPosition() {
 			return TileNetworkedModem.this;
+		}
+
+		@Override
+		protected BasicModemPeripheral<?> createPeripheral() {
+			return new ControllableModemPeripheral<BasicModem>(this);
 		}
 	};
 

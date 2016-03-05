@@ -1,4 +1,4 @@
-package org.squiddev.cctweaks.core.lua;
+package org.squiddev.cctweaks.core.lua.luaj;
 
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;

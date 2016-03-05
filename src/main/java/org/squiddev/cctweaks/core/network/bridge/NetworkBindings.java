@@ -17,17 +17,39 @@ import java.util.UUID;
  */
 public final class NetworkBindings {
 	public static final String BINDING_NAME = "cctweaks.data.networkBinding";
-	private static final SetMultimap<UUID, IWorldNetworkNode> networks = MultimapBuilder.hashKeys().hashSetValues().build();
+	private static final SetMultimap<UUID, IWorldNetworkNode> uuidNetworks = MultimapBuilder.hashKeys().hashSetValues().build();
+	private static final SetMultimap<Integer, IWorldNetworkNode> idNetworks = MultimapBuilder.hashKeys().hashSetValues().build();
 
 	public static Set<IWorldNetworkNode> getNodes(UUID id) {
 		if (id == null || !Config.Network.WirelessBridge.enabled) return Collections.emptySet();
-		return Collections.unmodifiableSet(networks.get(id));
+		return Collections.unmodifiableSet(uuidNetworks.get(id));
+	}
+
+	public static Set<IWorldNetworkNode> getNodes(int id) {
+		if (!Config.Network.WirelessBridge.enabled) return Collections.emptySet();
+		return Collections.unmodifiableSet(idNetworks.get(id));
 	}
 
 	public static void addNode(UUID id, IWorldNetworkNode node) {
 		if (id == null || !Config.Network.WirelessBridge.enabled) return;
+		add(uuidNetworks.get(id), node);
+	}
 
-		Set<IWorldNetworkNode> nodes = networks.get(id);
+	public static void addNode(int id, IWorldNetworkNode node) {
+		if (!Config.Network.WirelessBridge.enabled) return;
+		add(idNetworks.get(id), node);
+	}
+
+	public static void removeNode(UUID id, IWorldNetworkNode node) {
+		if (id == null) return;
+		remove(uuidNetworks.get(id), node);
+	}
+
+	public static void removeNode(int id, IWorldNetworkNode node) {
+		remove(idNetworks.get(id), node);
+	}
+
+	private static void add(Set<IWorldNetworkNode> nodes, IWorldNetworkNode node) {
 		if (nodes.add(node)) {
 			for (IWorldNetworkNode n : nodes) {
 				if (!n.equals(node) && n.getAttachedNetwork() != null) {
@@ -37,10 +59,7 @@ public final class NetworkBindings {
 		}
 	}
 
-	public static void removeNode(UUID id, IWorldNetworkNode node) {
-		if (id == null) return;
-
-		Set<IWorldNetworkNode> nodes = networks.get(id);
+	private static void remove(Set<IWorldNetworkNode> nodes, IWorldNetworkNode node) {
 		if (nodes.remove(node)) {
 			if (node.getAttachedNetwork() != null) {
 				// See #59. This shouldn't happen but it does
@@ -56,6 +75,7 @@ public final class NetworkBindings {
 
 	public static void reset() {
 		// TODO: There might be a cleaner way.
-		networks.clear();
+		uuidNetworks.clear();
+		idNetworks.clear();
 	}
 }

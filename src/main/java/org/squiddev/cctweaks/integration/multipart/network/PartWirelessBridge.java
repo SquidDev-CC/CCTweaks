@@ -13,6 +13,7 @@ import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
+import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
@@ -33,7 +34,23 @@ public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHo
 		new AxisAlignedBB(0.875, 0.125, 0.125, 1.0, 0.875, 0.875D),
 	};
 
-	private final NetworkBindingWithModem binding = new NetworkBindingWithModem(this);
+	private final NetworkBindingWithModem binding = new NetworkBindingWithModem(this) {
+		private boolean dirty = false;
+
+		@Override
+		public void markDirty() {
+			if (!dirty) {
+				McEvents.schedule(new Runnable() {
+					@Override
+					public void run() {
+						dirty = false;
+						PartWirelessBridge.this.markDirty();
+					}
+				});
+				dirty = true;
+			}
+		}
+	};
 
 	public PartWirelessBridge() {
 	}
@@ -126,9 +143,8 @@ public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHo
 
 	@Override
 	public Iterable<String> getFields() {
-		return Arrays.asList(NetworkBinding.LSB, NetworkBinding.MSB);
+		return Arrays.asList(NetworkBinding.LSB, NetworkBinding.MSB, NetworkBinding.ID);
 	}
-
 
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {

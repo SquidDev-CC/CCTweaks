@@ -9,6 +9,7 @@ import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
 import dan200.computercraft.shared.pocket.items.PocketComputerItemFactory;
 import dan200.computercraft.shared.turtle.items.ItemTurtleBase;
 import dan200.computercraft.shared.turtle.items.TurtleItemFactory;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -68,6 +69,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 
 		ItemStack computerStack = null;
 		boolean hasUpgrade = false;
+		int gold = 0;
 
 		for (int i = 0; i < size; i++) {
 			ItemStack itemStack = crafting.getStackInSlot(i);
@@ -76,9 +78,10 @@ public class CraftingComputerUpgrade implements IRecipe {
 			}
 
 			Item item = itemStack.getItem();
-
-			// If its a 'computer'
-			if (item instanceof IComputerItem) {
+			if (item == Items.gold_ingot) {
+				gold++;
+			} else if (item instanceof IComputerItem) {
+				// If its a 'computer'
 				// Don't allow more than one computer and it must be a normal computer
 				if (computerStack != null || ((IComputerItem) item).getFamily(itemStack) != ComputerFamily.Normal) {
 					return null;
@@ -93,8 +96,13 @@ public class CraftingComputerUpgrade implements IRecipe {
 			}
 		}
 
-		// Don't return computer stack
-		return hasUpgrade ? computerStack : null;
+		if (computerStack == null || !hasUpgrade) {
+			return null;
+		} else if (computerStack.getItem() instanceof ItemTurtleBase && gold < 7) {
+			return null;
+		} else {
+			return computerStack;
+		}
 	}
 
 	@Override

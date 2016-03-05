@@ -7,12 +7,14 @@ import org.squiddev.cctweaks.api.network.INetworkRegistry;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHelpers;
 import org.squiddev.cctweaks.api.pocket.IPocketRegistry;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelRegistry;
+import org.squiddev.cctweaks.api.turtle.ITurtleRegistry;
 import org.squiddev.cctweaks.core.lua.LuaEnvironment;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.NetworkRegistry;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHelpers;
 import org.squiddev.cctweaks.core.pocket.PocketRegistry;
 import org.squiddev.cctweaks.core.turtle.TurtleFuelRegistry;
+import org.squiddev.cctweaks.core.turtle.TurtleRegistry;
 
 /**
  * The implementation for {@link org.squiddev.cctweaks.api.CCTweaksAPI}
@@ -37,6 +39,11 @@ public final class API implements ICCTweaksAPI {
 	@Override
 	public ITurtleFuelRegistry fuelRegistry() {
 		return fuelRegistry;
+	}
+
+	@Override
+	public ITurtleRegistry turtleRegistry() {
+		return TurtleRegistry.instance;
 	}
 
 	@Override

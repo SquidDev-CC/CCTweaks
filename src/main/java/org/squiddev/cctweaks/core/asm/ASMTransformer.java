@@ -31,7 +31,7 @@ public class ASMTransformer implements IClassTransformer {
 	public ASMTransformer() {
 		/*
 			TODO: Look into moving some rewrites into compile-time processing instead.
-			This probably includes *_Rewrite as well as many of the binary handlers as only exist
+			This probably includes *_Rewrite as well as many of the binary handlers as they only exist
 			because they need to stub classes that we patch anyway.
 		 */
 		patches.addPatchFile("org.luaj.vm2.lib.DebugLib");
@@ -56,6 +56,9 @@ public class ASMTransformer implements IClassTransformer {
 			new InjectLuaJC(),
 			new WhitelistGlobals(),
 			new CustomAPIs(),
+			new TurtleBrainAlsoPeripheral(),
+			new AddAdditionalData(),
+			new CustomMachine(),
 
 			// Networking
 			new ClassMerger(
@@ -112,8 +115,6 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.pocket.items.ItemPocketComputer",
 				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"
 			),
-			new TurtleBrainAlsoPeripheral(),
-			new AddAdditionalData(),
 		});
 		BinaryUtils.inject(patches);
 

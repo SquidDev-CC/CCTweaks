@@ -1,8 +1,9 @@
-package org.squiddev.cctweaks.core.lua;
+package org.squiddev.cctweaks.core.lua.luaj;
 
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
+import org.squiddev.cctweaks.core.lua.BinaryConverter;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -12,7 +13,7 @@ import java.util.Map;
  * Duplicate of {@link dan200.computercraft.core.lua.LuaJLuaMachine#toObject(LuaValue)} with
  * binary support
  */
-public class LuaConverter {
+public class LuaJConverter {
 	public static Object toObject(LuaValue value, boolean binary) {
 		return toObject(value, null, binary);
 	}
@@ -31,7 +32,7 @@ public class LuaConverter {
 					System.arraycopy(string.m_bytes, string.m_offset, result, 0, string.m_length);
 					return result;
 				} else {
-					return decodeString(string.m_bytes, string.m_offset, string.m_length);
+					return BinaryConverter.decodeString(string.m_bytes, string.m_offset, string.m_length);
 				}
 			}
 			case LuaValue.TTABLE: {
@@ -74,71 +75,5 @@ public class LuaConverter {
 			objects[i] = toObject(value, null, binary);
 		}
 		return objects;
-	}
-
-	public static Object toString(Object value) {
-		return toString(value, null);
-	}
-
-	private static Object toString(Object value, Map<Object, Object> tables) {
-		if (value instanceof byte[]) {
-			return new String((byte[]) value);
-		} else if (value instanceof Map) {
-			if (tables == null) {
-				tables = new IdentityHashMap<Object, Object>();
-			} else {
-				Object object = tables.get(value);
-				if (object != null) return object;
-			}
-
-			Map<Object, Object> newMap = new HashMap<Object, Object>();
-			tables.put(value, newMap);
-
-			Map<?, ?> map = (Map) value;
-
-			for (Object key : map.keySet()) {
-				newMap.put(toString(key, tables), toString(map.get(key), tables));
-			}
-
-			return newMap;
-		} else {
-			return value;
-		}
-	}
-
-
-	/**
-	 * Convert the arguments to use strings instead of byte arrays
-	 *
-	 * @param items The arguments to convert. This will be modified in place
-	 */
-	public static void toStrings(Object[] items) {
-		for (int i = 0; i < items.length; i++) {
-			items[i] = toString(items[i], null);
-		}
-	}
-
-	public static String decodeString(byte[] bytes) {
-		return decodeString(bytes, 0, bytes.length);
-	}
-
-	public static String decodeString(byte[] bytes, int start, int length) {
-		char[] chars = new char[length];
-
-		for (int i = 0; i < chars.length; ++i) {
-			chars[i] = (char) (bytes[start + i] & 255);
-		}
-
-		return new String(chars);
-	}
-
-	public static byte[] toBytes(String string) {
-		byte[] chars = new byte[string.length()];
-
-		for (int i = 0; i < chars.length; ++i) {
-			// chars[i] = (char) (bytes[start + i] & 255);
-		}
-
-		return chars;
 	}
 }

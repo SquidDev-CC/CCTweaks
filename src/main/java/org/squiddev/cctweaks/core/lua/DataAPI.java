@@ -51,7 +51,7 @@ public class DataAPI implements ILuaAPI, ILuaObjectWithArguments, ILuaAPIFactory
 	public byte[] getStringBytes(Object[] args) throws LuaException {
 		if (args.length == 0 || !(args[0] instanceof String)) throw new LuaException("Expected string");
 
-		return LuaConverter.toBytes((String) args[0]);
+		return BinaryConverter.toBytes((String) args[0]);
 	}
 
 	@Override

@@ -19,7 +19,11 @@ public abstract class DirectionalPeripheralModem extends SinglePeripheralModem {
 		IWorldPosition position = getPosition();
 		IPeripheral peripheral = PeripheralUtil.getPeripheral((World) position.getBlockAccess(), position.getPosition().offset(dir), dir.getOpposite());
 
-		if (peripheral == null || peripheral instanceof IPeripheralHidden) {
+		if (peripheral instanceof IPeripheralHidden) {
+			peripheral = ((IPeripheralHidden) peripheral).getNetworkPeripheral();
+		}
+
+		if (peripheral == null) {
 			id = -1;
 			peripheral = null;
 		} else if (id <= -1) {
