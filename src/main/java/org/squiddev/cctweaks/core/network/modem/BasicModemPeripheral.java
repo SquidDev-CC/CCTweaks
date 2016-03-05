@@ -13,7 +13,7 @@ import org.squiddev.cctweaks.api.lua.IBinaryHandler;
 import org.squiddev.cctweaks.api.lua.IPeripheralWithArguments;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
-import org.squiddev.cctweaks.core.lua.LuaConverter;
+import org.squiddev.cctweaks.core.lua.BinaryConverter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -162,7 +162,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	public static String parseString(Object[] arguments, int index) throws LuaException {
 		if (arguments.length > index) {
 			if (arguments[index] instanceof byte[]) {
-				return LuaConverter.decodeString((byte[]) arguments[index]);
+				return BinaryConverter.decodeString((byte[]) arguments[index]);
 			} else if (arguments[index] instanceof String) {
 				return (String) arguments[index];
 			}

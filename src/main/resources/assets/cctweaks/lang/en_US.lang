@@ -32,6 +32,7 @@ gui.config.cctweaks.computer.globalWhitelist=Global Whitelist
 gui.config.cctweaks.computer.computerThreadTimeout=Computer Thread Timeout
 gui.config.cctweaks.computer.luaJC=LuaJC
 gui.config.cctweaks.computer.luaJCVerify=Verify LuaJC
+gui.config.cctweaks.computer.cobalt=Cobalt VM
 
 gui.config.cctweaks.turtle=Turtle
 gui.config.cctweaks.turtle.fluxRefuelAmount=RF Refuel Amount

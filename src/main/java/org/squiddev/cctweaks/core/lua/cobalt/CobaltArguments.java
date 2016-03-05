@@ -1,28 +1,28 @@
-package org.squiddev.cctweaks.core.lua;
+package org.squiddev.cctweaks.core.lua.cobalt;
 
 import dan200.computercraft.api.lua.LuaException;
-import org.luaj.vm2.LuaString;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
 import org.squiddev.cctweaks.api.lua.IArguments;
+import org.squiddev.cobalt.LuaString;
+import org.squiddev.cobalt.LuaValue;
+import org.squiddev.cobalt.Varargs;
 
-public class VarargArguments implements IArguments {
+public class CobaltArguments implements IArguments {
 	private final Varargs args;
 
-	public VarargArguments(Varargs args) {
+	public CobaltArguments(Varargs args) {
 		this.args = args;
 	}
 
 	@Override
 	public int size() {
-		return args.narg();
+		return args.count();
 	}
 
 	@Override
 	public double getNumber(int index) throws LuaException {
 		LuaValue value = args.arg(index + 1);
-		if (value.isnumber()) {
-			return value.todouble();
+		if (value.isNumber()) {
+			return value.toDouble();
 		} else {
 			throw new LuaException("Expected number");
 		}
@@ -31,8 +31,8 @@ public class VarargArguments implements IArguments {
 	@Override
 	public boolean getBoolean(int index) throws LuaException {
 		LuaValue value = args.arg(index + 1);
-		if (value.isboolean()) {
-			return value.toboolean();
+		if (value.isBoolean()) {
+			return value.toBoolean();
 		} else {
 			throw new LuaException("Expected boolean");
 		}
@@ -53,9 +53,13 @@ public class VarargArguments implements IArguments {
 		LuaValue value = args.arg(index + 1);
 		if (value instanceof LuaString) {
 			LuaString string = (LuaString) value;
-			byte[] result = new byte[string.m_length];
-			System.arraycopy(string.m_bytes, string.m_offset, result, 0, string.m_length);
-			return result;
+			if (string.offset == 0 && string.length == string.bytes.length) {
+				return string.bytes;
+			} else {
+				byte[] result = new byte[string.length];
+				System.arraycopy(string.bytes, string.offset, result, 0, string.length);
+				return result;
+			}
 		} else {
 			throw new LuaException("Expected string");
 		}
@@ -63,26 +67,26 @@ public class VarargArguments implements IArguments {
 
 	@Override
 	public Object getArgumentBinary(int index) {
-		return LuaConverter.toObject(args.arg(index + 1), true);
+		return CobaltConverter.toObject(args.arg(index + 1), true);
 	}
 
 	@Override
 	public Object getArgument(int index) {
-		return LuaConverter.toObject(args.arg(index + 1), false);
+		return CobaltConverter.toObject(args.arg(index + 1), false);
 	}
 
 	@Override
 	public Object[] asArguments() {
-		return LuaConverter.toObjects(args, 1, false);
+		return CobaltConverter.toObjects(args, 1, false);
 	}
 
 	@Override
 	public Object[] asBinary() {
-		return LuaConverter.toObjects(args, 1, true);
+		return CobaltConverter.toObjects(args, 1, true);
 	}
 
 	@Override
 	public IArguments subArgs(int offset) {
-		return new VarargArguments(args.subargs(offset + 1));
+		return new CobaltArguments(args.subargs(offset + 1));
 	}
 }

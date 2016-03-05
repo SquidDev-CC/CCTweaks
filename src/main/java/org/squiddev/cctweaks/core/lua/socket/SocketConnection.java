@@ -26,7 +26,7 @@ import dan200.computercraft.api.lua.LuaException;
 import org.squiddev.cctweaks.api.lua.IArguments;
 import org.squiddev.cctweaks.api.lua.ILuaObjectWithArguments;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.lua.LuaConverter;
+import org.squiddev.cctweaks.core.lua.BinaryConverter;
 import org.squiddev.cctweaks.core.lua.LuaHelpers;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
@@ -211,7 +211,7 @@ public class SocketConnection implements ILuaObjectWithArguments {
 				if (argument instanceof byte[]) {
 					stream = (byte[]) argument;
 				} else if (argument instanceof String) {
-					stream = LuaConverter.toBytes((String) argument);
+					stream = BinaryConverter.toBytes((String) argument);
 				} else {
 					throw new LuaException("Expected string");
 				}

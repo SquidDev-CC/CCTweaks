@@ -8,6 +8,12 @@ they're both chunk-loaded.
 
 ***
 
+You can also bind these similarly to wireless modems. Use the
+${dark_gray}openRemote${none} and ${dark_gray}closeRemote{none} methods
+to do so.
+
+***
+
 These devices also work on turtles (and sometimes pocket computers),
 though you must use the ${dark_gray}bindFromCard${none} method.
 

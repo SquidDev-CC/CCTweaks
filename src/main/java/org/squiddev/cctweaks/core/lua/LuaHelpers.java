@@ -4,11 +4,17 @@ import com.google.common.base.Strings;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.ILuaObject;
 import dan200.computercraft.api.lua.LuaException;
+import dan200.computercraft.core.computer.Computer;
+import dan200.computercraft.core.lua.ILuaMachine;
+import dan200.computercraft.core.lua.LuaJLuaMachine;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Facing;
 import org.luaj.vm2.Varargs;
 import org.objectweb.asm.ClassVisitor;
 import org.squiddev.cctweaks.api.lua.ArgumentDelegator;
+import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.lua.cobalt.CobaltMachine;
+import org.squiddev.cctweaks.core.lua.luaj.LuaJArguments;
 
 /**
  * Various classes for helping with Lua conversion
@@ -47,7 +53,7 @@ public class LuaHelpers {
 	 * @see org.squiddev.cctweaks.core.asm.binary.BinaryMachine#patchWrappedObject(ClassVisitor)
 	 */
 	public static Object[] delegateLuaObject(ILuaObject object, ILuaContext context, int method, Varargs arguments) throws LuaException, InterruptedException {
-		return ArgumentDelegator.delegateLuaObject(object, context, method, new VarargArguments(arguments));
+		return ArgumentDelegator.delegateLuaObject(object, context, method, new LuaJArguments(arguments));
 	}
 
 	/**
@@ -60,5 +66,13 @@ public class LuaHelpers {
 	public static LuaException rewriteException(Throwable e, String def) {
 		String message = e.getMessage();
 		return new LuaException(Strings.isNullOrEmpty(message) ? def : message);
+	}
+
+	public static ILuaMachine createMachine(Computer computer) {
+		if (Config.Computer.cobalt) {
+			return new CobaltMachine(computer);
+		} else {
+			return new LuaJLuaMachine(computer);
+		}
 	}
 }
