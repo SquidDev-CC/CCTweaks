@@ -350,7 +350,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 						boolean result = TurtleRegistry.instance.canSwing(access, player, stack, direction, hit);
 						if (result) return new Object[]{true};
 
-						if (hit.entityHit != null) {
+						if (hit != null && hit.entityHit != null) {
 							@SuppressWarnings("unchecked") Multimap<String, AttributeModifier> map = stack.getAttributeModifiers();
 							for (AttributeModifier modifier : map.get(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName())) {
 								if (modifier.getAmount() > 0) {
@@ -360,7 +360,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 						}
 					}
 
-					if (hit.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+					if (hit != null && hit.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
 						Block block = access.getWorld().getBlockState(hit.getBlockPos()).getBlock();
 						if (block.canHarvestBlock(access.getWorld(), hit.getBlockPos(), player)) {
 							return new Object[]{true};

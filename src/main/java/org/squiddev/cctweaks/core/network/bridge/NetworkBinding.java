@@ -127,8 +127,6 @@ public class NetworkBinding extends AbstractWorldNode {
 		if (tag.hasKey(ID)) {
 			setId(tag.getInteger(ID));
 			loaded = true;
-		} else {
-			removeId();
 		}
 
 		return loaded;
