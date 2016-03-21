@@ -44,12 +44,11 @@ public class DefaultTurtleProviders extends Module {
 				int fuelToGive = TileEntityFurnace.getItemBurnTime(stack) * 5 / 100 * limit;
 				ItemStack replacementStack = stack.getItem().getContainerItem(stack);
 
+				// Remove 'n' items from the stack.
+				InventoryUtil.takeItems(limit, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
 				if (replacementStack != null) {
-					// If item is empty (bucket) then replace
+					// If item is empty (bucket) then add it back
 					InventoryUtil.storeItems(replacementStack, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
-				} else {
-					// Else we just remove 'n' items from the stack.
-					InventoryUtil.takeItems(limit, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
 				}
 
 				return fuelToGive;
