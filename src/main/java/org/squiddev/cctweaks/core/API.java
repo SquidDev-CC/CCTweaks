@@ -7,12 +7,12 @@ import org.squiddev.cctweaks.api.network.INetworkRegistry;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHelpers;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelRegistry;
 import org.squiddev.cctweaks.api.turtle.ITurtleRegistry;
-import org.squiddev.cctweaks.core.lua.LuaEnvironment;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.NetworkRegistry;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHelpers;
 import org.squiddev.cctweaks.core.turtle.TurtleFuelRegistry;
 import org.squiddev.cctweaks.core.turtle.TurtleRegistry;
+import org.squiddev.cctweaks.lua.lib.LuaEnvironment;
 
 /**
  * The implementation for {@link org.squiddev.cctweaks.api.CCTweaksAPI}

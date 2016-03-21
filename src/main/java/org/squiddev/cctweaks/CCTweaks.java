@@ -12,10 +12,10 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.common.MinecraftForge;
 import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.McEvents;
-import org.squiddev.cctweaks.core.lua.DelayedTasks;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindings;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
+import org.squiddev.cctweaks.lua.lib.DelayedTasks;
 
 @Mod(modid = CCTweaks.ID, name = CCTweaks.NAME, version = CCTweaks.VERSION, dependencies = CCTweaks.DEPENDENCIES, guiFactory = CCTweaks.GUI_FACTORY)
 public class CCTweaks {

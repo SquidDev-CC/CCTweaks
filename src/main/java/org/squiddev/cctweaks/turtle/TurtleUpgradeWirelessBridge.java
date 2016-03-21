@@ -24,13 +24,13 @@ import org.squiddev.cctweaks.api.turtle.IExtendedTurtleUpgrade;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.blocks.network.TileNetworkedWirelessBridge;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.lua.LuaHelpers;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
 import org.squiddev.cctweaks.core.network.modem.PeripheralCollection;
 import org.squiddev.cctweaks.core.peripheral.PeripheralProxy;
 import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
+import org.squiddev.cctweaks.core.turtle.LuaDirection;
 
 import java.util.Map;
 
@@ -268,7 +268,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 							throw new LuaException("Expected string");
 						}
 
-						ChunkCoordinates coords = LuaHelpers.getRelative(direction, turtle.getDirection(), turtle.getPosition());
+						ChunkCoordinates coords = LuaDirection.getRelative(direction, turtle.getDirection(), turtle.getPosition());
 						TileEntity tile = turtle.getWorld().getTileEntity(coords.posX, coords.posY, coords.posZ);
 
 						if (!(tile instanceof TileNetworkedWirelessBridge)) {
@@ -289,7 +289,7 @@ public class TurtleUpgradeWirelessBridge extends Module implements ITurtleUpgrad
 							throw new LuaException("Expected string");
 						}
 
-						ChunkCoordinates coords = LuaHelpers.getRelative(direction, turtle.getDirection(), turtle.getPosition());
+						ChunkCoordinates coords = LuaDirection.getRelative(direction, turtle.getDirection(), turtle.getPosition());
 						TileEntity tile = turtle.getWorld().getTileEntity(coords.posX, coords.posY, coords.posZ);
 
 						if (!(tile instanceof TileNetworkedWirelessBridge)) {

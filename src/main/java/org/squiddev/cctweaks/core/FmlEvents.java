@@ -4,7 +4,7 @@ import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.lua.DelayedTasks;
+import org.squiddev.cctweaks.lua.lib.DelayedTasks;
 
 import java.util.LinkedList;
 import java.util.Queue;
