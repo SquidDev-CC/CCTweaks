@@ -21,7 +21,6 @@ Miscellaneous changes for ComputerCraft
  - Blacklist turtle verbs - no more `turtle.inspect` if you don't like it.
  - Turtle refuel using RF/EU
  - Turtle tool host - use any tool with turtles
- - Turtles named dinnerbone or Grumm turn upside down
 
 ### Networking
  - Networking API: add custom network components
@@ -35,6 +34,7 @@ Miscellaneous changes for ComputerCraft
  - Computer upgrades - convert normal computers to advanced!
  - Debug Wand - add the debug API to any computer
  - Monitors emit light
+ - Pocket computer upgrades
  
 ## Contributing
 ### Code and dependencies:

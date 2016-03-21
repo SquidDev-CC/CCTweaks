@@ -33,22 +33,16 @@ gui.config.cctweaks.computer.computerThreadTimeout=Computer Thread Timeout
 gui.config.cctweaks.computer.luaJC=LuaJC
 gui.config.cctweaks.computer.luaJCVerify=Verify LuaJC
 gui.config.cctweaks.computer.cobalt=Cobalt VM
+gui.config.cctweaks.computer.timeoutError=Timeout Error
 
 gui.config.cctweaks.turtle=Turtle
 gui.config.cctweaks.turtle.fluxRefuelAmount=RF Refuel Amount
 gui.config.cctweaks.turtle.euRefuelAmount=EU Refuel Amount
 gui.config.cctweaks.turtle.disabledActions=Disabled Actions
-<<<<<<< HEAD
-=======
-gui.config.cctweaks.turtle.funNames=Fun names
->>>>>>> minecraft-1.7.10
 
 gui.config.cctweaks.turtle.toolhost=Tool Host
 gui.config.cctweaks.turtle.toolhost.enabled=Enabled
-<<<<<<< HEAD
-=======
 gui.config.cctweaks.turtle.toolhost.advanced=Enabled Advanced
->>>>>>> minecraft-1.7.10
 gui.config.cctweaks.turtle.toolhost.crafting=Enable Crafting
 gui.config.cctweaks.turtle.toolhost.upgradeId=Upgrade ID
 gui.config.cctweaks.turtle.toolhost.advancedUpgradeId=Advanced Upgrade ID
