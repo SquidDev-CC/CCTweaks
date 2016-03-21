@@ -7,14 +7,21 @@ import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.relauncher.FMLInjectionData;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 
-@IFMLLoadingPlugin.TransformerExclusions({"org.squiddev.cctweaks.core.asm.", "org.squiddev.cctweaks.core.Config", "org.squiddev.patcher"})
+@IFMLLoadingPlugin.TransformerExclusions({
+	// CCTweaks-Lua
+	"org.squiddev.cctweaks.lua.asm.",
+	"org.squiddev.cctweaks.lua.Config",
+	// CCTweaks
+	"org.squiddev.cctweaks.core.asm.",
+	// Shared
+	"org.squiddev.patcher",
+})
 @IFMLLoadingPlugin.MCVersion("${mc_version}")
 @IFMLLoadingPlugin.SortingIndex(1001) // After runtime deobsfucation
 public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
@@ -24,10 +31,10 @@ public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
 	public TweaksLoadingPlugin() {
 		if (minecraftDir == null) {
 			minecraftDir = (File) FMLInjectionData.data()[6];
-			Config.init(new File(new File(minecraftDir, "config"), CCTweaks.ID + ".cfg"));
+			org.squiddev.cctweaks.core.Config.init(new File(new File(minecraftDir, "config"), CCTweaks.ID + ".cfg"));
 
 			dump = new File(new File(TweaksLoadingPlugin.minecraftDir, "asm"), CCTweaks.NAME);
-			if (Config.Testing.dumpAsm && !dump.exists() && !dump.mkdirs()) {
+			if (org.squiddev.cctweaks.lua.Config.Testing.dumpAsm && !dump.exists() && !dump.mkdirs()) {
 				DebugLogger.error("Cannot create ASM dump folder");
 			}
 		}

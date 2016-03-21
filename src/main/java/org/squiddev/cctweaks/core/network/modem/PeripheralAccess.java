@@ -9,7 +9,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.lua.ArgumentDelegator;
 import org.squiddev.cctweaks.api.lua.IArguments;
 import org.squiddev.cctweaks.api.lua.IBinaryHandler;
-import org.squiddev.cctweaks.core.lua.BinaryConverter;
+import org.squiddev.cctweaks.lua.lib.BinaryConverter;
 
 import java.util.HashMap;
 import java.util.Map;

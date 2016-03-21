@@ -7,9 +7,10 @@ import org.apache.logging.log4j.Level;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.asm.binary.BinaryUtils;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
+import org.squiddev.cctweaks.lua.asm.CustomChain;
+import org.squiddev.cctweaks.lua.asm.Tweaks;
 import org.squiddev.patcher.Logger;
 import org.squiddev.patcher.transformer.ClassMerger;
 import org.squiddev.patcher.transformer.ClassReplacer;
@@ -19,7 +20,7 @@ import org.squiddev.patcher.transformer.ISource;
 import java.io.*;
 
 public class ASMTransformer implements IClassTransformer {
-	protected final CustomChain patches = new CustomChain();
+	private final CustomChain patches = new CustomChain();
 
 	protected void add(Object[] patchers) {
 		for (Object patcher : patchers) {
@@ -34,8 +35,7 @@ public class ASMTransformer implements IClassTransformer {
 			This probably includes *_Rewrite as well as many of the binary handlers as they only exist
 			because they need to stub classes that we patch anyway.
 		 */
-		patches.addPatchFile("org.luaj.vm2.lib.DebugLib");
-		patches.addPatchFile("org.luaj.vm2.lib.StringLib");
+		Tweaks.setup(patches);
 
 		add(new Object[]{
 			// General stuff
@@ -52,13 +52,7 @@ public class ASMTransformer implements IClassTransformer {
 				"org.squiddev.cctweaks.core.patch.TurtleBrain_Patch"
 			),
 			new DisableTurtleCommand(),
-			new CustomTimeout(),
-			new InjectLuaJC(),
-			new WhitelistGlobals(),
-			new CustomAPIs(),
 			new TurtleBrainAlsoPeripheral(),
-			new AddAdditionalData(),
-			new CustomMachine(),
 
 			// Networking
 			new ClassMerger(
@@ -92,6 +86,8 @@ public class ASMTransformer implements IClassTransformer {
 				"openperipheral.addons.peripheralproxy.WrappedPeripheral",
 				"org.squiddev.cctweaks.core.patch.op.PeripheralProxy_Patch"
 			),
+
+			// OP Patches: targeted peripherals & network environment
 			new PatchOpenPeripheralAdapter(),
 			new PatchOpenModule(),
 
@@ -116,7 +112,6 @@ public class ASMTransformer implements IClassTransformer {
 				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"
 			),
 		});
-		BinaryUtils.inject(patches);
 
 		patches.finalise();
 
@@ -188,7 +183,7 @@ public class ASMTransformer implements IClassTransformer {
 	}
 
 	public void writeDump(String className, byte[] bytes) {
-		if (Config.Testing.dumpAsm) {
+		if (org.squiddev.cctweaks.lua.Config.Testing.dumpAsm) {
 			File file = new File(TweaksLoadingPlugin.dump, className.replace('.', '/') + ".class");
 			File directory = file.getParentFile();
 			if (directory.exists() || directory.mkdirs()) {

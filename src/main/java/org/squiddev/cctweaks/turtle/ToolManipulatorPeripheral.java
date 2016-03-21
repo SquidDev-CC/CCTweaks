@@ -28,8 +28,8 @@ import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
-import org.squiddev.cctweaks.core.lua.DelayedTask;
 import org.squiddev.cctweaks.core.turtle.TurtleRegistry;
+import org.squiddev.cctweaks.lua.lib.DelayedTask;
 
 public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatiblePeripheral {
 	private final ITurtleAccess access;

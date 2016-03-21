@@ -6,7 +6,6 @@ import org.squiddev.cctweaks.blocks.debug.BlockDebug;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.client.ModelLoader;
 import org.squiddev.cctweaks.client.render.RenderNetworkOverlay;
-import org.squiddev.cctweaks.core.lua.ApiModule;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHostProvider;
 import org.squiddev.cctweaks.core.pocket.CraftingPocketUpgrade;
 import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
@@ -19,6 +18,7 @@ import org.squiddev.cctweaks.items.ItemDataCard;
 import org.squiddev.cctweaks.items.ItemDebugger;
 import org.squiddev.cctweaks.items.ItemToolHost;
 import org.squiddev.cctweaks.pocket.PocketWirelessBinding;
+import org.squiddev.cctweaks.lua.lib.ApiRegister;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
 
 import java.util.HashSet;
@@ -54,8 +54,13 @@ public final class Registry {
 
 		// CC Providers
 		addModule(new PeripheralHostProvider());
+		addModule(new Module() {
+			@Override
+			public void init() {
+				ApiRegister.init();
+			}
+		});
 		addModule(new TurtleUpgradeWirelessBridge());
-		addModule(new ApiModule());
 
 		// CCTweaks providers
 		addModule(new DefaultTurtleProviders());

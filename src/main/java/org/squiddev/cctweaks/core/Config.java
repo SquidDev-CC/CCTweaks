@@ -1,11 +1,9 @@
 package org.squiddev.cctweaks.core;
 
 import net.minecraftforge.common.config.Configuration;
-import org.squiddev.cctweaks.core.lua.socket.AddressMatcher;
 import org.squiddev.configgen.*;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,22 +14,20 @@ import java.util.Set;
 public final class Config {
 	public static Configuration configuration;
 	public static Set<String> turtleDisabledActions;
-	public static Set<String> globalWhitelist;
-
-	public static AddressMatcher socketWhitelist;
-	public static AddressMatcher socketBlacklist;
 
 	public static void init(File file) {
-		ConfigLoader.init(file);
+		org.squiddev.cctweaks.lua.ConfigForgeLoader.init(file);
+		org.squiddev.cctweaks.core.ConfigForgeLoader.init(org.squiddev.cctweaks.lua.ConfigForgeLoader.getConfiguration());
 	}
 
 	public static void sync() {
-		ConfigLoader.sync();
+		org.squiddev.cctweaks.core.ConfigForgeLoader.doSync();
+		org.squiddev.cctweaks.lua.ConfigForgeLoader.sync();
 	}
 
 	@OnSync
 	public static void onSync() {
-		configuration = ConfigLoader.getConfiguration();
+		configuration = org.squiddev.cctweaks.lua.ConfigForgeLoader.getConfiguration();
 
 		// Handle generation of HashSets, etc...
 		Set<String> disabledActions = turtleDisabledActions = new HashSet<String>();
@@ -39,15 +35,10 @@ public final class Config {
 			disabledActions.add(action.toLowerCase());
 		}
 
-		globalWhitelist = new HashSet<String>(Arrays.asList(Computer.globalWhitelist));
-
 		Computer.computerUpgradeCrafting &= Computer.computerUpgradeEnabled;
 
 		Network.WirelessBridge.crafting &= Network.WirelessBridge.enabled;
 		Network.WirelessBridge.turtleEnabled &= Network.WirelessBridge.enabled;
-
-		socketWhitelist = new AddressMatcher(APIs.Socket.whitelist);
-		socketBlacklist = new AddressMatcher(APIs.Socket.blacklist);
 	}
 
 	/**
@@ -73,48 +64,6 @@ public final class Config {
 		 */
 		@DefaultBoolean(true)
 		public static boolean debugWandEnabled;
-
-		/**
-		 * Globals to whitelist (are not set to nil).
-		 * This is NOT recommended for servers, use at your own risk.
-		 */
-		@RequiresRestart(mc = false, world = true)
-		public static String[] globalWhitelist;
-
-		/**
-		 * Time in milliseconds before 'Too long without yielding' errors.
-		 * You cannot shutdown/reboot the computer during this time.
-		 * Use carefully.
-		 */
-		@DefaultInt(7000)
-		@Range(min = 0)
-		public static int computerThreadTimeout;
-
-		/**
-		 * Compile Lua bytecode to Java bytecode.
-		 * This speeds up code execution.
-		 */
-		@DefaultBoolean(false)
-		@RequiresRestart(mc = false, world = true)
-		public static boolean luaJC;
-
-		/**
-		 * Verify LuaJC sources on generation.
-		 * This will slow down compilation.
-		 * If you have errors, please turn this and debug on and
-		 * send it with the bug report.
-		 */
-		@DefaultBoolean(false)
-		public static boolean luaJCVerify;
-
-		/**
-		 * Use the Cobalt Lua engine instead.
-		 * This is a fork of LuaJ with many bugs fixed.
-		 * However other bugs may have appeared, so use with caution.
-		 * This is incompatible with LuaJC.
-		 */
-		@DefaultBoolean(false)
-		public static boolean cobalt;
 	}
 
 	/**
@@ -303,110 +252,16 @@ public final class Config {
 	}
 
 	/**
-	 * Custom APIs for computers
-	 */
-	public static final class APIs {
-		/**
-		 * TCP connections from the socket API
-		 */
-		public static final class Socket {
-			/**
-			 * Enable TCP connections.
-			 * When enabled, the socket API becomes available on
-			 * all computers.
-			 */
-			@DefaultBoolean(true)
-			@RequiresRestart(mc = false, world = true)
-			public static boolean enabled;
-
-			/**
-			 * Blacklisted domain names.
-			 *
-			 * Entries are either domain names (www.example.com) or IP addresses in
-			 * string format (10.0.0.3), optionally in CIDR notation to make it easier
-			 * to define address ranges (1.0.0.0/8). Domains are resolved to their
-			 * actual IP once on startup, future requests are resolved and compared
-			 * to the resolved addresses.
-			 */
-			@DefaultString({"127.0.0.0/8", "10.0.0.0/8", "192.168.0.0/16", "172.16.0.0/12"})
-			public static String[] blacklist;
-
-			/**
-			 * Whitelisted domain names.
-			 * If something is mentioned in both the blacklist and whitelist then
-			 * the blacklist takes priority.
-			 */
-			public static String[] whitelist;
-
-			/**
-			 * Maximum TCP connections a computer can have at any time
-			 */
-			@DefaultInt(4)
-			@Range(min = 1)
-			public static int maxTcpConnections;
-
-			/**
-			 * Number of threads to use for processing name lookups.
-			 */
-			@DefaultInt(4)
-			@Range(min = 1)
-			@RequiresRestart
-			public static int threads;
-
-			/**
-			 * Maximum number of characters to read from a socket.
-			 */
-			@DefaultInt(2048)
-			@Range(min = 1)
-			public static int maxRead;
-		}
-
-		/**
-		 * Basic data manipulation
-		 */
-		public static final class Data {
-			/**
-			 * If the data API is enabled
-			 */
-			@DefaultBoolean(true)
-			@RequiresRestart(mc = false, world = true)
-			public static boolean enabled;
-
-			/**
-			 * Maximum number of bytes to process.
-			 * The default is 1MiB
-			 */
-			@DefaultInt(1048576)
-			public static int limit;
-		}
-	}
-
-	/**
 	 * Only used when testing and developing the mod.
 	 * Nothing to see here, move along...
 	 */
 	public static final class Testing {
-		/**
-		 * Show debug messages.
-		 * If you hit a bug, enable this, rerun and send the log
-		 */
-		@DefaultBoolean(false)
-		public static boolean debug;
-
 		/**
 		 * Enable debug blocks/items.
 		 * Only use for testing.
 		 */
 		@DefaultBoolean(false)
 		public static boolean debugItems;
-
-		/**
-		 * Throw exceptions on calling deprecated methods
-		 *
-		 * Only for development/testing
-		 */
-		@DefaultBoolean(false)
-		public static boolean deprecatedWarnings;
 
 		/**
 		 * Controller validation occurs by default as a
@@ -419,11 +274,5 @@ public final class Config {
 		 */
 		@DefaultBoolean(false)
 		public static boolean extendedControllerValidation;
-
-		/**
-		 * Dump the modified class files to asm/CCTweaks
-		 */
-		@DefaultBoolean(false)
-		public static boolean dumpAsm;
 	}
 }

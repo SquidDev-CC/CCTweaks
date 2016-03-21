@@ -39,8 +39,6 @@ repositories {
 configurations {
 	shade
 	compile.extendsFrom shade
-
-	packaged
 }
 
 dependencies {
@@ -55,15 +53,16 @@ dependencies {
 	provided "net.industrial-craft:industrialcraft-2:2.+:api"
 	provided "openperipheral:OpenPeripheralCore-API:3.2"
 
-	shade 'org.squiddev:Cobalt:0.1'
-	shade('org.squiddev:luaj.luajc:1.0.5') {
-		// A custom LuaJ source is provided with ComputerCraft
-		exclude group: 'org.ow2.asm'
-		exclude group: 'org.luaj'
+	shade('org.squiddev:cctweaks-lua:1.0.2') {
+		// Different versions
+		exclude group: 'ComputerCraft'
+		exclude group: 'com.google.guava'
+		exclude group: 'net.minecraftforge'
+		exclude module: 'ConfigGen'
 	}
 
 	shade('org.squiddev:Patcher:1.1.1.1') { exclude group: 'org.ow2.asm' }
-	provided('org.squiddev:ConfigGen:1.1') { exclude group: 'net.minecraftforge' }
+	provided('org.squiddev:ConfigGen:1.2.3') { exclude group: 'net.minecraftforge' }
 
 	testCompile group: "junit", name: "junit", version: "4.+"
 }
