@@ -16,12 +16,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -150,10 +145,10 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 			GameRegistry.addRecipe(new ImpostorRecipe(3, 3,
 				new ItemStack[]{
 					gold, gold, gold,
-					gold, TurtleItemFactory.create(-1, null, null, ComputerFamily.Normal, null, null, 0, null, null), gold,
+					gold, TurtleItemFactory.create(-1, null, null, ComputerFamily.Normal, null, null, 0, null), gold,
 					gold, stack, gold,
 				},
-				TurtleItemFactory.create(-1, null, null, ComputerFamily.Advanced, null, null, 0, null, null)
+				TurtleItemFactory.create(-1, null, null, ComputerFamily.Advanced, null, null, 0, null)
 			));
 
 			// Non-wireless pocket computer

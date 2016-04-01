@@ -47,7 +47,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 				id, label, turtle.getColour(computerStack), ComputerFamily.Advanced,
 				turtle.getUpgrade(computerStack, TurtleSide.Left),
 				turtle.getUpgrade(computerStack, TurtleSide.Right),
-				turtle.getFuelLevel(computerStack), null, null
+				turtle.getFuelLevel(computerStack), null
 			);
 		} else if (computerItem instanceof ItemPocketComputer) {
 			ItemPocketComputer pocket = (ItemPocketComputer) computerItem;
