@@ -58,6 +58,10 @@ public class CraftingPocketUpgrade extends Module implements IRecipe {
 		tag.setShort("upgrade", PocketRegistry.FLAG);
 		tag.setString("upgrade_name", upgrade.getUpgradeID().toString());
 
+		// Ensure a new computer is created
+		tag.removeTag("instanceID");
+		tag.removeTag("sessionID");
+
 		return pocket;
 	}
 

@@ -94,7 +94,8 @@ public final class PocketRegistry implements IPocketRegistry {
 
 	public IPocketUpgrade getFromItemStack(ItemStack stack) {
 		for (IPocketUpgrade entry : upgrades.values()) {
-			if (InventoryUtil.areItemsStackable(stack, entry.getCraftingItem())) {
+			ItemStack craftingStack = entry.getCraftingItem();
+			if (craftingStack != null && InventoryUtil.areItemsStackable(stack, craftingStack)) {
 				return entry;
 			}
 		}

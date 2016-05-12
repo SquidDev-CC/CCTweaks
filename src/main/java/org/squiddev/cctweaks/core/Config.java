@@ -102,12 +102,14 @@ public final class Config {
 			 * Enable the Tool Host
 			 */
 			@DefaultBoolean(true)
+			@RequiresRestart
 			public static boolean enabled;
 
 			/**
 			 * Enable the Tool Manipulator
 			 */
 			@DefaultBoolean(true)
+			@RequiresRestart
 			public static boolean advanced;
 
 			/**
@@ -170,7 +172,7 @@ public final class Config {
 			 * Enable the Wireless Bridge upgrade for turtles.
 			 */
 			@DefaultBoolean(true)
-			@RequiresRestart
+			@RequiresRestart(mc = false, world = true)
 			public static boolean turtleEnabled;
 
 			/**
@@ -183,10 +185,9 @@ public final class Config {
 
 			/**
 			 * Enable the Wireless Bridge upgrade for pocket computers.
-			 * Requires Peripherals++
 			 */
 			@DefaultBoolean(true)
-			@RequiresRestart
+			@RequiresRestart(mc = false, world = true)
 			public static boolean pocketEnabled;
 
 			/**
@@ -249,6 +250,13 @@ public final class Config {
 		@DefaultInt(10)
 		@Range(min = 0, max = 15)
 		public static int advancedMonitorLight;
+
+		/**
+		 * Enable the Ender modem pocket computer upgrade
+		 */
+		@DefaultBoolean(true)
+		@RequiresRestart(mc = false, world = true)
+		public static boolean pocketEnderModem;
 	}
 
 	/**

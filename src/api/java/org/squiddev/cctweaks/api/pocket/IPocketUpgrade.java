@@ -40,7 +40,7 @@ public interface IPocketUpgrade {
 	 * with to create a turtle which holds this upgrade. This item stack is also used
 	 * to determine the upgrade given by turtle.equip()
 	 *
-	 * @return The item stack used for crafting.
+	 * @return The item stack used for crafting. This can be {@code null} if crafting is disabled.
 	 * @see ITurtleUpgrade#getCraftingItem()
 	 */
 	ItemStack getCraftingItem();

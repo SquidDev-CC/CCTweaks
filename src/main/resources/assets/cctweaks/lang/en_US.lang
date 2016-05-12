@@ -23,6 +23,7 @@ turtle.cctweaks.wirelessBridge.adjective=Networked
 turtle.cctweaks.toolHost.adjective=Gripping
 turtle.cctweaks.toolHost.advanced.adjective=Manipulative
 pocket.cctweaks.wirelessBridge.adjective=Networked
+pocket.cctweaks.advancedModem.adjective=Ender
 
 gui.config.cctweaks.computer=Computer
 gui.config.cctweaks.computer.computerUpgradeEnabled=Computer Upgrade Enabled
@@ -72,6 +73,7 @@ gui.config.cctweaks.testing.dumpAsm=Dump ASM
 gui.config.cctweaks.misc=Miscellaneous
 gui.config.cctweaks.misc.monitorLight=Monitor Light
 gui.config.cctweaks.misc.advancedMonitorLight=Advanced Monitor Light
+gui.config.cctweaks.misc.pocketEnderModem=Pocket Ender Modem
 
 gui.config.cctweaks.apis=APIs
 gui.config.cctweaks.apis.socket=Socket

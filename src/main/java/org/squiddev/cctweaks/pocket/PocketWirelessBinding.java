@@ -48,7 +48,7 @@ public class PocketWirelessBinding extends Module implements IPocketUpgrade {
 
 	@Override
 	public void update(IPocketAccess access, IPeripheral peripheral) {
-		if (peripheral instanceof PocketBinding.PocketModemPeripheral) {
+		if (Config.Network.WirelessBridge.pocketEnabled && peripheral instanceof PocketBinding.PocketModemPeripheral) {
 			PocketBinding binding = ((PocketBinding.PocketModemPeripheral) peripheral).getBinding();
 
 			binding.update(); // Update entity and save
@@ -219,11 +219,6 @@ public class PocketWirelessBinding extends Module implements IPocketUpgrade {
 				return PocketBinding.this;
 			}
 		}
-	}
-
-	@Override
-	public boolean canLoad() {
-		return Config.Network.WirelessBridge.pocketEnabled;
 	}
 
 	@Override
