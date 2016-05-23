@@ -8,6 +8,7 @@ import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.FmlEvents;
 import org.squiddev.cctweaks.core.network.controller.NetworkController;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,15 +38,20 @@ public final class NetworkHelpers implements INetworkHelpers {
 
 	@Override
 	public Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node, boolean checkExists) {
-		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
 		IWorldPosition position = node.getPosition();
-		World world = checkExists && position.getWorld() instanceof World ? (World) position.getWorld() : null;
+		IBlockAccess access = position.getWorld();
+
+		// It might happen
+		if(access == null) return Collections.emptySet();
+
+		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
+		World world = checkExists && access instanceof World ? (World) access : null;
 
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
 			if (node.canConnect(direction)) {
 				int x = position.getX() + direction.offsetX, y = position.getY() + direction.offsetY, z = position.getZ() + direction.offsetZ;
 				if (world == null || world.blockExists(x, y, z)) {
-					IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(position.getWorld(), x, y, z);
+					IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(access, x, y, z);
 
 					if (neighbour != null && neighbour.canConnect(direction.getOpposite())) {
 						nodes.add(neighbour);
