@@ -1,6 +1,11 @@
 # CCTweaks [![Build Status](https://travis-ci.org/SquidDev-CC/CCTweaks.svg?branch=minecraft-1.8.9)](https://travis-ci.org/SquidDev-CC/CCTweaks)
 Miscellaneous changes for ComputerCraft
 
+## Important!
+CCTweaks is a core mod and makes modifications to the internals of ComputerCraft. Whilst the mod is thoroughly tested there may be issues. If you encounter any bugs report them *here* and **not** on the ComputerCraft issue tracker. This will ensure a faster response time and will ensure you do not frustrate DanTwoHundred. 
+
+Thanks :smile:!
+
 ## Features
 
 ### Programming ([More up-to-date list here](https://github.com/SquidDev-CC/CCTweaks-Lua))
@@ -35,7 +40,7 @@ Miscellaneous changes for ComputerCraft
  - Debug Wand - add the debug API to any computer
  - Monitors emit light
  - Pocket computer upgrades
- 
+
 ## Contributing
 ### Code and dependencies:
 You'll need Git installed. If you are using Windows, replace `./gradlew` with `gradlew.bat`
@@ -52,14 +57,8 @@ CCTweaks is available on Maven. To include it in your project you will need the 
 repositories {
 	// Holds the main CCTweaks code
 	maven {
-    		name = "squiddev"
-    		url = "https://dl.bintray.com/squiddev/maven"
-    	}
-
-	// ComputerCraft
-	ivy {
-		name = "computercraft"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2272/212/[module][revision](.[ext])"
+		name = "squiddev"
+		url = "https://dl.bintray.com/squiddev/maven"
 	}
 }
 

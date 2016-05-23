@@ -9,6 +9,7 @@ import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.controller.NetworkController;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,16 +35,21 @@ public final class NetworkHelpers implements INetworkHelpers {
 
 	@Override
 	public Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node, boolean checkExists) {
-		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
 		IWorldPosition position = node.getPosition();
+		IBlockAccess access = position.getBlockAccess();
+
+		// It might happen
+		if(access == null) return Collections.emptySet();
+
+		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
+		World world = checkExists && access instanceof World ? (World) access : null;
 		BlockPos blockPos = position.getPosition();
-		World world = checkExists && position.getBlockAccess() instanceof World ? (World) position.getBlockAccess() : null;
 
 		for (EnumFacing direction : EnumFacing.VALUES) {
 			if (node.canConnect(direction)) {
 				BlockPos pos = blockPos.offset(direction);
 				if (world == null || world.isBlockLoaded(pos)) {
-					IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(position.getBlockAccess(), pos);
+					IWorldNetworkNode neighbour = NetworkAPI.registry().getNode(access, pos);
 
 					if (neighbour != null && neighbour.canConnect(direction.getOpposite())) {
 						nodes.add(neighbour);
