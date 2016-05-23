@@ -1,4 +1,4 @@
-# CCTweaks [![Build Status](https://travis-ci.org/SquidDev-CC/CC-Tweaks.svg?branch=minecraft-1.7.10)](https://travis-ci.org/SquidDev-CC/CC-Tweaks)
+# CCTweaks [![Build Status](https://travis-ci.org/SquidDev-CC/CCTweaks.svg?branch=minecraft-1.7.10)](https://travis-ci.org/SquidDev-CC/CCTweaks)
 Miscellaneous changes for ComputerCraft
 
 ## Important!
@@ -60,12 +60,6 @@ repositories {
     		name = "squiddev"
     		url = "https://dl.bintray.com/squiddev/maven"
     	}
-
-	// ComputerCraft
-	ivy {
-		name = "computercraft"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2272/212/[module][revision](.[ext])"
-	}
 }
 
 dependencies {
