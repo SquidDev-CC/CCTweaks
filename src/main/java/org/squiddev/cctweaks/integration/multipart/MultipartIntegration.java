@@ -49,7 +49,6 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 		itemPart = new ItemCustomPart();
 
 		GameRegistry.registerItem(itemPart, "itemPart");
-		Helpers.twoWayCrafting(new ItemStack(Registry.blockNetworked, 1, 0), new ItemStack(itemPart, 1, 0));
 
 		// Register parts
 		MultipartRegistry.registerPart(PartCable.class, CCTweaks.NAME + ":Cable");
@@ -90,6 +89,11 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 				return null;
 			}
 		});
+	}
+
+	@Override
+	public void init() {
+		Helpers.twoWayCrafting(new ItemStack(Registry.blockNetworked, 1, 0), new ItemStack(itemPart, 1, 0));
 	}
 
 	@Override
