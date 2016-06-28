@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.turtle;
 
 import dan200.computercraft.api.turtle.ITurtleAccess;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 

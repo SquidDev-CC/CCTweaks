@@ -8,12 +8,13 @@ import dan200.computercraft.shared.turtle.blocks.ITurtleTile;
 import dan200.computercraft.shared.util.InventoryUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.IFluidBlock;
@@ -99,15 +100,16 @@ public class DefaultTurtleProviders extends Module {
 		// Add bucket using provider
 		CCTweaksAPI.instance().turtleRegistry().registerInteraction(new AbstractTurtleInteraction() {
 			@Override
-			public boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) {
+			public boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) {
 				if (!FluidContainerRegistry.isBucket(stack)) return false;
 
 				BlockPos coords = turtle.getPosition().offset(direction);
-				Block block = turtle.getWorld().getBlockState(coords).getBlock();
+				IBlockState state = turtle.getWorld().getBlockState(coords);
+				Block block = state.getBlock();
 
-				if (block == null || block.isAir(turtle.getWorld(), coords)) {
+				if (block.isAir(state, turtle.getWorld(), coords)) {
 					return FluidContainerRegistry.isFilledContainer(stack);
-				} else if (block instanceof IFluidBlock || block instanceof BlockLiquid || block.getMaterial().isLiquid()) {
+				} else if (block instanceof IFluidBlock || block instanceof BlockLiquid || block.getMaterial(state).isLiquid()) {
 					return FluidContainerRegistry.isEmptyContainer(stack);
 				} else {
 					return false;

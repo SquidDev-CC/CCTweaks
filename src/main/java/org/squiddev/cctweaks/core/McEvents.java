@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.core;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -76,14 +77,15 @@ public class McEvents {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onHarvestDrops(BlockEvent.HarvestDropsEvent event) {
 		if (blockConsumers.size() > 0) {
-			IDropConsumer consumer = blockConsumers.get(new WorldPosition(event.world, event.pos));
+			World world = event.getWorld();
+			IDropConsumer consumer = blockConsumers.get(new WorldPosition(world, event.getPos()));
 			if (consumer != null) {
-				for (ItemStack item : event.drops) {
-					if (event.world.rand.nextFloat() < event.dropChance) {
+				for (ItemStack item : event.getDrops()) {
+					if (world.rand.nextFloat() < event.getDropChance()) {
 						consumer.consumeDrop(item);
 					}
 				}
-				event.drops.clear();
+				event.getDrops().clear();
 
 			}
 		}
@@ -91,12 +93,12 @@ public class McEvents {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onEntityLivingDrops(LivingDropsEvent event) {
-		IDropConsumer consumer = entityConsumers.get(event.entity);
+		IDropConsumer consumer = entityConsumers.get(event.getEntity());
 		if (consumer != null) {
-			for (EntityItem item : event.drops) {
+			for (EntityItem item : event.getDrops()) {
 				consumer.consumeDrop(item.getEntityItem());
 			}
-			event.drops.clear();
+			event.getDrops().clear();
 		}
 	}
 
@@ -139,7 +141,7 @@ public class McEvents {
 
 	@SubscribeEvent
 	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-		if (eventArgs.modID.equals(CCTweaks.ID)) {
+		if (eventArgs.getModID().equals(CCTweaks.ID)) {
 			Config.sync();
 		}
 	}

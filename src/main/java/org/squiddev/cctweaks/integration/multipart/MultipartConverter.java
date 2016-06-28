@@ -6,10 +6,11 @@ import dan200.computercraft.shared.peripheral.modem.TileCable;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.IPartConverter;
+import mcmultipart.multipart.IReversePartConverter;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.core.network.modem.SinglePeripheralModem;
@@ -22,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-public class MultipartConverter implements IPartConverter.IPartConverter2, IPartConverter.IReversePartConverter {
+public class MultipartConverter implements IPartConverter, IReversePartConverter {
 	@Override
 	public Collection<Block> getConvertableBlocks() {
 		return Collections.<Block>singleton(ComputerCraft.Blocks.cable);

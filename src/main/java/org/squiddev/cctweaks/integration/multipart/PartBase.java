@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.integration.multipart;
 
-import mcmultipart.client.multipart.IHitEffectsPart;
-import mcmultipart.multipart.IOccludingPart;
+import mcmultipart.client.multipart.AdvancedParticleManager;
+import mcmultipart.multipart.INormallyOccludingPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.MultipartRegistry;
 import mcmultipart.raytrace.PartMOP;
@@ -10,15 +10,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
 import java.util.Collections;
 import java.util.List;
 
-public abstract class PartBase extends Multipart implements IHitEffectsPart, IOccludingPart, IWorldPosition {
+public abstract class PartBase extends Multipart implements INormallyOccludingPart, IWorldPosition {
 	public abstract Block getBlock();
 
 	public ItemStack getStack() {
@@ -42,7 +42,7 @@ public abstract class PartBase extends Multipart implements IHitEffectsPart, IOc
 	}
 
 	@Override
-	public boolean addDestroyEffects(AdvancedEffectRenderer advancedEffectRenderer) {
+	public boolean addDestroyEffects(AdvancedParticleManager advancedEffectRenderer) {
 		advancedEffectRenderer.addBlockDestroyEffects(
 			getPos(),
 			Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(
@@ -53,7 +53,7 @@ public abstract class PartBase extends Multipart implements IHitEffectsPart, IOc
 	}
 
 	@Override
-	public boolean addHitEffects(PartMOP partMOP, AdvancedEffectRenderer advancedEffectRenderer) {
+	public boolean addHitEffects(PartMOP partMOP, AdvancedParticleManager advancedEffectRenderer) {
 		return true;
 	}
 

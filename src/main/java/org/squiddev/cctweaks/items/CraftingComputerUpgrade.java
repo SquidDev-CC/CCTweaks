@@ -17,18 +17,20 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
+import javax.annotation.Nonnull;
+
 /**
  * Handles crafting with ComputerUpgrades
  */
 public class CraftingComputerUpgrade implements IRecipe {
 
 	@Override
-	public boolean matches(InventoryCrafting inventorycrafting, World world) {
+	public boolean matches(@Nonnull InventoryCrafting inventorycrafting, @Nonnull World world) {
 		return getComputerStack(inventorycrafting) != null;
 	}
 
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
+	public ItemStack getCraftingResult(@Nonnull InventoryCrafting inventorycrafting) {
 		ItemStack computerStack = getComputerStack(inventorycrafting);
 		if (computerStack == null) return null;
 
@@ -64,7 +66,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 	 * @param crafting The crafting inventory space
 	 * @return The ItemStack with a computer type in, or null if the recipe doesn't match
 	 */
-	protected ItemStack getComputerStack(InventoryCrafting crafting) {
+	private ItemStack getComputerStack(InventoryCrafting crafting) {
 		int size = crafting.getSizeInventory();
 
 		ItemStack computerStack = null;
@@ -78,7 +80,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 			}
 
 			Item item = itemStack.getItem();
-			if (item == Items.gold_ingot) {
+			if (item == Items.GOLD_INGOT) {
 				gold++;
 			} else if (item instanceof IComputerItem) {
 				// If its a 'computer'
@@ -115,8 +117,9 @@ public class CraftingComputerUpgrade implements IRecipe {
 		return ComputerItemFactory.create(-1, null, ComputerFamily.Advanced);
 	}
 
+	@Nonnull
 	@Override
-	public ItemStack[] getRemainingItems(InventoryCrafting inventory) {
+	public ItemStack[] getRemainingItems(@Nonnull InventoryCrafting inventory) {
 		ItemStack[] result = new ItemStack[inventory.getSizeInventory()];
 
 		for (int i = 0; i < result.length; ++i) {

@@ -57,13 +57,14 @@ public abstract class TileLazyNBT extends TileBase {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
-		super.writeToNBT(tag);
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		tag = super.writeToNBT(tag);
 		if (lazyTag != null) {
 			for (String field : getFields()) {
 				NBTBase fieldTag = lazyTag.getTag(field);
 				if (fieldTag != null) tag.setTag(field, fieldTag);
 			}
 		}
+		return tag;
 	}
 }

@@ -5,11 +5,11 @@ import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.IDAssigner;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -41,7 +41,7 @@ public class Helpers {
 	 */
 	public static String translateOrDefault(String def, String... strings) {
 		for (String string : strings) {
-			if (StatCollector.canTranslate(string)) return StatCollector.translateToLocal(string);
+			if (I18n.canTranslate(string)) return I18n.translateToLocal(string);
 		}
 
 		return def;

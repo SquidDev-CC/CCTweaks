@@ -9,7 +9,7 @@ import dan200.computercraft.api.turtle.TurtleCommandResult;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.util.FakePlayer;
 import org.squiddev.cctweaks.api.turtle.ITurtleInteraction;
 import org.squiddev.cctweaks.api.turtle.ITurtleRegistry;
@@ -34,7 +34,7 @@ public class TurtleRegistry implements ITurtleRegistry, ITurtleInteraction {
 	}
 
 	@Override
-	public TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) throws LuaException {
+	public TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) throws LuaException {
 		for (ITurtleInteraction interaction : itemInteractions.get(stack.getItem())) {
 			TurtleCommandResult result = interaction.swing(turtle, computer, player, stack, direction, hit);
 			if (result != null) return result;
@@ -49,7 +49,7 @@ public class TurtleRegistry implements ITurtleRegistry, ITurtleInteraction {
 	}
 
 	@Override
-	public TurtleCommandResult use(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) throws LuaException {
+	public TurtleCommandResult use(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) throws LuaException {
 		for (ITurtleInteraction interaction : itemInteractions.get(stack.getItem())) {
 			TurtleCommandResult result = interaction.use(turtle, computer, player, stack, direction, hit);
 			if (result != null) return result;
@@ -64,7 +64,7 @@ public class TurtleRegistry implements ITurtleRegistry, ITurtleInteraction {
 	}
 
 	@Override
-	public boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) {
+	public boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) {
 		for (ITurtleInteraction interaction : itemInteractions.get(stack.getItem())) {
 			boolean result = interaction.canUse(turtle, player, stack, direction, hit);
 			if (result) return true;
@@ -79,7 +79,7 @@ public class TurtleRegistry implements ITurtleRegistry, ITurtleInteraction {
 	}
 
 	@Override
-	public boolean canSwing(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) {
+	public boolean canSwing(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) {
 		for (ITurtleInteraction interaction : itemInteractions.get(stack.getItem())) {
 			boolean result = interaction.canSwing(turtle, player, stack, direction, hit);
 			if (result) return true;

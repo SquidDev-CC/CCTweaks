@@ -17,7 +17,7 @@ public abstract class ItemBase extends Item implements IClientModule {
 		name = itemName;
 
 		setUnlocalizedName(CCTweaks.RESOURCE_DOMAIN + "." + name);
-
+		setRegistryName(CCTweaks.ID, name);
 		setCreativeTab(CCTweaks.getCreativeTab());
 		setMaxStackSize(stackSize);
 	}
@@ -39,7 +39,7 @@ public abstract class ItemBase extends Item implements IClientModule {
 
 	@Override
 	public void preInit() {
-		GameRegistry.registerItem(this, name);
+		GameRegistry.register(this);
 	}
 
 	@Override

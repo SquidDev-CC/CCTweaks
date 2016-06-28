@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
@@ -41,9 +42,10 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	};
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
-		super.writeToNBT(tag);
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		tag = super.writeToNBT(tag);
 		binding.save(tag);
+		return tag;
 	}
 
 	@Override
@@ -69,8 +71,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	}
 
 	@Override
-	public boolean onActivated(EntityPlayer player, EnumFacing side) {
-		ItemStack stack = player.getHeldItem();
+	public boolean onActivated(EntityPlayer player, EnumFacing side, EnumHand hand, ItemStack stack) {
 		return stack != null && stack.getItem() instanceof IDataCard && onActivated(stack, (IDataCard) stack.getItem(), player);
 	}
 

@@ -4,7 +4,7 @@ import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.PartSlot;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -52,9 +52,10 @@ public abstract class PartSided extends PartLazyNBT implements ISlottedPart {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
-		super.writeToNBT(tag);
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		tag = super.writeToNBT(tag);
 		tag.setByte("side", (byte) side.ordinal());
+		return tag;
 	}
 
 	@Override
@@ -76,8 +77,8 @@ public abstract class PartSided extends PartLazyNBT implements ISlottedPart {
 	}
 
 	@Override
-	public BlockState createBlockState() {
-		return new BlockState(MCMultiPartMod.multipart, SIDE);
+	public BlockStateContainer createBlockState() {
+		return new BlockStateContainer(MCMultiPartMod.multipart, SIDE);
 	}
 
 	@Override

@@ -7,8 +7,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
@@ -71,8 +74,8 @@ public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHo
 	}
 
 	@Override
-	public String getModelPath() {
-		return "cctweaks:wirelessBridgeSmall";
+	public ResourceLocation getModelPath() {
+		return new ResourceLocation(CCTweaks.ID, "wirelessBridgeSmall");
 	}
 
 	@Override
@@ -103,7 +106,7 @@ public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHo
 	//endregion
 
 	@Override
-	public boolean onActivated(EntityPlayer player, ItemStack stack, PartMOP hit) {
+	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 		if (getWorld().isRemote) return true;
 
 		if (stack != null && stack.getItem() instanceof IDataCard) {
@@ -147,9 +150,10 @@ public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHo
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		tag = super.writeToNBT(tag);
 		binding.save(tag);
-		super.writeToNBT(tag);
+		return tag;
 	}
 
 	@Override

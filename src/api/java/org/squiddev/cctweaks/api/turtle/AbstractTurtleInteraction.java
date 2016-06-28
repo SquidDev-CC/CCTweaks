@@ -7,7 +7,7 @@ import dan200.computercraft.api.turtle.TurtleCommandResult;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.util.FakePlayer;
 
 /**
@@ -19,22 +19,22 @@ import net.minecraftforge.common.util.FakePlayer;
  */
 public abstract class AbstractTurtleInteraction implements ITurtleInteraction {
 	@Override
-	public TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) throws LuaException {
+	public TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) throws LuaException {
 		return null;
 	}
 
 	@Override
-	public boolean canSwing(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) {
+	public boolean canSwing(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) {
 		return false;
 	}
 
 	@Override
-	public TurtleCommandResult use(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) throws LuaException {
+	public TurtleCommandResult use(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) throws LuaException {
 		return null;
 	}
 
 	@Override
-	public boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) {
+	public boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) {
 		return false;
 	}
 }

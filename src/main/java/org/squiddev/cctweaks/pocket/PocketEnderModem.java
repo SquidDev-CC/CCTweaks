@@ -10,7 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
@@ -76,13 +76,13 @@ public class PocketEnderModem extends Module implements IPocketUpgrade {
 		}
 
 		@Override
-		protected Vec3 getPosition() {
+		protected Vec3d getPosition() {
 			Entity entity = this.access.getEntity();
 			if (entity instanceof EntityLivingBase) {
 				EntityLivingBase modemLight = (EntityLivingBase) entity;
-				return new Vec3(modemLight.posX, modemLight.posY + modemLight.height, modemLight.posZ);
+				return new Vec3d(modemLight.posX, modemLight.posY + modemLight.height, modemLight.posZ);
 			} else if (entity != null) {
-				return new Vec3(entity.posX, entity.posY, entity.posZ);
+				return new Vec3d(entity.posX, entity.posY, entity.posZ);
 			} else {
 				return null;
 			}

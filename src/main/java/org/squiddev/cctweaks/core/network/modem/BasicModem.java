@@ -5,9 +5,9 @@ import com.google.common.collect.SetMultimap;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.IReceiver;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
@@ -65,7 +65,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	}
 
 	@Override
-	public void transmit(int channel, int replyChannel, Object payload, World world, Vec3 pos, double range, boolean interdimensional, Object senderObject) {
+	public void transmit(int channel, int replyChannel, Object payload, World world, Vec3d pos, double range, boolean interdimensional, Object senderObject) {
 		networkController.transmitPacket(this, new Packet(channel, replyChannel, payload, senderObject));
 	}
 

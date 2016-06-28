@@ -4,12 +4,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -31,8 +32,17 @@ import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Node;
  * This is a helper to render a network when testing.
  */
 public final class RenderNetworkOverlay extends Module implements IClientModule {
-	public int ticksInGame;
+	private int ticksInGame;
 	public static VisualisationData data;
+
+	private boolean hasItem() {
+		Minecraft minecraft = Minecraft.getMinecraft();
+		ItemStack stack = minecraft.thePlayer.getHeldItem(EnumHand.MAIN_HAND);
+		if (stack != null && stack.getItem() == Registry.itemDebugger) return true;
+
+		stack = minecraft.thePlayer.getHeldItem(EnumHand.OFF_HAND);
+		return stack != null && stack.getItem() == Registry.itemDebugger;
+	}
 
 	@SubscribeEvent
 	public void onWorldRenderLast(RenderWorldLastEvent event) {
@@ -40,8 +50,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		if (data == null) return;
 
 		Minecraft minecraft = Minecraft.getMinecraft();
-		ItemStack stack = minecraft.thePlayer.getHeldItem();
-		if (stack == null || stack.getItem() != Registry.itemDebugger) return;
+		if (!hasItem()) return;
 
 		GlStateManager.pushMatrix();
 		RenderManager renderManager = minecraft.getRenderManager();
@@ -61,7 +70,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 	}
 
 	private void renderNetwork(VisualisationData data, Color color, float thickness) {
-		MovingObjectPosition position = Minecraft.getMinecraft().objectMouseOver;
+		RayTraceResult position = Minecraft.getMinecraft().objectMouseOver;
 
 		Set<Node> nodes = new HashSet<Node>();
 
@@ -73,7 +82,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 			}
 
 			// We render a label of all nodes at this point.
-			if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+			if (position.typeOfHit == RayTraceResult.Type.BLOCK) {
 				if (a.position != null) {
 					if (a.position.equals(position.getBlockPos())) {
 						nodes.add(a);
@@ -91,7 +100,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		}
 
 		// Custom handling for networks with 0 connections (single node networks)
-		if (data.connections.length == 0 && position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+		if (data.connections.length == 0 && position.typeOfHit == RayTraceResult.Type.BLOCK) {
 			for (Node node : data.nodes) {
 				BlockPos nodePosition = node.position;
 				if (nodePosition != null && nodePosition.equals(position.getBlockPos())) {
@@ -139,7 +148,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 		// Render label background
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer renderer = tessellator.getWorldRenderer();
+		VertexBuffer renderer = tessellator.getBuffer();
 
 		int width = fontrenderer.getStringWidth(label);
 		int xOffset = width / 2;
@@ -165,7 +174,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 	private void renderLine(BlockPos a, BlockPos b) {
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer renderer = tessellator.getWorldRenderer();
+		VertexBuffer renderer = tessellator.getBuffer();
 
 		renderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 		renderer.pos(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5).endVertex();

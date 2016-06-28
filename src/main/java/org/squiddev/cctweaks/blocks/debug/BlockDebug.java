@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.blocks.debug;
 
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -98,8 +98,8 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	protected BlockState createBlockState() {
-		return new BlockState(this, TYPE);
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, TYPE);
 	}
 
 	@Override

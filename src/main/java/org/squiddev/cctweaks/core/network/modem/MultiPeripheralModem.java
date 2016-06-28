@@ -2,7 +2,7 @@ package org.squiddev.cctweaks.core.network.modem;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.PeripheralUtil;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;

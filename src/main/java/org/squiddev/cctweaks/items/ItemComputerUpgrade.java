@@ -16,7 +16,14 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -28,6 +35,7 @@ import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.InventoryUtils;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 
@@ -36,9 +44,14 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		super("computerUpgrade");
 	}
 
+	@Nonnull
 	@Override
-	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumFacing side, float hitX, float hitY, float hitZ) {
-		return Config.Computer.computerUpgradeEnabled && super.onItemUseFirst(stack, player, world, position, side, hitX, hitY, hitZ);
+	public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+		if (Config.Computer.computerUpgradeEnabled) {
+			return super.onItemUseFirst(stack, player, world, position, side, hitX, hitY, hitZ, hand);
+		} else {
+			return EnumActionResult.PASS;
+		}
 	}
 
 	@Override
@@ -72,9 +85,9 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		}
 
 		if (!player.capabilities.isCreativeMode) {
-			int remaining = InventoryUtils.extractItems(player.inventory, Items.gold_ingot, 7);
+			int remaining = InventoryUtils.extractItems(player.inventory, Items.GOLD_INGOT, 7);
 			if (remaining > 0) {
-				player.addChatMessage(new ChatComponentText("7 gold required. Need " + remaining + " more.").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_RED)));
+				player.addChatMessage(new TextComponentString("7 gold required. Need " + remaining + " more.").setStyle(new Style().setColor(TextFormatting.DARK_RED)));
 				return false;
 			}
 
@@ -112,7 +125,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 	@SideOnly(Side.CLIENT)
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
-		list.add(StatCollector.translateToLocal("gui.tooltip.cctweaks.computerUpgrade.normal"));
+		list.add(I18n.translateToLocal("gui.tooltip.cctweaks.computerUpgrade.normal"));
 	}
 
 	@Override
@@ -122,11 +135,11 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 
 		ItemStack stack = new ItemStack(this);
 		if (Config.Computer.computerUpgradeCrafting) {
-			GameRegistry.addRecipe(stack, "GGG", "GSG", "GSG", 'G', Items.gold_ingot, 'S', Blocks.stone);
+			GameRegistry.addRecipe(stack, "GGG", "GSG", "GSG", 'G', Items.GOLD_INGOT, 'S', Blocks.STONE);
 		}
 
 
-		RecipeSorter.register(CCTweaks.RESOURCE_DOMAIN + ":computer_upgrade_crafting", CraftingComputerUpgrade.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+		RecipeSorter.register(CCTweaks.ID + ":computer_upgrade_crafting", CraftingComputerUpgrade.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		GameRegistry.addRecipe(new CraftingComputerUpgrade());
 
 		// Add some impostor recipes for NEI. We just use CC's default ones
@@ -141,7 +154,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 			));
 
 			// Turtle (Is is silly to include every possible upgrade so we just do the normal one)
-			ItemStack gold = new ItemStack(Items.gold_ingot);
+			ItemStack gold = new ItemStack(Items.GOLD_INGOT);
 			GameRegistry.addRecipe(new ImpostorRecipe(3, 3,
 				new ItemStack[]{
 					gold, gold, gold,

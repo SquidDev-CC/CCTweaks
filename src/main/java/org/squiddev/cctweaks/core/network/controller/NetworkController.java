@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;

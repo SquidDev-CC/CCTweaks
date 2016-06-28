@@ -9,7 +9,7 @@ import mcmultipart.MCMultiPartMod;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,6 +17,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.text.TextComponentTranslation;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
@@ -116,8 +119,8 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	}
 
 	@Override
-	public String getModelPath() {
-		return "cctweaks:modem";
+	public ResourceLocation getModelPath() {
+		return new ResourceLocation(CCTweaks.ID, "modem");
 	}
 
 	@Override
@@ -137,8 +140,8 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	}
 
 	@Override
-	public BlockState createBlockState() {
-		return new BlockState(MCMultiPartMod.multipart, SIDE, MODEM);
+	public BlockStateContainer createBlockState() {
+		return new BlockStateContainer(MCMultiPartMod.multipart, SIDE, MODEM);
 	}
 
 	@Override
@@ -148,10 +151,11 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	//endregion
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		tag = super.writeToNBT(tag);
 		tag.setBoolean("modem_enabled", modem.isEnabled());
 		tag.setInteger("modem_id", modem.id);
-		super.writeToNBT(tag);
+		return tag;
 	}
 
 	@Override
@@ -217,7 +221,7 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	}
 
 	@Override
-	public boolean onActivated(EntityPlayer player, ItemStack stack, PartMOP hit) {
+	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 		if (player.isSneaking()) return false;
 		if (getWorld().isRemote) return true;
 		if (modem.getAttachedNetwork() == null) return false;
@@ -230,11 +234,11 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 
 		if (!Helpers.equals(name, newName)) {
 			if (name != null) {
-				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", name));
+				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", name));
 			}
 
 			if (newName != null) {
-				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
+				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
 			}
 
 			modem.getAttachedNetwork().invalidateNode(modem);

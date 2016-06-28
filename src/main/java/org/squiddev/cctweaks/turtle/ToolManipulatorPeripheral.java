@@ -15,12 +15,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -121,13 +125,13 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		}.execute(computer, context);
 	}
 
-	public Object[] doUse(DelayedTask task, IComputerAccess computer, EnumFacing direction, boolean sneak, int duration) throws LuaException {
+	private Object[] doUse(DelayedTask task, IComputerAccess computer, EnumFacing direction, boolean sneak, int duration) throws LuaException {
 		player.updateInformation(access, direction);
 		player.posY += 1.5;
 		player.loadWholeInventory(access);
 		player.setSneaking(sneak);
 
-		MovingObjectPosition hit = findHit(direction, 0.65);
+		RayTraceResult hit = findHit(direction, 0.65);
 		ItemStack stack = player.getItem(access);
 		World world = player.worldObj;
 
@@ -140,8 +144,13 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			if (hit != null) {
 				switch (hit.typeOfHit) {
 					case ENTITY:
-						if (stack != null && player.interactWith(hit.entityHit)) {
-							return new Object[]{true, "entity", "interact"};
+						if (stack != null) {
+							EnumActionResult result = player.interact(hit.entityHit, stack, EnumHand.MAIN_HAND);
+							if (result == EnumActionResult.FAIL) {
+								return new Object[]{false, "entity", "interact"};
+							} else if (result == EnumActionResult.SUCCESS) {
+								return new Object[]{false, "entity", "interact"};
+							}
 						}
 						break;
 					case BLOCK: {
@@ -155,31 +164,31 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				}
 			}
 
-			if (stack != null && !ForgeEventFactory.onPlayerInteract(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, world, null, null).isCanceled()) {
+			if (stack != null && !MinecraftForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickEmpty(player, EnumHand.MAIN_HAND))) {
 				player.posX += direction.getFrontOffsetX() * 0.6;
 				player.posY += direction.getFrontOffsetY() * 0.6;
 				player.posZ += direction.getFrontOffsetZ() * 0.6;
 
 				duration = Math.min(duration, stack.getMaxItemUseDuration());
-				ItemStack old = stack.copy();
-				ItemStack result = stack.useItemRightClick(player.worldObj, player);
+				ActionResult<ItemStack> result = stack.useItemRightClick(player.worldObj, player, EnumHand.MAIN_HAND);
 				task.delay = duration;
 
-				boolean using = player.isUsingItem();
-				if (using && !ForgeEventFactory.onUseItemStop(player, player.itemInUse, duration)) {
-					player.itemInUse.onPlayerStoppedUsing(player.worldObj, player, player.itemInUse.getMaxItemUseDuration() - duration);
-					player.clearItemInUse();
+				boolean using = player.isHandActive();
+				ItemStack inUse = player.getActiveItemStack();
+				if (using && !ForgeEventFactory.onUseItemStop(player, inUse, duration)) {
+					inUse.onPlayerStoppedUsing(player.worldObj, player, inUse.getMaxItemUseDuration() - duration);
+					player.stopActiveHand();
 				}
 
-				if (using || !ItemStack.areItemStacksEqual(old, result)) {
-					player.inventory.setInventorySlotContents(player.inventory.currentItem, result);
-					return new Object[]{true, "item", "use"};
+				if (using || result.getType() != EnumActionResult.PASS) {
+					player.inventory.setInventorySlotContents(player.inventory.currentItem, result.getResult());
+					return new Object[]{result.getType() == EnumActionResult.SUCCESS, "item", "use"};
 				} else {
 					return new Object[]{false};
 				}
 			}
 		} finally {
-			player.clearItemInUse();
+			player.stopActiveHand();
 			player.unloadWholeInventory(access);
 			player.setSneaking(false);
 		}
@@ -187,9 +196,10 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		return new Object[]{false};
 	}
 
-	public Object[] tryUseOnBlock(World world, MovingObjectPosition hit, ItemStack stack, EnumFacing side) {
-		if (!world.getBlockState(hit.getBlockPos()).getBlock().isAir(world, hit.getBlockPos())) {
-			if (ForgeEventFactory.onPlayerInteract(player, PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK, world, hit.getBlockPos(), side).isCanceled()) {
+	private Object[] tryUseOnBlock(World world, RayTraceResult hit, ItemStack stack, EnumFacing side) {
+		IBlockState state = world.getBlockState(hit.getBlockPos());
+		if (!state.getBlock().isAir(state, world, hit.getBlockPos())) {
+			if (MinecraftForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickBlock(player, EnumHand.MAIN_HAND, stack, hit.getBlockPos(), side, hit.hitVec))) {
 				return new Object[]{true, "block", "interact"};
 			}
 
@@ -200,19 +210,23 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		return null;
 	}
 
-	public Object[] onPlayerRightClick(ItemStack stack, BlockPos pos, EnumFacing side, Vec3 look) {
+	private Object[] onPlayerRightClick(ItemStack stack, BlockPos pos, EnumFacing side, Vec3d look) {
 		float xCoord = (float) look.xCoord - (float) pos.getX();
 		float yCoord = (float) look.yCoord - (float) pos.getY();
 		float zCoord = (float) look.zCoord - (float) pos.getZ();
 		World world = player.worldObj;
+		EnumActionResult result;
 
-		if (stack != null && stack.getItem() != null && stack.getItem().onItemUseFirst(stack, player, world, pos, side, xCoord, yCoord, zCoord)) {
-			return new Object[]{true, "item", "use"};
+		if (stack != null) {
+			result = stack.getItem().onItemUseFirst(stack, player, world, pos, side, xCoord, yCoord, zCoord, EnumHand.MAIN_HAND);
+			if (result != EnumActionResult.PASS) {
+				return new Object[]{result == EnumActionResult.SUCCESS, "item", "use"};
+			}
 		}
 
-		if (!player.isSneaking() || stack == null || stack.getItem().doesSneakBypassUse(world, pos, player)) {
+		if (!player.isSneaking() || stack == null || stack.getItem().doesSneakBypassUse(stack, world, pos, player)) {
 			IBlockState state = world.getBlockState(pos);
-			if (state.getBlock().onBlockActivated(world, pos, state, player, side, xCoord, yCoord, zCoord)) {
+			if (state.getBlock().onBlockActivated(world, pos, state, player, EnumHand.MAIN_HAND, stack, side, xCoord, yCoord, zCoord)) {
 				return new Object[]{true, "block", "interact"};
 			}
 		}
@@ -226,12 +240,13 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			}
 		}
 
-		if (stack.onItemUse(player, world, pos, side, xCoord, yCoord, zCoord)) {
+		result = stack.onItemUse(player, world, pos, EnumHand.MAIN_HAND, side, xCoord, yCoord, zCoord);
+		if (result != EnumActionResult.PASS) {
 			if (stack.stackSize <= 0) {
-				MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(player, stack));
+				MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(player, stack, EnumHand.MAIN_HAND));
 			}
 
-			return new Object[]{true, "place"};
+			return new Object[]{result == EnumActionResult.SUCCESS, "place"};
 		}
 
 		return null;
@@ -239,7 +254,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 	//endregion
 
 	//region Swing
-	public Object[] swing(final IComputerAccess computer, ILuaContext context, InteractDirection direction, Object[] args) throws LuaException, InterruptedException {
+	private Object[] swing(final IComputerAccess computer, ILuaContext context, InteractDirection direction, Object[] args) throws LuaException, InterruptedException {
 		final boolean sneak;
 
 		if (args.length <= 0 || args[0] == null) {
@@ -264,7 +279,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		});
 	}
 
-	public TurtleCommandResult doSwing(IComputerAccess computer, EnumFacing direction, boolean sneak) throws LuaException {
+	private TurtleCommandResult doSwing(IComputerAccess computer, EnumFacing direction, boolean sneak) throws LuaException {
 		player.updateInformation(access, direction);
 		player.posY += 1.5;
 		player.loadWholeInventory(access);
@@ -272,7 +287,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 
 		ItemStack stack = player.getItem(access);
 		TurtleAnimation animation = side == TurtleSide.Left ? TurtleAnimation.SwingLeftTool : TurtleAnimation.SwingRightTool;
-		MovingObjectPosition hit = findHit(direction, 0.65);
+		RayTraceResult hit = findHit(direction, 0.65);
 
 		try {
 			if (stack != null) {
@@ -298,7 +313,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				}
 			}
 		} finally {
-			player.clearItemInUse();
+			player.stopActiveHand();
 			player.unloadWholeInventory(access);
 			player.setSneaking(false);
 		}
@@ -308,7 +323,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 	//endregion
 
 	//region Can use
-	public Object[] canUse(final IComputerAccess computer, ILuaContext context, InteractDirection dir, Object[] args) throws LuaException, InterruptedException {
+	private Object[] canUse(final IComputerAccess computer, ILuaContext context, InteractDirection dir, Object[] args) throws LuaException, InterruptedException {
 		final EnumFacing direction = dir.toWorldDir(access);
 		return context.executeMainThreadTask(new ILuaTask() {
 			@Override
@@ -317,8 +332,8 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				player.posY += 1.5;
 				player.loadWholeInventory(access);
 
-				ItemStack stack = player.getHeldItem();
-				MovingObjectPosition hit = findHit(direction, 0.65);
+				ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
+				RayTraceResult hit = findHit(direction, 0.65);
 
 				try {
 					if (stack != null) {
@@ -334,7 +349,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		});
 	}
 
-	public Object[] canSwing(final IComputerAccess computer, ILuaContext context, InteractDirection dir, Object[] args) throws LuaException, InterruptedException {
+	private Object[] canSwing(final IComputerAccess computer, ILuaContext context, InteractDirection dir, Object[] args) throws LuaException, InterruptedException {
 		final EnumFacing direction = dir.toWorldDir(access);
 		return context.executeMainThreadTask(new ILuaTask() {
 			@Override
@@ -342,8 +357,8 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				player.updateInformation(access, direction);
 				player.loadWholeInventory(access);
 
-				ItemStack stack = player.getHeldItem();
-				MovingObjectPosition hit = findHit(direction, 0.65);
+				ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
+				RayTraceResult hit = findHit(direction, 0.65);
 
 				try {
 					if (stack != null) {
@@ -351,8 +366,8 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 						if (result) return new Object[]{true};
 
 						if (hit != null && hit.entityHit != null) {
-							@SuppressWarnings("unchecked") Multimap<String, AttributeModifier> map = stack.getAttributeModifiers();
-							for (AttributeModifier modifier : map.get(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName())) {
+							@SuppressWarnings("unchecked") Multimap<String, AttributeModifier> map = stack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
+							for (AttributeModifier modifier : map.get(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName())) {
 								if (modifier.getAmount() > 0) {
 									return new Object[]{true};
 								}
@@ -360,7 +375,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 						}
 					}
 
-					if (hit != null && hit.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+					if (hit != null && hit.typeOfHit == RayTraceResult.Type.BLOCK) {
 						Block block = access.getWorld().getBlockState(hit.getBlockPos()).getBlock();
 						if (block.canHarvestBlock(access.getWorld(), hit.getBlockPos(), player)) {
 							return new Object[]{true};
@@ -376,25 +391,25 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 	}
 	//endregion
 
-	public MovingObjectPosition findHit(EnumFacing facing, double range) {
-		Vec3 origin = new Vec3(player.posX, player.posY, player.posZ);
-		Vec3 blockCenter = origin.addVector(
+	private RayTraceResult findHit(EnumFacing facing, double range) {
+		Vec3d origin = new Vec3d(player.posX, player.posY, player.posZ);
+		Vec3d blockCenter = origin.addVector(
 			facing.getFrontOffsetX() * 0.51,
 			facing.getFrontOffsetY() * 0.51,
 			facing.getFrontOffsetZ() * 0.51
 		);
-		Vec3 target = blockCenter.addVector(
+		Vec3d target = blockCenter.addVector(
 			facing.getFrontOffsetX() * range,
 			facing.getFrontOffsetY() * range,
 			facing.getFrontOffsetZ() * range
 		);
 
-		MovingObjectPosition hit = player.worldObj.rayTraceBlocks(origin, target);
-		Pair<Entity, Vec3> pair = WorldUtil.rayTraceEntities(player.worldObj, origin, target, 1.1);
+		RayTraceResult hit = player.worldObj.rayTraceBlocks(origin, target);
+		Pair<Entity, Vec3d> pair = WorldUtil.rayTraceEntities(player.worldObj, origin, target, 1.1);
 		Entity entity = pair == null ? null : pair.getLeft();
 
 		if (entity instanceof EntityLivingBase && (hit == null || origin.squareDistanceTo(blockCenter) > player.getDistanceSqToEntity(entity))) {
-			return new MovingObjectPosition(entity);
+			return new RayTraceResult(entity);
 		} else {
 			return hit;
 		}
@@ -423,7 +438,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		return equals((Object) other);
 	}
 
-	public static Object[] toObjectArray(TurtleCommandResult result) {
+	private static Object[] toObjectArray(TurtleCommandResult result) {
 		if (result.isSuccess()) {
 			Object[] resultVals = result.getResults();
 			if (resultVals == null) {

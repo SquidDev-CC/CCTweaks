@@ -5,12 +5,22 @@ import dan200.computercraft.core.lua.LuaJLuaMachine;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.util.PeripheralUtil;
+import mcmultipart.raytrace.RayTraceUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
 import org.luaj.vm2.LuaValue;
@@ -27,6 +37,7 @@ import org.squiddev.cctweaks.core.utils.WorldPosition;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
 import org.squiddev.cctweaks.core.visualiser.VisualisationPacket;
 
+import javax.annotation.Nonnull;
 import java.util.Set;
 
 public class ItemDebugger extends ItemComputerAction {
@@ -34,22 +45,29 @@ public class ItemDebugger extends ItemComputerAction {
 		super("debugger");
 	}
 
+	@Nonnull
 	@Override
-	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumFacing side, float hitX, float hitY, float hitZ) {
-		return Config.Computer.debugWandEnabled && super.onItemUseFirst(stack, player, world, position, side, hitX, hitY, hitZ);
+	public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+		if (Config.Computer.debugWandEnabled) {
+			return super.onItemUseFirst(stack, player, world, position, side, hitX, hitY, hitZ, hand);
+		} else {
+			return EnumActionResult.PASS;
+		}
 	}
 
+	@Nonnull
 	@Override
-	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+	public ActionResult<ItemStack> onItemRightClick(@Nonnull ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
 		// Allow manually refreshing the network
-		if (player.isSneaking() && !world.isRemote && player instanceof EntityPlayerMP && Config.Computer.debugWandEnabled) {
-			handleWatcher((EntityPlayerMP) player, NetworkPlayerWatcher.get(player), true);
+		if (player.isSneaking() && player instanceof EntityPlayerMP && Config.Computer.debugWandEnabled) {
+			if (!world.isRemote) handleWatcher((EntityPlayerMP) player, NetworkPlayerWatcher.get(player), true);
+			return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
 		}
 
-		return super.onItemRightClick(stack, world, player);
+		return super.onItemRightClick(stack, world, player, hand);
 	}
 
-	protected void handleWatcher(EntityPlayerMP player, NetworkPlayerWatcher.Watcher watcher, boolean force) {
+	private void handleWatcher(EntityPlayerMP player, NetworkPlayerWatcher.Watcher watcher, boolean force) {
 		if (watcher == null) return;
 		if (watcher.changed() || force) VisualisationPacket.send(watcher.controller, player);
 		if (watcher.controller == null) NetworkPlayerWatcher.remove(player);
@@ -61,9 +79,10 @@ public class ItemDebugger extends ItemComputerAction {
 
 		if (!world.isRemote && entity instanceof EntityPlayerMP && Config.Computer.debugWandEnabled) {
 			EntityPlayerMP player = ((EntityPlayerMP) entity);
-			if (player.getHeldItem() == stack) {
-				MovingObjectPosition position = getMovingObjectPositionFromPlayer(world, player, false);
-				if (position == null || position.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
+
+			if (player.getHeldItem(EnumHand.MAIN_HAND) == stack || player.getHeldItem(EnumHand.OFF_HAND) == stack) {
+				RayTraceResult position = world.rayTraceBlocks(RayTraceUtils.getStart(player), RayTraceUtils.getEnd(player));
+				if (position == null || position.typeOfHit != RayTraceResult.Type.BLOCK) return;
 				handleWatcher(player, NetworkPlayerWatcher.update(player, position.getBlockPos()), false);
 			}
 		}
@@ -104,14 +123,14 @@ public class ItemDebugger extends ItemComputerAction {
 		IWorldPosition position = new WorldPosition(tile);
 
 		player.addChatMessage(
-			withColor("Tile: ", EnumChatFormatting.DARK_PURPLE)
+			withColor("Tile: ", TextFormatting.DARK_PURPLE)
 				.appendSibling(info(tile.getClass().getSimpleName() + ": " + tile.getBlockType().getLocalizedName()))
 		);
 
 		{
 			IPeripheral peripheral = PeripheralUtil.getPeripheral(tile.getWorld(), tile.getPos(), side);
 			if (peripheral != null) {
-				player.addChatMessage(withColor("Peripheral: ", EnumChatFormatting.AQUA).appendSibling(info(peripheral.getType())));
+				player.addChatMessage(withColor("Peripheral: ", TextFormatting.AQUA).appendSibling(info(peripheral.getType())));
 			}
 		}
 
@@ -119,9 +138,9 @@ public class ItemDebugger extends ItemComputerAction {
 			INetworkNode node = NetworkAPI.registry().getNode(tile);
 			INetworkController controller = node != null ? node.getAttachedNetwork() : null;
 			if (controller != null) {
-				player.addChatMessage(withColor("Network", EnumChatFormatting.LIGHT_PURPLE));
+				player.addChatMessage(withColor("Network", TextFormatting.LIGHT_PURPLE));
 				Set<INetworkNode> nodes = controller.getNodesOnNetwork();
-				player.addChatMessage(withColor(" Size: ", EnumChatFormatting.AQUA).appendSibling(info(nodes.size() + " nodes")));
+				player.addChatMessage(withColor(" Size: ", TextFormatting.AQUA).appendSibling(info(nodes.size() + " nodes")));
 
 				boolean writtenHeader = false;
 				for (INetworkNode remoteNode : nodes) {
@@ -130,16 +149,16 @@ public class ItemDebugger extends ItemComputerAction {
 						if (!peripherals.isEmpty()) {
 							if (!writtenHeader) {
 								writtenHeader = true;
-								player.addChatMessage(withColor(" Locals: ", EnumChatFormatting.AQUA));
+								player.addChatMessage(withColor(" Locals: ", TextFormatting.AQUA));
 							}
-							player.addChatMessage(withColor("  " + remoteNode.toString() + " ", EnumChatFormatting.DARK_AQUA).appendSibling(info(peripherals)));
+							player.addChatMessage(withColor("  " + remoteNode.toString() + " ", TextFormatting.DARK_AQUA).appendSibling(info(peripherals)));
 						}
 					}
 				}
 
 				Set<String> remotes = controller.getPeripheralsOnNetwork().keySet();
 				if (!remotes.isEmpty()) {
-					player.addChatMessage(withColor(" Remotes: ", EnumChatFormatting.AQUA).appendSibling(info(remotes)));
+					player.addChatMessage(withColor(" Remotes: ", TextFormatting.AQUA).appendSibling(info(remotes)));
 				}
 			}
 		}
@@ -147,15 +166,15 @@ public class ItemDebugger extends ItemComputerAction {
 		return false;
 	}
 
-	private static IChatComponent withColor(String message, EnumChatFormatting color) {
-		return new ChatComponentText(message).setChatStyle(new ChatStyle().setColor(color));
+	private static ITextComponent withColor(String message, TextFormatting color) {
+		return new TextComponentString(message).setStyle(new Style().setColor(color));
 	}
 
-	private static IChatComponent info(Iterable<String> message) {
+	private static ITextComponent info(Iterable<String> message) {
 		return info(StringUtils.join(message, ", "));
 	}
 
-	private static IChatComponent info(String message) {
-		return new ChatComponentText(message).setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GRAY).setItalic(true));
+	private static ITextComponent info(String message) {
+		return new TextComponentString(message).setStyle(new Style().setColor(TextFormatting.GRAY).setItalic(true));
 	}
 }
