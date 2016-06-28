@@ -52,14 +52,6 @@ jar {
 	from(configurations.shade
 		.findAll { it.getAbsolutePath().contains("org.squiddev") }
 		.collect { (it.isDirectory() ? it : zipTree(it)) })
-		{
-			exclude "**/OptionParser.class"
-		}
-
-	// Package the patch files into a patch/ folder
-	filesMatching("org/luaj/**", {
-		it.path = "patch/" + it.path
-	})
 
 	exclude("assets/**/docs")
 }

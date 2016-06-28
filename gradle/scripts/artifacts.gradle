@@ -37,11 +37,6 @@ task devJar(type: Jar) {
 		.findAll { it.getAbsolutePath().contains("org.squiddev") }
 		.collect { it.isDirectory() ? it : zipTree(it) }
 
-	// Package the patch files into a patch/ folder
-	filesMatching("org/luaj/**", {
-		it.path = "patch/" + it.path
-	})
-
 	classifier = 'dev'
 
 	exclude("assets/**/docs")

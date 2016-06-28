@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.core.network.PacketTest;
@@ -119,7 +119,7 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockPos, 
 	}
 
 	@Override
-	public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
+	public Biome getBiomeGenForCoords(BlockPos pos) {
 		return null;
 	}
 
