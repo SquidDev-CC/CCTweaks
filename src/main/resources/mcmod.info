@@ -5,7 +5,7 @@
 		"description": "Random tweaks to Computer Craft",
 		"version": "${mod_version}",
 		"mcversion": "${mc_version}",
-		"url": "https://github.com/SquidDev-CC/CC-Tweaks",
+		"url": "https://github.com/SquidDev-CC/CCTweaks",
 		"credits": "Dan200, Forge team, Luaj.org",
 		"authorList": [
 			"SquidDev",
