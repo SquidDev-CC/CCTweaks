@@ -1,6 +1,8 @@
 # CCTweaks [![Build Status](https://travis-ci.org/SquidDev-CC/CCTweaks.svg?branch=minecraft-1.7.10)](https://travis-ci.org/SquidDev-CC/CCTweaks)
 Miscellaneous changes for ComputerCraft
 
+**The 1.7.10 branch has been discontinued. I will release patches for major game-breaking bugs, but do not expect minor bugs to be fixed.**
+
 ## Important!
 CCTweaks is a core mod and makes modifications to the internals of ComputerCraft. Whilst the mod is thoroughly tested there may be issues. If you encounter any bugs report them *here* and **not** on the ComputerCraft issue tracker. This will ensure a faster response time and will ensure you do not frustrate DanTwoHundred. 
 
