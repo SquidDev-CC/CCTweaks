@@ -15,7 +15,7 @@ public abstract class TileNetworked extends TileBase implements IWorldNetworkNod
 	@Override
 	public void create() {
 		super.create();
-		NetworkHelpers.scheduleConnect(getNode());
+		NetworkHelpers.scheduleConnect(getNode(), this);
 	}
 
 	@Override

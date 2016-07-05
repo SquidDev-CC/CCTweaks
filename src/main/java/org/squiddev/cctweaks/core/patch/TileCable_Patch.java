@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.patch;
 
+import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
@@ -140,10 +141,13 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 
 				@Override
 				public void run() {
-					getCable().connect();
-					if (lazyTag != null) {
-						readLazyNBT(lazyTag);
-						lazyTag = null;
+					// In case the tile is removed within this tick
+					if (worldObj != null && worldObj.getBlockState(pos).getBlock() == ComputerCraft.Blocks.cable) {
+						getCable().connect();
+						if (lazyTag != null) {
+							readLazyNBT(lazyTag);
+							lazyTag = null;
+						}
 					}
 				}
 			});

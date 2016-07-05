@@ -152,7 +152,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 		super.onLoaded();
 
 		rebuildCanConnectMap();
-		if (!getWorld().isRemote) NetworkHelpers.scheduleConnect(cable);
+		if (!getWorld().isRemote) NetworkHelpers.scheduleConnect(cable, this);
 	}
 
 	@Override

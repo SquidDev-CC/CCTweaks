@@ -59,7 +59,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	@Override
 	public void create() {
 		super.create();
-		NetworkHelpers.scheduleConnect(binding);
+		NetworkHelpers.scheduleConnect(binding, this);
 	}
 
 	@Override

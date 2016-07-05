@@ -40,7 +40,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 
 	@Override
 	public void create() {
-		NetworkAPI.helpers().scheduleJoin(modem);
+		NetworkAPI.helpers().scheduleJoin(modem, this);
 		super.create();
 	}
 

@@ -1,13 +1,17 @@
 package org.squiddev.cctweaks.core.network;
 
+import mcmultipart.multipart.IMultipart;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.controller.NetworkController;
+import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,7 +43,7 @@ public final class NetworkHelpers implements INetworkHelpers {
 		IBlockAccess access = position.getBlockAccess();
 
 		// It might happen
-		if(access == null) return Collections.emptySet();
+		if (access == null) return Collections.emptySet();
 
 		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
 		World world = checkExists && access instanceof World ? (World) access : null;
@@ -102,12 +106,52 @@ public final class NetworkHelpers implements INetworkHelpers {
 		});
 	}
 
+	@Override
+	public void scheduleJoin(final IWorldNetworkNode node, final TileEntity tile) {
+		if (node == null) throw new IllegalArgumentException("node cannot be null");
+		McEvents.schedule(new Runnable() {
+			@Override
+			public void run() {
+				World world = tile.getWorld();
+				if (world != null && world.getTileEntity(tile.getPos()) == tile) {
+					joinNewNetwork(node);
+				}
+			}
+		});
+	}
+
 	public static void scheduleConnect(final AbstractWorldNode node) {
 		if (node == null) throw new IllegalArgumentException("node cannot be null");
 		McEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
 				node.connect();
+			}
+		});
+	}
+
+	public static void scheduleConnect(final AbstractWorldNode node, final TileEntity tile) {
+		if (node == null) throw new IllegalArgumentException("node cannot be null");
+		McEvents.schedule(new Runnable() {
+			@Override
+			public void run() {
+				World world = tile.getWorld();
+				if (world != null && world.getTileEntity(tile.getPos()) == tile) {
+					node.connect();
+				}
+			}
+		});
+	}
+
+	@Optional.Method(modid = MultipartIntegration.MOD_NAME)
+	public static void scheduleConnect(final AbstractWorldNode node, final IMultipart part) {
+		if (node == null) throw new IllegalArgumentException("node cannot be null");
+		McEvents.schedule(new Runnable() {
+			@Override
+			public void run() {
+				if (part.getWorld() != null) {
+					node.connect();
+				}
 			}
 		});
 	}

@@ -133,7 +133,7 @@ public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHo
 	@Override
 	public void onLoaded() {
 		super.onLoaded();
-		if (!getWorld().isRemote) NetworkHelpers.scheduleConnect(binding);
+		if (!getWorld().isRemote) NetworkHelpers.scheduleConnect(binding, this);
 	}
 
 	@Override
