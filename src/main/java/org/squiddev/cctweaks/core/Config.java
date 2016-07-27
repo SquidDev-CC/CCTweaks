@@ -95,6 +95,15 @@ public final class Config {
 		public static String[] disabledActions;
 
 		/**
+		 * Checks that blocks aren't protected
+		 * before breaking them and that they are
+		 * within the world border before moving
+		 * into them.
+		 */
+		@DefaultBoolean(false)
+		public static boolean enableProtection;
+
+		/**
 		 * Various tool host options
 		 */
 		public static class ToolHost {

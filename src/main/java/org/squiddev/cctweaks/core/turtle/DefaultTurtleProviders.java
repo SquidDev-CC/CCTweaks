@@ -1,10 +1,13 @@
 package org.squiddev.cctweaks.core.turtle;
 
+import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.api.permissions.ITurtlePermissionProvider;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import dan200.computercraft.api.turtle.TurtleSide;
 import dan200.computercraft.shared.turtle.blocks.ITurtleTile;
+import dan200.computercraft.shared.turtle.core.TurtlePlayer;
 import dan200.computercraft.shared.util.InventoryUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
@@ -14,6 +17,8 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.IFluidBlock;
@@ -24,6 +29,7 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.turtle.AbstractTurtleInteraction;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
+import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.Module;
 
 /**
@@ -112,6 +118,28 @@ public class DefaultTurtleProviders extends Module {
 				} else {
 					return false;
 				}
+			}
+		});
+
+		ComputerCraftAPI.registerPermissionProvider(new ITurtlePermissionProvider() {
+			@Override
+			public boolean isBlockEnterable(World world, BlockPos pos) {
+				// Block moving outside the world border
+				return !Config.Turtle.enableProtection || world.getWorldBorder().contains(pos);
+			}
+
+			@Override
+			public boolean isBlockEditable(World world, BlockPos pos) {
+				if (!Config.Turtle.enableProtection || !(world instanceof WorldServer)) return true;
+
+				WorldServer worldServer = (WorldServer) world;
+
+				// Setup a fake player
+				TurtlePlayer player = new TurtlePlayer(worldServer);
+				player.setPosition(pos.getX(), pos.getY(), pos.getZ());
+
+				// Check the block can be broken and is within the world border
+				return !worldServer.getMinecraftServer().isBlockProtected(world, pos, player) && world.getWorldBorder().contains(pos);
 			}
 		});
 	}

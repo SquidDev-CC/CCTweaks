@@ -40,6 +40,7 @@ gui.config.cctweaks.turtle=Turtle
 gui.config.cctweaks.turtle.fluxRefuelAmount=RF Refuel Amount
 gui.config.cctweaks.turtle.euRefuelAmount=EU Refuel Amount
 gui.config.cctweaks.turtle.disabledActions=Disabled Actions
+gui.config.cctweaks.turtle.enableProtection=Enable Protection
 
 gui.config.cctweaks.turtle.toolhost=Tool Host
 gui.config.cctweaks.turtle.toolhost.enabled=Enabled
