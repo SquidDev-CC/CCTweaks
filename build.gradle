@@ -19,15 +19,15 @@ plugins {
 buildDir = "build-${mc_version}"
 apply plugin: 'net.minecraftforge.gradle.forge'
 
+group = "org.squiddev"
+archivesBaseName = "CCTweaks"
+version = mc_version + "-" + mod_version
+
 apply from: 'gradle/scripts/dependencies.gradle'
 apply from: 'gradle/scripts/artifacts.gradle'
 apply from: 'gradle/scripts/upload.gradle'
 apply from: 'gradle/scripts/documentation.gradle'
 apply from: 'gradle/scripts/jsonGen.gradle'
-
-group = "org.squiddev"
-archivesBaseName = "CCTweaks"
-version = mc_version + "-" + mod_version
 
 minecraft {
 	version = project.mc_version + "-" + project.forge_version
