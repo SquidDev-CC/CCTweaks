@@ -114,7 +114,7 @@ public final class NetworkHelpers implements INetworkHelpers {
 			public void run() {
 				World world = tile.getWorld();
 				if (world != null && world.getTileEntity(tile.getPos()) == tile) {
-					joinNewNetwork(node);
+					joinOrCreateNetwork(node);
 				}
 			}
 		});
