@@ -5,7 +5,7 @@ import org.squiddev.cctweaks.api.network.INetworkNode;
 import java.util.*;
 
 /**
- * Various helper node functions
+ * Scans a list of points, putting each group of connected nodes in an individual network.
  */
 public class NodeScanner {
 	/**
@@ -49,20 +49,5 @@ public class NodeScanner {
 		}
 
 		return networks;
-	}
-
-	public static class TransmitPoint implements Comparable<TransmitPoint> {
-		public final Point point;
-		public final double distance;
-
-		public TransmitPoint(Point point, double distance) {
-			this.point = point;
-			this.distance = distance;
-		}
-
-		@Override
-		public int compareTo(TransmitPoint other) {
-			return Double.compare(this.distance, other.distance);
-		}
 	}
 }

@@ -56,7 +56,7 @@ public class NetworkController implements INetworkController {
 	 *
 	 * @param point The point to add
 	 */
-	protected void addPoint(Point point) {
+	private void addPoint(Point point) {
 		INetworkNode node = point.node;
 		if (node.getAttachedNetwork() != null) {
 			point.detachFromNetwork();
@@ -78,7 +78,7 @@ public class NetworkController implements INetworkController {
 	 * @return The point
 	 * @throws NullPointerException If the point cannot be found.
 	 */
-	public Point getPoint(INetworkNode node) {
+	private Point getPoint(INetworkNode node) {
 		Preconditions.checkNotNull(node, "Node cannot be null");
 		return Preconditions.checkNotNull(points.get(node), "Cannot find point for node %s", node);
 	}
@@ -90,7 +90,7 @@ public class NetworkController implements INetworkController {
 	 *
 	 * @param newNode The node to merge
 	 */
-	protected void assimilateNode(INetworkNode newNode) {
+	private void assimilateNode(INetworkNode newNode) {
 		INetworkController controller = newNode.getAttachedNetwork();
 
 		if (controller == null) {
@@ -132,7 +132,7 @@ public class NetworkController implements INetworkController {
 	 *
 	 * @param networks The networks to split into.
 	 */
-	protected void handleSplit(Collection<Map<INetworkNode, Point>> networks) {
+	private void handleSplit(Collection<Map<INetworkNode, Point>> networks) {
 		// If there are no changes, then we just ignore it.
 		if (networks.size() <= 1) return;
 
@@ -154,14 +154,21 @@ public class NetworkController implements INetworkController {
 	 *
 	 * @param difference The result of {@link Maps#difference(Map, Map)} on oldPeripherals, newPeripherals
 	 */
-	protected void handleInvalidation(MapDifference<String, IPeripheral> difference) {
+	private void handleInvalidation(MapDifference<String, IPeripheral> difference) {
 		handleInvalidation(difference.entriesOnlyOnLeft(), difference.entriesOnlyOnRight());
 	}
 
-	protected void handleInvalidation(Map<String, IPeripheral> removed, Map<String, IPeripheral> added) {
+	private void handleInvalidation(Map<String, IPeripheral> removed, Map<String, IPeripheral> added) {
 		for (Point point : points.values()) {
 			point.networkInvalidated(removed, added);
 		}
+	}
+
+	private void removePeripherals(Map<String, IPeripheral> peripherals) {
+		for (String name : peripherals.keySet()) {
+			peripheralsOnNetwork.remove(name);
+		}
+		handleInvalidation(Collections.unmodifiableMap(peripherals), Collections.<String, IPeripheral>emptyMap());
 	}
 	//endregion
 
@@ -198,6 +205,7 @@ public class NetworkController implements INetworkController {
 
 		points.remove(removedNode);
 		point.detachFromNetwork();
+		removePeripherals(point.peripherals);
 		handleSplit(point.breakConnections());
 
 		ControllerValidator.validate(this);
@@ -270,10 +278,10 @@ public class NetworkController implements INetworkController {
 		Point startPoint = getPoint(start);
 
 		Set<Point> received = new HashSet<Point>(points.size());
-		Queue<NodeScanner.TransmitPoint> transmitTo = new PriorityQueue<NodeScanner.TransmitPoint>();
-		transmitTo.offer(new NodeScanner.TransmitPoint(startPoint, 0));
+		Queue<TransmitPoint> transmitTo = new PriorityQueue<TransmitPoint>();
+		transmitTo.offer(new TransmitPoint(startPoint, 0));
 
-		NodeScanner.TransmitPoint nodePair;
+		TransmitPoint nodePair;
 		while ((nodePair = transmitTo.poll()) != null) {
 			Point point = nodePair.point;
 			if (!received.add(point)) continue;
@@ -296,8 +304,23 @@ public class NetworkController implements INetworkController {
 
 					distance += Math.sqrt(dx * dx + dy * dy + dz * dz);
 				}
-				transmitTo.offer(new NodeScanner.TransmitPoint(otherPoint, distance));
+				transmitTo.offer(new TransmitPoint(otherPoint, distance));
 			}
+		}
+	}
+
+	public static class TransmitPoint implements Comparable<TransmitPoint> {
+		public final Point point;
+		public final double distance;
+
+		public TransmitPoint(Point point, double distance) {
+			this.point = point;
+			this.distance = distance;
+		}
+
+		@Override
+		public int compareTo(TransmitPoint other) {
+			return Double.compare(this.distance, other.distance);
 		}
 	}
 }
