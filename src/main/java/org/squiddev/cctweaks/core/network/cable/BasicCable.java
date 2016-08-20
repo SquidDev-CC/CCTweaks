@@ -2,7 +2,7 @@ package org.squiddev.cctweaks.core.network.cable;
 
 import com.google.common.collect.Sets;
 import net.minecraft.util.EnumFacing;
-import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
+import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkHelpers;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
@@ -54,7 +54,7 @@ public abstract class BasicCable extends AbstractWorldNode {
 			}
 
 			for (INetworkNode removedNode : Sets.difference(attachedNodes, newNodes)) {
-				SingleTypeUnorderedPair<INetworkNode> connection = new SingleTypeUnorderedPair<INetworkNode>(this, removedNode);
+				UnorderedPair<INetworkNode> connection = new UnorderedPair<INetworkNode>(this, removedNode);
 
 				// The network can/will change whilst the loop is iterating.
 				if (getAttachedNetwork().getNodeConnections().contains(connection)) {

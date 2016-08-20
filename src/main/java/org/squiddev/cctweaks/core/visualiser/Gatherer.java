@@ -3,7 +3,7 @@ package org.squiddev.cctweaks.core.visualiser;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
+import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
@@ -38,10 +38,10 @@ public final class Gatherer {
 			index++;
 		}
 
-		Set<SingleTypeUnorderedPair<INetworkNode>> connections = controller.getNodeConnections();
+		Set<UnorderedPair<INetworkNode>> connections = controller.getNodeConnections();
 		Connection[] resultConnections = new Connection[connections.size()];
 		index = 0;
-		for (SingleTypeUnorderedPair<INetworkNode> connection : connections) {
+		for (UnorderedPair<INetworkNode> connection : connections) {
 			resultConnections[index] = new Connection(lookup.get(connection.x), lookup.get(connection.y));
 			index++;
 		}

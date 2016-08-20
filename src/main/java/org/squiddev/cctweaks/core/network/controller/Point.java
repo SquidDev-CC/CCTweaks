@@ -3,7 +3,7 @@ package org.squiddev.cctweaks.core.network.controller;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
+import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.utils.IterableIterator;
 
@@ -136,7 +136,7 @@ public class Point implements INetworkAccess {
 		return "Point<" + node + '>';
 	}
 
-	public static class Connection extends SingleTypeUnorderedPair<Point> {
+	public static class Connection extends UnorderedPair<Point> {
 		public Connection(Point x, Point y) {
 			super(x, y);
 

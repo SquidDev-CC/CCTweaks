@@ -1,12 +1,28 @@
 package org.squiddev.cctweaks.api;
 
-public class UnorderedPair<X, Y> {
-	public final X x;
-	public final Y y;
+public class UnorderedPair<T> {
+	public final T x;
+	public final T y;
 
-	public UnorderedPair(X x, Y y) {
+	public UnorderedPair(T x, T y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	/**
+	 * Gets the other object in the pair.
+	 *
+	 * @param obj The object that you don't want from this pair.
+	 * @return If obj is {@link #x}, returns {@link #y}. Else if obj is {@link #y}, returns {@link #x}. Else returns null.
+	 */
+	public T other(T obj) {
+		if (obj.equals(x)) {
+			return y;
+		} else if (obj.equals(y)) {
+			return x;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -28,7 +44,7 @@ public class UnorderedPair<X, Y> {
 			return true;
 		}
 		if (other instanceof UnorderedPair) {
-			UnorderedPair<?, ?> pair = (UnorderedPair) other;
+			UnorderedPair<?> pair = (UnorderedPair) other;
 			if (x.equals(pair.x) && y.equals(pair.y)) {
 				return true;
 			} else if (y.equals(pair.x) && x.equals(pair.y)) {

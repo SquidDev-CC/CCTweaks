@@ -3,7 +3,7 @@ package org.squiddev.cctweaks.core.network;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
-import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
+import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.core.network.controller.NetworkController;
@@ -128,7 +128,7 @@ public class NetworkTest {
 
 		{
 			// A--B--C
-			a.getAttachedNetwork().breakConnection(new SingleTypeUnorderedPair<INetworkNode>(a, c));
+			a.getAttachedNetwork().breakConnection(new UnorderedPair<INetworkNode>(a, c));
 
 			assertNotNull(a.getAttachedNetwork());
 			assertEquals(a.getAttachedNetwork(), b.getAttachedNetwork());
@@ -137,7 +137,7 @@ public class NetworkTest {
 
 		{
 			// A--B  C
-			a.getAttachedNetwork().breakConnection(new SingleTypeUnorderedPair<INetworkNode>(b, c));
+			a.getAttachedNetwork().breakConnection(new UnorderedPair<INetworkNode>(b, c));
 
 			assertNotNull(a.getAttachedNetwork());
 			assertEquals(a.getAttachedNetwork(), b.getAttachedNetwork());

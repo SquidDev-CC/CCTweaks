@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.api.network;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
-import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
+import org.squiddev.cctweaks.api.UnorderedPair;
 
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +35,7 @@ public interface INetworkController {
 	 *
 	 * @param connection A pair of nodes representing the nodes being disconnected.
 	 */
-	void breakConnection(SingleTypeUnorderedPair<INetworkNode> connection);
+	void breakConnection(UnorderedPair<INetworkNode> connection);
 
 	/**
 	 * Nodes call this when they wish to be removed from the network entirely.
@@ -79,7 +79,7 @@ public interface INetworkController {
 	/**
 	 * @return All the pairs of nodes that are connected.
 	 */
-	Set<SingleTypeUnorderedPair<INetworkNode>> getNodeConnections();
+	Set<UnorderedPair<INetworkNode>> getNodeConnections();
 
 	/**
 	 * Transmits a packet on the network.

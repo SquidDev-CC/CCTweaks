@@ -2,7 +2,7 @@ package org.squiddev.cctweaks.core.network.bridge;
 
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
-import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
+import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.core.Config;
@@ -64,7 +64,7 @@ public final class NetworkBindings {
 			if (node.getAttachedNetwork() != null) {
 				// See #59. This shouldn't happen but it does
 				for (IWorldNetworkNode other : new ArrayList<IWorldNetworkNode>(nodes)) {
-					SingleTypeUnorderedPair<INetworkNode> connection = new SingleTypeUnorderedPair<INetworkNode>(node, other);
+					UnorderedPair<INetworkNode> connection = new UnorderedPair<INetworkNode>(node, other);
 					if (node.getAttachedNetwork().getNodeConnections().contains(connection)) {
 						node.getAttachedNetwork().breakConnection(connection);
 					}
