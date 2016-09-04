@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.items;
 
+import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.core.lua.LuaJLuaMachine;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
@@ -20,6 +21,7 @@ import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
+import org.squiddev.cctweaks.blocks.debug.TileDebugPeripheral;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -112,6 +114,33 @@ public class ItemDebugger extends ItemComputerAction {
 			IPeripheral peripheral = PeripheralUtil.getPeripheral(tile.getWorld(), tile.getPos(), side);
 			if (peripheral != null) {
 				player.addChatMessage(withColor("Peripheral: ", EnumChatFormatting.AQUA).appendSibling(info(peripheral.getType())));
+
+				if (peripheral instanceof TileDebugPeripheral.SidedPeripheral) {
+					Set<IComputerAccess> computers = ((TileDebugPeripheral.SidedPeripheral) peripheral).computers();
+					IChatComponent boundList = withColor("Bound as: ", EnumChatFormatting.AQUA);
+					boolean first = true;
+					for (IComputerAccess access : computers) {
+						if (first) {
+							first = false;
+						} else {
+							boundList.appendSibling(info(", "));
+						}
+
+						String text;
+						ChatStyle style = new ChatStyle().setItalic(true);
+						try {
+							text = access.getAttachmentName() + " (#" + access.getID() + ")";
+							style.setColor(EnumChatFormatting.GRAY);
+						} catch (RuntimeException e) {
+							text = e.getMessage();
+							style.setColor(EnumChatFormatting.RED);
+						}
+
+						boundList.appendSibling(new ChatComponentText(text).setChatStyle(style));
+					}
+
+					player.addChatMessage(boundList);
+				}
 			}
 		}
 
