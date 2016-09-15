@@ -93,16 +93,16 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 				return new Object[]{table};
 			}
 			case 1: { // isPresentRemote
-				PeripheralAccess access = modem.peripheralWrappersByName.get(parseString(arguments, 0));
+				PeripheralAccess access = modem.getPeripheral(parseString(arguments, 0));
 				return new Object[]{access != null && access.getType() != null};
 			}
 			case 2: { // getTypeRemote
-				PeripheralAccess access = modem.peripheralWrappersByName.get(parseString(arguments, 0));
+				PeripheralAccess access = modem.getPeripheral(parseString(arguments, 0));
 				String type = null;
 				return access == null || (type = access.getType()) != null ? new Object[]{type} : null;
 			}
 			case 3: {// getMethodsRemote
-				PeripheralAccess access = modem.peripheralWrappersByName.get(parseString(arguments, 0));
+				PeripheralAccess access = modem.getPeripheral(parseString(arguments, 0));
 				String[] names;
 				if (access != null && (names = access.getMethodNames()) != null) {
 					Map<Object, Object> table = new HashMap<Object, Object>();
@@ -122,7 +122,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 				System.arraycopy(arguments, 2, methodArgs, 0, arguments.length - 2);
 
 				// Get the peripheral and call it
-				PeripheralAccess access = modem.peripheralWrappersByName.get(remoteName);
+				PeripheralAccess access = modem.getPeripheral(remoteName);
 				if (access == null) throw new LuaException("No peripheral: " + remoteName);
 				return access.callMethod(context, methodName, methodArgs);
 			}
@@ -139,7 +139,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 			String methodName = arguments.getString(1);
 
 			// Get the peripheral and call it
-			PeripheralAccess access = modem.peripheralWrappersByName.get(remoteName);
+			PeripheralAccess access = modem.getPeripheral(remoteName);
 			if (access == null) throw new LuaException("No peripheral: " + remoteName);
 			return access.callMethod(context, methodName, arguments.subArgs(2));
 		} else {
@@ -161,16 +161,11 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 
 	@Override
 	public void detach(IComputerAccess computer) {
+		modem.detachPeripherals();
 		super.detach(computer);
-		INetworkController controller = modem.getAttachedNetwork();
-		if (controller != null) {
-			for (String name : controller.getPeripheralsOnNetwork().keySet()) {
-				modem.detachPeripheral(name);
-			}
-		}
 	}
 
-	public static String parseString(Object[] arguments, int index) throws LuaException {
+	private static String parseString(Object[] arguments, int index) throws LuaException {
 		if (arguments.length > index) {
 			if (arguments[index] instanceof byte[]) {
 				return BinaryConverter.decodeString((byte[]) arguments[index]);
