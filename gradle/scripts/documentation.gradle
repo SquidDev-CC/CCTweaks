@@ -180,7 +180,7 @@ task documentation(type: DocumentationParser) {
 }
 
 processResources {
-	from("assets/**/lang").eachFile({ file ->
+	from("assets/") { include "**/lang" }.eachFile({ file ->
 		StringBuilder lang = documentation.languages[file.getName()];
 		if (lang != null) {
 			file.filter([readers: [new StringReader(lang.toString())] as Queue], DocFilter.class)
@@ -188,4 +188,3 @@ processResources {
 	})
 }
 processResources.dependsOn += documentation
-
