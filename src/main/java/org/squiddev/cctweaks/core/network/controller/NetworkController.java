@@ -5,7 +5,7 @@ import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.SingleTypeUnorderedPair;
+import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
@@ -119,7 +119,7 @@ public class NetworkController implements INetworkController {
 				peripherals.putAll(point.peripherals);
 			}
 
-			for (SingleTypeUnorderedPair<INetworkNode> connection : controller.getNodeConnections()) {
+			for (UnorderedPair<INetworkNode> connection : controller.getNodeConnections()) {
 				new Point.Connection(getPoint(connection.x), getPoint(connection.y));
 			}
 
@@ -188,7 +188,7 @@ public class NetworkController implements INetworkController {
 	}
 
 	@Override
-	public void breakConnection(SingleTypeUnorderedPair<INetworkNode> connection) {
+	public void breakConnection(UnorderedPair<INetworkNode> connection) {
 		Point xPoint = getPoint(connection.x);
 		Point.Connection pointConnection = new Point.Connection(xPoint, getPoint(connection.y));
 
@@ -255,12 +255,12 @@ public class NetworkController implements INetworkController {
 	}
 
 	@Override
-	public Set<SingleTypeUnorderedPair<INetworkNode>> getNodeConnections() {
+	public Set<UnorderedPair<INetworkNode>> getNodeConnections() {
 		// TODO: Optimise me!
-		Set<SingleTypeUnorderedPair<INetworkNode>> connections = new HashSet<SingleTypeUnorderedPair<INetworkNode>>();
+		Set<UnorderedPair<INetworkNode>> connections = new HashSet<UnorderedPair<INetworkNode>>();
 		for (Point point : points.values()) {
 			for (Point.Connection connection : point.connections) {
-				connections.add(new SingleTypeUnorderedPair<INetworkNode>(point.node, connection.other(point).node));
+				connections.add(new UnorderedPair<INetworkNode>(point.node, connection.other(point).node));
 			}
 		}
 
