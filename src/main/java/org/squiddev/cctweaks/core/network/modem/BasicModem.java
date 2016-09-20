@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.network.modem;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
 import dan200.computercraft.api.peripheral.IPeripheral;
@@ -11,10 +12,7 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractNode;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Basic wired modem that handles peripherals and
@@ -27,12 +25,12 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	/**
 	 * Set of receivers to use
 	 */
-	protected final SetMultimap<Integer, IReceiver> receivers = MultimapBuilder.hashKeys().hashSetValues().build();
+	private final SetMultimap<Integer, IReceiver> receivers = MultimapBuilder.hashKeys().hashSetValues().build();
 
 	/**
 	 * List of wrappers for peripherals on the remote network
 	 */
-	public final Map<String, PeripheralAccess> peripheralWrappersByName = new HashMap<String, PeripheralAccess>();
+	private final Map<String, PeripheralAccess> peripheralWrappersByName = new HashMap<String, PeripheralAccess>();
 
 	private boolean peripheralEnabled = false;
 
@@ -96,9 +94,27 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 		}
 	}
 
+	/**
+	 * Detach all peripherals
+	 */
+	public void detachPeripherals() {
+		synchronized (peripheralWrappersByName) {
+			List<String> names = Lists.newArrayList(peripheralWrappersByName.keySet());
+			for (String name : names) {
+				detachPeripheralUnsync(name);
+			}
+		}
+	}
+
 	private void detachPeripheralUnsync(String name) {
 		PeripheralAccess wrapper = peripheralWrappersByName.remove(name);
 		if (wrapper != null) wrapper.detach();
+	}
+
+	public PeripheralAccess getPeripheral(String name) {
+		synchronized (peripheralWrappersByName) {
+			return peripheralWrappersByName.get(name);
+		}
 	}
 
 	@Override
