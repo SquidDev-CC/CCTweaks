@@ -89,7 +89,7 @@ public class PartWirelessBridge extends PartSidedNetwork implements IPeripheralH
 	@Override
 	public void onWorldJoin() {
 		super.onWorldJoin();
-		NetworkHelpers.scheduleConnect(binding);
+		NetworkHelpers.scheduleConnect(binding, this);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.api.network;
 
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.squiddev.cctweaks.api.IWorldPosition;
@@ -90,5 +91,15 @@ public interface INetworkHelpers {
 	 *
 	 * @param node The node to schedule
 	 */
-	void scheduleJoin(final IWorldNetworkNode node);
+	void scheduleJoin(IWorldNetworkNode node);
+
+	/**
+	 * Schedule calling {@link #joinOrCreateNetwork(IWorldNetworkNode)} next tick.
+	 *
+	 * This is the recommended method of attaching nodes to a network.
+	 *
+	 * @param node The node to schedule
+	 * @param tile The tile this node is bound to. We will ensure the tile is still there.
+	 */
+	void scheduleJoin(IWorldNetworkNode node, TileEntity tile);
 }
