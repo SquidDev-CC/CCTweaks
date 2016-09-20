@@ -23,14 +23,15 @@ plugins {
 buildDir = "build-${mc_version}"
 
 apply plugin: 'forge'
-apply from: 'gradle/scripts/dependencies.gradle'
-apply from: 'gradle/scripts/artifacts.gradle'
-apply from: 'gradle/scripts/upload.gradle'
-apply from: 'gradle/scripts/documentation.gradle'
 
 group = "org.squiddev"
 archivesBaseName = "CCTweaks"
 version = mc_version + "-" + mod_version
+
+apply from: 'gradle/scripts/dependencies.gradle'
+apply from: 'gradle/scripts/artifacts.gradle'
+apply from: 'gradle/scripts/upload.gradle'
+apply from: 'gradle/scripts/documentation.gradle'
 
 minecraft {
 	version = project.mc_version + "-" + project.forge_version + "-" + project.mc_version
@@ -55,10 +56,6 @@ jar {
 		.findAll { it.getAbsolutePath().contains("org.squiddev") }
 		.collect { it.isDirectory() ? it : zipTree(it) }
 
-	// Package the patch files into a patch/ folder
-	filesMatching("org/luaj/**", {
-		it.path = "patch/" + it.path
-	})
 
 	exclude("assets/**/docs")
 }

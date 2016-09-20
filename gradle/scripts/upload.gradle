@@ -15,6 +15,7 @@ bintray {
 			name = project.version
 			desc = 'Random additions to ComputerCraft'
 			released = new Date()
+			vcsTag = 'v' + project.version
 		}
 	}
 }
