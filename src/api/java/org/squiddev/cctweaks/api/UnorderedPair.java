@@ -1,5 +1,8 @@
 package org.squiddev.cctweaks.api;
 
+/**
+ * An unordered pair of objects with the same type.
+ */
 public class UnorderedPair<T> {
 	public final T x;
 	public final T y;
