@@ -29,6 +29,7 @@ public interface ITurtleInteraction {
 	 * @param direction The direction to swing in
 	 * @param hit       Place the item was used at. May be {@code null}.
 	 * @return Result of interaction, or {@code null} if no action could be taken
+	 * @throws LuaException If an error occurs
 	 */
 	TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, ForgeDirection direction, MovingObjectPosition hit) throws LuaException;
 
@@ -56,6 +57,7 @@ public interface ITurtleInteraction {
 	 * @param direction The direction to swing in
 	 * @param hit       Place the item was used at. May be {@code null}.
 	 * @return Result of interaction, or {@code null} if no action could be taken
+	 * @throws LuaException If an error occurs
 	 */
 	TurtleCommandResult use(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, ForgeDirection direction, MovingObjectPosition hit) throws LuaException;
 
