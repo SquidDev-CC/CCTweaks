@@ -155,7 +155,7 @@ public class ASMTransformer implements IClassTransformer {
 
 		try {
 			byte[] rewritten = patches.transform(className, bytes);
-			if (rewritten != bytes) writeDump(className, bytes);
+			if (rewritten != bytes) writeDump(className, rewritten);
 			return rewritten;
 		} catch (Exception e) {
 			String contents = "Cannot patch " + className + ", falling back to default";
