@@ -3,6 +3,8 @@ package org.squiddev.cctweaks.turtle;
 import dan200.computercraft.api.turtle.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.Registry;
 
@@ -46,5 +48,11 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 		ToolHostPlayer player = players.get(turtle);
 		if (player == null) players.put(turtle, player = new ToolHostPlayer(turtle));
 		return player;
+	}
+
+	@Override
+	public void preInit() {
+		super.preInit();
+		EntityRegistry.registerModEntity(ToolHostPlayer.class, CCTweaks.ID + ":fakePlayer", 0, CCTweaks.instance, Integer.MAX_VALUE, Integer.MAX_VALUE, false);
 	}
 }
