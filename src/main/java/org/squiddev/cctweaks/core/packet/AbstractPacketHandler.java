@@ -25,7 +25,7 @@ public class AbstractPacketHandler<T extends AbstractPacketHandler.IPacket> exte
 	@Override
 	public void preInit() {
 		super.preInit();
-		CCTweaks.NETWORK.registerMessage(this, type, id, side);
+		CCTweaks.network.registerMessage(this, type, id, side);
 	}
 
 	@Override

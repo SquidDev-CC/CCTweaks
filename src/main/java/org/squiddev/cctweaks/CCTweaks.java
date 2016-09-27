@@ -27,7 +27,10 @@ public class CCTweaks {
 	public static final String ROOT_NAME = "org.squiddev.cctweaks.";
 	public static final String GUI_FACTORY = ROOT_NAME + "client.gui.GuiConfigFactory";
 
-	public static SimpleNetworkWrapper NETWORK;
+	@Mod.Instance
+	public static CCTweaks instance;
+
+	public static SimpleNetworkWrapper network;
 
 	public static CreativeTabs getCreativeTab() {
 		return ComputerCraft.mainCreativeTab;
@@ -37,7 +40,7 @@ public class CCTweaks {
 	public void preInit(FMLPreInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new McEvents());
 
-		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(ID);
+		network = NetworkRegistry.INSTANCE.newSimpleChannel(ID);
 
 		Registry.preInit();
 	}

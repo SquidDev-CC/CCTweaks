@@ -32,7 +32,7 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 	}
 
 	public static void send(INetworkController controller, EntityPlayerMP player) {
-		CCTweaks.NETWORK.sendTo(create(controller, player.worldObj), player);
+		CCTweaks.network.sendTo(create(controller, player.worldObj), player);
 	}
 
 	@Override
