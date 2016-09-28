@@ -73,7 +73,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 
 				@Override
 				protected boolean isPeripheralEnabled() {
-					return super.isPeripheralEnabled() && !m_destroyed && getPeripheralType() == PeripheralType.WiredModemWithCable;
+					return super.isPeripheralEnabled() && !m_destroyed && getPeripheralTypeSafe() == PeripheralType.WiredModemWithCable;
 				}
 			};
 		}
@@ -102,7 +102,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 					if (m_destroyed || worldObj == null) return false;
 
 					// Or has no cable or is the side it is facing
-					PeripheralType type = getPeripheralType();
+					PeripheralType type = getPeripheralTypeSafe();
 					return type == PeripheralType.Cable || (type == PeripheralType.WiredModemWithCable && direction != getDirection());
 				}
 			};
@@ -157,7 +157,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	@Override
 	public void onNeighbourChange() {
 		// Update the neighbour first as this might break the type
-		PeripheralType type = getPeripheralType();
+		PeripheralType type = getPeripheralTypeSafe();
 		nativeOnNeighbourChange();
 
 		// TODO: Break the modem if we change
@@ -175,9 +175,18 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	public void nativeOnNeighbourChange() {
 	}
 
+	private PeripheralType getPeripheralTypeSafe() {
+		if (worldObj == null) return null;
+
+		IBlockState state = worldObj.getBlockState(pos);
+		if (state.getBlock() != ComputerCraft.Blocks.cable) return null;
+
+		return ComputerCraft.Blocks.cable.getPeripheralType(state);
+	}
+
 	@Override
 	public boolean onActivate(EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
-		if (getPeripheralType() == PeripheralType.WiredModemWithCable && !player.isSneaking()) {
+		if (getPeripheralTypeSafe() == PeripheralType.WiredModemWithCable && !player.isSneaking()) {
 			if (!worldObj.isRemote) {
 
 				String oldPeriphName = getModem().getPeripheralName();
@@ -244,7 +253,14 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 
 	@Override
 	public IPeripheral getPeripheral(EnumFacing side) {
-		return side == getDirection() && getPeripheralType() != PeripheralType.Cable ? getModem().modem : null;
+		if (side != getDirection()) return null;
+
+		PeripheralType type = getPeripheralTypeSafe();
+		if (type == PeripheralType.WiredModem || type == PeripheralType.WiredModemWithCable) {
+			return getModem().modem;
+		} else {
+			return null;
+		}
 	}
 
 	@Override

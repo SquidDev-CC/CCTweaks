@@ -251,14 +251,6 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	public void destroy() {
 		if (networkController != null) networkController.removeNode(this);
 		modem.destroy();
-//
-//		// Remove all peripheral wrappers
-//		synchronized (peripheralWrappersByName) {
-//			List<String> peripheralNames = Lists.newArrayList(peripheralWrappersByName.keySet());
-//			for (String wrapper : peripheralNames) {
-//				detachPeripheralUnsync(wrapper);
-//			}
-//		}
 	}
 
 	/**
