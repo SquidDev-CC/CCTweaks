@@ -277,10 +277,10 @@ public final class Config {
 		 * correctly created.
 		 *
 		 * By enabling this it is easier to trace
-		 * faults, though it may slow things down
+		 * faults, though it willl slow things down
 		 * slightly
 		 */
 		@DefaultBoolean(false)
-		public static boolean extendedControllerValidation;
+		public static boolean controllerValidation;
 	}
 }

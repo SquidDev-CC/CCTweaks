@@ -19,6 +19,8 @@ import java.util.Set;
  */
 public class ControllerValidator {
 	public static void validate(NetworkController controller) {
+		if (!Config.Testing.controllerValidation) return;
+
 		List<String> errors = new ArrayList<String>();
 
 		Set<IPeripheral> foundPeripherals = Sets.newHashSet();
@@ -43,18 +45,16 @@ public class ControllerValidator {
 
 				if (other == null || !peripheral.getValue().equals(other)) {
 					String error = String.format("Peripherals for node %s (%s): %s != %s", point.node, peripheral.getKey(), peripheral.getValue(), other);
-					if (Config.Testing.extendedControllerValidation) {
-						StringBuilder builder = new StringBuilder(error);
+					StringBuilder builder = new StringBuilder(error);
 
-						for (Point otherPoint : controller.points.values()) {
-							IPeripheral otherPeripheral = otherPoint.peripherals.get(peripheral.getKey());
-							if (otherPeripheral != null) {
-								builder.append(String.format("\n Found peripheral conflict: %s => %s", otherPoint.node, otherPeripheral));
-							}
+					for (Point otherPoint : controller.points.values()) {
+						IPeripheral otherPeripheral = otherPoint.peripherals.get(peripheral.getKey());
+						if (otherPeripheral != null) {
+							builder.append(String.format("\n Found peripheral conflict: %s => %s", otherPoint.node, otherPeripheral));
 						}
-
-						error = builder.toString();
 					}
+
+					error = builder.toString();
 
 					errors.add(error);
 				}
@@ -75,15 +75,7 @@ public class ControllerValidator {
 
 
 		if (errors.size() > 0) {
-			trace("Controller is invalid:\n - " + Strings.join(errors, "\n - "));
-		}
-	}
-
-	public static void trace(String message) {
-		if (Config.Testing.extendedControllerValidation) {
-			DebugLogger.trace(message);
-		} else {
-			DebugLogger.debug(message);
+			DebugLogger.trace("Controller is invalid:\n - " + Strings.join(errors, "\n - "));
 		}
 	}
 }
