@@ -5,14 +5,13 @@ import com.google.common.collect.Maps;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.*;
-import org.squiddev.cctweaks.core.utils.IterableIterator;
 
 import java.util.*;
 
 /**
  * A {@link Point} represents one node on the network, and all its connections.
  */
-public class Point implements INetworkAccess {
+public final class Point implements INetworkAccess {
 	protected final INetworkNode node;
 	protected INetworkController controller;
 
@@ -46,19 +45,12 @@ public class Point implements INetworkAccess {
 			connection.other(this).connections.remove(connection);
 		}
 
-		final Iterator<Connection> iterator = connections.iterator();
+		ArrayList<Point> connected = new ArrayList<Point>(connections.size());
+		for (Connection connection : connections) {
+			connected.add(connection.other(this));
+		}
 
-		return NodeScanner.scanNetwork(new IterableIterator<Point>() {
-			@Override
-			public boolean hasNext() {
-				return iterator.hasNext();
-			}
-
-			@Override
-			public Point next() {
-				return iterator.next().other(Point.this);
-			}
-		});
+		return NodeScanner.scanNetwork(controller, connected);
 	}
 
 	public Map<String, IPeripheral> refreshPeripherals() {
@@ -148,7 +140,7 @@ public class Point implements INetworkAccess {
 			x.connections.remove(this);
 			y.connections.remove(this);
 
-			return NodeScanner.scanNetwork(x, y);
+			return NodeScanner.scanNetwork(x.controller, x, y);
 		}
 	}
 }

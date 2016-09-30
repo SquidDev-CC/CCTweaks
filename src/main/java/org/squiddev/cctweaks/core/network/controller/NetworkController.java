@@ -13,10 +13,10 @@ import org.squiddev.cctweaks.api.network.Packet;
 
 import java.util.*;
 
-public class NetworkController implements INetworkController {
+public final class NetworkController implements INetworkController {
 	protected Map<String, IPeripheral> peripheralsOnNetwork = new HashMap<String, IPeripheral>();
 
-	protected Map<INetworkNode, Point> points = new HashMap<INetworkNode, Point>();
+	protected final Map<INetworkNode, Point> points;
 
 	public NetworkController(INetworkNode node) {
 		this(new HashMap<INetworkNode, Point>());
@@ -28,8 +28,9 @@ public class NetworkController implements INetworkController {
 		ControllerValidator.validate(this);
 	}
 
-	public NetworkController(Map<INetworkNode, Point> points) {
-		this.points = Preconditions.checkNotNull(points, "Network points cannot be null");
+	private NetworkController(Map<INetworkNode, Point> points) {
+		Preconditions.checkNotNull(points, "Network points cannot be null");
+		this.points = points;
 
 		for (Point point : points.values()) {
 			addPoint(point);
@@ -38,7 +39,7 @@ public class NetworkController implements INetworkController {
 		ControllerValidator.validate(this);
 	}
 
-	public NetworkController(Map<INetworkNode, Point> points, Map<String, IPeripheral> oldPeripherals) {
+	private NetworkController(Map<INetworkNode, Point> points, Map<String, IPeripheral> oldPeripherals) {
 		this(points);
 		Preconditions.checkNotNull(oldPeripherals, "Old peripheral list cannot be null");
 
@@ -308,7 +309,7 @@ public class NetworkController implements INetworkController {
 		}
 	}
 
-	public static class TransmitPoint implements Comparable<TransmitPoint> {
+	private static class TransmitPoint implements Comparable<TransmitPoint> {
 		public final Point point;
 		public final double distance;
 
