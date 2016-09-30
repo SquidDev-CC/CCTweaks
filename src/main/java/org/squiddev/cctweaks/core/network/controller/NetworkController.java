@@ -17,6 +17,7 @@ public final class NetworkController implements INetworkController {
 	protected Map<String, IPeripheral> peripheralsOnNetwork = new HashMap<String, IPeripheral>();
 
 	protected final Map<INetworkNode, Point> points;
+	private Set<INetworkNode> nodeView;
 
 	public NetworkController(INetworkNode node) {
 		this(new HashMap<INetworkNode, Point>());
@@ -252,7 +253,11 @@ public final class NetworkController implements INetworkController {
 	//region INetworkController getters
 	@Override
 	public Set<INetworkNode> getNodesOnNetwork() {
-		return Collections.unmodifiableSet(points.keySet());
+		Set<INetworkNode> nodeView = this.nodeView;
+		if (nodeView == null) {
+			nodeView = this.nodeView = Collections.unmodifiableSet(points.keySet());
+		}
+		return nodeView;
 	}
 
 	@Override
