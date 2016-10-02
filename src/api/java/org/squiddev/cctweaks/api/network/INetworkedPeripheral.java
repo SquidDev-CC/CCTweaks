@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface INetworkedPeripheral extends INetworkCompatiblePeripheral {
 	/**
-	 * Called when this peripheral is attached to a network.
+	 * Called when this peripheral is attached to a network access.
 	 *
 	 * @param network Access to the network being attached to.
 	 * @param name    The name of this peripheral on that network.
@@ -14,7 +14,7 @@ public interface INetworkedPeripheral extends INetworkCompatiblePeripheral {
 	void attachToNetwork(INetworkAccess network, String name);
 
 	/**
-	 * Called when this peripheral is detached from a network.
+	 * Called when this peripheral is detached from a network access.
 	 *
 	 * @param network Access to the network being detached from.
 	 * @param name    The name of this peripheral on that network.
@@ -22,7 +22,9 @@ public interface INetworkedPeripheral extends INetworkCompatiblePeripheral {
 	void detachFromNetwork(INetworkAccess network, String name);
 
 	/**
-	 * Called when the network is invalidated.
+	 * Called when the peripheral map on the network changes
+	 *
+	 * This is also called when attaching or detaching from a network with peripherals
 	 *
 	 * @param network        The network that was invalidated.
 	 * @param oldPeripherals Peripherals removed from the network

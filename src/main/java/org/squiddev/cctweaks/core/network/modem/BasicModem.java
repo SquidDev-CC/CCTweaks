@@ -14,13 +14,12 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractNode;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Basic wired modem that handles peripherals and
- * computer interaction
- * <p>
- * TODO: Inherit from AbstractWorldNode?
+ * Basic wired modem that handles peripherals and computer interaction
  */
 public abstract class BasicModem extends AbstractNode implements INetwork, IWorldNetworkNode {
 	public static final byte MODEM_ON = 1;
@@ -226,22 +225,14 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	@Override
 	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
 		synchronized (peripheralWrappersByName) {
-			// Clone to prevent modification errors
-			Set<String> peripheralNames = new HashSet<String>(peripheralWrappersByName.keySet());
-			for (String wrapper : peripheralNames) {
-				if (!networkController.getPeripheralsOnNetwork().containsKey(wrapper)) {
-					// Wrapper removed
-					detachPeripheralUnsync(wrapper);
-				}
+			for (String wrapper : oldPeripherals.keySet()) {
+				detachPeripheralUnsync(wrapper);
 			}
 
 			if (modem != null && modem.getComputer() != null) {
-				for (String name : networkController.getPeripheralsOnNetwork().keySet()) {
+				for (String name : newPeripherals.keySet()) {
 					if (!peripheralWrappersByName.containsKey(name)) {
-						IPeripheral peripheral = networkController.getPeripheralsOnNetwork().get(name);
-						if (peripheral != null) {
-							attachPeripheralUnsync(name, peripheral);
-						}
+						attachPeripheralUnsync(name, newPeripherals.get(name));
 					}
 				}
 			}

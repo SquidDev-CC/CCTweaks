@@ -24,6 +24,8 @@ public class ControllerValidator {
 		List<String> errors = new ArrayList<String>();
 
 		Set<IPeripheral> foundPeripherals = Sets.newHashSet();
+		Map<String, IPeripheral> peripherals = controller.getPeripheralsOnNetwork();
+
 		for (Map.Entry<INetworkNode, Point> entry : controller.points.entrySet()) {
 			Point point = entry.getValue();
 
@@ -40,7 +42,7 @@ public class ControllerValidator {
 			}
 
 			for (Map.Entry<String, IPeripheral> peripheral : point.peripherals.entrySet()) {
-				IPeripheral other = controller.peripheralsOnNetwork.get(peripheral.getKey());
+				IPeripheral other = peripherals.get(peripheral.getKey());
 				foundPeripherals.add(peripheral.getValue());
 
 				if (other == null || !peripheral.getValue().equals(other)) {

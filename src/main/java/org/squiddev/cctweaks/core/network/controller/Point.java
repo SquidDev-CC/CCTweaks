@@ -1,10 +1,10 @@
 package org.squiddev.cctweaks.core.network.controller;
 
-import com.google.common.collect.MapDifference;
-import com.google.common.collect.Maps;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.*;
+import org.squiddev.cctweaks.core.collections.MapChanges;
+import org.squiddev.cctweaks.core.collections.MapsX;
 
 import java.util.*;
 
@@ -19,87 +19,99 @@ public final class Point implements INetworkAccess {
 
 	public Map<String, IPeripheral> peripherals = Collections.emptyMap();
 
-	public Point(INetworkNode node, INetworkController controller) {
+	public Point(INetworkNode node) {
 		this.node = node;
-		this.controller = controller;
+		this.controller = node.getAttachedNetwork();
 	}
 
+	//region INetworkAccess
 	@Override
 	public Map<String, IPeripheral> getPeripheralsOnNetwork() {
-		return controller.getPeripheralsOnNetwork();
+		if (controller == null) {
+			return Collections.emptyMap();
+		} else {
+			return controller.getPeripheralsOnNetwork();
+		}
 	}
 
 	@Override
 	public void invalidateNetwork() {
-		controller.invalidateNetwork();
+		if (controller != null) controller.invalidateNetwork();
 	}
 
 	@Override
 	public boolean transmitPacket(Packet packet) {
-		controller.transmitPacket(node, packet);
-		return true;
-	}
-
-	public Collection<Map<INetworkNode, Point>> breakConnections() {
-		for (Connection connection : connections) {
-			connection.other(this).connections.remove(connection);
+		if (controller == null) {
+			return false;
+		} else {
+			controller.transmitPacket(node, packet);
+			return true;
 		}
+	}
+	//endregion
 
+	public Collection<Point> breakConnections() {
 		ArrayList<Point> connected = new ArrayList<Point>(connections.size());
 		for (Connection connection : connections) {
-			connected.add(connection.other(this));
+			Point other = connection.other(this);
+			connected.add(other);
+			other.connections.remove(connection);
 		}
 
-		return NodeScanner.scanNetwork(controller, connected);
+		connections.clear();
+
+		return connected;
 	}
 
-	public Map<String, IPeripheral> refreshPeripherals() {
+	public MapChanges<String, IPeripheral> refreshPeripherals() {
 		Map<String, IPeripheral> oldPeripherals = peripherals;
-
 		Map<String, IPeripheral> newPeripherals = peripherals = node.getConnectedPeripherals();
 
-		MapDifference<String, IPeripheral> difference = Maps.difference(oldPeripherals, newPeripherals);
+		MapChanges<String, IPeripheral> difference = MapsX.changes(oldPeripherals, newPeripherals);
 
-		for (Map.Entry<String, IPeripheral> entry : difference.entriesOnlyOnLeft().entrySet()) {
+		for (Map.Entry<String, IPeripheral> entry : difference.removed().entrySet()) {
 			IPeripheral peripheral = entry.getValue();
 			if (peripheral instanceof INetworkedPeripheral) {
 				((INetworkedPeripheral) peripheral).detachFromNetwork(this, entry.getKey());
 			}
 		}
 
-		for (Map.Entry<String, IPeripheral> entry : difference.entriesOnlyOnRight().entrySet()) {
+		for (Map.Entry<String, IPeripheral> entry : difference.added().entrySet()) {
 			IPeripheral peripheral = entry.getValue();
 			if (peripheral instanceof INetworkedPeripheral) {
 				((INetworkedPeripheral) peripheral).attachToNetwork(this, entry.getKey());
 			}
 		}
 
-		return newPeripherals;
+		return difference;
 	}
 
-	//region Network events
+	//region Network delegates
 	public void detachFromNetwork() {
-		node.detachFromNetwork();
-		for (Map.Entry<String, IPeripheral> entry : peripherals.entrySet()) {
-			IPeripheral peripheral = entry.getValue();
-			if (peripheral instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) peripheral).detachFromNetwork(this, entry.getKey());
-			}
+		if (controller == null) {
+			throw new IllegalStateException("Not connected to network for " + this);
 		}
+
+		node.detachFromNetwork();
+		controller = null;
 	}
 
 	public void attachToNetwork(INetworkController controller) {
-		node.attachToNetwork(controller);
-
-		for (Map.Entry<String, IPeripheral> entry : peripherals.entrySet()) {
-			IPeripheral peripheral = entry.getValue();
-			if (peripheral instanceof INetworkedPeripheral) {
-				((INetworkedPeripheral) peripheral).attachToNetwork(this, entry.getKey());
-			}
+		if (this.controller != null) {
+			throw new IllegalStateException("Already connected for " + this);
+		} else if (controller == null) {
+			throw new IllegalArgumentException("Cannot connect to <null> for " + this);
 		}
+
+		this.controller = controller;
+		node.attachToNetwork(controller);
 	}
 
 	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
+		if (controller == null) {
+			throw new IllegalStateException("Cannot invalidate network when not connected");
+		}
+
 		node.networkInvalidated(oldPeripherals, newPeripherals);
 
 		for (Map.Entry<String, IPeripheral> entry : peripherals.entrySet()) {
@@ -112,6 +124,10 @@ public final class Point implements INetworkAccess {
 	}
 
 	public void receivePacket(Packet packet, double distanceTravelled) {
+		if (controller == null) {
+			throw new IllegalStateException("Cannot send packet when not connected");
+		}
+
 		node.receivePacket(packet, distanceTravelled);
 		for (Map.Entry<String, IPeripheral> entry : peripherals.entrySet()) {
 			IPeripheral value = entry.getValue();

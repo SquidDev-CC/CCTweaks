@@ -28,7 +28,7 @@ public class TileDebugNode extends TileNetworked {
 		@Override
 		public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
 			DebugLogger.debug(
-				"Node invalidated at %s, %s, %s\n - Old: %s\n - New: %s",
+				"Node invalidated at %s, %s, %s\n - Removed: %s\n - Added:   %s",
 				pos.getX(), pos.getY(), pos.getZ(),
 				StringUtils.join(oldPeripherals.keySet(), ", "),
 				StringUtils.join(newPeripherals.keySet(), ", ")

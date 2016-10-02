@@ -28,7 +28,12 @@ public interface INetworkNode {
 	void receivePacket(Packet packet, double distanceTravelled);
 
 	/**
-	 * Called when the peripheral map on the network changes.
+	 * Called when the peripheral map on the network changes
+	 *
+	 * This is also called when attaching or detaching from a network with peripherals
+	 *
+	 * If required, this will be called just after attaching to a network and
+	 * just before detaching. The node will be *always* be attached to a network.
 	 *
 	 * @param oldPeripherals Peripherals removed from the network
 	 * @param newPeripherals Peripherals added to the network
@@ -37,11 +42,23 @@ public interface INetworkNode {
 
 	/**
 	 * Called when the network is detached from this node.
+	 *
+	 * You should NEVER call this method yourself: use {@link INetworkController#removeNode(INetworkNode)}
+	 * instead.
+	 *
+	 * The network may be in an indeterminate state when this is called: do not
+	 * perform any processing: this should just be a getter or setter.
 	 */
 	void detachFromNetwork();
 
 	/**
 	 * Called when the network controller assimilates this node.
+	 *
+	 * You should NEVER call this method yourself: use
+	 * {@link INetworkController#formConnection(INetworkNode, INetworkNode)} instead.
+	 *
+	 * The network may be in an indeterminate state when this is called: do not
+	 * perform any processing: this should just be a getter or setter.
 	 *
 	 * @param networkController The network this node is being added to.
 	 */

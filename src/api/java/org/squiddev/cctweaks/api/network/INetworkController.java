@@ -12,11 +12,18 @@ import java.util.Set;
 public interface INetworkController {
 	/**
 	 * Nodes call this when a connection is formed between two nodes.
+	 *
 	 * For example, a cover being removed between two cables.
 	 * The nodes' networks will assimilate.
 	 *
-	 * This is not used when a node comes to exist.
-	 * Only when a connection is formed.
+	 * This is not used when a node comes to exist, only when a connection is formed.
+	 *
+	 * When assimilating another network (or just adding one node) the following
+	 * steps are taken:
+	 * - Detach every node on {@code newNode}'s network
+	 * - Form connection between {@code existingNode} and {@code newNode}
+	 * - Attach every node on {@code newNode}'s network
+	 * - Call networkInvalidated on the two newly-joined networks with the relevant peripherals
 	 *
 	 * @param existingNode The node already on this network.
 	 * @param newNode      The node that might not already be on this network.
@@ -27,18 +34,20 @@ public interface INetworkController {
 
 	/**
 	 * Nodes call this when a connection between two nodes is broken.
-	 * For example, a cover being placed between two cables.
+	 *
+	 * For example: a cover being placed between two cables.
 	 * The network will reevaluate nodes and create a severed network if necessary.
 	 *
-	 * This is not used when nodes are removed entirely.
-	 * Only when two nodes disconnect.
+	 * This is not used when nodes are removed entirely, only when they disconnect.
 	 *
 	 * @param connection A pair of nodes representing the nodes being disconnected.
+	 * @throws IllegalArgumentException If either node is not on the network
 	 */
 	void breakConnection(UnorderedPair<INetworkNode> connection);
 
 	/**
 	 * Nodes call this when they wish to be removed from the network entirely.
+	 *
 	 * For example, a cable being broken.
 	 * The network will reevaluate nodes and create as many severed networks as necessary.
 	 *
@@ -49,8 +58,9 @@ public interface INetworkController {
 
 	/**
 	 * Gets the peripherals known to be on the network.
-	 * This is usually cached, only changing when {@link #invalidateNetwork()} or {@link #invalidateNode(INetworkNode)}
-	 * are called.
+	 *
+	 * This is usually cached, only changing when {@link #invalidateNetwork()} or
+	 * {@link #invalidateNode(INetworkNode)} are called.
 	 *
 	 * @return The cached map of peripherals on the network.
 	 */
@@ -68,6 +78,7 @@ public interface INetworkController {
 	 * peripherals for one node.
 	 *
 	 * @param node The node to invalidate.
+	 * @throws IllegalArgumentException If the node is not on the network
 	 */
 	void invalidateNode(INetworkNode node);
 
@@ -86,6 +97,7 @@ public interface INetworkController {
 	 *
 	 * @param node   The node emitting the packet.
 	 * @param packet The packet being transmitted.
+	 * @throws IllegalArgumentException If the node is not on the network
 	 */
 	void transmitPacket(INetworkNode node, Packet packet);
 }
