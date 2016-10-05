@@ -1,21 +1,27 @@
 package org.squiddev.cctweaks.core.network.mock;
 
+import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.lua.LuaException;
+import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractWorldNode;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
  * A network node that counts how many times an event occurred
  */
-public class CountingNetworkNode extends AbstractWorldNode {
+public class CountingNetworkNode extends AbstractWorldNode implements IPeripheral {
 	protected final boolean[] canVisit;
 	protected final IWorldPosition position;
 	protected int invalidated = 0;
 	protected double distance = -1;
+
+	private boolean hasPeripherals = false;
 
 	public CountingNetworkNode(IWorldPosition position, boolean[] canVisit) {
 		this.canVisit = canVisit;
@@ -55,8 +61,49 @@ public class CountingNetworkNode extends AbstractWorldNode {
 		return distance;
 	}
 
+	@Override
+	public Map<String, IPeripheral> getConnectedPeripherals() {
+		if (hasPeripherals) {
+			return Collections.singletonMap("peripheral", (IPeripheral) this);
+		} else {
+			return Collections.emptyMap();
+		}
+	}
+
 	public void reset() {
 		invalidated = 0;
 	}
 
+	public void doInvalidate() {
+		hasPeripherals = !hasPeripherals;
+		getAttachedNetwork().invalidateNetwork();
+	}
+
+	@Override
+	public String getType() {
+		return "debug";
+	}
+
+	@Override
+	public String[] getMethodNames() {
+		return new String[0];
+	}
+
+	@Override
+	public Object[] callMethod(IComputerAccess iComputerAccess, ILuaContext iLuaContext, int i, Object[] objects) throws LuaException, InterruptedException {
+		return new Object[0];
+	}
+
+	@Override
+	public void attach(IComputerAccess iComputerAccess) {
+	}
+
+	@Override
+	public void detach(IComputerAccess iComputerAccess) {
+	}
+
+	@Override
+	public boolean equals(IPeripheral other) {
+		return this == other;
+	}
 }

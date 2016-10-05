@@ -10,6 +10,7 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.mock.BasicNetwork;
 import org.squiddev.cctweaks.core.network.mock.KeyedNetworkNode;
+import org.squiddev.cctweaks.core.network.mock.NodeTile;
 
 import java.io.InputStreamReader;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class PacketTest {
 
 		BasicNetwork network = new BasicNetwork(data);
 		network.reset();
-		((IWorldNetworkNodeHost) network.getTileEntity(0, 0, 0)).getNode().getAttachedNetwork().invalidateNetwork();
+		((NodeTile) network.getTileEntity(0, 0, 0)).node.doInvalidate();
 
 		for (Map.Entry<BlockPos, KeyedNetworkNode> location : network) {
 			Integer count = data.counts.get(location.getValue().key);

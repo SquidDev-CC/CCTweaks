@@ -7,7 +7,7 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.blocks.TileBase;
 
 public class NodeTile extends TileBase implements IWorldNetworkNodeHost {
-	public IWorldNetworkNode node;
+	public CountingNetworkNode node;
 	public final IBlockAccess world;
 
 	public NodeTile(IBlockAccess world, int x, int z) {
