@@ -147,9 +147,6 @@ public final class Point implements INetworkAccess {
 	public static class Connection extends UnorderedPair<Point> {
 		public Connection(Point x, Point y) {
 			super(x, y);
-
-			x.connections.add(this);
-			y.connections.add(this);
 		}
 
 		public Collection<Map<INetworkNode, Point>> breakConnection() {
@@ -157,6 +154,14 @@ public final class Point implements INetworkAccess {
 			y.connections.remove(this);
 
 			return NodeScanner.scanNetwork(x.controller, x, y);
+		}
+
+		public boolean formConnection() {
+			if (x.connections.contains(this)) return false;
+
+			x.connections.add(this);
+			y.connections.add(this);
+			return true;
 		}
 	}
 }

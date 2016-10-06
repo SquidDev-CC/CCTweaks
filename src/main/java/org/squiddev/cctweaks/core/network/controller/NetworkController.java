@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.network.controller;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.util.BlockPos;
 import org.squiddev.cctweaks.api.UnorderedPair;
@@ -24,6 +25,7 @@ public final class NetworkController implements INetworkController {
 
 	protected final Map<INetworkNode, Point> points;
 	private Set<INetworkNode> nodeView;
+	private Set<UnorderedPair<INetworkNode>> connectionCache;
 
 	/**
 	 * Construct a new network with a single node
@@ -103,6 +105,7 @@ public final class NetworkController implements INetworkController {
 		Map<String, IPeripheral> peripheralMap = unmodifiableMap(peripherals);
 
 		// Clear the structure. Make it impossible to add peripherals
+		connectionCache = null;
 		points.clear();
 		peripherals = newHashMap();
 
@@ -196,7 +199,10 @@ public final class NetworkController implements INetworkController {
 
 		if (points.containsKey(newNode)) {
 			// If we've already got the point then just form the connection
-			new Point.Connection(existingPoint, getPoint(newNode));
+			if (new Point.Connection(existingPoint, getPoint(newNode)).formConnection()) {
+				// Invalidate the connection cache if changed
+				connectionCache = null;
+			}
 		} else {
 			// We're going to have to add another node. Let's see what happens
 			INetworkController controller = newNode.getAttachedNetwork();
@@ -252,12 +258,15 @@ public final class NetworkController implements INetworkController {
 
 				// Re-build connection map
 				for (UnorderedPair<INetworkNode> connection : connections) {
-					new Point.Connection(getPoint(connection.x), getPoint(connection.y));
+					new Point.Connection(getPoint(connection.x), getPoint(connection.y)).formConnection();
 				}
 			}
 
 			// Form the connection
-			new Point.Connection(existingPoint, getPoint(newNode));
+			new Point.Connection(existingPoint, getPoint(newNode)).formConnection();
+
+			// Invalidate the connection cache now
+			connectionCache = null;
 
 			// And attach everything to the network
 			for (Point point : pointSet) {
@@ -366,14 +375,19 @@ public final class NetworkController implements INetworkController {
 
 	@Override
 	public Set<UnorderedPair<INetworkNode>> getNodeConnections() {
-		Set<UnorderedPair<INetworkNode>> connections = newHashSet();
-		for (Point point : points.values()) {
-			for (Point.Connection connection : point.connections) {
-				connections.add(new UnorderedPair<INetworkNode>(point.node, connection.other(point).node));
+		Set<UnorderedPair<INetworkNode>> connections = connectionCache;
+		if (connections == null) {
+			connections = Sets.newHashSet();
+			for (Point point : points.values()) {
+				for (Point.Connection connection : point.connections) {
+					connections.add(new UnorderedPair<INetworkNode>(point.node, connection.other(point).node));
+				}
 			}
+
+			connections = connectionCache = unmodifiableSet(connections);
 		}
 
-		return unmodifiableSet(connections);
+		return connections;
 	}
 
 	@Override
