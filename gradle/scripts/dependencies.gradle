@@ -2,7 +2,6 @@ apply plugin: 'idea'
 apply plugin: 'eclipse'
 
 repositories {
-	mavenLocal()
 	mavenCentral()
 	jcenter()
 
@@ -70,11 +69,12 @@ dependencies {
 	packaged "net.industrial-craft:industrialcraft-2:2.3.249-ex18:api"
 	packaged "openperipheral:OpenPeripheralCore-API:3.2"
 
-	shade('org.squiddev:cctweaks-lua:1.0.10') {
+	shade('org.squiddev:cctweaks-lua:1.0.13') {
 		// Different versions
 		exclude group: 'ComputerCraft'
 		exclude group: 'com.google.guava'
 		exclude group: 'net.minecraftforge'
+		exclude group: 'org.ow2.asm'
 		exclude module: 'ConfigGen'
 	}
 
