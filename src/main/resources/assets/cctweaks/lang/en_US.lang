@@ -33,8 +33,18 @@ gui.config.cctweaks.computer.debug=Debug API Enabled
 gui.config.cctweaks.computer.computerThreadTimeout=Computer Thread Timeout
 gui.config.cctweaks.computer.luaJC=LuaJC
 gui.config.cctweaks.computer.luaJCVerify=Verify LuaJC
+gui.config.cctweaks.computer.luajc=LuaJC
+gui.config.cctweaks.computer.luajc.enabled=Enabled
+gui.config.cctweaks.computer.luajc.verify=Verify
+gui.config.cctweaks.computer.luajc.threshold=Compile Threshold
 gui.config.cctweaks.computer.cobalt=Cobalt VM
 gui.config.cctweaks.computer.timeoutError=Timeout Error
+gui.config.cctweaks.computer.biosPath=Bios Path
+gui.config.cctweaks.computer.maxFilesHandles=Max File Handles
+gui.config.cctweaks.computer.rembulan=Rembulan
+gui.config.cctweaks.computer.multithreading=Multi-threading
+gui.config.cctweaks.computer.multithreading.enabled=Enabled
+gui.config.cctweaks.computer.multithreading.threads=Threads
 
 gui.config.cctweaks.turtle=Turtle
 gui.config.cctweaks.turtle.fluxRefuelAmount=RF Refuel Amount
@@ -67,7 +77,7 @@ gui.config.cctweaks.testing=Testing
 gui.config.cctweaks.testing.debug=Debug Logging
 gui.config.cctweaks.testing.debugItems=Debug Items
 gui.config.cctweaks.testing.deprecatedWarnings=Deprecated Warnings
-gui.config.cctweaks.testing.extendedControllerValidation=Extended Controller Validation
+gui.config.cctweaks.testing.controllerValidation=Controller Validation
 gui.config.cctweaks.testing.dumpAsm=Dump ASM
 
 gui.config.cctweaks.misc=Miscellaneous
@@ -86,3 +96,8 @@ gui.config.cctweaks.apis.socket.maxRead=Max read length
 gui.config.cctweaks.apis.data=Data
 gui.config.cctweaks.apis.data.enabled=Enabled
 gui.config.cctweaks.apis.data.limit=Limit
+gui.config.cctweaks.apis.bigInteger=biginteger Enabled
+gui.config.cctweaks.apis.debug=debug Enabled
+gui.config.cctweaks.apis.bitop=bitop Enabled
+gui.config.cctweaks.apis.profiler=profiler Enabled
+
