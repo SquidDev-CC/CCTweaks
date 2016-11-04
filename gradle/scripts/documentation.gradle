@@ -13,12 +13,12 @@ class DocumentationParser extends DefaultTask {
 	@TaskAction
 	public void run() {
 		sources
-			.findAll { regex.matcher(it.getPath()).matches() }
+			.findAll { regex.matcher(it.getPath().replace('\\', '/')).matches() }
 			.each { parse(it) };
 	}
 
 	public void parse(File file) {
-		Matcher matcher = regex.matcher(file.getPath());
+		Matcher matcher = regex.matcher(file.getPath().replace('\\', '/'));
 		if (!matcher.find()) throw new IllegalArgumentException("Cannot extract for " + file.getPath());
 
 		String language = matcher.group(2) + ".lang";
@@ -27,6 +27,7 @@ class DocumentationParser extends DefaultTask {
 
 		String key = matcher.group(3) + "." + matcher.group(1) + "." + matcher.group(4) + ".information";
 		String rewritten = State.parse(file.getText())
+			.replaceAll("\r", "")
 			.replaceAll("\n\n+", "\\\\n")
 			.replaceAll("[\n ]+", " ")
 			.trim()
@@ -136,13 +137,15 @@ class DocFilter extends FilterReader {
 	}
 
 	public int read(char[] cbuf, int off, int len) throws IOException {
-		for (int i = 0; i < len; ++i) {
-			int ch = this.read();
-			if (ch == -1) return i == 0 ? -1 : i;
-			cbuf[off + i] = (char) ch;
+		while (this.in != null) {
+			int read = this.in.read(cbuf, off, len);
+			if (read != -1) return read;
+
+			this.in.close();
+			this.in = readers.poll();
 		}
 
-		return len;
+		return -1;
 	}
 
 	public long skip(long n) throws IOException {
@@ -180,7 +183,7 @@ task documentation(type: DocumentationParser) {
 }
 
 processResources {
-	from("assets/") { include "**/lang" }.eachFile({ file ->
+	filesMatching("assets/**/lang/*.lang", { file ->
 		StringBuilder lang = documentation.languages[file.getName()];
 		if (lang != null) {
 			file.filter([readers: [new StringReader(lang.toString())] as Queue], DocFilter.class)
