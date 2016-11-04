@@ -122,14 +122,13 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 	}
 
 	public Object[] doUse(DelayedTask task, IComputerAccess computer, EnumFacing direction, boolean sneak, int duration) throws LuaException {
-		player.updateInformation(access, direction);
-		player.posY += 1.5;
-		player.loadWholeInventory(access);
-		player.setSneaking(sneak);
+		player.load(access, direction, sneak);
 
 		MovingObjectPosition hit = findHit(direction, 0.65);
 		ItemStack stack = player.getItem(access);
 		World world = player.worldObj;
+
+		player.posY += 1.5;
 
 		try {
 			if (stack != null) {
@@ -180,8 +179,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			}
 		} finally {
 			player.clearItemInUse();
-			player.unloadWholeInventory(access);
-			player.setSneaking(false);
+			player.unload(access);
 		}
 
 		return new Object[]{false};
@@ -265,14 +263,13 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 	}
 
 	public TurtleCommandResult doSwing(IComputerAccess computer, EnumFacing direction, boolean sneak) throws LuaException {
-		player.updateInformation(access, direction);
-		player.posY += 1.5;
-		player.loadWholeInventory(access);
-		player.setSneaking(sneak);
+		player.load(access, direction, sneak);
 
 		ItemStack stack = player.getItem(access);
 		TurtleAnimation animation = side == TurtleSide.Left ? TurtleAnimation.SwingLeftTool : TurtleAnimation.SwingRightTool;
 		MovingObjectPosition hit = findHit(direction, 0.65);
+
+		player.posY += 1.5;
 
 		try {
 			if (stack != null) {
@@ -286,12 +283,12 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			if (hit != null) {
 				switch (hit.typeOfHit) {
 					case ENTITY: {
-						TurtleCommandResult result = player.attack(access, direction);
+						TurtleCommandResult result = player.attack(access, hit.entityHit);
 						if (result.isSuccess()) access.playAnimation(animation);
 						return result;
 					}
 					case BLOCK: {
-						TurtleCommandResult result = player.dig(access, direction);
+						TurtleCommandResult result = player.dig(access, direction, hit.getBlockPos());
 						if (result.isSuccess()) access.playAnimation(animation);
 						return result;
 					}
@@ -299,8 +296,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			}
 		} finally {
 			player.clearItemInUse();
-			player.unloadWholeInventory(access);
-			player.setSneaking(false);
+			player.unload(access);
 		}
 
 		return TurtleCommandResult.failure("Nothing to do here");
@@ -313,12 +309,12 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		return context.executeMainThreadTask(new ILuaTask() {
 			@Override
 			public Object[] execute() throws LuaException {
-				player.updateInformation(access, direction);
-				player.posY += 1.5;
-				player.loadWholeInventory(access);
+				player.load(access, direction, false);
 
 				ItemStack stack = player.getHeldItem();
 				MovingObjectPosition hit = findHit(direction, 0.65);
+
+				player.posY += 1.5;
 
 				try {
 					if (stack != null) {
@@ -328,7 +324,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 
 					return new Object[]{false};
 				} finally {
-					player.unloadWholeInventory(access);
+					player.unload(access);
 				}
 			}
 		});
@@ -339,11 +335,12 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		return context.executeMainThreadTask(new ILuaTask() {
 			@Override
 			public Object[] execute() throws LuaException {
-				player.updateInformation(access, direction);
-				player.loadWholeInventory(access);
+				player.load(access, direction, false);
 
 				ItemStack stack = player.getHeldItem();
 				MovingObjectPosition hit = findHit(direction, 0.65);
+
+				player.posY += 1.5;
 
 				try {
 					if (stack != null) {
@@ -369,7 +366,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 
 					return new Object[]{false};
 				} finally {
-					player.unloadWholeInventory(access);
+					player.unload(access);
 				}
 			}
 		});
@@ -393,7 +390,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		Pair<Entity, Vec3> pair = WorldUtil.rayTraceEntities(player.worldObj, origin, target, 1.1);
 		Entity entity = pair == null ? null : pair.getLeft();
 
-		if (entity instanceof EntityLivingBase && (hit == null || origin.squareDistanceTo(blockCenter) > player.getDistanceSqToEntity(entity))) {
+		if (entity instanceof EntityLivingBase && (hit == null || player.getDistanceSq(hit.getBlockPos()) > player.getDistanceSqToEntity(entity))) {
 			return new MovingObjectPosition(entity);
 		} else {
 			return hit;
