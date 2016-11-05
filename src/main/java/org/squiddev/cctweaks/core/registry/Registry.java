@@ -6,6 +6,7 @@ import org.squiddev.cctweaks.blocks.debug.BlockDebug;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
 import org.squiddev.cctweaks.client.ModelLoader;
 import org.squiddev.cctweaks.client.render.RenderNetworkOverlay;
+import org.squiddev.cctweaks.client.render.RenderSquidOverlay;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHostProvider;
 import org.squiddev.cctweaks.core.pocket.CraftingPocketUpgrade;
 import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
@@ -79,6 +80,7 @@ public final class Registry {
 
 		addModule(new ModelLoader());
 
+		addModule(new RenderSquidOverlay());
 	}
 
 	public static void addModule(IModule module) {

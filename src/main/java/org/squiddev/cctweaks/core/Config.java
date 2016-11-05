@@ -257,6 +257,13 @@ public final class Config {
 		@DefaultBoolean(true)
 		@RequiresRestart(mc = false, world = true)
 		public static boolean pocketEnderModem;
+
+		/**
+		 * Fun rendering overlay for various objects.
+		 * Basically I'm slightly vain.
+		 */
+		@DefaultBoolean(true)
+		public static boolean funRender;
 	}
 
 	/**
