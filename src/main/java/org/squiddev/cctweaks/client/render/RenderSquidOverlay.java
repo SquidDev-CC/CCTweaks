@@ -20,6 +20,7 @@ import java.util.Map;
 public class RenderSquidOverlay extends Module implements IClientModule, LayerRenderer<EntityPlayer> {
 	private static final int SEGMENTS = 5;
 	private static final int TENTACLES = 6;
+	private static final int BASE_ANGLE = 40;
 
 	// Dimensions of the one tentacle
 	private static final float LENGTH = 0.3f;
@@ -27,10 +28,10 @@ public class RenderSquidOverlay extends Module implements IClientModule, LayerRe
 
 	private static final double EASING_TICKS = 5;
 	private static final double OFFSET_SPEED = 0.1;
-	private static final double OFFSET_VARIANCE = 3;
+	private static final double OFFSET_VARIANCE = 7;
 
-	private final double[] lastAngles = new double[TENTACLES];
-	private final double[] offsets = new double[TENTACLES];
+	private final double[] lastAngles = new double[TENTACLES * SEGMENTS];
+	private final double[] offsets = new double[TENTACLES * SEGMENTS];
 
 	private double tick = 0;
 
@@ -40,8 +41,8 @@ public class RenderSquidOverlay extends Module implements IClientModule, LayerRe
 		skinMap.get("default").addLayer(this);
 		skinMap.get("slim").addLayer(this);
 
-		for (int i = 0; i < TENTACLES; i++) {
-			lastAngles[i] = 30;
+		for (int i = 0; i < lastAngles.length; i++) {
+			lastAngles[i] = BASE_ANGLE;
 			offsets[i] = Math.random() * Math.PI * 2;
 		}
 	}
@@ -72,42 +73,45 @@ public class RenderSquidOverlay extends Module implements IClientModule, LayerRe
 			angle = 5;
 		} else if (player.hurtTime > 0) {
 			double progress = (double) player.hurtTime / player.maxHurtTime;
-			angle = 30 - (progress * 25);
+			angle = BASE_ANGLE - (progress * (BASE_ANGLE - OFFSET_VARIANCE));
 		} else {
-			angle = 30;
+			angle = BASE_ANGLE;
 		}
 
 		tick = (tick + partialTicks) % (Math.PI * 2 / OFFSET_SPEED);
 
 		for (int i = 0; i < TENTACLES; i++) {
-			// Offset each tentacle by a random amount
-			double lastAngle = lastAngles[i];
-			double thisAngle = angle + Math.sin(offsets[i] + tick * OFFSET_SPEED) * OFFSET_VARIANCE;
-
-			// Provide some basic easing on the angle
-			if (Math.abs(lastAngle - thisAngle) > 1) {
-				thisAngle = lastAngle - (lastAngle - thisAngle) / EASING_TICKS;
-			}
-
-			lastAngles[i] = thisAngle;
-
 			GlStateManager.pushMatrix();
 
 			GlStateManager.rotate(360.0f / TENTACLES * i, 0, 1, 0);
 			GlStateManager.translate(0.1, 0, 0);
 
-			GlStateManager.rotate((float) thisAngle, 0, 0, -1);
-
 			Tessellator tessellator = Tessellator.getInstance();
 			WorldRenderer renderer = tessellator.getWorldRenderer();
 
 			for (int j = 0; j < SEGMENTS; j++) {
+				// Offset each tentacle by a random amount
+				double lastAngle = lastAngles[i * SEGMENTS + j];
+				double thisAngle = angle + Math.sin(offsets[i * SEGMENTS + j] + tick * OFFSET_SPEED) * OFFSET_VARIANCE;
+
+				// Angle each tentacle to get a "claw" effect.
+				thisAngle *= Math.cos(j * (Math.PI / (SEGMENTS - 1)));
+
+				// Provide some basic easing on the angle
+				// Basically the middle segments have a high "delta"
+				if (Math.abs(lastAngle - thisAngle) > 1) {
+					thisAngle = lastAngle - (lastAngle - thisAngle) / EASING_TICKS;
+				}
+
+				lastAngles[i * SEGMENTS + j] = thisAngle;
+
+				GlStateManager.rotate((float) thisAngle, 0, 0, -1);
+
 				renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
 				tentacle(renderer);
 				tessellator.draw();
 
-				GlStateManager.translate(0, LENGTH, 0);
-				GlStateManager.rotate((float) thisAngle, 0, 0, -1);
+				GlStateManager.translate(0, LENGTH - WIDTH / 2, 0);
 			}
 
 			GlStateManager.popMatrix();
