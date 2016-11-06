@@ -17,147 +17,154 @@ import org.squiddev.cctweaks.core.registry.Module;
 
 import java.util.Map;
 
-public class RenderSquidOverlay extends Module implements IClientModule, LayerRenderer<EntityPlayer> {
-	private static final int SEGMENTS = 5;
-	private static final int TENTACLES = 6;
-	private static final int BASE_ANGLE = 40;
-
-	// Dimensions of the one tentacle
-	private static final float LENGTH = 0.3f;
-	private static final float WIDTH = 0.15f;
-
-	private static final double EASING_TICKS = 5;
-	private static final double OFFSET_SPEED = 0.1;
-	private static final double OFFSET_VARIANCE = 7;
-
-	private final double[] lastAngles = new double[TENTACLES * SEGMENTS];
-	private final double[] offsets = new double[TENTACLES * SEGMENTS];
-
-	private double tick = 0;
-
-	@Override
-	public void clientInit() {
-		Map<String, RenderPlayer> skinMap = Minecraft.getMinecraft().getRenderManager().getSkinMap();
-		skinMap.get("default").addLayer(this);
-		skinMap.get("slim").addLayer(this);
-
-		for (int i = 0; i < lastAngles.length; i++) {
-			lastAngles[i] = BASE_ANGLE;
-			offsets[i] = Math.random() * Math.PI * 2;
-		}
-	}
-
+public class RenderSquidOverlay extends Module implements IClientModule {
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void doRenderLayer(EntityPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-		String name = player.getDisplayName().getUnformattedText();
-		if (!name.equals("SquidDev") || !Config.Misc.funRender) return;
+	public void clientInit() {
+		Map<String, RenderPlayer> skinMap = Minecraft.getMinecraft().getRenderManager().getSkinMap();
+		RenderLayer layer = new RenderLayer();
+		skinMap.get("default").addLayer(layer);
+		skinMap.get("slim").addLayer(layer);
+	}
 
-		GlStateManager.disableLighting();
-		GlStateManager.disableTexture2D();
+	@SideOnly(Side.CLIENT)
+	private static final class RenderLayer implements LayerRenderer<EntityPlayer> {
+		private static final int SEGMENTS = 5;
+		private static final int TENTACLES = 6;
+		private static final int BASE_ANGLE = 25;
 
-		GlStateManager.pushMatrix();
-		if (player.isSneaking()) {
-			GlStateManager.translate(0F, 0.2F, 0F);
-			GlStateManager.rotate(90F / (float) Math.PI, 1.0F, 0.0F, 0.0F);
+		// Dimensions of the one tentacle
+		private static final float LENGTH = 0.3f;
+		private static final float WIDTH = 0.15f;
+
+		private static final double EASING_TICKS = 5;
+		private static final double OFFSET_SPEED = 0.1;
+		private static final double OFFSET_VARIANCE = 7;
+
+		private final double[] lastAngles = new double[TENTACLES * SEGMENTS];
+		private final double[] offsets = new double[TENTACLES * SEGMENTS];
+
+		private double tick = 0;
+
+		public RenderLayer() {
+			for (int i = 0; i < lastAngles.length; i++) {
+				lastAngles[i] = BASE_ANGLE;
+				offsets[i] = Math.random() * Math.PI * 2;
+			}
 		}
 
-		GlStateManager.rotate(90, 1, 0, 0);
-		GlStateManager.translate(0, 0.1, -0.3);
+		@Override
+		@SideOnly(Side.CLIENT)
+		public void doRenderLayer(EntityPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+			String name = player.getDisplayName().getUnformattedText();
+			if (!name.equals("SquidDev") || !Config.Misc.funRender) return;
 
-		GlStateManager.color(0, 0, 0, 1);
+			GlStateManager.disableLighting();
+			GlStateManager.disableTexture2D();
 
-		final double angle;
-
-		if (player.isSprinting()) {
-			angle = 5;
-		} else if (player.hurtTime > 0) {
-			double progress = (double) player.hurtTime / player.maxHurtTime;
-			angle = BASE_ANGLE - (progress * (BASE_ANGLE - OFFSET_VARIANCE));
-		} else {
-			angle = BASE_ANGLE;
-		}
-
-		tick = (tick + partialTicks) % (Math.PI * 2 / OFFSET_SPEED);
-
-		for (int i = 0; i < TENTACLES; i++) {
 			GlStateManager.pushMatrix();
+			if (player.isSneaking()) {
+				GlStateManager.translate(0F, 0.2F, 0F);
+				GlStateManager.rotate(90F / (float) Math.PI, 1.0F, 0.0F, 0.0F);
+			}
 
-			GlStateManager.rotate(360.0f / TENTACLES * i, 0, 1, 0);
-			GlStateManager.translate(0.1, 0, 0);
+			GlStateManager.rotate(90, 1, 0, 0);
+			GlStateManager.translate(0, 0.1, -0.3);
 
-			Tessellator tessellator = Tessellator.getInstance();
-			WorldRenderer renderer = tessellator.getWorldRenderer();
+			GlStateManager.color(0, 0, 0, 1);
 
-			for (int j = 0; j < SEGMENTS; j++) {
-				// Offset each tentacle by a random amount
-				double lastAngle = lastAngles[i * SEGMENTS + j];
-				double thisAngle = angle + Math.sin(offsets[i * SEGMENTS + j] + tick * OFFSET_SPEED) * OFFSET_VARIANCE;
+			final double angle;
 
-				// Angle each tentacle to get a "claw" effect.
-				thisAngle *= Math.cos(j * (Math.PI / (SEGMENTS - 1)));
+			if (player.isSprinting()) {
+				angle = 5;
+			} else if (player.hurtTime > 0) {
+				double progress = (double) player.hurtTime / player.maxHurtTime;
+				angle = BASE_ANGLE - (progress * (BASE_ANGLE - OFFSET_VARIANCE));
+			} else {
+				angle = BASE_ANGLE;
+			}
 
-				// Provide some basic easing on the angle
-				// Basically the middle segments have a high "delta"
-				if (Math.abs(lastAngle - thisAngle) > 1) {
-					thisAngle = lastAngle - (lastAngle - thisAngle) / EASING_TICKS;
+			tick = (tick + partialTicks) % (Math.PI * 2 / OFFSET_SPEED);
+
+			for (int i = 0; i < TENTACLES; i++) {
+				GlStateManager.pushMatrix();
+
+				GlStateManager.rotate(360.0f / TENTACLES * i, 0, 1, 0);
+				GlStateManager.translate(0.1, 0, 0);
+
+				Tessellator tessellator = Tessellator.getInstance();
+				WorldRenderer renderer = tessellator.getWorldRenderer();
+
+				for (int j = 0; j < SEGMENTS; j++) {
+					// Offset each tentacle by a random amount
+					double lastAngle = lastAngles[i * SEGMENTS + j];
+					double thisAngle = angle + Math.sin(offsets[i * SEGMENTS + j] + tick * OFFSET_SPEED) * OFFSET_VARIANCE;
+
+					// Angle each tentacle to get a "claw" effect.
+					thisAngle *= Math.cos(j * (Math.PI / (SEGMENTS - 1)));
+
+					// Provide some basic easing on the angle
+					// Basically the middle segments have a high "delta"
+					if (Math.abs(lastAngle - thisAngle) > 1) {
+						thisAngle = lastAngle - (lastAngle - thisAngle) / EASING_TICKS;
+					}
+
+					lastAngles[i * SEGMENTS + j] = thisAngle;
+
+					GlStateManager.rotate((float) thisAngle, 0, 0, -1);
+
+					renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+					tentacle(renderer);
+					tessellator.draw();
+
+					GlStateManager.translate(0, LENGTH - WIDTH / 2, 0);
 				}
 
-				lastAngles[i * SEGMENTS + j] = thisAngle;
-
-				GlStateManager.rotate((float) thisAngle, 0, 0, -1);
-
-				renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-				tentacle(renderer);
-				tessellator.draw();
-
-				GlStateManager.translate(0, LENGTH - WIDTH / 2, 0);
+				GlStateManager.popMatrix();
 			}
 
 			GlStateManager.popMatrix();
+
+			GlStateManager.enableLighting();
+			GlStateManager.enableTexture2D();
 		}
 
-		GlStateManager.popMatrix();
+		@Override
+		@SideOnly(Side.CLIENT)
+		public boolean shouldCombineTextures() {
+			return false;
+		}
 
-		GlStateManager.enableLighting();
-		GlStateManager.enableTexture2D();
-	}
+		private static void tentacle(WorldRenderer renderer) {
+			renderer.pos(0, 0, -WIDTH / 2).endVertex();
+			renderer.pos(0, 0, WIDTH / 2).endVertex();
+			renderer.pos(0, LENGTH, WIDTH / 2).endVertex();
+			renderer.pos(0, LENGTH, -WIDTH / 2).endVertex();
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean shouldCombineTextures() {
-		return false;
-	}
+			renderer.pos(0, 0, -WIDTH / 2).endVertex();
+			renderer.pos(0, 0, WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, 0, WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, 0, -WIDTH / 2).endVertex();
 
-	private static void tentacle(WorldRenderer renderer) {
-		renderer.pos(0, 0, -WIDTH / 2).endVertex();
-		renderer.pos(0, 0, WIDTH / 2).endVertex();
-		renderer.pos(0, LENGTH, WIDTH / 2).endVertex();
-		renderer.pos(0, LENGTH, -WIDTH / 2).endVertex();
+			renderer.pos(0, 0, -WIDTH / 2).endVertex();
+			renderer.pos(0, LENGTH, -WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, LENGTH, -WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, 0, -WIDTH / 2).endVertex();
 
-		renderer.pos(0, 0, -WIDTH / 2).endVertex();
-		renderer.pos(0, 0, WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, 0, WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, 0, -WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, 0, -WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, 0, WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, LENGTH, WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, LENGTH, -WIDTH / 2).endVertex();
 
-		renderer.pos(0, 0, -WIDTH / 2).endVertex();
-		renderer.pos(0, LENGTH, -WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, LENGTH, -WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, 0, -WIDTH / 2).endVertex();
+			renderer.pos(0, LENGTH, -WIDTH / 2).endVertex();
+			renderer.pos(0, LENGTH, WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, LENGTH, WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, LENGTH, -WIDTH / 2).endVertex();
 
-		renderer.pos(WIDTH, 0, -WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, 0, WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, LENGTH, WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, LENGTH, -WIDTH / 2).endVertex();
-
-		renderer.pos(0, LENGTH, -WIDTH / 2).endVertex();
-		renderer.pos(0, LENGTH, WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, LENGTH, WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, LENGTH, -WIDTH / 2).endVertex();
-
-		renderer.pos(0, 0, WIDTH / 2).endVertex();
-		renderer.pos(0, LENGTH, WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, LENGTH, WIDTH / 2).endVertex();
-		renderer.pos(WIDTH, 0, WIDTH / 2).endVertex();
+			renderer.pos(0, 0, WIDTH / 2).endVertex();
+			renderer.pos(0, LENGTH, WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, LENGTH, WIDTH / 2).endVertex();
+			renderer.pos(WIDTH, 0, WIDTH / 2).endVertex();
+		}
 	}
 }
