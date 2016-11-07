@@ -117,6 +117,12 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.peripheral.modem.ModemPeripheral",
 				"org.squiddev.cctweaks.core.patch.ModemPeripheral_Patch"
 			),
+
+			// Attempt to fix concurrent modification exceptions.
+			new ClassMerger(
+				"dan200.computercraft.shared.computer.core.ServerComputerRegistry",
+				"org.squiddev.cctweaks.core.patch.ServerComputerRegistry_Patch"
+			),
 		});
 
 		patches.finalise();
