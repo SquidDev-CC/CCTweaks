@@ -23,7 +23,7 @@ public class CCTweaks {
 	public static final String NAME = ID;
 	public static final String VERSION = "${mod_version}";
 	public static final String RESOURCE_DOMAIN = ID.toLowerCase();
-	public static final String DEPENDENCIES = "required-after:ComputerCraft@[1.74,);after:CCTurtle;after:ForgeMultipart;after:OpenPeripheralCore;";
+	public static final String DEPENDENCIES = "required-after:ComputerCraft@[${cc_version},);after:CCTurtle;";
 
 	public static final String ROOT_NAME = "org.squiddev.cctweaks.";
 	public static final String GUI_FACTORY = ROOT_NAME + "client.gui.GuiConfigFactory";
