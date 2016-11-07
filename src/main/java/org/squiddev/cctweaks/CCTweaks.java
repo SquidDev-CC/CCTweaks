@@ -14,6 +14,7 @@ import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindings;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
+import org.squiddev.cctweaks.lua.lib.ComputerMonitor;
 import org.squiddev.cctweaks.lua.lib.DelayedTasks;
 
 @Mod(modid = CCTweaks.ID, name = CCTweaks.NAME, version = CCTweaks.VERSION, dependencies = CCTweaks.DEPENDENCIES, guiFactory = CCTweaks.GUI_FACTORY)
@@ -56,6 +57,11 @@ public class CCTweaks {
 	}
 
 	@EventHandler
+	public void onServerStarting(FMLServerStartingEvent event) {
+		event.registerServerCommand(new CommandCCTweaks(event.getServer().isDedicatedServer()));
+	}
+
+	@EventHandler
 	public void onServerStart(FMLServerStartedEvent event) {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
 			DelayedTasks.reset();
@@ -70,6 +76,8 @@ public class CCTweaks {
 			DelayedTasks.reset();
 			NetworkBindings.reset();
 			NetworkPlayerWatcher.reset();
+
+			if (ComputerMonitor.get() != null) ComputerMonitor.stop();
 		}
 	}
 }
