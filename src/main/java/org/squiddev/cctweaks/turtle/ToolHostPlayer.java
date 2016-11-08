@@ -7,14 +7,16 @@ import dan200.computercraft.shared.util.DirectionUtil;
 import dan200.computercraft.shared.util.InventoryUtil;
 import dan200.computercraft.shared.util.WorldUtil;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.management.ItemInWorldManager;
-import net.minecraft.util.BlockPos;
+import net.minecraft.server.management.PlayerInteractionManager;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import org.squiddev.cctweaks.api.IWorldPosition;
@@ -28,7 +30,7 @@ import org.squiddev.cctweaks.core.utils.WorldPosition;
  */
 public class ToolHostPlayer extends TurtlePlayer {
 	private BlockPos coordinates;
-	private Vec3 positionVector;
+	private Vec3d positionVector;
 
 	private BlockPos digPosition;
 	private Block digBlock;
@@ -41,11 +43,9 @@ public class ToolHostPlayer extends TurtlePlayer {
 	 */
 	private ItemStack activeStack;
 
-	public ItemStack itemInUse;
-
 	public ToolHostPlayer(ITurtleAccess turtle) {
 		super((WorldServer) turtle.getWorld());
-		playerNetServerHandler = new FakeNetHandler(this);
+		connection = new FakeNetHandler(this);
 	}
 
 	public McEvents.IDropConsumer getConsumer(final ITurtleAccess turtle) {
@@ -70,8 +70,8 @@ public class ToolHostPlayer extends TurtlePlayer {
 	}
 
 	private void setState(Block block, BlockPos pos) {
-		theItemInWorldManager.cancelDestroyingBlock();
-		theItemInWorldManager.durabilityRemainingOnBlock = -1;
+		interactionManager.cancelDestroyingBlock();
+		interactionManager.durabilityRemainingOnBlock = -1;
 
 		digPosition = pos;
 		digBlock = block;
@@ -81,16 +81,17 @@ public class ToolHostPlayer extends TurtlePlayer {
 
 	public TurtleCommandResult dig(ITurtleAccess turtle, EnumFacing direction, BlockPos pos) {
 		World world = turtle.getWorld();
-		Block block = world.getBlockState(pos).getBlock();
+		IBlockState state = world.getBlockState(pos);
+		Block block = state.getBlock();
 
 		if (block != digBlock || !pos.equals(digPosition)) setState(block, pos);
 
-		if (!world.isAirBlock(pos) && !block.getMaterial().isLiquid()) {
-			if (block == Blocks.bedrock || block.getBlockHardness(world, pos) <= -1) {
+		if (!world.isAirBlock(pos) && !state.getMaterial().isLiquid()) {
+			if (block == Blocks.BEDROCK || state.getBlockHardness(world, pos) <= -1) {
 				return TurtleCommandResult.failure("Unbreakable block detected");
 			}
 
-			ItemInWorldManager manager = theItemInWorldManager;
+			PlayerInteractionManager manager = interactionManager;
 			for (int i = 0; i < Config.Turtle.ToolHost.digFactor; i++) {
 				if (currentDamageState == -1) {
 					// TODO: Migrate checks to here
@@ -98,7 +99,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 					currentDamageState = manager.durabilityRemainingOnBlock;
 				} else {
 					currentDamage++;
-					float hardness = block.getPlayerRelativeBlockHardness(this, world, pos) * (currentDamage + 1);
+					float hardness = state.getPlayerRelativeBlockHardness(this, world, pos) * (currentDamage + 1);
 					int hardnessState = (int) (hardness * 10);
 
 					if (hardnessState != currentDamageState) {
@@ -125,12 +126,12 @@ public class ToolHostPlayer extends TurtlePlayer {
 	}
 
 	@Override
-	public Vec3 getPositionVector() {
+	public Vec3d getPositionVector() {
 		return positionVector;
 	}
 
 	/**
-	 * Basically just {@link #getHeldItem()}
+	 * Basically just {@link #getHeldItemMainhand()}
 	 */
 	public ItemStack getItem(ITurtleAccess turtle) {
 		return turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
@@ -138,7 +139,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 
 	public void load(ITurtleAccess turtle, EnumFacing direction, boolean sneaking) {
 		// Update the position arguments
-		BlockPos position = turtle.getPosition();
+		net.minecraft.util.math.BlockPos position = turtle.getPosition();
 		positionVector = turtle.getVisualPosition(0);
 
 		setPositionAndRotation(
@@ -154,7 +155,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 		// Apply item stack properties
 		ItemStack currentStack = getItem(turtle);
 		if (currentStack != null) {
-			getAttributeMap().applyAttributeModifiers(currentStack.getAttributeModifiers());
+			getAttributeMap().applyAttributeModifiers(currentStack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 			activeStack = currentStack.copy();
 		}
 
@@ -176,7 +177,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 	public void unload(ITurtleAccess turtle) {
 		// Revert to old properties
 		if (activeStack != null) {
-			getAttributeMap().removeAttributeModifiers(activeStack.getAttributeModifiers());
+			getAttributeMap().removeAttributeModifiers(activeStack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 			activeStack = null;
 		}
 
@@ -198,18 +199,6 @@ public class ToolHostPlayer extends TurtlePlayer {
 			storeItem(inventory.getStackInSlot(i), turtleInventory, turtle);
 			inventory.setInventorySlotContents(i, null);
 		}
-	}
-
-	@Override
-	public void setItemInUse(ItemStack stack, int duration) {
-		super.setItemInUse(stack, duration);
-		itemInUse = stack;
-	}
-
-	@Override
-	public void clearItemInUse() {
-		super.clearItemInUse();
-		itemInUse = null;
 	}
 
 	private static void storeItem(ItemStack stack, IInventory inventory, ITurtleAccess turtle) {

@@ -3,8 +3,8 @@ package org.squiddev.cctweaks.api;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 
 /**
  * A card that can be used to store/retrieve data
@@ -74,8 +74,8 @@ public interface IDataCard {
 		 *
 		 * @return The chat message
 		 */
-		public IChatComponent getChatMessage() {
-			return new ChatComponentTranslation("chat.cctweaks.data.messages." + this.toString());
+		public ITextComponent getChatMessage() {
+			return new TextComponentTranslation("chat.cctweaks.data.messages." + this.toString());
 		}
 	}
 }

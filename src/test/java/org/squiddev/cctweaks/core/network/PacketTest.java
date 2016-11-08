@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.core.network;
 
 import com.google.gson.Gson;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

@@ -7,11 +7,14 @@ import dan200.computercraft.shared.peripheral.modem.TileCable;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.MultipartHelper;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.integration.multipart.network.PartCable;
 import org.squiddev.cctweaks.integration.multipart.network.PartModem;
@@ -34,43 +37,44 @@ public class ItemCable_Patch extends ItemCable {
 	}
 
 	@Override
-	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-		Block block = world.getBlockState(pos).getBlock();
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+		IBlockState state = world.getBlockState(pos);
+		Block block = state.getBlock();
 
 		// We can always place in an air block or a cable block that doesn't have a modem already.
-		if (block.isAir(world, pos) && nativePlace(stack, player, world, pos, side, hitX, hitY, hitZ)) {
-			return true;
+		if (block.isAir(state, world, pos) && nativePlace(stack, player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
+			return EnumActionResult.SUCCESS;
 		}
 		if (block == ComputerCraft.Blocks.cable) {
 			TileCable cable = (TileCable) world.getTileEntity(pos);
 			PeripheralType type = cable.getPeripheralType();
 			PeripheralType stackType = getPeripheralType(stack);
 			if ((type == PeripheralType.Cable && stackType == PeripheralType.WiredModem)
-				&& nativePlace(stack, player, world, pos, side, hitX, hitY, hitZ)) {
-				return true;
+				&& nativePlace(stack, player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
+				return EnumActionResult.SUCCESS;
 			} else if ((type == PeripheralType.WiredModem && stackType == PeripheralType.Cable)
-				&& nativePlace(stack, player, world, pos, side, hitX, hitY, hitZ)) {
-				return true;
+				&& nativePlace(stack, player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
+				return EnumActionResult.SUCCESS;
 			}
 		}
 
-		Vec3 hit = new Vec3(hitX, hitY, hitZ);
+		Vec3d hit = new Vec3d(hitX, hitY, hitZ);
 		double depth = (hit.xCoord * 2.0D - 1.0D) * (double) side.getFrontOffsetX() + (hit.yCoord * 2.0D - 1.0D) * (double) side.getFrontOffsetY() + (hit.zCoord * 2.0D - 1.0D) * (double) side.getFrontOffsetZ();
 		return (depth < 1.0D && place(stack, player, world, pos, side))
-			|| nativePlace(stack, player, world, pos, side, hitX, hitY, hitZ)
-			|| place(stack, player, world, pos.offset(side), side);
+			|| nativePlace(stack, player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS
+			|| place(stack, player, world, pos.offset(side), side) ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
 	}
 
 	/**
-	 * The original {@link ItemCable#onItemUse(ItemStack, EntityPlayer, World, BlockPos, EnumFacing, float, float, float)} method
+	 * The original {@link ItemCable#onItemUse(ItemStack, EntityPlayer, World, BlockPos, EnumHand, EnumFacing, float, float, float)} method
 	 * We keep this to ensure cables can be placed in existing modem blocks
 	 *
 	 * @return Success at placing the cable
 	 */
 	@MergeVisitor.Stub
 	@MergeVisitor.Rename(from = {"onItemUse", "func_180614_a"})
-	public boolean nativePlace(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-		return false;
+	public EnumActionResult nativePlace(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+		return EnumActionResult.SUCCESS;
 	}
 
 	/**

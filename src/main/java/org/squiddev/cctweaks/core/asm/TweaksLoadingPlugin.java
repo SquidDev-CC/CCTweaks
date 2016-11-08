@@ -23,7 +23,7 @@ import java.util.Map;
 	"org.squiddev.patcher",
 })
 @IFMLLoadingPlugin.MCVersion("${mc_version}")
-@IFMLLoadingPlugin.SortingIndex(1001) // After runtime deobsfucation
+@IFMLLoadingPlugin.SortingIndex(1011) // After runtime deobsfucation and Unborked
 public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
 	public static File minecraftDir;
 	public static File dump;

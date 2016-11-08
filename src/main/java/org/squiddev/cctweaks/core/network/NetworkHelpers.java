@@ -2,8 +2,8 @@ package org.squiddev.cctweaks.core.network;
 
 import mcmultipart.multipart.IMultipart;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
@@ -47,7 +47,7 @@ public final class NetworkHelpers implements INetworkHelpers {
 
 		Set<INetworkNode> nodes = new HashSet<INetworkNode>();
 		World world = checkExists && access instanceof World ? (World) access : null;
-		BlockPos blockPos = position.getPosition();
+		net.minecraft.util.math.BlockPos blockPos = position.getPosition();
 
 		for (EnumFacing direction : EnumFacing.VALUES) {
 			if (node.canConnect(direction)) {

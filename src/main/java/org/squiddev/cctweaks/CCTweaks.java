@@ -19,10 +19,9 @@ import org.squiddev.cctweaks.lua.lib.DelayedTasks;
 
 @Mod(modid = CCTweaks.ID, name = CCTweaks.NAME, version = CCTweaks.VERSION, dependencies = CCTweaks.DEPENDENCIES, guiFactory = CCTweaks.GUI_FACTORY)
 public class CCTweaks {
-	public static final String ID = "CCTweaks";
-	public static final String NAME = ID;
+	public static final String ID = "cctweaks";
+	public static final String NAME = "CCTweaks";
 	public static final String VERSION = "${mod_version}";
-	public static final String RESOURCE_DOMAIN = ID.toLowerCase();
 	public static final String DEPENDENCIES = "required-after:ComputerCraft@[${cc_version},);after:CCTurtle;";
 
 	public static final String ROOT_NAME = "org.squiddev.cctweaks.";

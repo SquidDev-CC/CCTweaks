@@ -23,7 +23,7 @@ public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implemen
 
 	@Override
 	public String getUnlocalisedAdjective() {
-		return "turtle." + CCTweaks.RESOURCE_DOMAIN + ".toolHost.advanced.adjective";
+		return "turtle." + CCTweaks.ID + ".toolHost.advanced.adjective";
 	}
 
 	@Override

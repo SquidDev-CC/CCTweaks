@@ -4,15 +4,15 @@ import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -24,6 +24,7 @@ import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.items.ItemMultiBlock;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,7 +32,7 @@ import java.util.List;
  * A bridge between two networks so they can communicate with each other
  */
 public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
-	public enum BlockNetworkedType implements IStringSerializable {
+	private enum BlockNetworkedType implements IStringSerializable {
 		WIRELESS_BRIDGE,
 		MODEM;
 
@@ -43,6 +44,7 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 			name = name().toLowerCase();
 		}
 
+		@Nonnull
 		@Override
 		public String getName() {
 			return name;
@@ -64,9 +66,9 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 		}
 	}
 
-	public static final PropertyEnum<BlockNetworkedType> TYPE = PropertyEnum.create("type", BlockNetworkedType.class);
-	public static final PropertyBool MODEM_ON = PropertyBool.create("modem_on");
-	public static final PropertyBool PERIPHERAL_ON = PropertyBool.create("peripheral_on");
+	private static final PropertyEnum<BlockNetworkedType> TYPE = PropertyEnum.create("type", BlockNetworkedType.class);
+	private static final PropertyBool MODEM_ON = PropertyBool.create("modem_on");
+	private static final PropertyBool PERIPHERAL_ON = PropertyBool.create("peripheral_on");
 
 	public BlockNetworked() {
 		super("networkedBlock", TileBase.class);
@@ -78,7 +80,7 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(World world, int meta) {
+	public TileEntity createNewTileEntity(@Nonnull World world, int meta) {
 		switch (meta) {
 			case 0:
 				return new TileNetworkedWirelessBridge();
@@ -89,7 +91,7 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> itemStacks) {
+	public void getSubBlocks(@Nonnull Item item, CreativeTabs tab, List<ItemStack> itemStacks) {
 		itemStacks.add(new ItemStack(this, 1, 0));
 		itemStacks.add(new ItemStack(this, 1, 1));
 	}
@@ -105,7 +107,10 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 		return getUnlocalizedName();
 	}
 
+
+	@Nonnull
 	@Override
+	@SuppressWarnings("deprecation")
 	public IBlockState getStateFromMeta(int meta) {
 		IBlockState state = super.getStateFromMeta(meta);
 		return state.withProperty(TYPE, BlockNetworkedType.VALUES[meta < 0 || meta >= BlockNetworkedType.VALUES.length ? 0 : meta]);
@@ -116,14 +121,15 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 		return state.getValue(TYPE).ordinal();
 	}
 
+	@Nonnull
 	@Override
-	protected BlockState createBlockState() {
-		return new BlockState(this, TYPE, MODEM_ON, PERIPHERAL_ON);
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, TYPE, MODEM_ON, PERIPHERAL_ON);
 	}
 
 	@Override
 	public void preInit() {
-		GameRegistry.registerBlock(this, ItemMultiBlock.class, name);
+		register(new ItemMultiBlock(this));
 		GameRegistry.registerTileEntity(TileNetworkedWirelessBridge.class, "wirelessBridge");
 		GameRegistry.registerTileEntity(TileNetworkedModem.class, "wiredModem");
 	}
@@ -138,8 +144,8 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 				"CAC",
 				"GMG",
 
-				'G', Items.gold_ingot,
-				'D', Items.diamond,
+				'G', Items.GOLD_INGOT,
+				'D', Items.DIAMOND,
 				'C', PeripheralItemFactory.create(PeripheralType.Cable, null, 1),
 				'M', PeripheralItemFactory.create(PeripheralType.WiredModem, null, 1),
 				'A', PeripheralItemFactory.create(PeripheralType.AdvancedModem, null, 1)
@@ -152,7 +158,9 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+	@Nonnull
+	@SuppressWarnings("deprecation")
+	public IBlockState getActualState(@Nonnull IBlockState state, IBlockAccess worldIn, BlockPos pos) {
 		state = super.getActualState(state, worldIn, pos);
 		if (state.getValue(TYPE) == BlockNetworkedType.MODEM) {
 			TileBase te = getTile(worldIn, pos);

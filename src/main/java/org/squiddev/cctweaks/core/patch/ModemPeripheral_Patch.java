@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.core.patch;
 
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
 
 /**
  * To allow multi-threading modems we remove the {@code synchronized} flags from
@@ -29,7 +29,7 @@ public abstract class ModemPeripheral_Patch extends ModemPeripheral {
 	 * @return The modem's position in world.
 	 */
 	@Override
-	public Vec3 getWorldPosition() {
+	public Vec3d getWorldPosition() {
 		return getPosition();
 	}
 

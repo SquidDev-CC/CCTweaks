@@ -1,8 +1,8 @@
 package org.squiddev.cctweaks.core.turtle;
 
 import dan200.computercraft.api.lua.LuaException;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Helpers for getting the direction

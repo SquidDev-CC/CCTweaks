@@ -2,7 +2,7 @@ package org.squiddev.cctweaks.core.patch.targeted;
 
 import dan200.computercraft.shared.computer.blocks.ComputerPeripheral;
 import dan200.computercraft.shared.computer.core.ServerComputer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
 import org.squiddev.patcher.visitors.MergeVisitor;

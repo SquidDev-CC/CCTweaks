@@ -7,7 +7,7 @@ import dan200.computercraft.api.turtle.TurtleCommandResult;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.util.FakePlayer;
 
 /**
@@ -31,7 +31,7 @@ public interface ITurtleInteraction {
 	 * @return Result of interaction, or {@code null} if no action could be taken
 	 * @throws LuaException If an error occurs
 	 */
-	TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) throws LuaException;
+	TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) throws LuaException;
 
 	/**
 	 * Is the tool appropriate for this job
@@ -43,7 +43,7 @@ public interface ITurtleInteraction {
 	 * @param hit       Place the item was used at. May be {@code null}.
 	 * @return If the tool is appropriate: can it attack or dig the block?
 	 */
-	boolean canSwing(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit);
+	boolean canSwing(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit);
 
 	/**
 	 * Use (right click) a tool
@@ -59,7 +59,7 @@ public interface ITurtleInteraction {
 	 * @return Result of interaction, or {@code null} if no action could be taken
 	 * @throws LuaException If an error occurs
 	 */
-	TurtleCommandResult use(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) throws LuaException;
+	TurtleCommandResult use(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) throws LuaException;
 
 	/**
 	 * Is the tool appropriate for this job
@@ -71,5 +71,5 @@ public interface ITurtleInteraction {
 	 * @param hit       Place the item was used at. May be {@code null}.
 	 * @return If the tool can be right clicked.
 	 */
-	boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit);
+	boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit);
 }

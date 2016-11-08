@@ -1,13 +1,14 @@
 package org.squiddev.cctweaks.blocks;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
@@ -74,13 +75,27 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	}
 
 	@Override
-	public final Packet<?> getDescriptionPacket() {
-		NBTTagCompound tag = new NBTTagCompound();
-		return writeDescription(tag) ? new S35PacketUpdateTileEntity(pos, 0, tag) : null;
+	public NBTTagCompound getUpdateTag() {
+		NBTTagCompound tag = super.getUpdateTag();
+		writeDescription(tag);
+		return tag;
 	}
 
 	@Override
-	public final void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+	public void handleUpdateTag(NBTTagCompound tag) {
+		super.handleUpdateTag(tag);
+		readDescription(tag);
+	}
+
+	@Override
+	public SPacketUpdateTileEntity getUpdatePacket() {
+		NBTTagCompound tag = new NBTTagCompound();
+		writeDescription(tag);
+		return new SPacketUpdateTileEntity(getPosition(), 0, tag);
+	}
+
+	@Override
+	public final void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
 		readDescription(packet.getNbtCompound());
 	}
 
@@ -89,7 +104,13 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	 */
 	public void markForUpdate() {
 		markDirty();
-		worldObj.markBlockForUpdate(pos);
+		BlockPos pos = getPos();
+		IBlockState state = worldObj.getBlockState(pos);
+		worldObj.notifyBlockUpdate(getPos(), state, state, 3);
+	}
+
+	public void markRenderDirty() {
+		worldObj.markBlockRangeForRenderUpdate(pos, pos);
 	}
 
 	/**
@@ -97,9 +118,10 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	 *
 	 * @param player The player who triggered this
 	 * @param side   The side the block is activated on
+	 * @param hand   The hand it was clicked with
 	 * @return If the event succeeded
 	 */
-	public boolean onActivated(EntityPlayer player, EnumFacing side) {
+	public boolean onActivated(EntityPlayer player, EnumFacing side, EnumHand hand) {
 		return false;
 	}
 

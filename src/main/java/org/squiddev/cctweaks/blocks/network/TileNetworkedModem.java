@@ -3,9 +3,10 @@ package org.squiddev.cctweaks.blocks.network;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.text.TextComponentTranslation;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
@@ -60,7 +61,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	}
 
 	@Override
-	public boolean onActivated(EntityPlayer player, EnumFacing side) {
+	public boolean onActivated(EntityPlayer player, EnumFacing side, EnumHand hand) {
 		if (player.isSneaking()) return false;
 		if (worldObj.isRemote) return true;
 
@@ -72,11 +73,11 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 
 		if (!Helpers.equals(names, newNames)) {
 			if (names != null && !names.isEmpty()) {
-				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", StringUtils.join(names, ", ")));
+				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", StringUtils.join(names, ", ")));
 			}
 
 			if (newNames != null && !newNames.isEmpty()) {
-				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", StringUtils.join(newNames, ", ")));
+				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", StringUtils.join(newNames, ", ")));
 			}
 
 			modem.getAttachedNetwork().invalidateNode(modem);
@@ -87,11 +88,12 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
-		super.writeToNBT(tag);
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		tag = super.writeToNBT(tag);
 
 		tag.setBoolean("modem_enabled", modem.isEnabled());
 		tag.setIntArray("modem_id", modem.peripherals.ids);
+		return tag;
 	}
 
 	@Override
@@ -115,7 +117,8 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	protected void readDescription(NBTTagCompound tag) {
 		modem.setState(tag.getByte("modem_state"));
 		// Force a rerender
-		worldObj.markBlockForUpdate(pos);
+		markDirty();
+		markRenderDirty();
 	}
 
 	@Override

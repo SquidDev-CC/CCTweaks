@@ -3,7 +3,7 @@ package org.squiddev.cctweaks.client.render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -93,7 +93,7 @@ public class RenderSquidOverlay extends Module implements IClientModule {
 				GlStateManager.translate(0.1, 0, 0);
 
 				Tessellator tessellator = Tessellator.getInstance();
-				WorldRenderer renderer = tessellator.getWorldRenderer();
+				VertexBuffer renderer = tessellator.getBuffer();
 
 				for (int j = 0; j < SEGMENTS; j++) {
 					// Offset each tentacle by a random amount
@@ -135,7 +135,7 @@ public class RenderSquidOverlay extends Module implements IClientModule {
 			return false;
 		}
 
-		private static void tentacle(WorldRenderer renderer) {
+		private static void tentacle(VertexBuffer renderer) {
 			renderer.pos(0, 0, -WIDTH / 2).endVertex();
 			renderer.pos(0, 0, WIDTH / 2).endVertex();
 			renderer.pos(0, LENGTH, WIDTH / 2).endVertex();

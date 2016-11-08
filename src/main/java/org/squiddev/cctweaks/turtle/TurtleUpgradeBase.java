@@ -4,7 +4,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
-import net.minecraft.client.resources.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -39,7 +39,7 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 		this.id = id;
 		this.stack = stack;
 
-		location = new ResourceLocation(CCTweaks.RESOURCE_DOMAIN, name);
+		location = new ResourceLocation(CCTweaks.ID, name);
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 
 	@Override
 	public String getUnlocalisedAdjective() {
-		return "turtle." + CCTweaks.RESOURCE_DOMAIN + "." + name + ".adjective";
+		return "turtle." + CCTweaks.ID + "." + name + ".adjective";
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 	@Override
 	@SideOnly(Side.CLIENT)
 	@SuppressWarnings("deprecation")
-	public Pair<IBakedModel, Matrix4f> getModel(ITurtleAccess access, TurtleSide side) {
+	public Pair<net.minecraft.client.renderer.block.model.IBakedModel, Matrix4f> getModel(ITurtleAccess access, TurtleSide side) {
 		float xOffset = side == TurtleSide.Left ? -0.40625F : 0.40625F;
 		Matrix4f transform = new Matrix4f(0.0F, 0.0F, -1.0F, 1.0F + xOffset, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 1.0F);
 

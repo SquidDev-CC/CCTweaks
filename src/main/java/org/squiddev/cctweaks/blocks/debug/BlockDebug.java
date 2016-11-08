@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.blocks.debug;
 
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -17,6 +17,7 @@ import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.items.ItemMultiBlock;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 		}
 
 		@Override
+		@Nonnull
 		public String getName() {
 			return name;
 		}
@@ -87,6 +89,7 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public IBlockState getStateFromMeta(int meta) {
 		IBlockState state = super.getStateFromMeta(meta);
 		return state.withProperty(TYPE, BlockDebugType.VALUES[meta < 0 || meta >= BlockDebugType.VALUES.length ? 0 : meta]);
@@ -98,8 +101,8 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	protected BlockState createBlockState() {
-		return new BlockState(this, TYPE);
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, TYPE);
 	}
 
 	@Override
@@ -117,7 +120,7 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 
 	@Override
 	public void preInit() {
-		GameRegistry.registerBlock(this, ItemMultiBlock.class, name);
+		register(new ItemMultiBlock(this));
 		GameRegistry.registerTileEntity(TileDebugPeripheral.class, "debugPeripheral");
 		GameRegistry.registerTileEntity(TileDebugNetworkedPeripheral.class, "debugNetworkedPeripheral");
 		GameRegistry.registerTileEntity(TileDebugNode.class, "debugNode");

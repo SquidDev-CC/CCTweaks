@@ -89,7 +89,7 @@ public class CraftingPocketUpgrade extends Module implements IRecipe {
 
 	@Override
 	public void init() {
-		RecipeSorter.register(CCTweaks.RESOURCE_DOMAIN + ":pocket_upgrade_crafting", CraftingPocketUpgrade.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+		RecipeSorter.register(CCTweaks.ID + ":pocket_upgrade_crafting", CraftingPocketUpgrade.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		GameRegistry.addRecipe(this);
 	}
 }

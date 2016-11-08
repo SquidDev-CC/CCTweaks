@@ -15,12 +15,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -124,7 +128,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 	public Object[] doUse(DelayedTask task, IComputerAccess computer, EnumFacing direction, boolean sneak, int duration) throws LuaException {
 		player.load(access, direction, sneak);
 
-		MovingObjectPosition hit = findHit(direction, 0.65);
+		RayTraceResult hit = findHit(direction, 0.65);
 		ItemStack stack = player.getItem(access);
 		World world = player.worldObj;
 
@@ -139,8 +143,11 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			if (hit != null) {
 				switch (hit.typeOfHit) {
 					case ENTITY:
-						if (stack != null && player.interactWith(hit.entityHit)) {
-							return new Object[]{true, "entity", "interact"};
+						if (stack != null) {
+							EnumActionResult result = player.interact(hit.entityHit, stack, EnumHand.MAIN_HAND);
+							if (result != EnumActionResult.PASS) {
+								return new Object[]{result == EnumActionResult.SUCCESS, "entity", "interact"};
+							}
 						}
 						break;
 					case BLOCK: {
@@ -154,40 +161,46 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				}
 			}
 
-			if (stack != null && !ForgeEventFactory.onPlayerInteract(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, world, null, null).isCanceled()) {
+			if (stack != null) {
+				if (MinecraftForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickEmpty(player, EnumHand.MAIN_HAND))) {
+					return new Object[]{true, "item", "use"};
+				}
+
 				player.posX += direction.getFrontOffsetX() * 0.6;
 				player.posY += direction.getFrontOffsetY() * 0.6;
 				player.posZ += direction.getFrontOffsetZ() * 0.6;
 
 				duration = Math.min(duration, stack.getMaxItemUseDuration());
-				ItemStack old = stack.copy();
-				ItemStack result = stack.useItemRightClick(player.worldObj, player);
-				task.delay = duration;
+				ActionResult<ItemStack> result = stack.useItemRightClick(player.worldObj, player, EnumHand.MAIN_HAND);
 
-				boolean using = player.isUsingItem();
-				if (using && !ForgeEventFactory.onUseItemStop(player, player.itemInUse, duration)) {
-					player.itemInUse.onPlayerStoppedUsing(player.worldObj, player, player.itemInUse.getMaxItemUseDuration() - duration);
-					player.clearItemInUse();
-				}
+				switch (result.getType()) {
+					case FAIL:
+						return new Object[]{false, "item", "use"};
+					case SUCCESS:
+						task.delay = duration;
+						ItemStack active = player.getActiveItemStack();
+						if (active != null && !ForgeEventFactory.onUseItemStop(player, active, duration)) {
+							active.onPlayerStoppedUsing(player.worldObj, player, active.getMaxItemUseDuration() - duration);
+							player.resetActiveHand();
 
-				if (using || !ItemStack.areItemStacksEqual(old, result)) {
-					player.inventory.setInventorySlotContents(player.inventory.currentItem, result);
-					return new Object[]{true, "item", "use"};
-				} else {
-					return new Object[]{false};
+							player.inventory.setInventorySlotContents(player.inventory.currentItem, result.getResult());
+							return new Object[]{true, "item", "use"};
+						}
+						break;
 				}
 			}
+
+			return new Object[]{false};
 		} finally {
-			player.clearItemInUse();
+			player.resetActiveHand();
 			player.unload(access);
 		}
-
-		return new Object[]{false};
 	}
 
-	public Object[] tryUseOnBlock(World world, MovingObjectPosition hit, ItemStack stack, EnumFacing side) {
-		if (!world.getBlockState(hit.getBlockPos()).getBlock().isAir(world, hit.getBlockPos())) {
-			if (ForgeEventFactory.onPlayerInteract(player, PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK, world, hit.getBlockPos(), side).isCanceled()) {
+	public Object[] tryUseOnBlock(World world, RayTraceResult hit, ItemStack stack, EnumFacing side) {
+		IBlockState state = world.getBlockState(hit.getBlockPos());
+		if (!state.getBlock().isAir(state, world, hit.getBlockPos())) {
+			if (MinecraftForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickBlock(player, EnumHand.MAIN_HAND, stack, hit.getBlockPos(), side, hit.hitVec))) {
 				return new Object[]{true, "block", "interact"};
 			}
 
@@ -198,19 +211,19 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		return null;
 	}
 
-	public Object[] onPlayerRightClick(ItemStack stack, BlockPos pos, EnumFacing side, Vec3 look) {
+	public Object[] onPlayerRightClick(ItemStack stack, BlockPos pos, EnumFacing side, Vec3d look) {
 		float xCoord = (float) look.xCoord - (float) pos.getX();
 		float yCoord = (float) look.yCoord - (float) pos.getY();
 		float zCoord = (float) look.zCoord - (float) pos.getZ();
 		World world = player.worldObj;
 
-		if (stack != null && stack.getItem() != null && stack.getItem().onItemUseFirst(stack, player, world, pos, side, xCoord, yCoord, zCoord)) {
+		if (stack != null && stack.getItem().onItemUseFirst(stack, player, world, pos, side, xCoord, yCoord, zCoord, EnumHand.MAIN_HAND) == EnumActionResult.SUCCESS) {
 			return new Object[]{true, "item", "use"};
 		}
 
-		if (!player.isSneaking() || stack == null || stack.getItem().doesSneakBypassUse(world, pos, player)) {
+		if (!player.isSneaking() || stack == null || stack.getItem().doesSneakBypassUse(stack, world, pos, player)) {
 			IBlockState state = world.getBlockState(pos);
-			if (state.getBlock().onBlockActivated(world, pos, state, player, side, xCoord, yCoord, zCoord)) {
+			if (state.getBlock().onBlockActivated(world, pos, state, player, EnumHand.MAIN_HAND, stack, side, xCoord, yCoord, zCoord)) {
 				return new Object[]{true, "block", "interact"};
 			}
 		}
@@ -224,9 +237,9 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			}
 		}
 
-		if (stack.onItemUse(player, world, pos, side, xCoord, yCoord, zCoord)) {
+		if (stack.onItemUse(player, world, pos, EnumHand.MAIN_HAND, side, xCoord, yCoord, zCoord) == EnumActionResult.SUCCESS) {
 			if (stack.stackSize <= 0) {
-				MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(player, stack));
+				MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(player, stack, EnumHand.MAIN_HAND));
 			}
 
 			return new Object[]{true, "place"};
@@ -267,7 +280,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 
 		ItemStack stack = player.getItem(access);
 		TurtleAnimation animation = side == TurtleSide.Left ? TurtleAnimation.SwingLeftTool : TurtleAnimation.SwingRightTool;
-		MovingObjectPosition hit = findHit(direction, 0.65);
+		RayTraceResult hit = findHit(direction, 0.65);
 
 		player.posY += 1.5;
 
@@ -295,7 +308,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				}
 			}
 		} finally {
-			player.clearItemInUse();
+			player.resetActiveHand();
 			player.unload(access);
 		}
 
@@ -311,8 +324,8 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			public Object[] execute() throws LuaException {
 				player.load(access, direction, false);
 
-				ItemStack stack = player.getHeldItem();
-				MovingObjectPosition hit = findHit(direction, 0.65);
+				ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
+				RayTraceResult hit = findHit(direction, 0.65);
 
 				player.posY += 1.5;
 
@@ -337,8 +350,8 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			public Object[] execute() throws LuaException {
 				player.load(access, direction, false);
 
-				ItemStack stack = player.getHeldItem();
-				MovingObjectPosition hit = findHit(direction, 0.65);
+				ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
+				RayTraceResult hit = findHit(direction, 0.65);
 
 				player.posY += 1.5;
 
@@ -348,8 +361,8 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 						if (result) return new Object[]{true};
 
 						if (hit != null && hit.entityHit != null) {
-							@SuppressWarnings("unchecked") Multimap<String, AttributeModifier> map = stack.getAttributeModifiers();
-							for (AttributeModifier modifier : map.get(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName())) {
+							@SuppressWarnings("unchecked") Multimap<String, AttributeModifier> map = stack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
+							for (AttributeModifier modifier : map.get(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName())) {
 								if (modifier.getAmount() > 0) {
 									return new Object[]{true};
 								}
@@ -357,7 +370,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 						}
 					}
 
-					if (hit != null && hit.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+					if (hit != null && hit.typeOfHit == RayTraceResult.Type.BLOCK) {
 						Block block = access.getWorld().getBlockState(hit.getBlockPos()).getBlock();
 						if (block.canHarvestBlock(access.getWorld(), hit.getBlockPos(), player)) {
 							return new Object[]{true};
@@ -373,25 +386,25 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 	}
 	//endregion
 
-	public MovingObjectPosition findHit(EnumFacing facing, double range) {
-		Vec3 origin = new Vec3(player.posX, player.posY, player.posZ);
-		Vec3 blockCenter = origin.addVector(
+	public RayTraceResult findHit(EnumFacing facing, double range) {
+		Vec3d origin = new Vec3d(player.posX, player.posY, player.posZ);
+		Vec3d blockCenter = origin.addVector(
 			facing.getFrontOffsetX() * 0.51,
 			facing.getFrontOffsetY() * 0.51,
 			facing.getFrontOffsetZ() * 0.51
 		);
-		Vec3 target = blockCenter.addVector(
+		Vec3d target = blockCenter.addVector(
 			facing.getFrontOffsetX() * range,
 			facing.getFrontOffsetY() * range,
 			facing.getFrontOffsetZ() * range
 		);
 
-		MovingObjectPosition hit = player.worldObj.rayTraceBlocks(origin, target);
-		Pair<Entity, Vec3> pair = WorldUtil.rayTraceEntities(player.worldObj, origin, target, 1.1);
+		RayTraceResult hit = player.worldObj.rayTraceBlocks(origin, target);
+		Pair<Entity, Vec3d> pair = WorldUtil.rayTraceEntities(player.worldObj, origin, target, 1.1);
 		Entity entity = pair == null ? null : pair.getLeft();
 
 		if (entity instanceof EntityLivingBase && (hit == null || player.getDistanceSq(hit.getBlockPos()) > player.getDistanceSqToEntity(entity))) {
-			return new MovingObjectPosition(entity);
+			return new RayTraceResult(entity);
 		} else {
 			return hit;
 		}

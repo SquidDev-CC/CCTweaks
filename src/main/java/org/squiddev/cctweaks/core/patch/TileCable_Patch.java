@@ -9,7 +9,11 @@ import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
@@ -195,10 +199,10 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 
 				if (!Helpers.equals(periphName, oldPeriphName)) {
 					if (oldPeriphName != null) {
-						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", oldPeriphName));
+						player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", oldPeriphName));
 					}
 					if (periphName != null) {
-						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", periphName));
+						player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", periphName));
 					}
 
 					INetworkController controller = getModem().getAttachedNetwork();
@@ -229,8 +233,8 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
-		super.writeToNBT(tag);
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		tag = super.writeToNBT(tag);
 		if (lazyTag != null) {
 			tag.setBoolean("peripheralAccess", tag.getBoolean("peripheralAccess"));
 			tag.setInteger("peripheralID", tag.getInteger("peripheralID"));
@@ -238,6 +242,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 			tag.setBoolean("peripheralAccess", modem.isEnabled());
 			tag.setInteger("peripheralID", modem.id);
 		}
+		return tag;
 	}
 
 	@Override
@@ -282,7 +287,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	}
 
 	@Override
-	public void transmit(int channel, int replyChannel, Object payload, World world, Vec3 pos, double range, boolean interdimensional, Object senderObject) {
+	public void transmit(int channel, int replyChannel, Object payload, World world, Vec3d pos, double range, boolean interdimensional, Object senderObject) {
 		getModem().transmit(channel, replyChannel, payload, world, pos, range, interdimensional, senderObject);
 	}
 

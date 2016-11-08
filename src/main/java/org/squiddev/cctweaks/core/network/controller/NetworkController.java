@@ -3,7 +3,6 @@ package org.squiddev.cctweaks.core.network.controller;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import net.minecraft.util.BlockPos;
 import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
@@ -418,8 +417,8 @@ public final class NetworkController implements INetworkController {
 				INetworkNode otherNode = otherPoint.node;
 				double distance = nodePair.distance;
 				if (node instanceof IWorldNetworkNode && otherNode instanceof IWorldNetworkNode) {
-					BlockPos position = ((IWorldNetworkNode) node).getPosition().getPosition();
-					BlockPos otherPosition = ((IWorldNetworkNode) otherNode).getPosition().getPosition();
+					net.minecraft.util.math.BlockPos position = ((IWorldNetworkNode) node).getPosition().getPosition();
+					net.minecraft.util.math.BlockPos otherPosition = ((IWorldNetworkNode) otherNode).getPosition().getPosition();
 
 					int dx = position.getX() - otherPosition.getX();
 					int dy = position.getY() - otherPosition.getY();

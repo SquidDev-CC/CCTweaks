@@ -5,17 +5,20 @@ import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.BlockCable;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import mcmultipart.MCMultiPartMod;
-import mcmultipart.microblock.ISideHollowConnect;
+import mcmultipart.microblock.ICenterConnectablePart;
 import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.INormallyOccludingPart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.PartSlot;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
@@ -29,7 +32,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlottedPart, ISideHollowConnect {
+public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlottedPart, ICenterConnectablePart, INormallyOccludingPart {
 	public static final double MIN = 0.375;
 	public static final double MAX = 1 - MIN;
 
@@ -48,7 +51,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 
 	//region Basic getters
 	@Override
-	public int getHollowSize(EnumFacing enumFacing) {
+	public int getHoleRadius(EnumFacing enumFacing) {
 		return 4;
 	}
 
@@ -73,12 +76,12 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 	}
 
 	@Override
-	public String getModelPath() {
-		return "cctweaks:cable";
+	public ResourceLocation getModelPath() {
+		return new ResourceLocation(CCTweaks.ID, "cable");
 	}
 
 	@Override
-	public void addSelectionBoxes(List<AxisAlignedBB> list) {
+	public void addSelectionBoxes(List<net.minecraft.util.math.AxisAlignedBB> list) {
 		list.add(BOXES[6]);
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (cable.doesConnectVisually(facing)) list.add(BOXES[facing.ordinal()]);
@@ -86,25 +89,25 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 	}
 
 	@Override
-	public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
+	public void addCollisionBoxes(AxisAlignedBB mask, List<net.minecraft.util.math.AxisAlignedBB> list, Entity collidingEntity) {
 		if (BOXES[6].intersectsWith(mask)) list.add(BOXES[6]);
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (cable.doesConnectVisually(facing)) {
-				AxisAlignedBB box = BOXES[facing.ordinal()];
+				net.minecraft.util.math.AxisAlignedBB box = BOXES[facing.ordinal()];
 				if (box.intersectsWith(mask)) list.add(box);
 			}
 		}
 	}
 
 	@Override
-	public void addOcclusionBoxes(List<AxisAlignedBB> list) {
+	public void addOcclusionBoxes(List<net.minecraft.util.math.AxisAlignedBB> list) {
 		list.add(BOXES[6]);
 	}
 
 	@Override
-	public BlockState createBlockState() {
-		return new BlockState(
+	public BlockStateContainer createBlockState() {
+		return new BlockStateContainer(
 			MCMultiPartMod.multipart,
 			BlockCable.Properties.NORTH,
 			BlockCable.Properties.SOUTH,
@@ -116,12 +119,13 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 	}
 
 	@Override
-	public IBlockState getExtendedState(IBlockState state) {
+	@SuppressWarnings("deprecation")
+	public IBlockState getActualState(IBlockState state) {
 		if (getContainer() != null) {
 			rebuildCanConnectMap();
 			cable.updateConnectionMaps();
 		}
-		return state
+		return super.getActualState(state)
 			.withProperty(BlockCable.Properties.NORTH, cable.doesConnectVisually(EnumFacing.NORTH))
 			.withProperty(BlockCable.Properties.SOUTH, cable.doesConnectVisually(EnumFacing.SOUTH))
 			.withProperty(BlockCable.Properties.EAST, cable.doesConnectVisually(EnumFacing.EAST))

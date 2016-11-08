@@ -37,7 +37,7 @@ curseforge {
 
 	project {
 		id = '232180'
-		releaseType = 'release'
+		releaseType = 'beta'
 		changelog = ''
 		addArtifact devJar
 

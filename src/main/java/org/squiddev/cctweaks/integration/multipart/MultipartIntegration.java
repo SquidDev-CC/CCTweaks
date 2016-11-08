@@ -10,8 +10,9 @@ import mcmultipart.multipart.PartSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -48,12 +49,12 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 	public void preInit() {
 		itemPart = new ItemCustomPart();
 
-		GameRegistry.registerItem(itemPart, "itemPart");
+		GameRegistry.register(itemPart, new ResourceLocation(CCTweaks.ID, "itemPart"));
 
 		// Register parts
-		MultipartRegistry.registerPart(PartCable.class, CCTweaks.NAME + ":Cable");
-		MultipartRegistry.registerPart(PartModem.class, CCTweaks.NAME + ":Modem");
-		MultipartRegistry.registerPart(PartWirelessBridge.class, CCTweaks.NAME + ":wirelessBridge");
+		MultipartRegistry.registerPart(PartCable.class, CCTweaks.ID + ":cable");
+		MultipartRegistry.registerPart(PartModem.class, CCTweaks.ID + ":modem");
+		MultipartRegistry.registerPart(PartWirelessBridge.class, CCTweaks.ID + ":wirelessBridge");
 
 		// Multipart converters
 		MultipartConverter converter = new MultipartConverter();

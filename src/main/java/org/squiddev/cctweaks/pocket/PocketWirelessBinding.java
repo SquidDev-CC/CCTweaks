@@ -33,7 +33,7 @@ public class PocketWirelessBinding extends Module implements IPocketUpgrade {
 
 	@Override
 	public String getUnlocalisedAdjective() {
-		return "pocket." + CCTweaks.RESOURCE_DOMAIN + ".wirelessBridge.adjective";
+		return "pocket." + CCTweaks.ID + ".wirelessBridge.adjective";
 	}
 
 	@Override

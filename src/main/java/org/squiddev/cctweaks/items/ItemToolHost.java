@@ -57,9 +57,9 @@ public class ItemToolHost extends ItemBase {
 					"DOD",
 					"GDG",
 
-					'G', Items.gold_ingot,
-					'D', Items.diamond,
-					'O', Blocks.obsidian
+					'G', Items.GOLD_INGOT,
+					'D', Items.DIAMOND,
+					'O', Blocks.OBSIDIAN
 				);
 			}
 
@@ -71,8 +71,8 @@ public class ItemToolHost extends ItemBase {
 					"DOD",
 					"GDG",
 
-					'G', Items.gold_ingot,
-					'D', Items.diamond,
+					'G', Items.GOLD_INGOT,
+					'D', Items.DIAMOND,
 					'O', new ItemStack(this, 1, 0)
 				);
 

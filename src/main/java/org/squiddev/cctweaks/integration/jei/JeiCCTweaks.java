@@ -1,7 +1,12 @@
 package org.squiddev.cctweaks.integration.jei;
 
-import mezz.jei.api.*;
+import mezz.jei.api.IJeiRuntime;
+import mezz.jei.api.IModPlugin;
+import mezz.jei.api.IModRegistry;
+import mezz.jei.api.JEIPlugin;
 import org.squiddev.cctweaks.core.registry.Registry;
+
+import javax.annotation.Nonnull;
 
 import static org.squiddev.cctweaks.integration.jei.JeiDescription.registerDescription;
 import static org.squiddev.cctweaks.integration.jei.JeiDescription.registerGenericDescription;
@@ -9,15 +14,7 @@ import static org.squiddev.cctweaks.integration.jei.JeiDescription.registerGener
 @JEIPlugin
 public class JeiCCTweaks implements IModPlugin {
 	@Override
-	public void onJeiHelpersAvailable(IJeiHelpers jeiHelpers) {
-	}
-
-	@Override
-	public void onItemRegistryAvailable(IItemRegistry itemRegistry) {
-	}
-
-	@Override
-	public void register(IModRegistry registry) {
+	public void register(@Nonnull IModRegistry registry) {
 		registerGenericDescription(registry, Registry.itemComputerUpgrade);
 		registerGenericDescription(registry, Registry.itemDebugger);
 		registerDescription(registry, Registry.itemToolHost);
@@ -28,6 +25,7 @@ public class JeiCCTweaks implements IModPlugin {
 	}
 
 	@Override
-	public void onRecipeRegistryAvailable(IRecipeRegistry recipeRegistry) {
+	public void onRuntimeAvailable(@Nonnull IJeiRuntime jeiRuntime) {
+
 	}
 }

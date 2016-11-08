@@ -4,12 +4,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -40,8 +40,14 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		if (data == null) return;
 
 		Minecraft minecraft = Minecraft.getMinecraft();
-		ItemStack stack = minecraft.thePlayer.getHeldItem();
-		if (stack == null || stack.getItem() != Registry.itemDebugger) return;
+		ItemStack stack = minecraft.thePlayer.getHeldItemMainhand();
+		ItemStack otherStack = minecraft.thePlayer.getHeldItemOffhand();
+
+		if (
+			(stack == null || stack.getItem() != Registry.itemDebugger) &&
+				(otherStack == null || otherStack.getItem() != Registry.itemDebugger)) {
+			return;
+		}
 
 		GlStateManager.pushMatrix();
 		RenderManager renderManager = minecraft.getRenderManager();
@@ -70,13 +76,13 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		Set<Node> nodes = new HashSet<Node>();
 
 		// Custom handling for networks with 0 connections (single node networks)
-		MovingObjectPosition position = Minecraft.getMinecraft().objectMouseOver;
-		if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+		RayTraceResult position = Minecraft.getMinecraft().objectMouseOver;
+		if (position.typeOfHit == RayTraceResult.Type.BLOCK) {
 			for (Connection connection : data.connections) {
 				Node a = connection.x, b = connection.y;
 
 				// We render a label of all nodes at this point.
-				if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+				if (position.typeOfHit == RayTraceResult.Type.BLOCK) {
 					if (a.position != null) {
 						if (a.position.equals(position.getBlockPos())) {
 							nodes.add(a);
@@ -95,7 +101,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 			if (data.connections.length == 0) {
 				for (Node node : data.nodes) {
-					BlockPos nodePosition = node.position;
+					net.minecraft.util.math.BlockPos nodePosition = node.position;
 					if (nodePosition != null && nodePosition.equals(position.getBlockPos())) {
 						nodes.add(node);
 					}
@@ -114,7 +120,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 	private void renderConnections(VisualisationData data, Color color, float alpha, float thickness) {
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer renderer = tessellator.getWorldRenderer();
+		VertexBuffer renderer = tessellator.getBuffer();
 
 		GlStateManager.pushMatrix();
 		GlStateManager.scale(1, 1, 1);
@@ -124,7 +130,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 		renderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 		for (Connection connection : data.connections) {
-			BlockPos a = connection.x.position, b = connection.y.position;
+			net.minecraft.util.math.BlockPos a = connection.x.position, b = connection.y.position;
 
 			if (a != null && b != null) {
 				renderer.pos(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5).endVertex();
@@ -153,7 +159,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 		// Render label background
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer renderer = tessellator.getWorldRenderer();
+		VertexBuffer renderer = tessellator.getBuffer();
 
 		int width = fontrenderer.getStringWidth(label);
 		int xOffset = width / 2;

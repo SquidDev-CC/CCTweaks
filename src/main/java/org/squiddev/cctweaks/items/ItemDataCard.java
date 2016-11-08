@@ -5,8 +5,11 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -49,19 +52,22 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 	}
 
 	@Override
-	public boolean doesSneakBypassUse(World world, BlockPos pos, EntityPlayer player) {
+	public boolean doesSneakBypassUse(ItemStack stack, IBlockAccess world, BlockPos pos, EntityPlayer player) {
 		return true;
 	}
 
 	@Override
-	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-		if (player.isSneaking() && !world.isRemote) {
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+		if (player.isSneaking()) {
+			// I feel we should return SUCCESS, but only PASS works
+			if (world.isRemote) return EnumActionResult.PASS;
+
 			((IDataCard) stack.getItem()).notifyPlayer(player, Messages.Cleared);
 			stack.setTagCompound(null);
-			return true;
+			return EnumActionResult.SUCCESS;
 		}
 
-		return false;
+		return EnumActionResult.PASS;
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -90,9 +96,9 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 			"SSS",
 			"GRR",
 
-			'G', Items.gold_ingot,
-			'R', Items.redstone,
-			'S', Blocks.stone
+			'G', Items.GOLD_INGOT,
+			'R', Items.REDSTONE,
+			'S', Blocks.STONE
 		);
 	}
 }

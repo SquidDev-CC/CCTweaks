@@ -6,10 +6,11 @@ import dan200.computercraft.shared.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import mcmultipart.MCMultiPartMod;
+import mcmultipart.multipart.INormallyOccludingPart;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,6 +18,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.text.TextComponentTranslation;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
@@ -28,28 +32,42 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.integration.multipart.PartSided;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 
-public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeripheralHost, ITickable {
-	public static final PropertyEnum<ModemType> MODEM = PropertyEnum.create("modem", ModemType.class);
+public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeripheralHost, ITickable, INormallyOccludingPart {
+	private static final PropertyEnum<ModemType> MODEM = PropertyEnum.create("modem", ModemType.class);
 
-	public enum ModemType implements IStringSerializable {
+	private enum ModemType implements IStringSerializable {
 		OFF,
 		ON,
 		OFF_PERIPHERAL,
 		ON_PERIPHERAL;
 
+		private final String name;
+
+		ModemType() {
+			name = name().toLowerCase();
+		}
+
+		@Nonnull
 		@Override
 		public String getName() {
-			return toString();
+			return name;
+		}
+
+
+		@Override
+		public String toString() {
+			return name;
 		}
 	}
 
 	/**
 	 * Occlusion for collision detection
 	 */
-	public static final AxisAlignedBB[] OCCLUSION = new AxisAlignedBB[]{
+	private static final AxisAlignedBB[] OCCLUSION = new AxisAlignedBB[]{
 		new AxisAlignedBB(0.125, 0.0, 0.125, 0.875, 0.1875, 0.875),
 		new AxisAlignedBB(0.125, 0.8125, 0.125, 0.875, 1.0, 0.875),
 		new AxisAlignedBB(0.125, 0.125, 0.0, 0.875, 0.875, 0.1875),
@@ -61,7 +79,7 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	/**
 	 * Slightly smaller bounds
 	 */
-	public static final AxisAlignedBB[] BOUNDS = new AxisAlignedBB[]{
+	private static final AxisAlignedBB[] BOUNDS = new AxisAlignedBB[]{
 		new AxisAlignedBB(0.125, 0.0, 0.125, 0.875, 0.125, 0.875D),
 		new AxisAlignedBB(0.125, 0.875, 0.125, 0.875, 1.0, 0.875D),
 		new AxisAlignedBB(0.125, 0.125, 0.0, 0.875, 0.875, 0.125D),
@@ -116,8 +134,8 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	}
 
 	@Override
-	public String getModelPath() {
-		return "cctweaks:modem";
+	public ResourceLocation getModelPath() {
+		return new ResourceLocation(CCTweaks.ID, "modem");
 	}
 
 	@Override
@@ -126,7 +144,7 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	}
 
 	@Override
-	public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
+	public void addCollisionBoxes(AxisAlignedBB mask, List<net.minecraft.util.math.AxisAlignedBB> list, Entity collidingEntity) {
 		AxisAlignedBB bounds = OCCLUSION[getSide().ordinal()];
 		if (bounds.intersectsWith(mask)) list.add(bounds);
 	}
@@ -137,21 +155,24 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	}
 
 	@Override
-	public BlockState createBlockState() {
-		return new BlockState(MCMultiPartMod.multipart, SIDE, MODEM);
+	public BlockStateContainer createBlockState() {
+		return new BlockStateContainer(MCMultiPartMod.multipart, SIDE, MODEM);
 	}
 
 	@Override
-	public IBlockState getExtendedState(IBlockState state) {
-		return super.getExtendedState(state).withProperty(MODEM, ModemType.values()[modem.state]);
+	@SuppressWarnings("deprecation")
+	public IBlockState getActualState(IBlockState state) {
+		return super.getActualState(state)
+			.withProperty(MODEM, ModemType.values()[modem.state]);
 	}
 	//endregion
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		super.writeToNBT(tag);
 		tag.setBoolean("modem_enabled", modem.isEnabled());
 		tag.setInteger("modem_id", modem.id);
-		super.writeToNBT(tag);
+		return tag;
 	}
 
 	@Override
@@ -217,7 +238,7 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	}
 
 	@Override
-	public boolean onActivated(EntityPlayer player, ItemStack stack, PartMOP hit) {
+	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 		if (player.isSneaking()) return false;
 		if (getWorld().isRemote) return true;
 		if (modem.getAttachedNetwork() == null) return false;
@@ -230,11 +251,11 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 
 		if (!Helpers.equals(name, newName)) {
 			if (name != null) {
-				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", name));
+				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", name));
 			}
 
 			if (newName != null) {
-				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
+				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
 			}
 
 			modem.getAttachedNetwork().invalidateNode(modem);

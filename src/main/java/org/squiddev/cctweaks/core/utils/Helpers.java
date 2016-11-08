@@ -5,11 +5,11 @@ import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.IDAssigner;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -39,12 +39,18 @@ public class Helpers {
 	 * @param strings The strings to try to translate
 	 * @return The first translateable string or the default
 	 */
+	@SuppressWarnings("deprecation")
 	public static String translateOrDefault(String def, String... strings) {
 		for (String string : strings) {
-			if (StatCollector.canTranslate(string)) return StatCollector.translateToLocal(string);
+			if (I18n.canTranslate(string)) return I18n.translateToLocal(string);
 		}
 
 		return def;
+	}
+
+	@SuppressWarnings("deprecation")
+	public static String translateToLocal(String str) {
+		return I18n.translateToLocal(str);
 	}
 
 	public static void twoWayCrafting(ItemStack a, ItemStack b) {
@@ -121,12 +127,10 @@ public class Helpers {
 
 	@SideOnly(Side.CLIENT)
 	public static void setupModel(Item item, int damage, String name) {
-		name = CCTweaks.RESOURCE_DOMAIN + ":" + name;
+		name = CCTweaks.ID + ":" + name;
 
-		ModelResourceLocation res = new ModelResourceLocation(name, "inventory");
+		net.minecraft.client.renderer.block.model.ModelResourceLocation res = new ModelResourceLocation(name, "inventory");
 		ModelBakery.registerItemVariants(item, res);
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, damage, res);
 	}
-
-	public static int THREAD_PRIORITY = Thread.MIN_PRIORITY + (Thread.NORM_PRIORITY - Thread.MIN_PRIORITY) / 2;
 }

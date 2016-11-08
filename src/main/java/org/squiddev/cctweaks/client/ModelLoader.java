@@ -1,15 +1,8 @@
 package org.squiddev.cctweaks.client;
 
-import com.google.common.base.Function;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.IFlexibleBakedModel;
-import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -17,9 +10,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.registry.Module;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
-
-import java.io.IOException;
 
 /**
  * Loader for models that aren't associated with a block
@@ -38,23 +28,15 @@ public class ModelLoader extends Module implements IClientModule {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchEvent(TextureStitchEvent.Pre event) {
 		// I didn't think I had to do this. Odd.
-		event.map.registerSprite(new ResourceLocation(CCTweaks.RESOURCE_DOMAIN, "blocks/wirelessBridgeSmall"));
+		event.getMap().registerSprite(new ResourceLocation(CCTweaks.ID, "blocks/wirelessBridgeSmall"));
 	}
 
 	@SideOnly(Side.CLIENT)
 	private void loadModel(ModelBakeEvent event, String name) {
-		try {
-			IModel e = event.modelLoader.getModel(new ResourceLocation(CCTweaks.RESOURCE_DOMAIN, "block/" + name));
-			IFlexibleBakedModel bakedModel = e.bake(e.getDefaultState(), DefaultVertexFormats.ITEM, new Function<ResourceLocation, TextureAtlasSprite>() {
-				@Override
-				public TextureAtlasSprite apply(ResourceLocation location) {
-					return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
-				}
-			});
-			event.modelRegistry.putObject(new ModelResourceLocation(CCTweaks.RESOURCE_DOMAIN + ":" + name, "inventory"), bakedModel);
-		} catch (IOException e) {
-			DebugLogger.error("Could not load model: " + name, e);
-		}
+		// IBakedModel model = event.getModelManager().getModel(new ModelResourceLocation(new ResourceLocation(CCTweaks.ID, name), "inventory"));
+		// TODO: 1.10.2 Fix me
+//		IBakedModel model = event.getModelRegistry().getObject(new ModelResourceLocation(new ResourceLocation(CCTweaks.ID, name), "inventory"));
+//		event.getModelRegistry().putObject(new ModelResourceLocation(CCTweaks.ID + ":" + name, "inventory"), model);
 	}
 
 	@Override

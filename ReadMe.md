@@ -1,4 +1,4 @@
-# CCTweaks [![Build Status](https://travis-ci.org/SquidDev-CC/CCTweaks.svg?branch=minecraft-1.8.9)](https://travis-ci.org/SquidDev-CC/CCTweaks)
+# CCTweaks [![Build Status](https://travis-ci.org/SquidDev-CC/CCTweaks.svg?branch=minecraft-1.10.2)](https://travis-ci.org/SquidDev-CC/CCTweaks)
 Miscellaneous changes for ComputerCraft
 
 ## Important!

@@ -34,8 +34,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
 
@@ -79,7 +79,7 @@ public class InventoryUtils {
 
 		final Block block = te.getBlockType();
 
-		if (block == Blocks.chest || block == Blocks.trapped_chest) {
+		if (block == Blocks.CHEST || block == Blocks.TRAPPED_CHEST) {
 			for (EnumFacing facing : EnumFacing.VALUES) {
 				BlockPos offset = position.offset(facing);
 				if (world.getBlockState(offset).getBlock() == block) {

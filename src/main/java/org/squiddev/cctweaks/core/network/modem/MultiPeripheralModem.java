@@ -2,7 +2,6 @@ package org.squiddev.cctweaks.core.network.modem;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.PeripheralUtil;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
@@ -25,7 +24,7 @@ public abstract class MultiPeripheralModem extends BasicModem {
 			IPeripheral[] peripherals = new IPeripheral[6];
 
 			World world = (World) position.getBlockAccess();
-			BlockPos blockPos = position.getPosition();
+			net.minecraft.util.math.BlockPos blockPos = position.getPosition();
 
 			for (EnumFacing facing : EnumFacing.VALUES) {
 				IPeripheral peripheral = peripherals[facing.ordinal()] = PeripheralUtil.getPeripheral(

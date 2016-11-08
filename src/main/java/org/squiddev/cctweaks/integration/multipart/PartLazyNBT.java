@@ -53,7 +53,7 @@ public abstract class PartLazyNBT extends PartBase {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
 		if (lazyTag != null) {
 			for (String field : getFields()) {
@@ -61,5 +61,6 @@ public abstract class PartLazyNBT extends PartBase {
 				if (fieldTag != null) tag.setTag(field, fieldTag);
 			}
 		}
+		return tag;
 	}
 }

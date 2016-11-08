@@ -9,9 +9,14 @@ import dan200.computercraft.shared.computer.core.ServerComputer;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.event.ClickEvent;
-import net.minecraft.event.HoverEvent;
-import net.minecraft.util.*;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.lua.Config;
@@ -23,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CommandCCTweaks extends CommandBase {
-	private static final IChatComponent SEPARATOR = new ChatComponentText(" | ");
+	private static final ITextComponent SEPARATOR = new TextComponentString(" | ");
 
 	private static final Comparator<ComputerMonitor.ComputerEntry> comparator = new Comparator<ComputerMonitor.ComputerEntry>() {
 		@Override
@@ -41,7 +46,7 @@ public class CommandCCTweaks extends CommandBase {
 	};
 
 	static {
-		SEPARATOR.getChatStyle().setColor(EnumChatFormatting.GRAY);
+		SEPARATOR.getStyle().setColor(TextFormatting.GRAY);
 	}
 
 	private final boolean restricted;
@@ -61,7 +66,7 @@ public class CommandCCTweaks extends CommandBase {
 	}
 
 	@Override
-	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if (args.length < 1 || Strings.isNullOrEmpty(args[0])) throw new CommandException(getCommandUsage(sender));
 
 		String command = args[0];
@@ -72,7 +77,7 @@ public class CommandCCTweaks extends CommandBase {
 
 			try {
 				ComputerMonitor.start();
-				sender.addChatMessage(new ChatComponentText("Run '/" + getCommandName() + " stop' to stop monitoring and view results"));
+				sender.addChatMessage(new TextComponentString("Run '/" + getCommandName() + " stop' to stop monitoring and view results"));
 			} catch (IllegalStateException e) {
 				throw new CommandException(e.getMessage());
 			} catch (Throwable e) {
@@ -94,7 +99,7 @@ public class CommandCCTweaks extends CommandBase {
 					lookup.put(computer, serverComputer);
 				}
 
-				sender.addChatMessage(new ChatComponentText("")
+				sender.addChatMessage(new TextComponentString("")
 					.appendSibling(header("Id", 3))
 					.appendSibling(SEPARATOR)
 					.appendSibling(header("Computer", 19))
@@ -109,14 +114,14 @@ public class CommandCCTweaks extends CommandBase {
 				for (ComputerMonitor.ComputerEntry entry : entries) {
 					Computer computer = entry.getComputer();
 					ServerComputer serverComputer = lookup.get(computer);
-					IChatComponent position;
+					ITextComponent position;
 					if (serverComputer == null) {
 						position = fixed("?", 19);
 					} else {
 						position = link(fixed(formatPosition(serverComputer.getPosition()), 19), serverComputer.getPosition(), sender);
 					}
 
-					sender.addChatMessage(new ChatComponentText("")
+					sender.addChatMessage(new TextComponentString("")
 						.appendSibling(fixed(Integer.toString(computer.getID()), 3))
 						.appendSibling(SEPARATOR)
 						.appendSibling(position)
@@ -136,7 +141,7 @@ public class CommandCCTweaks extends CommandBase {
 				throw new CommandException(e.toString());
 			}
 		} else if (command.equals("dump")) {
-			sender.addChatMessage(new ChatComponentText("")
+			sender.addChatMessage(new TextComponentString("")
 				.appendSibling(header("Istn", 5))
 				.appendSibling(SEPARATOR)
 				.appendSibling(header("Id", 3))
@@ -147,7 +152,7 @@ public class CommandCCTweaks extends CommandBase {
 			);
 
 			for (ServerComputer computer : ComputerCraft.serverComputerRegistry.getComputers()) {
-				sender.addChatMessage(new ChatComponentText("")
+				sender.addChatMessage(new TextComponentString("")
 					.appendSibling(fixed(Integer.toString(computer.getInstanceID()), 5))
 					.appendSibling(SEPARATOR)
 					.appendSibling(fixed(Integer.toString(computer.getID()), 3))
@@ -163,7 +168,7 @@ public class CommandCCTweaks extends CommandBase {
 	}
 
 	@Override
-	public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
 		if (args.length == 1) {
 			return getListOfStringsMatchingLastWord(args, "start", "stop", "dump");
 		}
@@ -177,63 +182,63 @@ public class CommandCCTweaks extends CommandBase {
 	}
 
 	@Override
-	public boolean canCommandSenderUseCommand(ICommandSender sender) {
-		return !restricted || super.canCommandSenderUseCommand(sender);
+	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+		return !restricted || super.checkPermission(server, sender);
 	}
 
 	private static String formatPosition(BlockPos pos) {
 		return String.format("%d, %d, %d", pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	private static IChatComponent formatBool(boolean value, int l) {
+	private static ITextComponent formatBool(boolean value, int l) {
 		if (value) {
-			IChatComponent component = new ChatComponentText("Y" + StringUtils.repeat(' ', l - 1));
-			component.getChatStyle().setColor(EnumChatFormatting.GREEN);
+			ITextComponent component = new TextComponentString("Y" + StringUtils.repeat(' ', l - 1));
+			component.getStyle().setColor(TextFormatting.GREEN);
 			return component;
 		} else {
-			IChatComponent component = new ChatComponentText("N" + StringUtils.repeat(' ', l - 1));
-			component.getChatStyle().setColor(EnumChatFormatting.RED);
+			ITextComponent component = new TextComponentString("N" + StringUtils.repeat(' ', l - 1));
+			component.getStyle().setColor(TextFormatting.RED);
 			return component;
 		}
 	}
 
-	private static IChatComponent formatted(String format, Object... args) {
-		return new ChatComponentText(String.format(format, args));
+	private static ITextComponent formatted(String format, Object... args) {
+		return new TextComponentString(String.format(format, args));
 	}
 
-	private static IChatComponent link(IChatComponent component, BlockPos pos, ICommandSender sender) {
+	private static ITextComponent link(ITextComponent component, BlockPos pos, ICommandSender sender) {
 		if (!sender.canCommandSenderUseCommand(2, "tp")) return component;
 
-		ChatStyle style = component.getChatStyle();
+		Style style = component.getStyle();
 
-		style.setColor(EnumChatFormatting.YELLOW);
-		style.setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+		style.setColor(TextFormatting.YELLOW);
+		style.setClickEvent(new ClickEvent(net.minecraft.util.text.event.ClickEvent.Action.RUN_COMMAND,
 			"/tp " + pos.getX() + " " + pos.getY() + " " + pos.getZ()
 		));
-		style.setChatHoverEvent(new HoverEvent(
-			HoverEvent.Action.SHOW_TEXT,
-			new ChatComponentText("Click to teleport to this location")
+		style.setHoverEvent(new HoverEvent(
+			net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT,
+			new TextComponentString("Click to teleport to this location")
 		));
 
 		return component;
 	}
 
-	private static IChatComponent fixed(String text, int length) {
+	private static ITextComponent fixed(String text, int length) {
 		if (text.length() < length) {
-			return new ChatComponentText(text + StringUtils.repeat(' ', length - text.length()));
+			return new TextComponentString(text + StringUtils.repeat(' ', length - text.length()));
 		} else {
-			IChatComponent component = new ChatComponentText(text.substring(0, length - 1) + "…");
-			component.getChatStyle().setChatHoverEvent(new HoverEvent(
+			ITextComponent component = new TextComponentString(text.substring(0, length - 1) + "…");
+			component.getStyle().setHoverEvent(new HoverEvent(
 				HoverEvent.Action.SHOW_TEXT,
-				new ChatComponentText(text)
+				new TextComponentString(text)
 			));
 			return component;
 		}
 	}
 
-	private static IChatComponent header(String text, int length) {
-		IChatComponent component = new ChatComponentText(text + StringUtils.repeat(' ', length - text.length()));
-		component.getChatStyle().setColor(EnumChatFormatting.LIGHT_PURPLE);
+	private static ITextComponent header(String text, int length) {
+		ITextComponent component = new TextComponentString(text + StringUtils.repeat(' ', length - text.length()));
+		component.getStyle().setColor(TextFormatting.LIGHT_PURPLE);
 		return component;
 	}
 }

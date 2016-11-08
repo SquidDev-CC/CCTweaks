@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,7 +17,7 @@ public abstract class ItemBase extends Item implements IClientModule {
 	public ItemBase(String itemName, int stackSize) {
 		name = itemName;
 
-		setUnlocalizedName(CCTweaks.RESOURCE_DOMAIN + "." + name);
+		setUnlocalizedName(CCTweaks.ID + "." + name);
 
 		setCreativeTab(CCTweaks.getCreativeTab());
 		setMaxStackSize(stackSize);
@@ -39,7 +40,7 @@ public abstract class ItemBase extends Item implements IClientModule {
 
 	@Override
 	public void preInit() {
-		GameRegistry.registerItem(this, name);
+		GameRegistry.register(this, new ResourceLocation(CCTweaks.ID, name));
 	}
 
 	@Override

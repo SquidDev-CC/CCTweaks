@@ -78,7 +78,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 			}
 
 			Item item = itemStack.getItem();
-			if (item == Items.gold_ingot) {
+			if (item == Items.GOLD_INGOT) {
 				gold++;
 			} else if (item instanceof IComputerItem) {
 				// If its a 'computer'

@@ -5,7 +5,7 @@ import dan200.computercraft.shared.util.WorldUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import org.apache.commons.lang3.tuple.Pair;
 import org.squiddev.cctweaks.CCTweaks;
@@ -45,10 +45,10 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 
 				try {
 
-					Vec3 rayDir = player.getLook(1.0f);
-					Vec3 rayStart = new Vec3(player.posX, player.posY, player.posZ);
+					Vec3d rayDir = player.getLook(1.0f);
+					Vec3d rayStart = new Vec3d(player.posX, player.posY, player.posZ);
 
-					Pair<Entity, Vec3> hit = WorldUtil.rayTraceEntities(turtle.getWorld(), rayStart, rayDir, 1.5);
+					Pair<Entity, Vec3d> hit = WorldUtil.rayTraceEntities(turtle.getWorld(), rayStart, rayDir, 1.5);
 
 					return player.attack(turtle, hit == null ? null : hit.getLeft());
 				} finally {

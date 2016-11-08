@@ -2,7 +2,7 @@ package org.squiddev.cctweaks.core.visualiser;
 
 import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
@@ -42,7 +42,7 @@ public final class EncoderV0 implements VisualisationPacket.Encoder {
 		DebugLogger.debug("Reading " + nodeSize + " nodes");
 		for (int i = 0; i < nodeSize; i++) {
 			String name = ByteBufUtils.readUTF8String(buffer);
-			BlockPos position = buffer.readByte() == 1 ? new BlockPos(buffer.readInt(), buffer.readInt(), buffer.readInt()) : null;
+			net.minecraft.util.math.BlockPos position = buffer.readByte() == 1 ? new BlockPos(buffer.readInt(), buffer.readInt(), buffer.readInt()) : null;
 
 			nodes[i] = new Node(name, position);
 		}
@@ -86,7 +86,7 @@ public final class EncoderV0 implements VisualisationPacket.Encoder {
 
 			ByteBufUtils.writeUTF8String(buffer, node.name);
 
-			BlockPos position = node.position;
+			net.minecraft.util.math.BlockPos position = node.position;
 			if (position != null) {
 				buffer.writeByte(1);
 				buffer.writeInt(position.getX());

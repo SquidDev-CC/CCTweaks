@@ -1,6 +1,6 @@
 package org.squiddev.cctweaks.core.visualiser;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Stores data for drawing network graphs
