@@ -100,6 +100,8 @@ public class CommandCCTweaks extends CommandBase {
 				}
 
 				sender.addChatMessage(new TextComponentString("")
+					.appendSibling(header("Istn", 5))
+					.appendSibling(SEPARATOR)
 					.appendSibling(header("Id", 3))
 					.appendSibling(SEPARATOR)
 					.appendSibling(header("Computer", 19))
@@ -116,12 +118,14 @@ public class CommandCCTweaks extends CommandBase {
 					ServerComputer serverComputer = lookup.get(computer);
 					ITextComponent position;
 					if (serverComputer == null) {
-						position = fixed("?", 19);
+						position = fixed("<no computer>", 19);
 					} else {
 						position = link(fixed(formatPosition(serverComputer.getPosition()), 19), serverComputer.getPosition(), sender);
 					}
 
 					sender.addChatMessage(new TextComponentString("")
+						.appendSibling(fixed(Integer.toString(serverComputer == null ? -1 : serverComputer.getInstanceID()), 5))
+						.appendSibling(SEPARATOR)
 						.appendSibling(fixed(Integer.toString(computer.getID()), 3))
 						.appendSibling(SEPARATOR)
 						.appendSibling(position)
@@ -187,6 +191,7 @@ public class CommandCCTweaks extends CommandBase {
 	}
 
 	private static String formatPosition(BlockPos pos) {
+		if (pos == null) return "<no pos>";
 		return String.format("%d, %d, %d", pos.getX(), pos.getY(), pos.getZ());
 	}
 
@@ -208,6 +213,7 @@ public class CommandCCTweaks extends CommandBase {
 
 	private static ITextComponent link(ITextComponent component, BlockPos pos, ICommandSender sender) {
 		if (!sender.canCommandSenderUseCommand(2, "tp")) return component;
+		if (pos == null) return component;
 
 		Style style = component.getStyle();
 

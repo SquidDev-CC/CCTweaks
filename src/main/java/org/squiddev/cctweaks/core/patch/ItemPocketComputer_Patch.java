@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.core.asm.PocketUpgrades;
 import org.squiddev.cctweaks.core.pocket.PocketHooks;
@@ -51,6 +50,6 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer {
 		String adjective = PocketRegistry.instance.getUpgradeAdjective(stack, null);
 
 		if (adjective == null) return Helpers.translateToLocal(baseName + ".name");
-		return Helpers.translateToLocal(baseName + ".upgraded.name").replace("%s", I18n.translateToLocal(adjective));
+		return Helpers.translateToLocal(baseName + ".upgraded.name").replace("%s", Helpers.translateToLocal(adjective));
 	}
 }
