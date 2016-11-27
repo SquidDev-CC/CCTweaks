@@ -3,8 +3,11 @@ package org.squiddev.cctweaks;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.core.computer.Computer;
+import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -19,9 +22,11 @@ import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
+import org.squiddev.cctweaks.core.utils.WorldPosition;
 import org.squiddev.cctweaks.lua.Config;
 import org.squiddev.cctweaks.lua.lib.ComputerMonitor;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -55,14 +60,16 @@ public class CommandCCTweaks extends CommandBase {
 		this.restricted = restricted;
 	}
 
+	@Nonnull
 	@Override
 	public String getCommandName() {
 		return "cctweaks";
 	}
 
+	@Nonnull
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
-		return "cctweaks [start|stop|dump]";
+	public String getCommandUsage(@Nonnull ICommandSender sender) {
+		return "cctweaks <start|stop|dump|shutdown|pdump>";
 	}
 
 	@Override
@@ -166,18 +173,84 @@ public class CommandCCTweaks extends CommandBase {
 					.appendSibling(link(fixed(formatPosition(computer.getPosition()), 30), computer.getPosition(), sender))
 				);
 			}
+		} else if (command.equals("shutdown")) {
+			List<ServerComputer> computers = Lists.newArrayList();
+			if (args.length > 1) {
+				for (int i = 1; i < args.length; i++) {
+					String arg = args[i];
+					int id;
+					try {
+						id = Integer.parseInt(arg);
+					} catch (NumberFormatException e) {
+						throw new CommandException(arg + " is not a valid number");
+					}
+
+					ServerComputer computer = ComputerCraft.serverComputerRegistry.get(id);
+					if (computer == null) throw new CommandException("No such computer " + id);
+
+					computers.add(computer);
+				}
+			} else {
+				computers.addAll(ComputerCraft.serverComputerRegistry.getComputers());
+			}
+
+			int shutdown = 0;
+			for (ServerComputer computer : computers) {
+				if (computer.isOn()) shutdown++;
+				computer.unload();
+			}
+			sender.addChatMessage(new ChatComponentText("Shutdown " + shutdown + " / " + computers.size()));
+		} else if (command.equals("pdump")) {
+			Multimap<WorldPosition, ServerComputer> computers = MultimapBuilder.hashKeys().hashSetValues().build();
+			for (ServerComputer computer : ComputerCraft.serverComputerRegistry.getComputers()) {
+				World world = computer.getWorld();
+				BlockPos pos = computer.getPosition();
+
+				if (world != null && pos != null) {
+					computers.put(new WorldPosition(world, pos), computer);
+				}
+			}
+
+			for (WorldPosition position : computers.keySet()) {
+				sender.addChatMessage(new ChatComponentText("")
+					.appendSibling(link(fixed(formatPosition(position.getPosition()), 19), position.getPosition(), sender))
+				);
+
+				TileEntity te = position.getBlockAccess().getTileEntity(position.getPosition());
+
+				ServerComputer actual = te instanceof TileComputerBase ? ((TileComputerBase) te).getServerComputer() : null;
+				boolean found = false;
+
+				for (ServerComputer computer : computers.get(position)) {
+					sender.addChatMessage(new ChatComponentText(computer == actual ? "  > " : "    ")
+						.appendSibling(fixed(Integer.toString(computer.getInstanceID()), 10))
+						.appendSibling(SEPARATOR)
+						.appendSibling(fixed(Integer.toString(computer.getID()), 10))
+					);
+					if (computer == actual) found = true;
+				}
+
+				if (!found && actual != null) {
+					sender.addChatMessage(new ChatComponentText(" ?>  ")
+						.appendSibling(fixed(Integer.toString(actual.getInstanceID()), 10))
+						.appendSibling(SEPARATOR)
+						.appendSibling(fixed(Integer.toString(actual.getID()), 10))
+					);
+				}
+			}
 		} else {
 			throw new CommandException("Unknown command '" + command + "'");
 		}
 	}
 
+	@Nonnull
 	@Override
 	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
 		if (args.length == 1) {
-			return getListOfStringsMatchingLastWord(args, "start", "stop", "dump");
+			return getListOfStringsMatchingLastWord(args, "start", "stop", "dump", "shutdown", "pdump");
 		}
 
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override

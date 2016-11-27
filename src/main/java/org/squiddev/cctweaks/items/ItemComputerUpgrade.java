@@ -59,17 +59,25 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		World world = computerTile.getWorld();
 
 		// Check we can copy the tile and it is a normal computer
-		if (computerTile.getFamily() != ComputerFamily.Normal || ComputerAccessor.tileCopy == null) {
+		if (computerTile.getFamily() != ComputerFamily.Normal) {
 			return false;
 		}
 
 		// Set metadata
 		IBlockState state = world.getBlockState(position);
-		if (ComputerAccessor.tileCopy == null || state.getValue(BlockComputer.Properties.ADVANCED)) {
+		if (state.getValue(BlockComputer.Properties.ADVANCED)) {
+			return false;
+		}
+
+		// Ensure we can break/place this block
+		if (!world.isBlockModifiable(player, computerTile.getPos())) {
 			return false;
 		}
 
 		world.setBlockState(position, state.withProperty(BlockComputer.Properties.ADVANCED, true));
+		computerTile.invalidate();
+		computerTile.validate();
+
 		return true;
 	}
 
@@ -93,6 +101,11 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 			player.inventoryContainer.detectAndSendChanges();
 		}
 
+		// Ensure we can break/place this block
+		if (!world.isBlockModifiable(player, computerTile.getPos())) {
+			return false;
+		}
+
 		// If we set the turtle as moved, the destroy method won't drop the items
 		try {
 			ComputerAccessor.turtleTileMoved.setBoolean(computerTile, true);
@@ -103,6 +116,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 
 		// Set block as AdvancedTurtle
 		world.setBlockState(position, ComputerCraft.Blocks.turtleAdvanced.getDefaultState());
+
 		TileEntity newTile = world.getTileEntity(position);
 
 		// Transfer state
@@ -113,6 +127,11 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		TileTurtle newTurtle = (TileTurtle) newTile;
 		newTurtle.transferStateFrom(computerTile);
 
+		// Invalidate & revalidate to unload the instance ID
+		newTurtle.invalidate();
+		newTurtle.validate();
+
+		// And update the computer
 		newTurtle.createServerComputer().setWorld(world);
 		newTurtle.createServerComputer().setPosition(position);
 		newTurtle.updateBlock();
