@@ -23,7 +23,7 @@ public abstract class ItemComputerAction extends ItemBase {
 
 	@Nonnull
 	@Override
-	public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (!player.isSneaking()) {
 			return EnumActionResult.PASS;
 		}
@@ -31,8 +31,7 @@ public abstract class ItemComputerAction extends ItemBase {
 		TileEntity tile = world.getTileEntity(position);
 		if (tile == null) return EnumActionResult.PASS;
 
-		// I feel we should return SUCCESS, but only PASS works
-		if (world.isRemote) return EnumActionResult.PASS;
+		if (world.isRemote) return EnumActionResult.SUCCESS;
 
 		boolean result;
 		if (tile instanceof TileComputerBase) {

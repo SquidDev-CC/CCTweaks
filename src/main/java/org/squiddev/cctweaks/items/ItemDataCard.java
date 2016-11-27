@@ -59,8 +59,7 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 	@Override
 	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (player.isSneaking()) {
-			// I feel we should return SUCCESS, but only PASS works
-			if (world.isRemote) return EnumActionResult.PASS;
+			if (world.isRemote) return EnumActionResult.SUCCESS;
 
 			((IDataCard) stack.getItem()).notifyPlayer(player, Messages.Cleared);
 			stack.setTagCompound(null);

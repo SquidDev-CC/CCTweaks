@@ -35,6 +35,7 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.core.utils.InventoryUtils;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 public class ItemComputerUpgrade extends ItemComputerAction {
@@ -42,10 +43,11 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		super("computerUpgrade");
 	}
 
+	@Nonnull
 	@Override
-	public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (Config.Computer.computerUpgradeEnabled) {
-			return super.onItemUseFirst(stack, player, world, position, side, hitX, hitY, hitZ, hand);
+			return super.onItemUse(stack, player, world, position, hand, side, hitX, hitY, hitZ);
 		} else {
 			return EnumActionResult.PASS;
 		}

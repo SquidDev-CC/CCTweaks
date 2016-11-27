@@ -48,10 +48,11 @@ public class ItemDebugger extends ItemComputerAction {
 		super("debugger");
 	}
 
+	@Nonnull
 	@Override
-	public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (Config.Computer.debugWandEnabled) {
-			return super.onItemUseFirst(stack, player, world, position, side, hitX, hitY, hitZ, hand);
+			return super.onItemUse(stack, player, world, position, hand, side, hitX, hitY, hitZ);
 		} else {
 			return EnumActionResult.PASS;
 		}
