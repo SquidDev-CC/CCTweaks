@@ -13,6 +13,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
@@ -20,6 +21,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
@@ -199,7 +201,7 @@ public class CommandCCTweaks extends CommandBase {
 				if (computer.isOn()) shutdown++;
 				computer.unload();
 			}
-			sender.addChatMessage(new ChatComponentText("Shutdown " + shutdown + " / " + computers.size()));
+			sender.addChatMessage(new TextComponentString("Shutdown " + shutdown + " / " + computers.size()));
 		} else if (command.equals("pdump")) {
 			Multimap<WorldPosition, ServerComputer> computers = MultimapBuilder.hashKeys().hashSetValues().build();
 			for (ServerComputer computer : ComputerCraft.serverComputerRegistry.getComputers()) {
@@ -212,7 +214,7 @@ public class CommandCCTweaks extends CommandBase {
 			}
 
 			for (WorldPosition position : computers.keySet()) {
-				sender.addChatMessage(new ChatComponentText("")
+				sender.addChatMessage(new TextComponentString("")
 					.appendSibling(link(fixed(formatPosition(position.getPosition()), 19), position.getPosition(), sender))
 				);
 
@@ -222,7 +224,7 @@ public class CommandCCTweaks extends CommandBase {
 				boolean found = false;
 
 				for (ServerComputer computer : computers.get(position)) {
-					sender.addChatMessage(new ChatComponentText(computer == actual ? "  > " : "    ")
+					sender.addChatMessage(new TextComponentString(computer == actual ? "  > " : "    ")
 						.appendSibling(fixed(Integer.toString(computer.getInstanceID()), 10))
 						.appendSibling(SEPARATOR)
 						.appendSibling(fixed(Integer.toString(computer.getID()), 10))
@@ -231,7 +233,7 @@ public class CommandCCTweaks extends CommandBase {
 				}
 
 				if (!found && actual != null) {
-					sender.addChatMessage(new ChatComponentText(" ?>  ")
+					sender.addChatMessage(new TextComponentString(" ?>  ")
 						.appendSibling(fixed(Integer.toString(actual.getInstanceID()), 10))
 						.appendSibling(SEPARATOR)
 						.appendSibling(fixed(Integer.toString(actual.getID()), 10))
