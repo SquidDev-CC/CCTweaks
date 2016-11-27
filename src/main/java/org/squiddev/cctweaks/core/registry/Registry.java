@@ -4,7 +4,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.blocks.debug.BlockDebug;
 import org.squiddev.cctweaks.blocks.network.BlockNetworked;
-import org.squiddev.cctweaks.client.ModelLoader;
+import org.squiddev.cctweaks.client.CustomModelLoader;
 import org.squiddev.cctweaks.client.render.RenderNetworkOverlay;
 import org.squiddev.cctweaks.client.render.RenderSquidOverlay;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHostProvider;
@@ -78,7 +78,7 @@ public final class Registry {
 		addModule(new NetworkPlayerWatcher());
 		addModule(new RenderNetworkOverlay());
 
-		addModule(new ModelLoader());
+		addModule(new CustomModelLoader());
 
 		addModule(new RenderSquidOverlay());
 	}
