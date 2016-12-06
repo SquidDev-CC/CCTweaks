@@ -123,6 +123,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 
 	@Override
 	protected boolean writeDescription(NBTTagCompound tag) {
+		modem.refreshState();
 		tag.setByte("modem_state", modem.state);
 		return true;
 	}

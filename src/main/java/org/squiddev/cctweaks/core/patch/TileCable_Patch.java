@@ -245,6 +245,12 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 		return tag;
 	}
 
+	public void writeDescription(NBTTagCompound tag) {
+		// Manually refresh the state to ensure modems display correctly.
+		updateAnim();
+		super.writeDescription(tag);
+	}
+
 	@Override
 	protected ModemPeripheral createPeripheral() {
 		return getModem().modem;
