@@ -51,7 +51,7 @@ dependencies {
 	provided "net.industrial-craft:industrialcraft-2:2.3.249-ex18:api"
 	provided "openperipheral:OpenPeripheralCore-API:3.2"
 
-	shade('org.squiddev:cctweaks-lua:1.2.3') {
+	shade('org.squiddev:cctweaks-lua:1.2.4') {
 		// Different versions
 		exclude group: 'ComputerCraft'
 		exclude group: 'com.google.guava'

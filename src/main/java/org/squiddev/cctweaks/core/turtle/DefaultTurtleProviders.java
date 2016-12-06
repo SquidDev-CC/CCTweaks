@@ -5,6 +5,7 @@ import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import dan200.computercraft.api.turtle.TurtleSide;
 import dan200.computercraft.shared.turtle.blocks.ITurtleTile;
+import dan200.computercraft.shared.turtle.core.TurtlePlayer;
 import dan200.computercraft.shared.util.InventoryUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
@@ -18,6 +19,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
@@ -33,6 +36,11 @@ import static net.minecraftforge.fluids.capability.CapabilityFluidHandler.FLUID_
  * Registers turtle related things
  */
 public class DefaultTurtleProviders extends Module {
+	@Override
+	public void preInit() {
+		EntityRegistry.registerModEntity(TurtlePlayer.class, CCTweaks.ID + ":ccFakePlayer", 1, CCTweaks.instance, Integer.MAX_VALUE, Integer.MAX_VALUE, false);
+	}
+
 	@Override
 	public void init() {
 		// Add default furnace fuel provider
