@@ -3,7 +3,6 @@ package org.squiddev.cctweaks.core.patch;
 import com.google.common.base.Objects;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ClientComputer;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
 /**
@@ -59,7 +58,6 @@ public abstract class TileComputerBase_Patch extends TileComputerBase {
 				}
 
 				if (changed) {
-					DebugLogger.debug("Updating status: id=%s->%s, label=%s->%s, on=%s->%s", oldId, id, oldLabel, label, oldOn, on);
 					markDirty();
 				}
 			}
