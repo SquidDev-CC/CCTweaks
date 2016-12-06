@@ -7,18 +7,9 @@ import dan200.computercraft.api.turtle.TurtleSide;
 import dan200.computercraft.shared.turtle.blocks.ITurtleTile;
 import dan200.computercraft.shared.turtle.core.TurtlePlayer;
 import dan200.computercraft.shared.util.InventoryUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
@@ -26,11 +17,8 @@ import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
-import org.squiddev.cctweaks.api.turtle.AbstractTurtleInteraction;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.core.registry.Module;
-
-import static net.minecraftforge.fluids.capability.CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY;
 
 /**
  * Registers turtle related things
@@ -104,30 +92,6 @@ public class DefaultTurtleProviders extends Module {
 				}
 
 				return null;
-			}
-		});
-
-		// Add bucket using provider
-		CCTweaksAPI.instance().turtleRegistry().registerInteraction(new AbstractTurtleInteraction() {
-			@Override
-			public boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) {
-				if (!stack.hasCapability(FLUID_HANDLER_CAPABILITY, null)) return false;
-
-				BlockPos coords = turtle.getPosition().offset(direction);
-				IBlockState blockState = turtle.getWorld().getBlockState(coords);
-				Block block = blockState.getBlock();
-
-				IFluidHandler handler = stack.getCapability(FLUID_HANDLER_CAPABILITY, null);
-
-				if (block.isAir(blockState, turtle.getWorld(), coords)) {
-					return handler.drain(1000, false) != null;
-				} else if (block instanceof IFluidBlock || block instanceof BlockLiquid || blockState.getMaterial().isLiquid()) {
-					// TODO: 1.10.2 Fix me
-					return false;
-					// return handler.fill(1000, false) >= 1000;
-				} else {
-					return false;
-				}
 			}
 		});
 	}

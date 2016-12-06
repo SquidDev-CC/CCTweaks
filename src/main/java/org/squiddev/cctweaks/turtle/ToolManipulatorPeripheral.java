@@ -182,11 +182,10 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 						if (active != null && !ForgeEventFactory.onUseItemStop(player, active, duration)) {
 							active.onPlayerStoppedUsing(player.worldObj, player, active.getMaxItemUseDuration() - duration);
 							player.resetActiveHand();
-
-							player.inventory.setInventorySlotContents(player.inventory.currentItem, result.getResult());
-							return new Object[]{true, "item", "use"};
 						}
-						break;
+
+						player.inventory.setInventorySlotContents(player.inventory.currentItem, result.getResult());
+						return new Object[]{true, "item", "use"};
 				}
 			}
 

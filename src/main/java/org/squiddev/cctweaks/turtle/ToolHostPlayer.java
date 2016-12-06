@@ -94,7 +94,6 @@ public class ToolHostPlayer extends TurtlePlayer {
 			PlayerInteractionManager manager = interactionManager;
 			for (int i = 0; i < Config.Turtle.ToolHost.digFactor; i++) {
 				if (currentDamageState == -1) {
-					// TODO: Migrate checks to here
 					manager.onBlockClicked(pos, direction.getOpposite());
 					currentDamageState = manager.durabilityRemainingOnBlock;
 				} else {

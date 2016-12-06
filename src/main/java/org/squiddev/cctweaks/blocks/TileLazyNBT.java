@@ -32,9 +32,6 @@ public abstract class TileLazyNBT extends TileBase {
 	@Override
 	public void create() {
 		super.create();
-		/**
-		 * TODO: Can we move this into {@link #onLoad()}?
-		 */
 		McEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
