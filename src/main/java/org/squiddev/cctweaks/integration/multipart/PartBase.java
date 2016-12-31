@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -65,5 +66,11 @@ public abstract class PartBase extends Multipart implements IHitEffectsPart, IOc
 	@Override
 	public final BlockPos getPosition() {
 		return getPos();
+	}
+
+	@Override
+	public void onConverted(TileEntity tile) {
+		super.onConverted(tile);
+		onAdded();
 	}
 }

@@ -48,7 +48,7 @@ configurations {
 
 dependencies {
 	compile "ComputerCraft:ComputerCraft:${project.cc_version}"
-	deobfCompile "MCMultiPart:MCMultiPart:1.0.4:universal"
+	deobfCompile "MCMultiPart:MCMultiPart:1.0.8:universal"
 	deobfCompile "mezz.jei:jei_${project.mc_version}:2.16.2.78"
 
 	deobfCompile "mezz.jei:jei_${project.mc_version}:2.14.0.139"
