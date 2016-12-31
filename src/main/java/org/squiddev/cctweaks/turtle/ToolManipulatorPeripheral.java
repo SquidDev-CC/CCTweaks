@@ -15,6 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -219,7 +220,17 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 
 		if (stack.getItem() instanceof ItemBlock) {
 			ItemBlock itemBlock = (ItemBlock) stack.getItem();
-			if (!itemBlock.canPlaceBlockOnSide(world, pos, side, player, stack)) {
+
+			Block block = world.getBlockState(pos).getBlock();
+			BlockPos shiftPos = pos;
+			EnumFacing shiftSide = side;
+			if (block == Blocks.snow_layer && block.isReplaceable(world, pos)) {
+				shiftSide = EnumFacing.UP;
+			} else if (!block.isReplaceable(world, pos)) {
+				shiftPos = pos.offset(side);
+			}
+
+			if (!world.canBlockBePlaced(itemBlock.block, shiftPos, false, shiftSide, null, stack)) {
 				return null;
 			}
 		}
