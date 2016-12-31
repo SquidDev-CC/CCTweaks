@@ -99,13 +99,14 @@ public final class NetworkController implements INetworkController {
 	 * @param networks The networks to split into.
 	 */
 	private void handleSplit(Collection<Map<INetworkNode, Point>> networks) {
+		connectionCache = null;
+
 		// If there are no changes, then we just ignore it.
 		if (networks.size() <= 1) return;
 
 		Map<String, IPeripheral> peripheralMap = unmodifiableMap(peripherals);
 
 		// Clear the structure. Make it impossible to add peripherals
-		connectionCache = null;
 		points.clear();
 		peripherals = newHashMap();
 
