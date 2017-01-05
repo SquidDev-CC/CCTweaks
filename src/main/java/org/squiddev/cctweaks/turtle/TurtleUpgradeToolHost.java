@@ -22,16 +22,21 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 	protected static final Map<ITurtleAccess, ToolHostPlayer> players = new WeakHashMap<ITurtleAccess, ToolHostPlayer>();
 
 	public TurtleUpgradeToolHost() {
-		this("toolHost", Config.Turtle.ToolHost.upgradeId, new ItemStack(Registry.itemToolHost, 1, 0));
+		this("toolHost", Config.Turtle.ToolHost.upgradeId);
 	}
 
-	public TurtleUpgradeToolHost(String name, int id, ItemStack stack) {
-		super(name, id, stack);
+	public TurtleUpgradeToolHost(String name, int id) {
+		super(name, id);
 	}
 
 	@Override
 	public TurtleUpgradeType getType() {
 		return TurtleUpgradeType.Tool;
+	}
+
+	@Override
+	protected ItemStack getStack() {
+		return new ItemStack(Registry.itemToolHost, 1, 0);
 	}
 
 	@Override

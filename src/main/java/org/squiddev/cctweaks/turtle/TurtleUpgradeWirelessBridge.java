@@ -52,7 +52,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 	private IBakedModel modelRight;
 
 	public TurtleUpgradeWirelessBridge() {
-		super("wirelessBridge", Config.Network.WirelessBridge.turtleId, new ItemStack(Registry.blockNetworked, 1, 1));
+		super("wirelessBridge", Config.Network.WirelessBridge.turtleId);
 	}
 
 	@Override
@@ -61,8 +61,13 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 	}
 
 	@Override
+	protected ItemStack getStack() {
+		return new ItemStack(Registry.blockNetworked, 1, 0);
+	}
+
+	@Override
 	public ItemStack getCraftingItem() {
-		return Config.Network.WirelessBridge.turtleEnabled ? new ItemStack(Registry.blockNetworked, 1, 0) : null;
+		return Config.Network.WirelessBridge.turtleEnabled ? super.getCraftingItem() : null;
 	}
 
 	@Override

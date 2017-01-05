@@ -5,7 +5,6 @@ import dan200.computercraft.api.turtle.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -24,20 +23,14 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 	protected final String name;
 	private final int id;
 	private final ResourceLocation location;
-	private final ItemStack stack;
 
 	@SideOnly(Side.CLIENT)
 	@SuppressWarnings("deprecation")
 	private IBakedModel model;
 
-	public TurtleUpgradeBase(String name, int id, Item item) {
-		this(name, id, new ItemStack(item, 1, 0));
-	}
-
-	public TurtleUpgradeBase(String name, int id, ItemStack stack) {
+	public TurtleUpgradeBase(String name, int id) {
 		this.name = name;
 		this.id = id;
-		this.stack = stack;
 
 		location = new ResourceLocation(CCTweaks.RESOURCE_DOMAIN, name);
 	}
@@ -57,9 +50,11 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 		return "turtle." + CCTweaks.RESOURCE_DOMAIN + "." + name + ".adjective";
 	}
 
+	protected abstract ItemStack getStack();
+
 	@Override
 	public ItemStack getCraftingItem() {
-		return stack;
+		return getStack();
 	}
 
 	@Override
@@ -69,7 +64,7 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 		float xOffset = side == TurtleSide.Left ? -0.40625F : 0.40625F;
 		Matrix4f transform = new Matrix4f(0.0F, 0.0F, -1.0F, 1.0F + xOffset, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 1.0F);
 
-		if (model == null) model = getMesher().getItemModel(stack);
+		if (model == null) model = getMesher().getItemModel(getStack());
 		return Pair.of(model, transform);
 	}
 
