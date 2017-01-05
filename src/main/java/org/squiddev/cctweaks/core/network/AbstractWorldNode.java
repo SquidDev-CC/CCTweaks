@@ -7,6 +7,7 @@ import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 
+import javax.annotation.Nonnull;
 import java.util.Set;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Set;
  */
 public abstract class AbstractWorldNode extends AbstractNode implements IWorldNetworkNode {
 	@Override
-	public boolean canConnect(EnumFacing direction) {
+	public boolean canConnect(@Nonnull EnumFacing direction) {
 		return true;
 	}
 

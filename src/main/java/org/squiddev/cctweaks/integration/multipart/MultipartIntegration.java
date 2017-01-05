@@ -29,6 +29,8 @@ import org.squiddev.cctweaks.integration.multipart.network.PartCable;
 import org.squiddev.cctweaks.integration.multipart.network.PartModem;
 import org.squiddev.cctweaks.integration.multipart.network.PartWirelessBridge;
 
+import javax.annotation.Nonnull;
+
 public class MultipartIntegration extends ModIntegration implements IClientModule {
 	public static final String MOD_NAME = "mcmultipart";
 
@@ -63,7 +65,7 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 		// CC providers
 		CCTweaksAPI.instance().networkRegistry().addNodeProvider(new INetworkNodeProvider() {
 			@Override
-			public IWorldNetworkNode getNode(TileEntity tile) {
+			public IWorldNetworkNode getNode(@Nonnull TileEntity tile) {
 				if (tile instanceof IMultipartContainer) {
 					IMultipart part = ((IMultipartContainer) tile).getPartInSlot(PartSlot.CENTER);
 					return part == null ? null : MultipartHelpers.getWorldNode(part);
@@ -73,7 +75,7 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 			}
 
 			@Override
-			public boolean isNode(TileEntity tile) {
+			public boolean isNode(@Nonnull TileEntity tile) {
 				return getNode(tile) != null;
 			}
 		});

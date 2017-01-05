@@ -22,15 +22,15 @@ public class ItemCable_Patch extends ItemCable {
 		super(block);
 	}
 
-	public IMultipart newPart(ItemStack stack, EnumFacing facing) {
+	private IMultipart newPart(ItemStack stack, EnumFacing facing) {
 		switch (getPeripheralType(stack)) {
 			case Cable:
 				return new PartCable();
 			case WiredModem:
 				return new PartModem(facing.getOpposite());
+			default:
+				return null;
 		}
-
-		return null;
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public class ItemCable_Patch extends ItemCable {
 	 *
 	 * @return Success at placing the part
 	 */
-	public boolean place(ItemStack item, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
+	private boolean place(ItemStack item, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
 		IMultipart part = newPart(item, side);
 
 		if (part == null || !MultipartHelper.canAddPart(world, pos, part)) return false;

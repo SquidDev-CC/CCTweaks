@@ -1,11 +1,13 @@
 package org.squiddev.cctweaks.core.network.controller;
 
+import com.google.common.base.Preconditions;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.collections.MapChanges;
 import org.squiddev.cctweaks.core.collections.MapsX;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 /**
@@ -25,6 +27,7 @@ public final class Point implements INetworkAccess {
 	}
 
 	//region INetworkAccess
+	@Nonnull
 	@Override
 	public Map<String, IPeripheral> getPeripheralsOnNetwork() {
 		if (controller == null) {
@@ -40,7 +43,8 @@ public final class Point implements INetworkAccess {
 	}
 
 	@Override
-	public boolean transmitPacket(Packet packet) {
+	public boolean transmitPacket(@Nonnull Packet packet) {
+		Preconditions.checkNotNull(packet, "packet cannot be null");
 		if (controller == null) {
 			return false;
 		} else {

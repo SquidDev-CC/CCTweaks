@@ -19,6 +19,7 @@ import org.squiddev.cctweaks.core.network.modem.ControllableModemPeripheral;
 import org.squiddev.cctweaks.core.network.modem.MultiPeripheralModem;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -27,6 +28,7 @@ import java.util.Set;
  */
 public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, IWorldNetworkNodeHost, ITickable {
 	public final MultiPeripheralModem modem = new MultiPeripheralModem() {
+		@Nonnull
 		@Override
 		public IWorldPosition getPosition() {
 			return TileNetworkedModem.this;
@@ -137,10 +139,11 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	}
 
 	@Override
-	public IPeripheral getPeripheral(EnumFacing side) {
+	public IPeripheral getPeripheral(@Nonnull EnumFacing side) {
 		return modem.modem;
 	}
 
+	@Nonnull
 	@Override
 	public IWorldNetworkNode getNode() {
 		return modem;

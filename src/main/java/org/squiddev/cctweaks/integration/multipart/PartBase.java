@@ -16,6 +16,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 
@@ -58,11 +59,13 @@ public abstract class PartBase extends Multipart implements IHitEffectsPart, IOc
 		return true;
 	}
 
+	@Nonnull
 	@Override
 	public final IBlockAccess getBlockAccess() {
 		return getWorld();
 	}
 
+	@Nonnull
 	@Override
 	public final BlockPos getPosition() {
 		return getPos();

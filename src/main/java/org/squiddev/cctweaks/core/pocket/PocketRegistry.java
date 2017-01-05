@@ -9,6 +9,7 @@ import org.squiddev.cctweaks.api.pocket.IPocketRegistry;
 import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,11 +18,11 @@ public final class PocketRegistry implements IPocketRegistry {
 
 	public static final PocketRegistry instance = new PocketRegistry();
 
-	protected final Map<Integer, IPocketUpgrade> legacyUpgrades = new HashMap<Integer, IPocketUpgrade>();
-	protected final Map<String, IPocketUpgrade> upgrades = new HashMap<String, IPocketUpgrade>();
+	private final Map<Integer, IPocketUpgrade> legacyUpgrades = new HashMap<Integer, IPocketUpgrade>();
+	private final Map<String, IPocketUpgrade> upgrades = new HashMap<String, IPocketUpgrade>();
 
 	@Override
-	public void addUpgrade(IPocketUpgrade upgrade) {
+	public void addUpgrade(@Nonnull IPocketUpgrade upgrade) {
 		Preconditions.checkNotNull(upgrade, "upgrade cannot be null");
 
 		String location = upgrade.getUpgradeID().toString();
@@ -31,7 +32,7 @@ public final class PocketRegistry implements IPocketRegistry {
 	}
 
 	@Override
-	public void addLegacyUpgrade(int id, IPocketUpgrade upgrade) {
+	public void addLegacyUpgrade(int id, @Nonnull IPocketUpgrade upgrade) {
 		Preconditions.checkNotNull(upgrade, "upgrade cannot be null");
 
 		if (legacyUpgrades.containsKey(id)) {

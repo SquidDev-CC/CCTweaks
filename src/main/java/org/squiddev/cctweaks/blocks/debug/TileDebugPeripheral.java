@@ -10,6 +10,7 @@ import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileBase;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
 	private final IPeripheral[] sides = new IPeripheral[6];
 
 	@Override
-	public IPeripheral getPeripheral(EnumFacing side) {
+	public IPeripheral getPeripheral(@Nonnull EnumFacing side) {
 		int s = side.ordinal();
 		if (sides[s] != null) return sides[s];
 		return sides[s] = createPeripheral(s);

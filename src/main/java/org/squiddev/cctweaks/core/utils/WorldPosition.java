@@ -5,12 +5,14 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
+import javax.annotation.Nonnull;
+
 /**
  * Base implementation of {@link IWorldPosition}
  */
 public class WorldPosition implements IWorldPosition {
-	protected final IBlockAccess world;
-	protected final BlockPos pos;
+	private final IBlockAccess world;
+	private final BlockPos pos;
 
 	public WorldPosition(TileEntity tile) {
 		this(tile.getWorld(), tile.getPos());
@@ -21,11 +23,13 @@ public class WorldPosition implements IWorldPosition {
 		this.pos = pos;
 	}
 
+	@Nonnull
 	@Override
 	public IBlockAccess getBlockAccess() {
 		return world;
 	}
 
+	@Nonnull
 	@Override
 	public BlockPos getPosition() {
 		return pos;

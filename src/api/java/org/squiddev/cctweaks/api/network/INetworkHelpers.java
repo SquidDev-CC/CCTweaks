@@ -6,6 +6,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
+import javax.annotation.Nonnull;
 import java.util.Set;
 
 /**
@@ -20,7 +21,7 @@ public interface INetworkHelpers {
 	 * @param direction Direction we are checking in
 	 * @return If the target block is a node and can be connected to
 	 */
-	boolean canConnect(IBlockAccess world, BlockPos position, EnumFacing direction);
+	boolean canConnect(@Nonnull IBlockAccess world, @Nonnull BlockPos position, @Nonnull EnumFacing direction);
 
 	/**
 	 * Check if an adjacent block is a node and accepts connections.
@@ -29,7 +30,7 @@ public interface INetworkHelpers {
 	 * @param direction Direction we are checking in
 	 * @return If the target block is a node and can be connected to
 	 */
-	boolean canConnect(IWorldPosition pos, EnumFacing direction);
+	boolean canConnect(@Nonnull IWorldPosition pos, @Nonnull EnumFacing direction);
 
 	/**
 	 * Get adjacent nodes that can be connected to
@@ -40,7 +41,8 @@ public interface INetworkHelpers {
 	 * @param node The current node
 	 * @return The adjacent nodes
 	 */
-	Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node);
+	@Nonnull
+	Set<INetworkNode> getAdjacentNodes(@Nonnull IWorldNetworkNode node);
 
 	/**
 	 * Get adjacent nodes that can be connected to
@@ -54,7 +56,8 @@ public interface INetworkHelpers {
 	 *                    if we should check if the chunk the neighbouring blocks are loaded
 	 * @return The adjacent nodes
 	 */
-	Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node, boolean checkExists);
+	@Nonnull
+	Set<INetworkNode> getAdjacentNodes(@Nonnull IWorldNetworkNode node, boolean checkExists);
 
 	/**
 	 * Connect to adjacent nodes, or create a network.
@@ -63,7 +66,7 @@ public interface INetworkHelpers {
 	 *
 	 * @param node The node to scan with
 	 */
-	void joinOrCreateNetwork(IWorldNetworkNode node);
+	void joinOrCreateNetwork(@Nonnull IWorldNetworkNode node);
 
 	/**
 	 * Attempt to connect to all nodes.
@@ -73,7 +76,7 @@ public interface INetworkHelpers {
 	 * @param node        The node to scan with
 	 * @param connections The nodes that can connect
 	 */
-	void joinOrCreateNetwork(INetworkNode node, Set<? extends INetworkNode> connections);
+	void joinOrCreateNetwork(@Nonnull INetworkNode node, @Nonnull Set<? extends INetworkNode> connections);
 
 	/**
 	 * Creates a new network for the node.
@@ -81,7 +84,7 @@ public interface INetworkHelpers {
 	 *
 	 * @param node The node to create the network with.
 	 */
-	void joinNewNetwork(INetworkNode node);
+	void joinNewNetwork(@Nonnull INetworkNode node);
 
 	/**
 	 * Schedule calling {@link #joinOrCreateNetwork(IWorldNetworkNode)} next tick.
@@ -90,7 +93,7 @@ public interface INetworkHelpers {
 	 *
 	 * @param node The node to schedule
 	 */
-	void scheduleJoin(IWorldNetworkNode node);
+	void scheduleJoin(@Nonnull IWorldNetworkNode node);
 
 	/**
 	 * Schedule calling {@link #joinOrCreateNetwork(IWorldNetworkNode)} next tick.
@@ -100,5 +103,5 @@ public interface INetworkHelpers {
 	 * @param node The node to schedule
 	 * @param tile The tile this node is bound to. We will ensure the tile is still there.
 	 */
-	void scheduleJoin(IWorldNetworkNode node, TileEntity tile);
+	void scheduleJoin(@Nonnull IWorldNetworkNode node, @Nonnull TileEntity tile);
 }

@@ -10,6 +10,7 @@ import org.squiddev.cctweaks.api.peripheral.IPeripheralHidden;
 import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
 
+import javax.annotation.Nonnull;
 import java.util.Set;
 
 /**
@@ -28,9 +29,10 @@ public abstract class NetworkBindingWithModem extends NetworkBinding {
 	protected final BindingModem modem = createModem();
 
 	protected class BindingModem extends BasicModem {
+		@Nonnull
 		@Override
 		public IWorldPosition getPosition() {
-			return position;
+			return NetworkBindingWithModem.this.getPosition();
 		}
 
 		@Override

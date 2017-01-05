@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.core.network.modem;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import java.util.Map;
 public abstract class SinglePeripheralModem extends BasicModem {
 	public int id = -1;
 
+	@Nonnull
 	@Override
 	public Map<String, IPeripheral> getConnectedPeripherals() {
 		if (!isPeripheralEnabled()) return Collections.emptyMap();

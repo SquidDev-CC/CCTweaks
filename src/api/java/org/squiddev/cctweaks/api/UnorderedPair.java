@@ -1,13 +1,19 @@
 package org.squiddev.cctweaks.api;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * An unordered pair of objects with the same type.
  */
 public class UnorderedPair<T> {
+	@Nonnull
 	public final T x;
+
+	@Nonnull
 	public final T y;
 
-	public UnorderedPair(T x, T y) {
+	public UnorderedPair(@Nonnull T x, @Nonnull T y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -18,7 +24,7 @@ public class UnorderedPair<T> {
 	 * @param obj The object that you don't want from this pair.
 	 * @return If obj is {@link #x}, returns {@link #y}. Else if obj is {@link #y}, returns {@link #x}. Else returns null.
 	 */
-	public T other(T obj) {
+	public T other(@Nonnull T obj) {
 		if (obj.equals(x)) {
 			return y;
 		} else if (obj.equals(y)) {
@@ -34,7 +40,7 @@ public class UnorderedPair<T> {
 	 * @param z An object to test against.
 	 * @return If {@link #x} or {@link #y} {@link #equals(Object)} the passed object.
 	 */
-	public boolean contains(Object z) {
+	public boolean contains(@Nullable Object z) {
 		return x.equals(z) || y.equals(z);
 	}
 
@@ -66,6 +72,7 @@ public class UnorderedPair<T> {
 	}
 
 	@Override
+	@Nonnull
 	public String toString() {
 		return String.format("<%s, %s>", x, y);
 	}

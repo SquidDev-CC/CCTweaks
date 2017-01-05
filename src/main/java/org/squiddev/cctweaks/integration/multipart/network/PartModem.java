@@ -28,11 +28,12 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.integration.multipart.PartSided;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 
 public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeripheralHost, ITickable {
-	public static final PropertyEnum<ModemType> MODEM = PropertyEnum.create("modem", ModemType.class);
+	private static final PropertyEnum<ModemType> MODEM = PropertyEnum.create("modem", ModemType.class);
 
 	public enum ModemType implements IStringSerializable {
 		OFF,
@@ -49,7 +50,7 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	/**
 	 * Occlusion for collision detection
 	 */
-	public static final AxisAlignedBB[] OCCLUSION = new AxisAlignedBB[]{
+	private static final AxisAlignedBB[] OCCLUSION = new AxisAlignedBB[]{
 		new AxisAlignedBB(0.125, 0.0, 0.125, 0.875, 0.1875, 0.875),
 		new AxisAlignedBB(0.125, 0.8125, 0.125, 0.875, 1.0, 0.875),
 		new AxisAlignedBB(0.125, 0.125, 0.0, 0.875, 0.875, 0.1875),
@@ -61,7 +62,7 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	/**
 	 * Slightly smaller bounds
 	 */
-	public static final AxisAlignedBB[] BOUNDS = new AxisAlignedBB[]{
+	private static final AxisAlignedBB[] BOUNDS = new AxisAlignedBB[]{
 		new AxisAlignedBB(0.125, 0.0, 0.125, 0.875, 0.125, 0.875D),
 		new AxisAlignedBB(0.125, 0.875, 0.125, 0.875, 1.0, 0.875D),
 		new AxisAlignedBB(0.125, 0.125, 0.0, 0.875, 0.875, 0.125D),
@@ -95,13 +96,14 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	public final WiredModem modem = new WiredModem();
 
 	//region Basic getters
+	@Nonnull
 	@Override
 	public IWorldNetworkNode getNode() {
 		return modem;
 	}
 
 	@Override
-	public IPeripheral getPeripheral(EnumFacing side) {
+	public IPeripheral getPeripheral(@Nonnull EnumFacing side) {
 		return side == getSide() ? modem.modem : null;
 	}
 
@@ -251,6 +253,7 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	}
 
 	public class WiredModem extends DirectionalPeripheralModem {
+		@Nonnull
 		@Override
 		public IWorldPosition getPosition() {
 			return PartModem.this;

@@ -1,10 +1,12 @@
 package org.squiddev.cctweaks.core.network;
 
+import com.google.common.base.Preconditions;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Map;
 
@@ -17,17 +19,18 @@ public abstract class AbstractNode implements INetworkNode {
 	 */
 	protected INetworkController networkController;
 
+	@Nonnull
 	@Override
 	public Map<String, IPeripheral> getConnectedPeripherals() {
 		return Collections.emptyMap();
 	}
 
 	@Override
-	public void receivePacket(Packet packet, double distanceTravelled) {
+	public void receivePacket(@Nonnull Packet packet, double distanceTravelled) {
 	}
 
 	@Override
-	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
+	public void networkInvalidated(@Nonnull Map<String, IPeripheral> oldPeripherals, @Nonnull Map<String, IPeripheral> newPeripherals) {
 	}
 
 	@Override
@@ -40,11 +43,10 @@ public abstract class AbstractNode implements INetworkNode {
 	}
 
 	@Override
-	public void attachToNetwork(INetworkController networkController) {
+	public void attachToNetwork(@Nonnull INetworkController networkController) {
+		Preconditions.checkNotNull(networkController, "networkController cannot be null");
 		if (this.networkController != null) {
 			throw new IllegalStateException("Already connected");
-		} else if (networkController == null) {
-			throw new IllegalArgumentException("Cannot connect to <null>");
 		}
 
 		this.networkController = networkController;

@@ -29,6 +29,8 @@ import org.squiddev.cctweaks.api.turtle.AbstractTurtleInteraction;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.core.registry.Module;
 
+import javax.annotation.Nonnull;
+
 /**
  * Registers turtle related things
  */
@@ -43,12 +45,12 @@ public class DefaultTurtleProviders extends Module {
 		// Add default furnace fuel provider
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {
 			@Override
-			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack) {
+			public boolean canRefuel(@Nonnull ITurtleAccess turtle, @Nonnull ItemStack stack) {
 				return TileEntityFurnace.isItemFuel(stack);
 			}
 
 			@Override
-			public int refuel(ITurtleAccess turtle, ItemStack stack, int limit) {
+			public int refuel(@Nonnull ITurtleAccess turtle, @Nonnull ItemStack stack, int limit) {
 				int fuelToGive = TileEntityFurnace.getItemBurnTime(stack) * 5 / 100 * limit;
 				ItemStack replacementStack = stack.getItem().getContainerItem(stack);
 
@@ -67,7 +69,7 @@ public class DefaultTurtleProviders extends Module {
 		// TODO: Bind all nodes into one like CablePart
 		NetworkAPI.registry().addNodeProvider(new INetworkNodeProvider() {
 			@Override
-			public IWorldNetworkNode getNode(TileEntity tile) {
+			public IWorldNetworkNode getNode(@Nonnull TileEntity tile) {
 				if (tile instanceof ITurtleTile) {
 					ITurtleAccess turtle = ((ITurtleTile) tile).getAccess();
 
@@ -81,7 +83,7 @@ public class DefaultTurtleProviders extends Module {
 			}
 
 			@Override
-			public boolean isNode(TileEntity tile) {
+			public boolean isNode(@Nonnull TileEntity tile) {
 				return getNode(tile) != null;
 			}
 
@@ -107,7 +109,7 @@ public class DefaultTurtleProviders extends Module {
 		// Add bucket using provider
 		CCTweaksAPI.instance().turtleRegistry().registerInteraction(new AbstractTurtleInteraction() {
 			@Override
-			public boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) {
+			public boolean canUse(@Nonnull ITurtleAccess turtle, @Nonnull FakePlayer player, @Nonnull ItemStack stack, @Nonnull EnumFacing direction, MovingObjectPosition hit) {
 				if (!FluidContainerRegistry.isBucket(stack)) return false;
 
 				BlockPos coords = turtle.getPosition().offset(direction);

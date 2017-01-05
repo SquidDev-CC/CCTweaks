@@ -51,7 +51,7 @@ public class ItemDebugger extends ItemComputerAction {
 		return super.onItemRightClick(stack, world, player);
 	}
 
-	protected void handleWatcher(EntityPlayerMP player, NetworkPlayerWatcher.Watcher watcher, boolean force) {
+	private void handleWatcher(EntityPlayerMP player, NetworkPlayerWatcher.Watcher watcher, boolean force) {
 		if (watcher == null) return;
 		if (watcher.changed() || force) VisualisationPacket.send(watcher.controller, player);
 		if (watcher.controller == null) NetworkPlayerWatcher.remove(player);
@@ -177,7 +177,7 @@ public class ItemDebugger extends ItemComputerAction {
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 	private static IChatComponent withColor(String message, EnumChatFormatting color) {

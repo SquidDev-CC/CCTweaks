@@ -64,9 +64,9 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 		}
 	}
 
-	public static final PropertyEnum<BlockNetworkedType> TYPE = PropertyEnum.create("type", BlockNetworkedType.class);
-	public static final PropertyBool MODEM_ON = PropertyBool.create("modem_on");
-	public static final PropertyBool PERIPHERAL_ON = PropertyBool.create("peripheral_on");
+	private static final PropertyEnum<BlockNetworkedType> TYPE = PropertyEnum.create("type", BlockNetworkedType.class);
+	private static final PropertyBool MODEM_ON = PropertyBool.create("modem_on");
+	private static final PropertyBool PERIPHERAL_ON = PropertyBool.create("peripheral_on");
 
 	public BlockNetworked() {
 		super("networkedBlock", TileBase.class);

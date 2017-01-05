@@ -21,6 +21,8 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
+import javax.annotation.Nonnull;
+
 @MergeVisitor.Rename(from = "dan200/computercraft/shared/peripheral/modem/TileCable$Packet", to = "org/squiddev/cctweaks/api/network/Packet")
 public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNodeHost, IWorldPosition {
 
@@ -52,13 +54,14 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 					return TileCable_Patch.this.getDirection();
 				}
 
+				@Nonnull
 				@Override
 				public IWorldPosition getPosition() {
 					return TileCable_Patch.this;
 				}
 
 				@Override
-				public boolean canConnect(EnumFacing from) {
+				public boolean canConnect(@Nonnull EnumFacing from) {
 					return true;
 				}
 
@@ -91,13 +94,14 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 					return TileCable_Patch.this.getModem();
 				}
 
+				@Nonnull
 				@Override
 				public IWorldPosition getPosition() {
 					return TileCable_Patch.this;
 				}
 
 				@Override
-				public boolean canConnect(EnumFacing direction) {
+				public boolean canConnect(@Nonnull EnumFacing direction) {
 					// Can't be visited by other nodes if it is destroyed
 					if (m_destroyed || worldObj == null) return false;
 
@@ -378,16 +382,19 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 		);
 	}
 
+	@Nonnull
 	@Override
 	public IWorldNetworkNode getNode() {
 		return getCable();
 	}
 
+	@Nonnull
 	@Override
 	public IBlockAccess getBlockAccess() {
 		return worldObj;
 	}
 
+	@Nonnull
 	@Override
 	public BlockPos getPosition() {
 		return pos;

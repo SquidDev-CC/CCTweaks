@@ -5,10 +5,13 @@ import org.squiddev.cctweaks.blocks.TileBase;
 import org.squiddev.cctweaks.core.network.AbstractWorldNode;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 
+import javax.annotation.Nonnull;
+
 /**
  * Abstract world node host
  */
 public abstract class TileNetworked extends TileBase implements IWorldNetworkNodeHost {
+	@Nonnull
 	@Override
 	public abstract AbstractWorldNode getNode();
 

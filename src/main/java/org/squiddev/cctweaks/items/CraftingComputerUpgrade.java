@@ -64,7 +64,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 	 * @param crafting The crafting inventory space
 	 * @return The ItemStack with a computer type in, or null if the recipe doesn't match
 	 */
-	protected ItemStack getComputerStack(InventoryCrafting crafting) {
+	private ItemStack getComputerStack(InventoryCrafting crafting) {
 		int size = crafting.getSizeInventory();
 
 		ItemStack computerStack = null;

@@ -7,6 +7,7 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.core.network.AbstractWorldNode;
 
+import javax.annotation.Nonnull;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,9 +19,9 @@ public class NetworkBinding extends AbstractWorldNode {
 	public static final String LSB = "bound_id_lsb";
 	public static final String ID = "bound_id";
 
-	protected UUID uuid = UUID.randomUUID();
-	protected Integer id = null;
-	protected final IWorldPosition position;
+	private UUID uuid = UUID.randomUUID();
+	private Integer id = null;
+	private final IWorldPosition position;
 
 	public NetworkBinding(IWorldPosition position) {
 		this.position = position;
@@ -157,6 +158,7 @@ public class NetworkBinding extends AbstractWorldNode {
 		return card.getType(stack).equals(NetworkBindings.BINDING_NAME) && load(card.getData(stack));
 	}
 
+	@Nonnull
 	@Override
 	public IWorldPosition getPosition() {
 		return position;

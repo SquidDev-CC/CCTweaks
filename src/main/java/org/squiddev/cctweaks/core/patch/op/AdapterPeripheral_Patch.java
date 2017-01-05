@@ -8,6 +8,7 @@ import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
 import org.squiddev.cctweaks.core.network.NetworkAccessDelegate;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -40,20 +41,20 @@ public abstract class AdapterPeripheral_Patch implements IPeripheralTargeted, IN
 	}
 
 	@Override
-	public void attachToNetwork(INetworkAccess network, String name) {
+	public void attachToNetwork(@Nonnull INetworkAccess network, @Nonnull String name) {
 		getNetworkAccess().add(network);
 	}
 
 	@Override
-	public void detachFromNetwork(INetworkAccess network, String name) {
+	public void detachFromNetwork(@Nonnull INetworkAccess network, @Nonnull String name) {
 		getNetworkAccess().remove(network);
 	}
 
 	@Override
-	public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
+	public void networkInvalidated(@Nonnull INetworkAccess network, @Nonnull Map<String, IPeripheral> oldPeripherals, @Nonnull Map<String, IPeripheral> newPeripherals) {
 	}
 
 	@Override
-	public void receivePacket(INetworkAccess network, Packet packet, double distanceTravelled) {
+	public void receivePacket(@Nonnull INetworkAccess network, @Nonnull Packet packet, double distanceTravelled) {
 	}
 }

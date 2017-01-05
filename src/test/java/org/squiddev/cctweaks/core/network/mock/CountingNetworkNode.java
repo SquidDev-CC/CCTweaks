@@ -9,6 +9,7 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractWorldNode;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Map;
 
@@ -33,21 +34,22 @@ public class CountingNetworkNode extends AbstractWorldNode implements IPeriphera
 	}
 
 	@Override
-	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
+	public void networkInvalidated(@Nonnull Map<String, IPeripheral> oldPeripherals, @Nonnull Map<String, IPeripheral> newPeripherals) {
 		invalidated++;
 	}
 
 	@Override
-	public void receivePacket(Packet packet, double distanceTravelled) {
+	public void receivePacket(@Nonnull Packet packet, double distanceTravelled) {
 		super.receivePacket(packet, distanceTravelled);
 		distance = distanceTravelled;
 	}
 
 	@Override
-	public boolean canConnect(EnumFacing direction) {
+	public boolean canConnect(@Nonnull EnumFacing direction) {
 		return direction.getAxis() != EnumFacing.Axis.Y && canVisit[direction.ordinal() - 2];
 	}
 
+	@Nonnull
 	@Override
 	public IWorldPosition getPosition() {
 		return position;
@@ -61,6 +63,7 @@ public class CountingNetworkNode extends AbstractWorldNode implements IPeriphera
 		return distance;
 	}
 
+	@Nonnull
 	@Override
 	public Map<String, IPeripheral> getConnectedPeripherals() {
 		if (hasPeripherals) {

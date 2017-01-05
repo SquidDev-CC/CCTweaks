@@ -10,6 +10,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.FakePlayer;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Add custom interactions to the turtle tool manipulator
  *
@@ -31,7 +34,8 @@ public interface ITurtleInteraction {
 	 * @return Result of interaction, or {@code null} if no action could be taken
 	 * @throws LuaException If an error occurs
 	 */
-	TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) throws LuaException;
+	@Nullable
+	TurtleCommandResult swing(@Nonnull ITurtleAccess turtle, @Nonnull IComputerAccess computer, @Nonnull FakePlayer player, @Nonnull ItemStack stack, @Nonnull EnumFacing direction, @Nullable MovingObjectPosition hit) throws LuaException;
 
 	/**
 	 * Is the tool appropriate for this job
@@ -43,7 +47,7 @@ public interface ITurtleInteraction {
 	 * @param hit       Place the item was used at. May be {@code null}.
 	 * @return If the tool is appropriate: can it attack or dig the block?
 	 */
-	boolean canSwing(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit);
+	boolean canSwing(@Nonnull ITurtleAccess turtle, @Nonnull FakePlayer player, @Nonnull ItemStack stack, @Nonnull EnumFacing direction, @Nullable MovingObjectPosition hit);
 
 	/**
 	 * Use (right click) a tool
@@ -59,7 +63,8 @@ public interface ITurtleInteraction {
 	 * @return Result of interaction, or {@code null} if no action could be taken
 	 * @throws LuaException If an error occurs
 	 */
-	TurtleCommandResult use(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit) throws LuaException;
+	@Nullable
+	TurtleCommandResult use(@Nonnull ITurtleAccess turtle, @Nonnull IComputerAccess computer, @Nonnull FakePlayer player, @Nonnull ItemStack stack, @Nonnull EnumFacing direction, @Nullable MovingObjectPosition hit) throws LuaException;
 
 	/**
 	 * Is the tool appropriate for this job
@@ -71,5 +76,5 @@ public interface ITurtleInteraction {
 	 * @param hit       Place the item was used at. May be {@code null}.
 	 * @return If the tool can be right clicked.
 	 */
-	boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, MovingObjectPosition hit);
+	boolean canUse(@Nonnull ITurtleAccess turtle, @Nonnull FakePlayer player, @Nonnull ItemStack stack, @Nonnull EnumFacing direction, @Nullable MovingObjectPosition hit);
 }

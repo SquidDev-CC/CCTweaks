@@ -5,6 +5,9 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Handles registration of node providers
  */
@@ -16,7 +19,7 @@ public interface INetworkRegistry {
 	 *
 	 * @param provider The provider to register
 	 */
-	void addNodeProvider(INetworkNodeProvider provider);
+	void addNodeProvider(@Nonnull INetworkNodeProvider provider);
 
 	/**
 	 * Check if this block is a node
@@ -25,7 +28,7 @@ public interface INetworkRegistry {
 	 * @param position Position of the block
 	 * @return If this block is a node
 	 */
-	boolean isNode(IBlockAccess world, BlockPos position);
+	boolean isNode(@Nonnull IBlockAccess world, @Nonnull BlockPos position);
 
 	/**
 	 * Check if this tile is a node
@@ -33,7 +36,7 @@ public interface INetworkRegistry {
 	 * @param tile The tile to check
 	 * @return If this block is a node
 	 */
-	boolean isNode(TileEntity tile);
+	boolean isNode(@Nullable TileEntity tile);
 
 	/**
 	 * Check if block tile is a node
@@ -41,7 +44,7 @@ public interface INetworkRegistry {
 	 * @param position The position to check
 	 * @return If this block is a node
 	 */
-	boolean isNode(IWorldPosition position);
+	boolean isNode(@Nonnull IWorldPosition position);
 
 	/**
 	 * Get the node for this position
@@ -50,7 +53,8 @@ public interface INetworkRegistry {
 	 * @param position Position of the block
 	 * @return The node, or null if there is none
 	 */
-	IWorldNetworkNode getNode(IBlockAccess world, BlockPos position);
+	@Nullable
+	IWorldNetworkNode getNode(@Nonnull IBlockAccess world, @Nonnull BlockPos position);
 
 	/**
 	 * Get the node from this tile entity
@@ -58,7 +62,8 @@ public interface INetworkRegistry {
 	 * @param tile The tile to check
 	 * @return The node, or null if there is none
 	 */
-	IWorldNetworkNode getNode(TileEntity tile);
+	@Nullable
+	IWorldNetworkNode getNode(@Nullable TileEntity tile);
 
 	/**
 	 * Get the node for this position
@@ -66,5 +71,6 @@ public interface INetworkRegistry {
 	 * @param position The position to check
 	 * @return The node, or null if there is none
 	 */
-	IWorldNetworkNode getNode(IWorldPosition position);
+	@Nullable
+	IWorldNetworkNode getNode(@Nonnull IWorldPosition position);
 }

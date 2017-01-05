@@ -11,6 +11,7 @@ import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,7 @@ public class PeripheralAPI_Patch extends PeripheralAPI {
 			}
 		}
 
+		@Nonnull
 		@Override
 		public Map<String, IPeripheral> getPeripheralsOnNetwork() {
 			Map<String, IPeripheral> peripheralMap = new HashMap<String, IPeripheral>();
@@ -87,7 +89,7 @@ public class PeripheralAPI_Patch extends PeripheralAPI {
 		}
 
 		@Override
-		public boolean transmitPacket(Packet packet) {
+		public boolean transmitPacket(@Nonnull Packet packet) {
 			return false;
 		}
 	}

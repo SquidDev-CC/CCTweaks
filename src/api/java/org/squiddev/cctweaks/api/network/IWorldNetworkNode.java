@@ -3,6 +3,8 @@ package org.squiddev.cctweaks.api.network;
 import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
+import javax.annotation.Nonnull;
+
 /**
  * Represents an INetworkNode with a position in the world.
  */
@@ -12,6 +14,7 @@ public interface IWorldNetworkNode extends INetworkNode {
 	 *
 	 * @return The node's position
 	 */
+	@Nonnull
 	IWorldPosition getPosition();
 
 	/**
@@ -22,5 +25,5 @@ public interface IWorldNetworkNode extends INetworkNode {
 	 * @param direction The direction to check
 	 * @return If the node can connect
 	 */
-	boolean canConnect(EnumFacing direction);
+	boolean canConnect(@Nonnull EnumFacing direction);
 }

@@ -4,8 +4,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
-import org.squiddev.cctweaks.api.peripheral.IPeripheralEnvironments;
+import org.squiddev.cctweaks.api.peripheral.PeripheralEnvironments;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.patcher.transformer.ClassMerger;
 import org.squiddev.patcher.transformer.IPatcher;
@@ -51,7 +50,7 @@ public class PatchOpenPeripheralAdapter implements IPatcher {
 			public void handle(InsnList nodes, MethodVisitor visitor) {
 				nodes.accept(visitor);
 
-				visitor.visitLdcInsn(IPeripheralEnvironments.ARG_NETWORK);
+				visitor.visitLdcInsn(PeripheralEnvironments.ARG_NETWORK);
 				visitor.visitVarInsn(ALOAD, 0);
 				visitor.visitFieldInsn(INVOKEVIRTUAL, CLASS_TYPE, "getNetworkAccess", "()Lorg/squiddev/cctweaks/core/network/NetworkAccessDelegate;");
 				visitor.visitMethodInsn(

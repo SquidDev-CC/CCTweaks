@@ -2,6 +2,8 @@ package org.squiddev.cctweaks.api.peripheral;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 
+import javax.annotation.Nullable;
+
 /**
  * A peripheral that cannot be accessed on a network, only
  * by a computer or turtle.
@@ -15,5 +17,6 @@ public interface IPeripheralHidden extends IPeripheral {
 	 *
 	 * @return The peripheral to use on the network or {@code null} if none needed.
 	 */
+	@Nullable
 	IPeripheral getNetworkPeripheral();
 }

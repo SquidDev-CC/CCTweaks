@@ -12,6 +12,7 @@ import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.collections.MapChanges;
 import org.squiddev.cctweaks.core.collections.MapsX;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -190,7 +191,9 @@ public final class NetworkController implements INetworkController {
 
 	//region INetworkController node access
 	@Override
-	public void formConnection(INetworkNode existingNode, INetworkNode newNode) {
+	public void formConnection(@Nonnull INetworkNode existingNode, @Nonnull INetworkNode newNode) {
+		Preconditions.checkNotNull(existingNode, "existingNode cannot be null");
+		Preconditions.checkNotNull(newNode, "newNode cannot be null");
 		Preconditions.checkArgument(existingNode != newNode, "Cannot connect a node to itself");
 		Preconditions.checkArgument(points.containsKey(existingNode), "Existing node must be on the network");
 
@@ -308,7 +311,9 @@ public final class NetworkController implements INetworkController {
 	}
 
 	@Override
-	public void breakConnection(UnorderedPair<INetworkNode> connection) {
+	public void breakConnection(@Nonnull UnorderedPair<INetworkNode> connection) {
+		Preconditions.checkNotNull(connection, "connection cannot be null");
+
 		Point xPoint = getPoint(connection.x);
 		Point.Connection pointConnection = new Point.Connection(xPoint, getPoint(connection.y));
 
@@ -320,7 +325,7 @@ public final class NetworkController implements INetworkController {
 	}
 
 	@Override
-	public void removeNode(INetworkNode removedNode) {
+	public void removeNode(@Nonnull INetworkNode removedNode) {
 		Point point = getPoint(removedNode);
 
 		points.remove(removedNode);
@@ -357,7 +362,7 @@ public final class NetworkController implements INetworkController {
 	}
 
 	@Override
-	public void invalidateNode(INetworkNode toInvalidate) {
+	public void invalidateNode(@Nonnull INetworkNode toInvalidate) {
 		Point point = getPoint(toInvalidate);
 		peripheralsUpdate(point.refreshPeripherals(), null);
 		ControllerValidator.validate(this);
@@ -365,6 +370,7 @@ public final class NetworkController implements INetworkController {
 	//endregion
 
 	//region INetworkController getters
+	@Nonnull
 	@Override
 	public Set<INetworkNode> getNodesOnNetwork() {
 		Set<INetworkNode> nodeView = this.nodeView;
@@ -374,6 +380,7 @@ public final class NetworkController implements INetworkController {
 		return nodeView;
 	}
 
+	@Nonnull
 	@Override
 	public Set<UnorderedPair<INetworkNode>> getNodeConnections() {
 		Set<UnorderedPair<INetworkNode>> connections = connectionCache;
@@ -391,6 +398,7 @@ public final class NetworkController implements INetworkController {
 		return connections;
 	}
 
+	@Nonnull
 	@Override
 	public Map<String, IPeripheral> getPeripheralsOnNetwork() {
 		return unmodifiableMap(peripherals);
@@ -398,8 +406,9 @@ public final class NetworkController implements INetworkController {
 	//endregion
 
 	@Override
-	public void transmitPacket(INetworkNode start, Packet packet) {
+	public void transmitPacket(@Nonnull INetworkNode start, @Nonnull Packet packet) {
 		Point startPoint = getPoint(start);
+		Preconditions.checkNotNull(packet, "packet cannot be null");
 
 		Set<Point> received = newHashSetWithExpectedSize(points.size());
 		Queue<TransmitPoint> transmitTo = new PriorityQueue<TransmitPoint>();
@@ -443,7 +452,7 @@ public final class NetworkController implements INetworkController {
 		}
 
 		@Override
-		public int compareTo(TransmitPoint other) {
+		public int compareTo(@Nonnull TransmitPoint other) {
 			return Double.compare(this.distance, other.distance);
 		}
 	}

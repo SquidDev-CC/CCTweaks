@@ -1,5 +1,7 @@
 package org.squiddev.cctweaks.api.network;
 
+import javax.annotation.Nonnull;
+
 /**
  * An object that hosts a {@link IWorldNetworkNode}.
  *
@@ -13,5 +15,6 @@ public interface IWorldNetworkNodeHost {
 	 *
 	 * @return The node this object holds
 	 */
+	@Nonnull
 	IWorldNetworkNode getNode();
 }

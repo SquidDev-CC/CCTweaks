@@ -58,7 +58,7 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 		}
 	}
 
-	public static final PropertyEnum<BlockDebugType> TYPE = PropertyEnum.create("type", BlockDebugType.class);
+	private static final PropertyEnum<BlockDebugType> TYPE = PropertyEnum.create("type", BlockDebugType.class);
 
 	public BlockDebug() {
 		super("debugBlock", TileBase.class);

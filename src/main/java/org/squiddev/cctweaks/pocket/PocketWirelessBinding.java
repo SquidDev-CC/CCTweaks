@@ -4,6 +4,7 @@ import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -23,14 +24,17 @@ import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.utils.EntityPosition;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 public class PocketWirelessBinding extends Module implements IPocketUpgrade {
+	@Nonnull
 	@Override
 	public ResourceLocation getUpgradeID() {
 		return new ResourceLocation("cctweaks:wirelessBridge");
 	}
 
+	@Nonnull
 	@Override
 	public String getUnlocalisedAdjective() {
 		return "pocket." + CCTweaks.RESOURCE_DOMAIN + ".wirelessBridge.adjective";
@@ -42,12 +46,12 @@ public class PocketWirelessBinding extends Module implements IPocketUpgrade {
 	}
 
 	@Override
-	public IPeripheral createPeripheral(IPocketAccess access) {
+	public IPeripheral createPeripheral(@Nonnull IPocketAccess access) {
 		return Config.Network.WirelessBridge.pocketEnabled ? new PocketBinding(access).getModem().modem : null;
 	}
 
 	@Override
-	public void update(IPocketAccess access, IPeripheral peripheral) {
+	public void update(@Nonnull IPocketAccess access, IPeripheral peripheral) {
 		if (Config.Network.WirelessBridge.pocketEnabled && peripheral instanceof PocketBinding.PocketModemPeripheral) {
 			PocketBinding binding = ((PocketBinding.PocketModemPeripheral) peripheral).getBinding();
 
@@ -56,7 +60,7 @@ public class PocketWirelessBinding extends Module implements IPocketUpgrade {
 	}
 
 	@Override
-	public boolean onRightClick(World world, IPocketAccess access, IPeripheral peripheral) {
+	public boolean onRightClick(@Nonnull World world, @Nonnull IPocketAccess access, IPeripheral peripheral) {
 		return false;
 	}
 
@@ -97,7 +101,7 @@ public class PocketWirelessBinding extends Module implements IPocketUpgrade {
 		}
 
 		public void update() {
-			((EntityPosition) position).entity = pocket.getEntity();
+			((EntityPosition) getPosition()).entity = pocket.getEntity();
 
 			// We may receive update events whilst not being attached. To prevent this, just exit if we
 			// have no network
@@ -119,10 +123,12 @@ public class PocketWirelessBinding extends Module implements IPocketUpgrade {
 
 				@Override
 				protected World getWorld() {
-					return pocket.getEntity().worldObj;
+					Entity entity = pocket.getEntity();
+					return entity == null ? null : entity.worldObj;
 				}
 			};
 
+			@Nonnull
 			@Override
 			public Map<String, IPeripheral> getConnectedPeripherals() {
 				return peripherals.getConnectedPeripherals();

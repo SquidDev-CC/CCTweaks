@@ -8,6 +8,8 @@ import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.core.Config;
 
+import javax.annotation.Nonnull;
+
 /**
  * Refuel for IC2 energy sources
  */
@@ -20,12 +22,12 @@ public class IndustrialCraftIntegration extends APIIntegration {
 	public void init() {
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {
 			@Override
-			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack) {
+			public boolean canRefuel(@Nonnull ITurtleAccess turtle, @Nonnull ItemStack stack) {
 				return Config.Turtle.euRefuelAmount > 0 && stack.getItem() instanceof IElectricItem;
 			}
 
 			@Override
-			public int refuel(ITurtleAccess turtle, ItemStack stack, int limit) {
+			public int refuel(@Nonnull ITurtleAccess turtle, @Nonnull ItemStack stack, int limit) {
 				int euAmount = Config.Turtle.euRefuelAmount;
 
 				// Avoid over refueling

@@ -14,6 +14,7 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractNode;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,7 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	}
 
 	@Override
-	public void receivePacket(Packet packet, double distanceTravelled) {
+	public void receivePacket(@Nonnull Packet packet, double distanceTravelled) {
 		synchronized (receivers) {
 			for (IReceiver receiver : receivers.get(packet.channel)) {
 				receiver.receiveSameDimension(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
@@ -218,12 +219,12 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	}
 
 	@Override
-	public boolean canConnect(EnumFacing from) {
+	public boolean canConnect(@Nonnull EnumFacing from) {
 		return true;
 	}
 
 	@Override
-	public void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
+	public void networkInvalidated(@Nonnull Map<String, IPeripheral> oldPeripherals, @Nonnull Map<String, IPeripheral> newPeripherals) {
 		synchronized (peripheralWrappersByName) {
 			for (String wrapper : oldPeripherals.keySet()) {
 				detachPeripheralUnsync(wrapper);

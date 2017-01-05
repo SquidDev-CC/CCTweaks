@@ -6,14 +6,14 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.squiddev.cctweaks.api.peripheral.IPeripheralEnvironments;
+import org.squiddev.cctweaks.api.peripheral.PeripheralEnvironments;
 import org.squiddev.patcher.transformer.IPatcher;
 import org.squiddev.patcher.visitors.FindingVisitor;
 
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
 /**
- * Add {@link IPeripheralEnvironments#ARG_NETWORK} to ComputerCraft's
+ * Add {@link PeripheralEnvironments#ARG_NETWORK} to ComputerCraft's
  * environment list:
  *
  * https://github.com/OpenMods/OpenPeripheral/blob/master/src/main/java/openperipheral/interfaces/cc/ModuleComputerCraft.java#L33-L37
@@ -40,7 +40,7 @@ public class PatchOpenModule implements IPatcher {
 			@Override
 			public void handle(InsnList nodes, MethodVisitor visitor) {
 				nodes.accept(visitor);
-				visitor.visitLdcInsn(IPeripheralEnvironments.ARG_NETWORK);
+				visitor.visitLdcInsn(PeripheralEnvironments.ARG_NETWORK);
 				visitor.visitLdcInsn(Type.getType("Lorg/squiddev/cctweaks/api/network/INetworkAccess;"));
 				visitor.visitMethodInsn(INVOKEVIRTUAL,
 					"openperipheral/adapter/composed/MethodSelector",

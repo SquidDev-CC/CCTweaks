@@ -15,7 +15,7 @@ public class LuaDirection {
 	 * @param facing    The "forward" direction
 	 * @param coords    The coordinates to get relative to. These will be modified in place
 	 * @return The coordinates
-	 * @throws LuaException
+	 * @throws LuaException If the direction is invalid.
 	 */
 	public static BlockPos getRelative(String direction, EnumFacing facing, BlockPos coords) throws LuaException {
 		if (direction.equals("forward")) {

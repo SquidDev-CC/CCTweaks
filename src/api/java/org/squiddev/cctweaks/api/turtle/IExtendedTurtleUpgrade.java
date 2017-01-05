@@ -5,6 +5,9 @@ import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import dan200.computercraft.api.turtle.TurtleSide;
 import dan200.computercraft.api.turtle.TurtleUpgradeType;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Extended functionality for turtle upgrades.
  */
@@ -17,7 +20,7 @@ public interface IExtendedTurtleUpgrade extends ITurtleUpgrade {
 	 * @param oldUpgrade The old upgrade. May be {@code null}.
 	 * @param newUpgrade The new upgrade. May be {@code null}.
 	 */
-	void upgradeChanged(ITurtleAccess turtle, TurtleSide side, ITurtleUpgrade oldUpgrade, ITurtleUpgrade newUpgrade);
+	void upgradeChanged(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side, @Nullable ITurtleUpgrade oldUpgrade, @Nullable ITurtleUpgrade newUpgrade);
 
 	/**
 	 * Check if this upgrade is a peripheral and a tool.

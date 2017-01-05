@@ -49,7 +49,7 @@ public class PocketHooks {
 	}
 
 	public static void create(IInventory inventory, ItemStack stack, ServerComputer computer) {
-		IPocketUpgrade upgrade = PocketRegistry.instance.getUpgrade(stack, null);
+		IPocketUpgrade upgrade = PocketRegistry.instance.getUpgrade(stack, inventory);
 		if (upgrade == null) return;
 
 		Entity entity = inventory instanceof InventoryPlayer ? ((InventoryPlayer) inventory).player : null;

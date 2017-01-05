@@ -2,6 +2,8 @@ package org.squiddev.cctweaks.api.peripheral;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 
+import javax.annotation.Nullable;
+
 /**
  * Used to denote a peripheral that targets a TileEntity or other object in game
  *
@@ -14,5 +16,6 @@ public interface IPeripheralTargeted extends IPeripheral {
 	 *
 	 * @return The target
 	 */
+	@Nullable
 	Object getTarget();
 }

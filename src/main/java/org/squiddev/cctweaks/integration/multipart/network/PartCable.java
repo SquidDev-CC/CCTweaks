@@ -25,15 +25,16 @@ import org.squiddev.cctweaks.core.network.cable.CableWithInternalSidedParts;
 import org.squiddev.cctweaks.integration.multipart.MultipartHelpers;
 import org.squiddev.cctweaks.integration.multipart.PartBase;
 
+import javax.annotation.Nonnull;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlottedPart, ISideHollowConnect {
-	public static final double MIN = 0.375;
-	public static final double MAX = 1 - MIN;
+	private static final double MIN = 0.375;
+	private static final double MAX = 1 - MIN;
 
-	public static final AxisAlignedBB[] BOXES = new AxisAlignedBB[]{
+	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[]{
 		new AxisAlignedBB(MIN, 0, MIN, MAX, MIN, MAX),
 		new AxisAlignedBB(MIN, MAX, MIN, MAX, 1, MAX),
 		new AxisAlignedBB(MIN, MIN, 0, MAX, MAX, MIN),
@@ -67,6 +68,7 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 		return PeripheralItemFactory.create(PeripheralType.Cable, null, 1);
 	}
 
+	@Nonnull
 	@Override
 	public IWorldNetworkNode getNode() {
 		return cable;
@@ -225,13 +227,14 @@ public class PartCable extends PartBase implements IWorldNetworkNodeHost, ISlott
 			return MultipartHelpers.getNode(part) != null;
 		}
 
+		@Nonnull
 		@Override
 		public IWorldPosition getPosition() {
 			return PartCable.this;
 		}
 
 		@Override
-		public boolean canConnect(EnumFacing direction) {
+		public boolean canConnect(@Nonnull EnumFacing direction) {
 			/**
 			 * When initially rendering this the flag may not have been set.
 			 *

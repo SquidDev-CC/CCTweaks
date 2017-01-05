@@ -14,6 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -25,26 +26,27 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 	}
 
 	@Override
-	public void setSettings(ItemStack stack, String type, NBTTagCompound data) {
+	public void setSettings(@Nonnull ItemStack stack, @Nonnull String type, NBTTagCompound data) {
 		NBTTagCompound tag = getTag(stack);
 		tag.setString("type", type);
 		tag.setTag("data", data);
 	}
 
+	@Nonnull
 	@Override
-	public String getType(ItemStack stack) {
+	public String getType(@Nonnull ItemStack stack) {
 		String name = getTag(stack).getString("type");
 		return name == null || name.isEmpty() ? EMPTY : name;
 	}
 
 	@Override
-	public NBTTagCompound getData(ItemStack stack) {
+	public NBTTagCompound getData(@Nonnull ItemStack stack) {
 		if (!stack.hasTagCompound()) return null;
 		return getTag(stack).getCompoundTag("data");
 	}
 
 	@Override
-	public void notifyPlayer(EntityPlayer player, Messages message) {
+	public void notifyPlayer(@Nonnull EntityPlayer player, @Nonnull Messages message) {
 		player.addChatMessage(message.getChatMessage());
 	}
 

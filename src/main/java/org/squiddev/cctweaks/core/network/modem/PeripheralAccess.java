@@ -18,12 +18,12 @@ import java.util.Map;
  * Base class for remote peripherals
  */
 public class PeripheralAccess implements IComputerAccess {
-	protected final IPeripheral peripheral;
-	protected final IComputerAccess computer;
-	protected final String name;
+	private final IPeripheral peripheral;
+	private final IComputerAccess computer;
+	private final String name;
 
-	protected final String[] methods;
-	protected final Map<String, Integer> methodMap;
+	private final String[] methods;
+	private final Map<String, Integer> methodMap;
 
 	public PeripheralAccess(IPeripheral peripheral, IComputerAccess computer, String name) {
 		this.peripheral = peripheral;

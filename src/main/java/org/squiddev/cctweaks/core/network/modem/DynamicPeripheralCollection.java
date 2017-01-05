@@ -10,7 +10,7 @@ import java.util.*;
  * A collection of peripherals that handles id assignment
  */
 public abstract class DynamicPeripheralCollection<T> {
-	protected final Map<T, Integer> ids = new HashMap<T, Integer>();
+	private final Map<T, Integer> ids = new HashMap<T, Integer>();
 
 	public Map<String, IPeripheral> getConnectedPeripherals() {
 		Map<T, IPeripheral> peripherals = getPeripherals();

@@ -7,6 +7,7 @@ import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -29,17 +30,17 @@ public class TileDebugNetworkedPeripheral extends TileDebugPeripheral {
 		}
 
 		@Override
-		public void attachToNetwork(INetworkAccess network, String name) {
+		public void attachToNetwork(@Nonnull INetworkAccess network, @Nonnull String name) {
 			DebugLogger.debug("Attaching to network " + network + " with name " + name);
 		}
 
 		@Override
-		public void detachFromNetwork(INetworkAccess network, String name) {
+		public void detachFromNetwork(@Nonnull INetworkAccess network, @Nonnull String name) {
 			DebugLogger.debug("Detaching from network " + network + " with name " + name);
 		}
 
 		@Override
-		public void networkInvalidated(INetworkAccess network, Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals) {
+		public void networkInvalidated(@Nonnull INetworkAccess network, @Nonnull Map<String, IPeripheral> oldPeripherals, @Nonnull Map<String, IPeripheral> newPeripherals) {
 			DebugLogger.debug(
 				"Node invalidated at %s, %s, %s\n - Removed: %s\n - Added:   %s",
 				pos.getX(), pos.getY(), pos.getZ(),
@@ -49,7 +50,7 @@ public class TileDebugNetworkedPeripheral extends TileDebugPeripheral {
 		}
 
 		@Override
-		public void receivePacket(INetworkAccess network, Packet packet, double distanceTravelled) {
+		public void receivePacket(@Nonnull INetworkAccess network, @Nonnull Packet packet, double distanceTravelled) {
 			DebugLogger.debug("Received packet from " + distanceTravelled + " blocks away");
 		}
 	}

@@ -6,6 +6,8 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.blocks.TileBase;
 
+import javax.annotation.Nonnull;
+
 public class NodeTile extends TileBase implements IWorldNetworkNodeHost {
 	public CountingNetworkNode node;
 	public final IBlockAccess world;
@@ -15,11 +17,13 @@ public class NodeTile extends TileBase implements IWorldNetworkNodeHost {
 		this.pos = new BlockPos(x, 0, z);
 	}
 
+	@Nonnull
 	@Override
 	public IWorldNetworkNode getNode() {
 		return node;
 	}
 
+	@Nonnull
 	@Override
 	public IBlockAccess getBlockAccess() {
 		return world;

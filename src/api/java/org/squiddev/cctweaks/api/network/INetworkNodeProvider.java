@@ -2,6 +2,9 @@ package org.squiddev.cctweaks.api.network;
 
 import net.minecraft.tileentity.TileEntity;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Provide a custom way to get a node.
  *
@@ -15,7 +18,8 @@ public interface INetworkNodeProvider {
 	 * @param tile The entity to get the node for
 	 * @return The node or {@code null} if it cannot be converted
 	 */
-	IWorldNetworkNode getNode(TileEntity tile);
+	@Nullable
+	IWorldNetworkNode getNode(@Nonnull TileEntity tile);
 
 	/**
 	 * Checks if this TileEntity is a network node
@@ -23,5 +27,5 @@ public interface INetworkNodeProvider {
 	 * @param tile The entity to check
 	 * @return True if this can be converted into a node
 	 */
-	boolean isNode(TileEntity tile);
+	boolean isNode(@Nonnull TileEntity tile);
 }

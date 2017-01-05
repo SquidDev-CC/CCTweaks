@@ -8,6 +8,7 @@ import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHelpers;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralProxy;
 
+import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,10 +16,10 @@ import java.util.Set;
  * An simple peripheral proxy instance.
  */
 public abstract class PeripheralProxy implements IPeripheral, IPeripheralProxy {
-	protected IPeripheral instance;
-	protected final Set<IComputerAccess> mounts = new HashSet<IComputerAccess>();
+	private IPeripheral instance;
+	private final Set<IComputerAccess> mounts = new HashSet<IComputerAccess>();
 
-	protected String defaultType = null;
+	private String defaultType = null;
 
 	public PeripheralProxy() {
 	}
@@ -27,8 +28,10 @@ public abstract class PeripheralProxy implements IPeripheral, IPeripheralProxy {
 		this.defaultType = defaultType;
 	}
 
+	@Nonnull
 	protected abstract IPeripheral createPeripheral();
 
+	@Nonnull
 	@Override
 	public IPeripheral getBasePeripheral() {
 		IPeripheral instance = this.instance;

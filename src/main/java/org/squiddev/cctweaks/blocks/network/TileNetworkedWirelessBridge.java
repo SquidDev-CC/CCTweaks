@@ -15,6 +15,7 @@ import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBinding;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -102,10 +103,11 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	}
 
 	@Override
-	public IPeripheral getPeripheral(EnumFacing side) {
+	public IPeripheral getPeripheral(@Nonnull EnumFacing side) {
 		return binding.getModem().modem;
 	}
 
+	@Nonnull
 	@Override
 	public IWorldNetworkNode getNode() {
 		return binding;

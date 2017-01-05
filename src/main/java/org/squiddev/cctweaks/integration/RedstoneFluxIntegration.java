@@ -7,6 +7,8 @@ import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.core.Config;
 
+import javax.annotation.Nonnull;
+
 /**
  * Registers Redstone Flux as a fuel
  */
@@ -19,12 +21,12 @@ public class RedstoneFluxIntegration extends APIIntegration {
 	public void init() {
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {
 			@Override
-			public boolean canRefuel(ITurtleAccess turtle, ItemStack stack) {
+			public boolean canRefuel(@Nonnull ITurtleAccess turtle, @Nonnull ItemStack stack) {
 				return Config.Turtle.fluxRefuelAmount > 0 && stack.getItem() instanceof IEnergyContainerItem;
 			}
 
 			@Override
-			public int refuel(ITurtleAccess turtle, ItemStack stack, int limit) {
+			public int refuel(@Nonnull ITurtleAccess turtle, @Nonnull ItemStack stack, int limit) {
 				int fluxAmount = Config.Turtle.fluxRefuelAmount;
 
 				// Avoid over refueling
