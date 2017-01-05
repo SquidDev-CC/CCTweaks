@@ -14,6 +14,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
@@ -52,10 +53,19 @@ public class CraftingComputerUpgrade implements IRecipe {
 		} else if (computerItem instanceof ItemPocketComputer) {
 			ItemPocketComputer pocket = (ItemPocketComputer) computerItem;
 
-			return PocketComputerItemFactory.create(id, label, ComputerFamily.Advanced, pocket.getHasModem(computerStack));
-		}
+			ItemStack stack = PocketComputerItemFactory.create(id, label, ComputerFamily.Advanced, pocket.getHasModem(computerStack));
 
-		return null;
+			NBTTagCompound toTag = stack.getTagCompound();
+			NBTTagCompound fromTag = computerStack.getTagCompound();
+
+			if (fromTag.hasKey("upgrade")) toTag.setTag("upgrade", fromTag.getTag("upgrade"));
+			if (fromTag.hasKey("upgrade_name")) toTag.setTag("upgrade_name", fromTag.getTag("upgrade_name"));
+			if (fromTag.hasKey("upgrade_info")) toTag.setTag("upgrade_info", fromTag.getTag("upgrade_info"));
+
+			return stack;
+		} else {
+			return null;
+		}
 	}
 
 	/**
