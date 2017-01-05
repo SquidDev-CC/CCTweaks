@@ -1,11 +1,13 @@
 package org.squiddev.cctweaks.core.visualiser;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Connection;
@@ -38,18 +40,18 @@ public final class EncoderV0 implements VisualisationPacket.Encoder {
 	@Override
 	public VisualisationData read(ByteBuf buffer) {
 		int nodeSize = buffer.readInt();
-		Node[] nodes = new Node[nodeSize];
+		List<Node> nodes = Lists.newArrayListWithCapacity(nodeSize);
 		DebugLogger.debug("Reading " + nodeSize + " nodes");
 		for (int i = 0; i < nodeSize; i++) {
 			String name = ByteBufUtils.readUTF8String(buffer);
 			BlockPos position = buffer.readByte() == 1 ? new BlockPos(buffer.readInt(), buffer.readInt(), buffer.readInt()) : null;
 
-			nodes[i] = new Node(name, position);
+			nodes.add(new Node(name, position));
 		}
 
 		int connectionSize = buffer.readInt();
 		DebugLogger.debug("Reading " + connectionSize + " connections");
-		Connection[] connections = new Connection[connectionSize];
+		List<Connection> connections = Lists.newArrayListWithCapacity(connectionSize);
 		for (int i = 0; i < connectionSize; i++) {
 			int x = buffer.readInt();
 			if (x < 0 || x >= nodeSize) {
@@ -63,7 +65,7 @@ public final class EncoderV0 implements VisualisationPacket.Encoder {
 				return null;
 			}
 
-			connections[i] = new Connection(nodes[x], nodes[y]);
+			connections.add(new Connection(nodes.get(x), nodes.get(y)));
 		}
 
 		return new VisualisationData(nodes, connections);
@@ -79,7 +81,7 @@ public final class EncoderV0 implements VisualisationPacket.Encoder {
 
 		Map<Node, Integer> lookup = Maps.newHashMap();
 
-		buffer.writeInt(data.nodes.length);
+		buffer.writeInt(data.nodes.size());
 		int index = 0;
 		for (Node node : data.nodes) {
 			lookup.put(node, index);
@@ -99,7 +101,7 @@ public final class EncoderV0 implements VisualisationPacket.Encoder {
 			index++;
 		}
 
-		buffer.writeInt(data.connections.length);
+		buffer.writeInt(data.connections.size());
 		for (Connection connection : data.connections) {
 			buffer.writeInt(lookup.get(connection.x));
 			buffer.writeInt(lookup.get(connection.y));

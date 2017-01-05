@@ -2,14 +2,17 @@ package org.squiddev.cctweaks.core.visualiser;
 
 import net.minecraft.util.BlockPos;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Stores data for drawing network graphs
  */
 public final class VisualisationData {
-	public final Node[] nodes;
-	public final Connection[] connections;
+	public final List<Node> nodes;
+	public final Collection<Connection> connections;
 
-	public VisualisationData(Node[] nodes, Connection[] connections) {
+	public VisualisationData(List<Node> nodes, List<Connection> connections) {
 		this.nodes = nodes;
 		this.connections = connections;
 	}

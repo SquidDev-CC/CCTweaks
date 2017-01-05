@@ -93,7 +93,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 				}
 			}
 
-			if (data.connections.length == 0) {
+			if (data.connections.size() == 0) {
 				for (Node node : data.nodes) {
 					BlockPos nodePosition = node.position;
 					if (nodePosition != null && nodePosition.equals(position.getBlockPos())) {
