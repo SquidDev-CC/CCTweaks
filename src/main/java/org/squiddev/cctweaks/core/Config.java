@@ -64,6 +64,14 @@ public final class Config {
 		 */
 		@DefaultBoolean(true)
 		public static boolean debugWandEnabled;
+
+		/**
+		 * Prevent controlling computers without a container on the server side.
+		 * This ensures arbitrary computers can not be used by the client, but may break other mods. Please disable if
+		 * you encounter problems (and report an issue on the tracker).
+		 */
+		@DefaultBoolean(true)
+		public static boolean safeNetworking;
 	}
 
 	/**

@@ -132,7 +132,21 @@ public class ASMTransformer implements IClassTransformer {
 			new ClassMerger(
 				"dan200.computercraft.shared.computer.blocks.TileComputerBase",
 				"org.squiddev.cctweaks.core.patch.TileComputerBase_Patch"
-			)
+			),
+
+			// Add IContainerComputer to various containers.
+			new ClassMerger(
+				"dan200.computercraft.shared.computer.inventory.ContainerComputer",
+				"org.squiddev.cctweaks.core.patch.ContainerComputer_Patch"
+			),
+			new ClassMerger(
+				"dan200.computercraft.shared.turtle.inventory.ContainerTurtle",
+				"org.squiddev.cctweaks.core.patch.ContainerTurtle_Patch"
+			),
+			new ClassMerger(
+				"dan200.computercraft.shared.media.inventory.ContainerHeldItem",
+				"org.squiddev.cctweaks.core.patch.ContainerHeldItem_Patch"
+			),
 		});
 
 		patches.finalise();
