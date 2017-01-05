@@ -103,3 +103,5 @@ gui.config.cctweaks.apis.debug=debug Enabled
 gui.config.cctweaks.apis.bitop=bitop Enabled
 gui.config.cctweaks.apis.profiler=profiler Enabled
 
+gui.jei.cctweaks.pocket=Pocket upgrades
+gui.jei.cctweaks.turtle=Turtle upgrades

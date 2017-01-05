@@ -49,9 +49,7 @@ configurations {
 dependencies {
 	compile "ComputerCraft:ComputerCraft:${project.cc_version}"
 	deobfCompile "MCMultiPart:MCMultiPart:1.0.8:universal"
-	deobfCompile "mezz.jei:jei_${project.mc_version}:2.16.2.78"
-
-	deobfCompile "mezz.jei:jei_${project.mc_version}:2.14.0.139"
+	deobfCompile "mezz.jei:jei_${project.mc_version}:2.28.9.177"
 
 	// For 1.7.10 but including anyway
 	provided "CoFHLib:CoFHLib:[1.7.10]1.0.1-159-dev"

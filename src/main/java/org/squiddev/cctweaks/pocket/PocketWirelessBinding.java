@@ -42,7 +42,7 @@ public class PocketWirelessBinding extends Module implements IPocketUpgrade {
 
 	@Override
 	public ItemStack getCraftingItem() {
-		return Config.Network.WirelessBridge.pocketEnabled ? new ItemStack(Registry.blockNetworked, 0) : null;
+		return Config.Network.WirelessBridge.pocketEnabled ? new ItemStack(Registry.blockNetworked, 1, 0) : null;
 	}
 
 	@Override

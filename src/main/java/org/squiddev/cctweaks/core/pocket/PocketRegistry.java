@@ -10,6 +10,7 @@ import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,5 +103,9 @@ public final class PocketRegistry implements IPocketRegistry {
 		}
 
 		return null;
+	}
+
+	public Collection<IPocketUpgrade> getUpgrades() {
+		return upgrades.values();
 	}
 }
