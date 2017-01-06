@@ -13,31 +13,45 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.lwjgl.opengl.GL11;
+import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
-import org.squiddev.cctweaks.core.visualiser.VisualisationData;
+import org.squiddev.cctweaks.core.visualiser.NetworkChange;
+import org.squiddev.cctweaks.core.visualiser.NetworkNode;
+import org.squiddev.cctweaks.core.visualiser.NetworkState;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Connection;
-import static org.squiddev.cctweaks.core.visualiser.VisualisationData.Node;
 
 /**
  * This is a helper to render a network when testing.
  */
 public final class RenderNetworkOverlay extends Module implements IClientModule {
 	private int ticksInGame;
-	public static VisualisationData data;
+	private static final NetworkState data = new NetworkState();
+
+	public static void apply(NetworkChange change) {
+		synchronized (data) {
+			data.applyChange(change);
+		}
+	}
+
+	public static void reset() {
+		synchronized (data) {
+			data.reset();
+		}
+	}
 
 	@SubscribeEvent
 	public void onWorldRenderLast(RenderWorldLastEvent event) {
 		++ticksInGame;
-		if (data == null) return;
+		if (data.nodes().size() == 0) return;
 
 		Minecraft minecraft = Minecraft.getMinecraft();
 		ItemStack stack = minecraft.thePlayer.getHeldItem();
@@ -52,8 +66,10 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-		renderNetworkConnections(data, new Color(Color.HSBtoRGB(ticksInGame % 200 / 200F, 0.6F, 1F)), 1f);
-		renderNetworkLabels(data);
+		synchronized (data) {
+			renderNetworkConnections(data.connections(), new Color(Color.HSBtoRGB(ticksInGame % 200 / 200F, 0.6F, 1F)), 1f);
+			renderNetworkLabels(data);
+		}
 
 		GlStateManager.enableDepth();
 		GlStateManager.enableTexture2D();
@@ -61,19 +77,19 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		GlStateManager.popMatrix();
 	}
 
-	private void renderNetworkConnections(VisualisationData data, Color color, float thickness) {
+	private void renderNetworkConnections(Collection<UnorderedPair<NetworkNode>> data, Color color, float thickness) {
 		renderConnections(data, color, 1.0f, thickness);
 		renderConnections(data, color, 64.0f / 255.0f, thickness * 3);
 	}
 
-	private void renderNetworkLabels(VisualisationData data) {
-		Set<Node> nodes = new HashSet<Node>();
+	private void renderNetworkLabels(NetworkState state) {
+		Set<NetworkNode> nodes = new HashSet<NetworkNode>();
 
 		// Custom handling for networks with 0 connections (single node networks)
 		MovingObjectPosition position = Minecraft.getMinecraft().objectMouseOver;
 		if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-			for (Connection connection : data.connections) {
-				Node a = connection.x, b = connection.y;
+			for (UnorderedPair<NetworkNode> connection : state.connections()) {
+				NetworkNode a = connection.x, b = connection.y;
 
 				// We render a label of all nodes at this point.
 				if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
@@ -93,8 +109,8 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 				}
 			}
 
-			if (data.connections.size() == 0) {
-				for (Node node : data.nodes) {
+			if (state.connections().size() == 0) {
+				for (NetworkNode node : state.nodes()) {
 					BlockPos nodePosition = node.position;
 					if (nodePosition != null && nodePosition.equals(position.getBlockPos())) {
 						nodes.add(node);
@@ -103,7 +119,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 			}
 
 			int counter = 0;
-			for (Node node : nodes) {
+			for (NetworkNode node : nodes) {
 				BlockPos pos = position.getBlockPos();
 
 				String name = node.position == null ? "\u00a78" + node.name : node.name;
@@ -112,7 +128,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		}
 	}
 
-	private void renderConnections(VisualisationData data, Color color, float alpha, float thickness) {
+	private void renderConnections(Collection<UnorderedPair<NetworkNode>> connections, Color color, float alpha, float thickness) {
 		Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer renderer = tessellator.getWorldRenderer();
 
@@ -123,7 +139,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		GL11.glLineWidth(thickness);
 
 		renderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		for (Connection connection : data.connections) {
+		for (UnorderedPair<NetworkNode> connection : connections) {
 			BlockPos a = connection.x.position, b = connection.y.position;
 
 			if (a != null && b != null) {
@@ -185,5 +201,10 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 	@Override
 	public void clientInit() {
 		MinecraftForge.EVENT_BUS.register(this);
+	}
+
+	@SubscribeEvent
+	public void onWorldRenderLast(PlayerEvent.PlayerLoggedOutEvent ev) {
+
 	}
 }

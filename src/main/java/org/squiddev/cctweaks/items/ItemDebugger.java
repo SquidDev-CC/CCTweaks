@@ -25,7 +25,6 @@ import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
-import org.squiddev.cctweaks.core.visualiser.VisualisationPacket;
 import org.squiddev.cctweaks.lua.lib.cobalt.CobaltMachine;
 import org.squiddev.cctweaks.lua.lib.rembulan.RembulanMachine;
 
@@ -42,22 +41,6 @@ public class ItemDebugger extends ItemComputerAction {
 	}
 
 	@Override
-	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-		// Allow manually refreshing the network
-		if (player.isSneaking() && !world.isRemote && player instanceof EntityPlayerMP && Config.Computer.debugWandEnabled) {
-			handleWatcher((EntityPlayerMP) player, NetworkPlayerWatcher.get(player), true);
-		}
-
-		return super.onItemRightClick(stack, world, player);
-	}
-
-	private void handleWatcher(EntityPlayerMP player, NetworkPlayerWatcher.Watcher watcher, boolean force) {
-		if (watcher == null) return;
-		if (watcher.changed() || force) VisualisationPacket.send(watcher.controller, player);
-		if (watcher.controller == null) NetworkPlayerWatcher.remove(player);
-	}
-
-	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int p_77663_4_, boolean p_77663_5_) {
 		super.onUpdate(stack, world, entity, p_77663_4_, p_77663_5_);
 
@@ -65,8 +48,7 @@ public class ItemDebugger extends ItemComputerAction {
 			EntityPlayerMP player = ((EntityPlayerMP) entity);
 			if (player.getHeldItem() == stack) {
 				MovingObjectPosition position = getMovingObjectPositionFromPlayer(world, player, false);
-				if (position == null || position.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
-				handleWatcher(player, NetworkPlayerWatcher.update(player, position.getBlockPos()), false);
+				NetworkPlayerWatcher.update(player, position == null ? null : position.getBlockPos());
 			}
 		}
 	}
