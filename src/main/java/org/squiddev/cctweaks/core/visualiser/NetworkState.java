@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -14,6 +15,7 @@ import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
+import org.squiddev.cctweaks.core.Config;
 
 import java.util.*;
 
@@ -21,9 +23,13 @@ import java.util.*;
  * Stores the state of the network and provides methods for tracking and applying network changes
  */
 public final class NetworkState {
+	private int cooldown;
+
 	public final EntityPlayerMP player;
 	private World world;
 	private INetworkController controller;
+
+	private final Comparator<NetworkNode> comparator;
 
 	private int index = 0;
 	private final Map<Integer, NetworkNode> intMapping = Maps.newHashMap();
@@ -32,13 +38,18 @@ public final class NetworkState {
 
 	public NetworkState(EntityPlayerMP player) {
 		this.player = player;
+		this.comparator = new EntityDistanceComparator(player);
 	}
 
 	public NetworkState() {
 		this.player = null;
+		this.comparator = null;
 	}
 
 	public NetworkChange calculateChange(INetworkController controller) {
+		cooldown--;
+		if (cooldown > 0) return null;
+
 		boolean clear = false;
 		if (controller != this.controller || player.worldObj != world) {
 			clear = true;
@@ -54,37 +65,8 @@ public final class NetworkState {
 		Set<INetworkNode> networkNodes = controller.getNodesOnNetwork();
 		Set<UnorderedPair<INetworkNode>> networkConnections = controller.getNodeConnections();
 
-		List<NetworkNode> addedNodes = Lists.newArrayList();
+		PriorityQueue<NetworkNode> addedNodes = new PriorityQueue<NetworkNode>(16, comparator);
 		List<Integer> removedNodes = Lists.newArrayList();
-
-		for (NetworkNode node : intMapping.values()) {
-			INetworkNode networkNode = node.node;
-
-			if (!networkNodes.contains(networkNode)) {
-				removedNodes.add(node.id);
-			} else {
-				IWorldPosition position = networkNode instanceof IWorldNetworkNode ? ((IWorldNetworkNode) networkNode).getPosition() : null;
-				BlockPos newPos = position == null ? null : position.getPosition();
-				String newName = networkNode.toString();
-
-				if (position != null && position.getBlockAccess() != world) {
-					// Remove intMapping in different dimensions
-					removedNodes.add(node.id);
-				} else if (!Objects.equal(newPos, node.position) || !Objects.equal(newName, node.name)) {
-					node.position = newPos;
-					node.name = newName;
-
-					// Position has changed so reset.
-					addedNodes.add(node);
-				}
-			}
-		}
-
-		// Remove all items we have queued for removal
-		for (Integer removed : removedNodes) {
-			NetworkNode node = intMapping.remove(removed);
-			nodeMapping.remove(node.node);
-		}
 
 		// Add new nodes within range
 		for (INetworkNode networkNode : networkNodes) {
@@ -101,8 +83,49 @@ public final class NetworkState {
 			// Add the node to all the mappings
 			NetworkNode node = new NetworkNode(index++, networkNode.toString(), position, networkNode);
 			addedNodes.add(node);
-			nodeMapping.put(networkNode, node);
+
+			// Remove furthest element
+			if (addedNodes.size() > NetworkChange.MAX_NODES) {
+				addedNodes.poll();
+			}
+		}
+
+		// Add all queued nodes into the mapping
+		for (NetworkNode node : addedNodes) {
+			nodeMapping.put(node.node, node);
 			intMapping.put(node.id, node);
+		}
+
+		// Scan for removed and changed nodes
+		for (NetworkNode node : intMapping.values()) {
+			INetworkNode networkNode = node.node;
+
+			if (!networkNodes.contains(networkNode)) {
+				removedNodes.add(node.id);
+			} else {
+				IWorldPosition position = networkNode instanceof IWorldNetworkNode ? ((IWorldNetworkNode) networkNode).getPosition() : null;
+				BlockPos newPos = position == null ? null : position.getPosition();
+				String newName = networkNode.toString();
+
+				if (position != null && position.getBlockAccess() != world) {
+					// Remove intMapping in different dimensions
+					removedNodes.add(node.id);
+				} else if (!Objects.equal(newPos, node.position) || !Objects.equal(newName, node.name)) {
+					if (addedNodes.size() < NetworkChange.MAX_NODES) {
+						// Only apply this change if we've got spacechanged.
+						node.position = newPos;
+						node.name = newName;
+
+						addedNodes.add(node);
+					}
+				}
+			}
+		}
+
+		// Remove all items we have queued for removal
+		for (Integer removed : removedNodes) {
+			NetworkNode node = intMapping.remove(removed);
+			nodeMapping.remove(node.node);
 		}
 
 		List<UnorderedPair<Integer>> addedConnections = Lists.newArrayList();
@@ -134,7 +157,9 @@ public final class NetworkState {
 			}
 		}
 
-		return new NetworkChange(clear, addedNodes, removedNodes, addedConnections, removedConnections);
+		NetworkChange change = new NetworkChange(clear, addedNodes, removedNodes, addedConnections, removedConnections);
+		if (!change.isEmpty()) cooldown = Config.Network.Visualisation.cooldown;
+		return change;
 	}
 
 	public void applyChange(NetworkChange change) {
@@ -175,7 +200,14 @@ public final class NetworkState {
 		double distance = player.getPosition().distanceSq(position.getPosition());
 		MinecraftServer server = MinecraftServer.getServer();
 
-		int maxDistance = (server == null ? 5 : MinecraftServer.getServer().getConfigurationManager().getViewDistance()) * 16;
+		int maxDistance = Config.Network.Visualisation.renderDistance;
+		if (server != null) {
+			// Limit again to the server's render distance.
+			maxDistance = Math.min(maxDistance, MinecraftServer.getServer().getConfigurationManager().getViewDistance());
+		}
+
+		// Convert to chunks
+		maxDistance *= 16;
 
 		return distance <= maxDistance * maxDistance;
 	}
@@ -196,5 +228,29 @@ public final class NetworkState {
 		intMapping.clear();
 		nodeMapping.clear();
 		connections.clear();
+	}
+
+	private static final class EntityDistanceComparator implements Comparator<NetworkNode> {
+		private final Entity entity;
+
+		private EntityDistanceComparator(Entity entity) {
+			this.entity = entity;
+		}
+
+		@Override
+		public int compare(NetworkNode o1, NetworkNode o2) {
+			if (o1.position == null && o2.position == null) return 0;
+			if (o1.position == null) return 1;
+			if (o2.position == null) return -1;
+
+			double delta = entity.getDistanceSq(o2.position) - entity.getDistanceSq(o1.position);
+			if (delta < 0) {
+				return -1;
+			} else if (delta > 0) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
 	}
 }

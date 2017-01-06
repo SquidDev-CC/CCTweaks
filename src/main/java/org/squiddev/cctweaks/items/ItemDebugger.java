@@ -44,7 +44,7 @@ public class ItemDebugger extends ItemComputerAction {
 	public void onUpdate(ItemStack stack, World world, Entity entity, int p_77663_4_, boolean p_77663_5_) {
 		super.onUpdate(stack, world, entity, p_77663_4_, p_77663_5_);
 
-		if (!world.isRemote && entity instanceof EntityPlayerMP && Config.Computer.debugWandEnabled) {
+		if (!world.isRemote && entity instanceof EntityPlayerMP && Config.Network.Visualisation.enabled) {
 			EntityPlayerMP player = ((EntityPlayerMP) entity);
 			if (player.getHeldItem() == stack) {
 				MovingObjectPosition position = getMovingObjectPositionFromPlayer(world, player, false);

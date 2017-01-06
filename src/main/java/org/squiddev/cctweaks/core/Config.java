@@ -209,6 +209,34 @@ public final class Config {
 		}
 
 		/**
+		 * Various configuration options for network visualisation (provided by the debug wand).
+		 */
+		public static class Visualisation {
+			/**
+			 * Whether network visualisation is enabled
+			 */
+			@DefaultBoolean(true)
+			public static boolean enabled;
+
+			/**
+			 * The maximum distance for which the network is sent to the client.
+			 * Further distances may be rendered on the client.
+			 */
+			@DefaultInt(3)
+			@Range(min = 1)
+			public static int renderDistance;
+
+			/**
+			 * The cooldown between sending visualisation packets to the client.
+			 *
+			 * Prevents load on larget networks.
+			 */
+			@DefaultInt(5)
+			@Range(min = 0)
+			public static int cooldown;
+		}
+
+		/**
 		 * Enable the crafting of full block modems.
 		 *
 		 * If you disable, existing ones will still function,

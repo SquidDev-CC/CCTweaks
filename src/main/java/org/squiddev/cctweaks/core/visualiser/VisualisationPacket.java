@@ -24,7 +24,7 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 
 	public static void send(NetworkState state, INetworkController controller) {
 		NetworkChange change = state.calculateChange(controller);
-		if (!change.isEmpty()) {
+		if (change != null && !change.isEmpty()) {
 			CCTweaks.network.sendTo(new VisualisationPacket(change), state.player);
 		}
 	}

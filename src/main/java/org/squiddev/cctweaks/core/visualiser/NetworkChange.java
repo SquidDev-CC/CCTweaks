@@ -6,25 +6,27 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import org.squiddev.cctweaks.api.UnorderedPair;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public final class NetworkChange {
 	private static final int HAS_POSITION = 1;
 	private static final int HAS_LABEL = 2;
+	public static final int MAX_NODES = 128;
 
 	public final boolean clear;
-	public final List<NetworkNode> addedNodes;
-	public final List<Integer> removedNodes;
-	public final List<UnorderedPair<Integer>> addedConnections;
-	public final List<UnorderedPair<Integer>> removedConnections;
+	public final Collection<NetworkNode> addedNodes;
+	public final Collection<Integer> removedNodes;
+	public final Collection<UnorderedPair<Integer>> addedConnections;
+	public final Collection<UnorderedPair<Integer>> removedConnections;
 
-	public NetworkChange(boolean clear, List<NetworkNode> addedNodes, List<Integer> removedNodes, List<UnorderedPair<Integer>> addedConnections, List<UnorderedPair<Integer>> removedConnections) {
+	public NetworkChange(boolean clear, Collection<NetworkNode> addedNodes, Collection<Integer> removedNodes, Collection<UnorderedPair<Integer>> addedConnections, Collection<UnorderedPair<Integer>> removedConnections) {
 		this.clear = clear;
-		this.addedNodes = Collections.unmodifiableList(addedNodes);
-		this.removedNodes = Collections.unmodifiableList(removedNodes);
-		this.addedConnections = Collections.unmodifiableList(addedConnections);
-		this.removedConnections = Collections.unmodifiableList(removedConnections);
+		this.addedNodes = Collections.unmodifiableCollection(addedNodes);
+		this.removedNodes = Collections.unmodifiableCollection(removedNodes);
+		this.addedConnections = Collections.unmodifiableCollection(addedConnections);
+		this.removedConnections = Collections.unmodifiableCollection(removedConnections);
 	}
 
 	public void write(ByteBuf buffer) {
