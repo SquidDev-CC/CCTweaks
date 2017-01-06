@@ -1,6 +1,9 @@
 package org.squiddev.cctweaks.core.asm;
 
+import joptsimple.internal.Strings;
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.ICrashCallable;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import org.apache.logging.log4j.Level;
@@ -183,6 +186,18 @@ public class ASMTransformer implements IClassTransformer {
 					"If you encounter issues then try to reproduce without CCTweaks installed, then report to the appropriate mod author.",
 				};
 				DebugLogger.major(Level.WARN, message);
+
+				FMLCommonHandler.instance().registerCrashCallable(new ICrashCallable() {
+					@Override
+					public String getLabel() {
+						return "CCTweaks version issue";
+					}
+
+					@Override
+					public String call() throws Exception {
+						return Strings.join(message, "\n\t");
+					}
+				});
 			}
 		}
 	}
