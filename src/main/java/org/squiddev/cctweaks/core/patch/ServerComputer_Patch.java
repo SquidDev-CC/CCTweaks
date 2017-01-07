@@ -8,17 +8,27 @@ import net.minecraft.inventory.Container;
 import org.squiddev.cctweaks.api.IContainerComputer;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.cctweaks.lua.patch.ComputerThread_Rewrite;
 import org.squiddev.cctweaks.lua.patch.Computer_Patch;
+import org.squiddev.cctweaks.lua.patch.iface.IComputerEnvironmentExtended;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
 /**
  * Add isMostlyOn method
  */
 @MergeVisitor.Rename(
-	from = "org/squiddev/cctweaks/lua/patch/Computer_Patch",
-	to = "dan200/computercraft/core/computer/Computer"
+	from = {"org/squiddev/cctweaks/lua/patch/Computer_Patch", "org/squiddev/cctweaks/lua/patch/ComputerThread_Rewrite"},
+	to = {"dan200/computercraft/core/computer/Computer", "dan200/computercraft/core/computer/ComputerThread"}
 )
-public class ServerComputer_Patch extends ServerComputer {
+public class ServerComputer_Patch extends ServerComputer implements IComputerEnvironmentExtended {
+	private static final int TIMEOUT = 100;
+
+	private boolean suspendable;
+
+	@MergeVisitor.Stub
+	private int m_ticksSincePing = 0;
+
+
 	@MergeVisitor.Stub
 	private Computer_Patch m_computer;
 
@@ -29,6 +39,31 @@ public class ServerComputer_Patch extends ServerComputer {
 
 	public boolean isMostlyOn() {
 		return m_computer.isMostlyOn();
+	}
+
+
+	public void keepAlive() {
+		boolean resume = m_ticksSincePing > TIMEOUT && isSuspendable();
+		m_ticksSincePing = 0;
+		if (resume) ComputerThread_Rewrite.resumeComputer(m_computer);
+	}
+
+	@Override
+	public boolean hasTimedOut() {
+		return !isSuspendable() && m_ticksSincePing > TIMEOUT;
+	}
+
+	@Override
+	public boolean suspendEvents() {
+		return isSuspendable() && m_ticksSincePing > TIMEOUT;
+	}
+
+	public void setSuspendable() {
+		suspendable = true;
+	}
+
+	private boolean isSuspendable() {
+		return Config.Computer.suspendInactive && suspendable;
 	}
 
 	@Override

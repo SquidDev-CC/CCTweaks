@@ -150,6 +150,9 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.media.inventory.ContainerHeldItem",
 				"org.squiddev.cctweaks.core.patch.ContainerHeldItem_Patch"
 			),
+
+			// Allow suspending computers which time out.
+			new SetSuspendable(),
 		});
 
 		patches.finalise();

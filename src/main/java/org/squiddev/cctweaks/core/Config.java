@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core;
 
 import net.minecraftforge.common.config.Configuration;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.configgen.*;
 
 import java.io.File;
@@ -39,6 +40,11 @@ public final class Config {
 
 		Network.WirelessBridge.crafting &= Network.WirelessBridge.enabled;
 		Network.WirelessBridge.turtleEnabled &= Network.WirelessBridge.enabled;
+
+		if (Config.Computer.suspendInactive && !org.squiddev.cctweaks.lua.Config.Computer.MultiThreading.enabled) {
+			Config.Computer.suspendInactive = false;
+			DebugLogger.warn("Computer.suspendInactive requires multi-threading to be enabled. Falling back to default.");
+		}
 	}
 
 	/**
@@ -72,6 +78,15 @@ public final class Config {
 		 */
 		@DefaultBoolean(true)
 		public static boolean safeNetworking;
+
+		/**
+		 * Suspend computers and turtles which timeout, rather than shutting them down.
+		 *
+		 * Requires multi-threading to be on, though threads can be set to 1.
+		 */
+		@DefaultBoolean(false)
+		@RequiresRestart
+		public static boolean suspendInactive;
 	}
 
 	/**
