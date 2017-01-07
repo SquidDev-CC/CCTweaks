@@ -47,12 +47,19 @@ public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
 
 		@Override
 		public String[] getMethodNames() {
-			return new String[]{"getSide"};
+			return new String[]{"getSide", "getName"};
 		}
 
 		@Override
 		public Object[] callMethod(IComputerAccess computer, ILuaContext context, int function, Object[] arguments) throws LuaException, InterruptedException {
-			return new Object[]{sideName};
+			switch (function) {
+				case 0:
+					return new Object[]{sideName};
+				case 1:
+					return new Object[]{toString()};
+				default:
+					return null;
+			}
 		}
 
 		@Override
