@@ -14,6 +14,8 @@ import javax.annotation.Nullable;
  * You should always implement {@link IPeripheral}.
  * You should implement {@link org.squiddev.cctweaks.api.network.INetworkedPeripheral}
  * if you wish to delegate network events.
+ *
+ * You can get the base peripheral using {@link IPeripheralHelpers#getBasePeripheral(IPeripheral)}.
  */
 public interface IPeripheralProxy extends IPeripheral {
 	/**

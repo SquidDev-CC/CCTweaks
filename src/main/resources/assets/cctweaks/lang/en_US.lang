@@ -71,7 +71,6 @@ gui.config.cctweaks.network.visualisation.renderDistance=Render distance
 gui.config.cctweaks.network.visualisation.cooldown=Cooldown
 
 gui.config.cctweaks.integration=Integration
-gui.config.cctweaks.integration.openPeripheralInventories=OpenPeripheral Inventories
 gui.config.cctweaks.integration.mcMultipart=MC Multipart Support
 
 gui.config.cctweaks.testing=Testing

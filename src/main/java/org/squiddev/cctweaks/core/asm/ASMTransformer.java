@@ -84,16 +84,6 @@ public class ASMTransformer implements IClassTransformer {
 				}
 			},
 
-			// Open peripheral
-			new ClassMerger(
-				"openperipheral.addons.peripheralproxy.WrappedPeripheral",
-				"org.squiddev.cctweaks.core.patch.op.PeripheralProxy_Patch"
-			),
-
-			// OP Patches: targeted peripherals & network environment
-			new PatchOpenPeripheralAdapter(),
-			new PatchOpenModule(),
-
 			// Targeted peripherals
 			new ClassMerger(
 				"dan200.computercraft.shared.computer.blocks.ComputerPeripheral",

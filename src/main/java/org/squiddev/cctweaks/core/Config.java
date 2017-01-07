@@ -268,13 +268,6 @@ public final class Config {
 	@RequiresRestart
 	public static final class Integration {
 		/**
-		 * Allows pushing items from one inventory
-		 * to another inventory on the network.
-		 */
-		@DefaultBoolean(true)
-		public static boolean openPeripheralInventories;
-
-		/**
 		 * MC Multipart integration
 		 */
 		@DefaultBoolean(true)
