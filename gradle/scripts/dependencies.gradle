@@ -34,11 +34,6 @@ repositories {
 		name = "CoFHLib"
 		artifactPattern "http://addons-origin.cursecdn.com/files/2235/558/[module]-[revision](.[ext])"
 	}
-
-	maven {
-		name = "snapshots"
-		url = "https://oss.sonatype.org/content/repositories/snapshots/"
-	}
 }
 
 configurations {
@@ -56,12 +51,9 @@ dependencies {
 	provided "net.industrial-craft:industrialcraft-2:2.3.249-ex18:api"
 	provided "openperipheral:OpenPeripheralCore-API:3.2"
 
-	shade('org.squiddev:cctweaks-lua:1.2.4') {
+	shade('org.squiddev:cctweaks-lua:1.3.0') {
 		// Different versions
-		exclude group: 'ComputerCraft'
 		exclude group: 'com.google.guava'
-		exclude group: 'net.minecraftforge'
-		exclude module: 'ConfigGen'
 		exclude group: 'org.ow2.asm'
 	}
 

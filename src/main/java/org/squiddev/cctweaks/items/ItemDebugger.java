@@ -25,9 +25,8 @@ import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
-import org.squiddev.cctweaks.lua.lib.cobalt.CobaltMachine;
-import org.squiddev.cctweaks.lua.lib.rembulan.RembulanMachine;
 
+import java.lang.reflect.Method;
 import java.util.Set;
 
 public class ItemDebugger extends ItemComputerAction {
@@ -65,13 +64,15 @@ public class ItemDebugger extends ItemComputerAction {
 			if (luaMachine instanceof LuaJLuaMachine) {
 				org.luaj.vm2.LuaValue globals = (org.luaj.vm2.LuaValue) ComputerAccessor.luaMachineGlobals.get(luaMachine);
 				globals.load(new org.luaj.vm2.lib.DebugLib());
-			} else if (luaMachine instanceof CobaltMachine) {
-				((CobaltMachine) luaMachine).injectDebug();
-			} else if (luaMachine instanceof RembulanMachine) {
-				((RembulanMachine) luaMachine).injectDebug();
 			} else {
-				DebugLogger.warn("Computer machine is unknown (" + luaMachine.getClass().getName() + "). Cannot inject debug library.");
-				return false;
+				try {
+					Method method = luaMachine.getClass().getMethod("injectDebug");
+					method.setAccessible(true);
+					method.invoke(luaMachine);
+				} catch (NoSuchMethodException e) {
+					DebugLogger.warn("Computer machine (" + luaMachine.getClass().getName() + ") has no .injectDebug() method. Cannot inject debug library.");
+					return false;
+				}
 			}
 		} catch (NullPointerException e) {
 			DebugLogger.warn("Could not add DebugLib", e);
