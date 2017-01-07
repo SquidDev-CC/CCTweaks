@@ -81,7 +81,6 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 				player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", StringUtils.join(newNames, ", ")));
 			}
 
-			modem.getAttachedNetwork().invalidateNode(modem);
 			markForUpdate();
 		}
 

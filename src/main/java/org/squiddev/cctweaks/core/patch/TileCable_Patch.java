@@ -205,8 +205,6 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 						player.addChatMessage(new ChatComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", periphName));
 					}
 
-					INetworkController controller = getModem().getAttachedNetwork();
-					if (controller != null) controller.invalidateNode(modem);
 					updateAnim();
 					return true;
 				}
