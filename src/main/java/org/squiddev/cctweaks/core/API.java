@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core;
 
 import org.squiddev.cctweaks.api.ICCTweaksAPI;
+import org.squiddev.cctweaks.api.block.IRotationRegistry;
 import org.squiddev.cctweaks.api.lua.ILuaEnvironment;
 import org.squiddev.cctweaks.api.network.INetworkHelpers;
 import org.squiddev.cctweaks.api.network.INetworkRegistry;
@@ -8,6 +9,7 @@ import org.squiddev.cctweaks.api.peripheral.IPeripheralHelpers;
 import org.squiddev.cctweaks.api.pocket.IPocketRegistry;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelRegistry;
 import org.squiddev.cctweaks.api.turtle.ITurtleRegistry;
+import org.squiddev.cctweaks.core.block.RotationRegistry;
 import org.squiddev.cctweaks.core.network.NetworkHelpers;
 import org.squiddev.cctweaks.core.network.NetworkRegistry;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHelpers;
@@ -25,6 +27,7 @@ public final class API implements ICCTweaksAPI {
 
 	private final ITurtleFuelRegistry fuelRegistry = new TurtleFuelRegistry();
 	private final IPeripheralHelpers peripheralHelpers = new PeripheralHelpers();
+	private final IRotationRegistry rotationRegistry = new RotationRegistry();
 
 	@Override
 	public INetworkRegistry networkRegistry() {
@@ -59,5 +62,10 @@ public final class API implements ICCTweaksAPI {
 	@Override
 	public IPocketRegistry pocketRegistry() {
 		return PocketRegistry.instance;
+	}
+
+	@Override
+	public IRotationRegistry rotationRegistry() {
+		return rotationRegistry;
 	}
 }

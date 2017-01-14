@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import org.apache.logging.log4j.Level;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -143,6 +144,12 @@ public class ASMTransformer implements IClassTransformer {
 
 			// Allow suspending computers which time out.
 			new SetSuspendable(),
+
+			// Allow specifying direction on turtle.place methods
+			new ClassMerger(
+				"dan200.computercraft.shared.turtle.core.TurtlePlaceCommand",
+				"org.squiddev.cctweaks.core.patch.TurtlePlaceCommand_Patch"
+			),
 		});
 
 		patches.finalise();
@@ -227,6 +234,24 @@ public class ASMTransformer implements IClassTransformer {
 	}
 
 	public void writeDump(String className, byte[] bytes) {
+
+		if (className.endsWith("TurtlePlaceCommand")) {
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			ClassReader reader = new ClassReader(bytes);
+			Exception error = null;
+			try {
+				CheckClassAdapter.verify(reader, getClass().getClassLoader(), false, printWriter);
+			} catch (Exception e) {
+				error = e;
+			}
+
+			String contents = writer.toString();
+			if (error != null || contents.length() > 0) {
+				DebugLogger.debug("Cannot load " + className + "\n" + contents, error);
+			}
+		}
+
 		if (org.squiddev.cctweaks.lua.Config.Testing.dumpAsm) {
 			File file = new File(TweaksLoadingPlugin.dump, className.replace('.', '/') + ".class");
 			File directory = file.getParentFile();
