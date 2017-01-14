@@ -49,6 +49,12 @@ public interface IPocketAccess {
 	void updateUpgradeNBTData();
 
 	/**
+	 * Remove the current peripheral and create a new one. You
+	 * may wish to do this if the methods available change.
+	 */
+	void invalidatePeripheral();
+
+	/**
 	 * Get a list of all upgrades for the pocket computer
 	 *
 	 * @return A collection of all upgrade names

@@ -23,7 +23,7 @@ public final class PocketAccess implements IPocketAccess {
 	protected final IPocketUpgrade upgrade;
 	protected Entity entity;
 	protected ItemStack stack;
-	protected final IPeripheral peripheral;
+	protected IPeripheral peripheral;
 
 	public PocketAccess(IPocketUpgrade upgrade, Entity entity, ItemStack stack) {
 		this.upgrade = upgrade;
@@ -102,6 +102,15 @@ public final class PocketAccess implements IPocketAccess {
 		if (inventory != null) {
 			inventory.markDirty();
 		}
+	}
+
+	@Override
+	public void invalidatePeripheral() {
+		ServerComputer computer = getComputer();
+		if (computer == null) return;
+
+		peripheral = upgrade.createPeripheral(this);
+		computer.setPeripheral(2, peripheral);
 	}
 
 	@Nonnull
