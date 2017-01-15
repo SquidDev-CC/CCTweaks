@@ -2,7 +2,6 @@ package org.squiddev.cctweaks.core.utils;
 
 import dan200.computercraft.core.computer.Computer;
 import dan200.computercraft.core.lua.LuaJLuaMachine;
-import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
@@ -10,20 +9,17 @@ import dan200.computercraft.shared.turtle.blocks.TileTurtle;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.squiddev.cctweaks.core.patch.TileCable_Patch;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
  * Reflection for stuff Dan200 doesn't let us do.
  */
 public final class ComputerAccessor {
-	/**
-	 * Copy a computer from one tile to another
-	 */
-	public static Method tileCopy;
-
 	/**
 	 * Set the fact that the turtle has moved. This is so we can muck about with it
 	 * without the broken event being set
@@ -69,29 +65,55 @@ public final class ComputerAccessor {
 
 	static {
 		try {
-			tileCopy = TileComputerBase.class.getDeclaredMethod("transferStateFrom", TileComputerBase.class);
-			tileCopy.setAccessible(true);
-
-			turtleTileMoved = TileTurtle.class.getDeclaredField("m_moved");
-			turtleTileMoved.setAccessible(true);
-
-			serverComputerComputer = ServerComputer.class.getDeclaredField("m_computer");
-			serverComputerComputer.setAccessible(true);
-
-			computerMachine = Computer.class.getDeclaredField("m_machine");
-			computerMachine.setAccessible(true);
-
-			luaMachineGlobals = LuaJLuaMachine.class.getDeclaredField("m_globals");
-			luaMachineGlobals.setAccessible(true);
-
-			cableModem = TileCable.class.getDeclaredField("modem");
-			cableModem.setAccessible(true);
-
-			pocketServerComputer = ItemPocketComputer.class.getDeclaredMethod("createServerComputer", World.class, IInventory.class, ItemStack.class);
-			pocketServerComputer.setAccessible(true);
+			turtleTileMoved = findField(TileTurtle.class, "m_moved");
+			serverComputerComputer = findField(ServerComputer.class, "m_computer");
+			computerMachine = findField(Computer.class, "m_machine");
+			luaMachineGlobals = findField(LuaJLuaMachine.class, "m_globals");
+			cableModem = findField(TileCable.class, "modem");
+			pocketServerComputer = findMethod(ItemPocketComputer.class, "createServerComputer", World.class, IInventory.class, ItemStack.class);
 		} catch (Exception e) {
 			DebugLogger.error("ComputerCraft not found", e);
 			e.printStackTrace();
+		}
+	}
+
+	private static Method findMethod(Class<?> klass, String name, Class<?>... arguments) {
+		try {
+			Method method = klass.getDeclaredMethod(name, arguments);
+			method.setAccessible(true);
+			return method;
+		} catch (NoSuchMethodException e) {
+			throw new ReflectionHelper.UnableToFindMethodException(new String[]{name}, e);
+		}
+	}
+
+	private static Field findField(Class<?> klass, String name) {
+		try {
+			Field field = klass.getDeclaredField(name);
+			field.setAccessible(true);
+			return field;
+		} catch (NoSuchFieldException e) {
+			throw new ReflectionHelper.UnableToFindFieldException(new String[]{name}, e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T getField(Field field, Object instance) {
+		try {
+			return (T) field.get(instance);
+		} catch (IllegalAccessException e) {
+			throw new ReflectionHelper.UnableToAccessFieldException(new String[0], e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T callMethod(Method method, Object instance, Object... args) {
+		try {
+			return (T) method.invoke(instance, args);
+		} catch (IllegalAccessException e) {
+			throw new ReflectionHelper.UnableToAccessFieldException(new String[0], e);
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException(e);
 		}
 	}
 }

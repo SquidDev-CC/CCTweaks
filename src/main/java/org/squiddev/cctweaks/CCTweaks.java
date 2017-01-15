@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
+import org.squiddev.cctweaks.command.CommandCCTweaks;
 import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindings;
 import org.squiddev.cctweaks.core.registry.Registry;
@@ -58,7 +59,7 @@ public class CCTweaks {
 
 	@EventHandler
 	public void onServerStarting(FMLServerStartingEvent event) {
-		event.registerServerCommand(new CommandCCTweaks(event.getServer().isDedicatedServer()));
+		event.registerServerCommand(CommandCCTweaks.create(event.getServer()));
 	}
 
 	@EventHandler
