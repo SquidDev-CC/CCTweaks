@@ -51,7 +51,7 @@ public class SubCommandGive extends SubCommandBase {
 
 	public SubCommandGive() {
 		super(
-			"give", "<item> <id> [label] [family]", "Spawn in a computer item with the computer id.",
+			"give", "<item> <id> [label] [family]", "Spawn in a computer item with the specified id.",
 			"You can optionally specify the label and computer family of the item. Valid families are normal, " +
 				"advanced, and command."
 		);

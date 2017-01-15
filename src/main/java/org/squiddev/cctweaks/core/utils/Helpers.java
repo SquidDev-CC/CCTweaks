@@ -3,12 +3,17 @@ package org.squiddev.cctweaks.core.utils;
 import com.google.common.base.CaseFormat;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.shared.computer.blocks.TileComputerBase;
+import dan200.computercraft.shared.computer.core.ComputerFamily;
+import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.util.IDAssigner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -16,6 +21,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.CCTweaks;
 
+import javax.annotation.Nullable;
 import java.io.File;
 
 /**
@@ -129,4 +135,26 @@ public class Helpers {
 	}
 
 	public static int THREAD_PRIORITY = Thread.MIN_PRIORITY + (Thread.NORM_PRIORITY - Thread.MIN_PRIORITY) / 2;
+
+	@Nullable
+	public static TileComputerBase getTile(ServerComputer computer) {
+		World world = computer.getWorld();
+		BlockPos pos = computer.getPosition();
+
+		if (world != null && pos != null && world.isBlockLoaded(pos)) {
+			TileEntity te = world.getTileEntity(pos);
+			if (te instanceof TileComputerBase && ((TileComputerBase) te).getServerComputer() == computer) {
+				return ((TileComputerBase) te);
+			}
+		}
+
+		return null;
+	}
+
+	public static ComputerFamily guessFamily(ServerComputer computer) {
+		TileComputerBase tile = getTile(computer);
+		if (tile != null) return tile.getFamily();
+
+		return computer.isColour() ? ComputerFamily.Advanced : ComputerFamily.Normal;
+	}
 }

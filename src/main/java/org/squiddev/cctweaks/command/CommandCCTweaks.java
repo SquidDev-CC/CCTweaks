@@ -15,8 +15,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
+import org.squiddev.cctweaks.GuiHandler;
 import org.squiddev.cctweaks.core.command.*;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
+import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.lua.Config;
 import org.squiddev.cctweaks.lua.lib.ComputerMonitor;
 
@@ -49,16 +51,14 @@ public final class CommandCCTweaks {
 
 	public static ICommand create(MinecraftServer server) {
 		CommandRoot root = new CommandRoot(
-			"cctweaks", "Various commands for CCTweaks",
+			"cctweaks", "Various commands for CCTweaks.",
 			"The CCTweaks command provides various debugging and administrator tools for controlling and interacting " +
 				"with computers."
 		);
 
-		// TODO: view
-
 		{
 			CommandRoot profile = new CommandRoot(
-				"profile", "Profile the CPU usage of computers",
+				"profile", "Profile the CPU usage of computers.",
 				"Monitor all computers on the server and counts the time they ran for, along with number of yields and " +
 					"other useful information. This requires multi-threading to be enabled, though the thread count can be 1"
 			);
@@ -84,7 +84,7 @@ public final class CommandCCTweaks {
 			});
 
 			profile.register(new SubCommandBase(
-				"stop", "Stop profiling all computers",
+				"stop", "Stop profiling all computers.",
 				"Stop the monitoring of execution time and print the results. Fails if the profiler is not running."
 			) {
 				@Override
@@ -111,11 +111,7 @@ public final class CommandCCTweaks {
 						if (serverComputer == null || serverComputer.getPosition() == null) {
 							position = text("?");
 						} else {
-							position = link(
-								position(serverComputer.getPosition()),
-								"/cctweaks tp " + serverComputer.getInstanceID(),
-								"Teleport to this computer"
-							);
+							position = linkComputer(serverComputer);
 						}
 
 						table.addRow(
@@ -136,7 +132,7 @@ public final class CommandCCTweaks {
 		}
 
 		root.register(new SubCommandBase(
-			"dump", "[id]", "Display the status of computers", false,
+			"dump", "[id]", "Display the status of computers.", false,
 			"Display the status of all computers or specific information about one computer. You can either specify the computer's instance " +
 				"id (e.g. 123) or computer id (e.g #123)."
 		) {
@@ -154,11 +150,7 @@ public final class CommandCCTweaks {
 							),
 							text(Integer.toString(computer.getID())),
 							bool(computer.isOn()),
-							link(
-								position(computer.getPosition()),
-								"/cctweaks tp " + computer.getInstanceID(),
-								"Teleport to this computer"
-							)
+							linkComputer(computer)
 						);
 					}
 
@@ -171,6 +163,8 @@ public final class CommandCCTweaks {
 					table.addRow(header("Id"), text(Integer.toString(computer.getID())));
 					table.addRow(header("Label"), text(computer.getLabel()));
 					table.addRow(header("On"), bool(computer.isOn()));
+					table.addRow(header("Position"), linkComputer(computer));
+					table.addRow(header("Family"), text(Helpers.guessFamily(computer).toString()));
 
 					for (int i = 0; i < 6; i++) {
 						IPeripheral peripheral = computer.getPeripheral(i);
@@ -195,7 +189,7 @@ public final class CommandCCTweaks {
 		});
 
 		root.register(new SubCommandBase(
-			"shutdown", "[ids...]", "Shutdown computers remotely",
+			"shutdown", "[ids...]", "Shutdown computers remotely.",
 			"Shutdown the listed computers or all if none are specified. You can either specify the computer's instance " +
 				"id (e.g. 123) or computer id (e.g #123)."
 		) {
@@ -228,7 +222,7 @@ public final class CommandCCTweaks {
 		});
 
 		root.register(new SubCommandBase(
-			"tp", "<id>", "Teleport to a specific computer",
+			"tp", "<id>", "Teleport to a specific computer.",
 			"Teleport to the location of a computer. You can either specify the computer's instance " +
 				"id (e.g. 123) or computer id (e.g #123)."
 		) {
@@ -275,6 +269,40 @@ public final class CommandCCTweaks {
 
 		root.register(new SubCommandGive());
 
+		root.register(new SubCommandBase(
+			"view", "View the terminal of a computer.",
+			"Open the terminal of a computer, allowing remote control of a computer. This does not provide access to " +
+				"turtle's inventories. You can either specify the computer's instance id (e.g. 123) or computer id (e.g #123)."
+		) {
+			@Override
+			public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
+				if (arguments.size() != 1) throw new CommandException(context.getFullUsage());
+
+				if (!(sender instanceof EntityPlayerMP)) {
+					throw new CommandException("Cannot open terminal for non-player");
+				}
+
+				ServerComputer computer = ComputerSelector.getComputer(arguments.get(0));
+				GuiHandler.openComputer((EntityPlayerMP) sender, computer);
+			}
+
+			@Nonnull
+			@Override
+			public List<String> getCompletion(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull List<String> arguments) {
+				return arguments.size() == 1
+					? ComputerSelector.completeComputer(arguments.get(0))
+					: Collections.<String>emptyList();
+			}
+		});
+
 		return new CommandDelegate(server, root);
+	}
+
+	private static IChatComponent linkComputer(ServerComputer computer) {
+		return link(
+			position(computer.getPosition()),
+			"/cctweaks tp " + computer.getInstanceID(),
+			"Teleport to this computer"
+		);
 	}
 }
