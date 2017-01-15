@@ -54,7 +54,7 @@ public final class CommandCCTweaks {
 				"with computers."
 		);
 
-		// TODO: view, give
+		// TODO: view
 
 		{
 			CommandRoot profile = new CommandRoot(
@@ -272,6 +272,8 @@ public final class CommandCCTweaks {
 					: Collections.<String>emptyList();
 			}
 		});
+
+		root.register(new SubCommandGive());
 
 		return new CommandDelegate(server, root);
 	}

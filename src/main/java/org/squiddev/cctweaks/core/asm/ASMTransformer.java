@@ -150,6 +150,12 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.turtle.core.TurtlePlaceCommand",
 				"org.squiddev.cctweaks.core.patch.TurtlePlaceCommand_Patch"
 			),
+
+			// Implement IComputerItemFactory
+			new ClassMerger(
+				"dan200.computercraft.shared.computer.items.ItemComputerBase",
+				"org.squiddev.cctweaks.core.patch.ItemComputerBase_Patch"
+			),
 		});
 
 		patches.finalise();
