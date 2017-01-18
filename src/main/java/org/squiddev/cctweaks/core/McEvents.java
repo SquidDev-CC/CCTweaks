@@ -4,14 +4,12 @@ import dan200.computercraft.shared.computer.core.IComputer;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -21,7 +19,10 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 import org.squiddev.cctweaks.lua.lib.DelayedTasks;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Main event handler
@@ -35,7 +36,6 @@ public class McEvents {
 	private static final Map<Entity, IDropConsumer> entityConsumers = new HashMap<Entity, IDropConsumer>();
 	private static final Queue<Runnable> serverQueue = new LinkedList<Runnable>();
 	private static final Queue<Runnable> clientQueue = new LinkedList<Runnable>();
-	private static final Map<EntityPlayerMP, Integer> oldContainer = new WeakHashMap<EntityPlayerMP, Integer>();
 
 	/**
 	 * Add a consumer for entity drops
@@ -126,31 +126,18 @@ public class McEvents {
 					scheduled.run();
 				}
 			}
-		} else if (event.phase == TickEvent.Phase.END) {
-			// Track container changes and send it when a new container is opened.
-			// TODO: Convert this to use PlayerContainerEvent on 1.10.2
-			FMLCommonHandler handler = FMLCommonHandler.instance();
-			if (handler == null) return;
-			MinecraftServer server = handler.getMinecraftServerInstance();
-			if (server == null) return;
+		}
+	}
 
-			for (EntityPlayerMP player : server.getPlayerList().getPlayerList()) {
-				Container container = player.openContainer;
-				if (container == null) {
-					oldContainer.remove(player);
-				} else {
-					Integer oldIndexObj = oldContainer.get(player);
+	@SubscribeEvent
+	public void onContainerOpen(PlayerContainerEvent.Open open) {
+		if (open.getEntityPlayer().worldObj.isRemote) return;
 
-					if (oldIndexObj == null || oldIndexObj != container.windowId) {
-						oldContainer.put(player, container.windowId);
-						if (container instanceof IContainerComputer) {
-							IComputer computer = ((IContainerComputer) container).getComputer();
-							if (computer instanceof ServerComputer) {
-								((ServerComputer) computer).sendState(player);
-							}
-						}
-					}
-				}
+		Container container = open.getContainer();
+		if (container instanceof IContainerComputer) {
+			IComputer computer = ((IContainerComputer) container).getComputer();
+			if (computer instanceof ServerComputer) {
+				((ServerComputer) computer).sendState(open.getEntityPlayer());
 			}
 		}
 	}

@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 
 
 public class SimpleRecipeHandler<T extends IRecipeWrapper> extends BasicRecipeHandler<T> {
-	public SimpleRecipeHandler(IRecipeCategory category, Class<T> klass) {
+	public SimpleRecipeHandler(IRecipeCategory<? super T> category, Class<T> klass) {
 		super(category, klass);
 	}
 

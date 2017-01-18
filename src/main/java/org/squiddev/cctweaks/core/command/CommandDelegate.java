@@ -56,6 +56,7 @@ public class CommandDelegate extends CommandBase {
 
 	@Nonnull
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
 		return command.getCompletion(server, sender, Arrays.asList(args));
 	}

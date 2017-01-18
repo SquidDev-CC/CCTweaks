@@ -13,7 +13,7 @@ import org.squiddev.cctweaks.core.utils.Helpers;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class UpgradeCategory extends BlankRecipeCategory {
+public class UpgradeCategory extends BlankRecipeCategory<IRecipeWrapper> {
 	private final String id;
 	private final IDrawable background;
 
