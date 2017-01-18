@@ -72,14 +72,6 @@ public final class Config {
 		public static boolean debugWandEnabled;
 
 		/**
-		 * Prevent controlling computers without a container on the server side.
-		 * This ensures arbitrary computers can not be used by the client, but may break other mods. Please disable if
-		 * you encounter problems (and report an issue on the tracker).
-		 */
-		@DefaultBoolean(true)
-		public static boolean safeNetworking;
-
-		/**
 		 * Suspend computers and turtles which timeout, rather than shutting them down.
 		 *
 		 * Requires multi-threading to be on, though threads can be set to 1.
@@ -308,6 +300,25 @@ public final class Config {
 		 */
 		@DefaultBoolean(true)
 		public static boolean funRender;
+	}
+
+	/**
+	 * Controls over the packets sent between the server and client.
+	 */
+	public static final class Packets {
+		/**
+		 * Prevent controlling computers without a container on the server side.
+		 * This ensures arbitrary computers can not be used by the client, but may break other mods. Please disable if
+		 * you encounter problems (and report an issue on the tracker).
+		 */
+		@DefaultBoolean(true)
+		public static boolean requireContainer;
+
+		/**
+		 * Only broadcast computer state to those in the current dimension and in range or to those interacting with it.
+		 */
+		@DefaultBoolean(true)
+		public static boolean updateLimiting;
 	}
 
 	/**
