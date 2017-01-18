@@ -156,6 +156,12 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.shared.computer.items.ItemComputerBase",
 				"org.squiddev.cctweaks.core.patch.ItemComputerBase_Patch"
 			),
+
+			// Optimisations for terminal packets
+			new ClassMerger(
+				"dan200.computercraft.core.terminal.Terminal",
+				"org.squiddev.cctweaks.core.patch.Terminal_Patch"
+			),
 		});
 
 		patches.finalise();

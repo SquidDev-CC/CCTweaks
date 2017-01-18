@@ -1,9 +1,11 @@
 package org.squiddev.cctweaks.core.patch;
 
 import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.core.terminal.Terminal;
 import dan200.computercraft.shared.computer.core.IComputer;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.network.ComputerCraftPacket;
+import dan200.computercraft.shared.util.NBTUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -30,8 +32,16 @@ import org.squiddev.patcher.visitors.MergeVisitor;
  * - Various network changes
  */
 @MergeVisitor.Rename(
-	from = {"org/squiddev/cctweaks/lua/patch/Computer_Patch", "org/squiddev/cctweaks/lua/patch/ComputerThread_Rewrite"},
-	to = {"dan200/computercraft/core/computer/Computer", "dan200/computercraft/core/computer/ComputerThread"}
+	from = {
+		"org/squiddev/cctweaks/lua/patch/Computer_Patch",
+		"org/squiddev/cctweaks/lua/patch/ComputerThread_Rewrite",
+		"org/squiddev/cctweaks/core/patch/Terminal_Patch",
+	},
+	to = {
+		"dan200/computercraft/core/computer/Computer",
+		"dan200/computercraft/core/computer/ComputerThread",
+		"dan200/computercraft/core/terminal/Terminal",
+	}
 )
 public class ServerComputer_Patch extends ServerComputer implements IComputerEnvironmentExtended {
 	private static final int TIMEOUT = 100;
@@ -49,6 +59,9 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 
 	@MergeVisitor.Stub
 	private Computer_Patch m_computer;
+
+	@MergeVisitor.Stub
+	private NBTTagCompound m_userData;
 
 	@MergeVisitor.Stub
 	public ServerComputer_Patch() {
@@ -107,48 +120,115 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 			}
 		}
 
-		native_handlePacket(packet, sender);
-	}
-
-	public void broadcastState() {
-		ComputerCraftPacket packet = new ComputerCraftPacket();
-		packet.m_packetType = 7;
-		packet.m_dataInt = new int[]{this.getInstanceID()};
-		packet.m_dataNBT = new NBTTagCompound();
-		writeDescription(packet.m_dataNBT);
-
-		if (Config.Packets.updateLimiting && m_world != null && m_position != null) {
-			int distance = MathHelper.clamp_int(MinecraftServer.getServer().getConfigurationManager().getViewDistance(), 3, 32) * 16;
-
-			// Send to players within the render distance
-			ComputerCraft.networkEventChannel.sendToAllAround(
-				encode(packet),
-				new NetworkRegistry.TargetPoint(
-					m_world.provider.getDimensionId(),
-					m_position.getX() + 0.5,
-					m_position.getY() + 0.5,
-					m_position.getZ() + 0.5,
-					distance
-				)
-			);
-
-			// Send to all players outside the range who are using the terminal
-			for (EntityPlayerMP player : MinecraftServer.getServer().getConfigurationManager().getPlayerList()) {
-				Container container = player.openContainer;
-				if (container instanceof IContainerComputer && ((IContainerComputer) container).getComputer() == this) {
-					if (player.worldObj != m_world || player.getDistanceSq(m_position) > distance * distance) {
-						ComputerCraft.sendToPlayer(player, packet);
-					}
-				}
+		switch (packet.m_packetType) {
+			case ComputerCraftPacket.TurnOn:
+				turnOn();
+				break;
+			case ComputerCraftPacket.Reboot:
+				reboot();
+				break;
+			case ComputerCraftPacket.Shutdown:
+				shutdown();
+				break;
+			case ComputerCraftPacket.QueueEvent: {
+				String event = packet.m_dataString[0];
+				Object[] arguments = null;
+				if (packet.m_dataNBT != null) arguments = NBTUtil.decodeObjects(packet.m_dataNBT);
+				queueEvent(event, arguments);
+				break;
 			}
-		} else {
-			ComputerCraft.sendToAllPlayers(packet);
+			case ComputerCraftPacket.RequestComputerUpdate:
+				sendState(sender, false);
+				break;
+			case ComputerCraftPacket.SetLabel: {
+				String label = packet.m_dataString != null && packet.m_dataString.length >= 1 ? packet.m_dataString[0] : null;
+				setLabel(label);
+				break;
+			}
 		}
 	}
 
-	@MergeVisitor.Stub
-	@MergeVisitor.Rename(from = "handlePacket")
-	public void native_handlePacket(ComputerCraftPacket packet, EntityPlayer sender) {
+	public void broadcastState() {
+		broadcastState(false);
+	}
+
+	public void broadcastState(boolean initial) {
+		// If the computer state has changed, this is the initial state then send it.
+		// If neither of these then the terminal must have changed so we want to send this
+		// when terminal limiting is disabled.
+		if (!Config.Packets.terminalLimiting || hasOutputChanged() || initial) {
+			ComputerCraftPacket packet = createStatePacket();
+			writeDescription(packet.m_dataNBT, !Config.Packets.terminalLimiting);
+
+			if (Config.Packets.updateLimiting && m_world != null && m_position != null) {
+				ComputerCraft.networkEventChannel.sendToAllAround(
+					encode(packet),
+					new NetworkRegistry.TargetPoint(
+						m_world.provider.getDimensionId(),
+						m_position.getX() + 0.5,
+						m_position.getY() + 0.5,
+						m_position.getZ() + 0.5,
+						MathHelper.clamp_int(MinecraftServer.getServer().getConfigurationManager().getViewDistance(), 3, 32) * 16
+					)
+				);
+			} else {
+				ComputerCraft.sendToAllPlayers(packet);
+			}
+		}
+
+		// We'll have sent the terminal above if terminal limiting isn't enabled. Obviously we only want
+		// to send it if it has changed
+		if (Config.Packets.terminalLimiting && hasTerminalChanged()) {
+			ComputerCraftPacket termPacket = createStatePacket();
+			writeDescription(termPacket.m_dataNBT, true);
+
+			// Send the terminal data to those watching. Sadly this does mean we send
+			// it twice, but I can live.
+			for (EntityPlayerMP player : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+				Container container = player.openContainer;
+				if (container instanceof IContainerComputer && ((IContainerComputer) container).getComputer() == this) {
+					ComputerCraft.sendToPlayer(player, termPacket);
+				}
+			}
+		}
+	}
+
+	public void sendState(EntityPlayer player) {
+		sendState(player, true);
+	}
+
+	private void sendState(EntityPlayer player, boolean withTerminal) {
+		ComputerCraftPacket packet = createStatePacket();
+		writeDescription(packet.m_dataNBT, withTerminal || !Config.Packets.terminalLimiting);
+		ComputerCraft.sendToPlayer(player, packet);
+	}
+
+	private ComputerCraftPacket createStatePacket() {
+		ComputerCraftPacket packet = new ComputerCraftPacket();
+		packet.m_packetType = 7;
+		packet.m_dataInt = new int[]{getInstanceID()};
+		packet.m_dataNBT = new NBTTagCompound();
+		return packet;
+	}
+
+	public void writeDescription(NBTTagCompound tag, boolean withTerminal) {
+		tag.setBoolean("colour", isColour());
+		Terminal terminal = getTerminal();
+		if (terminal != null) {
+			NBTTagCompound termTag = new NBTTagCompound();
+			termTag.setInteger("term_width", terminal.getWidth());
+			termTag.setInteger("term_height", terminal.getHeight());
+			((Terminal_Patch) terminal).writeToNBT(termTag, withTerminal);
+			tag.setTag("terminal", termTag);
+		}
+
+		tag.setInteger("id", m_computer.getID());
+		String label = m_computer.getLabel();
+		if (label != null) tag.setString("label", label);
+
+		tag.setBoolean("on", m_computer.isOn());
+		tag.setBoolean("blinking", m_computer.isBlinking());
+		if (m_userData != null) tag.setTag("userData", m_userData.copy());
 	}
 
 	private static FMLProxyPacket encode(ComputerCraftPacket packet) {

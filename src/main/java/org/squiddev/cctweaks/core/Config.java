@@ -319,6 +319,12 @@ public final class Config {
 		 */
 		@DefaultBoolean(true)
 		public static boolean updateLimiting;
+
+		/**
+		 * Only broadcast terminal state to those in interacting with the computer.
+		 */
+		@DefaultBoolean(true)
+		public static boolean terminalLimiting;
 	}
 
 	/**
