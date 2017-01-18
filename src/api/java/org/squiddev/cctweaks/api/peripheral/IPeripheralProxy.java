@@ -2,6 +2,8 @@ package org.squiddev.cctweaks.api.peripheral;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 
+import javax.annotation.Nullable;
+
 /**
  * Used to denote a peripheral that delegates to another peripheral.
  *
@@ -12,6 +14,8 @@ import dan200.computercraft.api.peripheral.IPeripheral;
  * You should always implement {@link IPeripheral}.
  * You should implement {@link org.squiddev.cctweaks.api.network.INetworkedPeripheral}
  * if you wish to delegate network events.
+ *
+ * You can get the base peripheral using {@link IPeripheralHelpers#getBasePeripheral(IPeripheral)}.
  */
 public interface IPeripheralProxy extends IPeripheral {
 	/**
@@ -19,5 +23,6 @@ public interface IPeripheralProxy extends IPeripheral {
 	 *
 	 * @return The peripheral this delegates to
 	 */
+	@Nullable
 	IPeripheral getBasePeripheral();
 }

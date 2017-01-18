@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,13 +62,21 @@ public abstract class PartBase extends Multipart implements IWorldPosition {
 		return true;
 	}
 
+	@Nonnull
 	@Override
 	public final IBlockAccess getBlockAccess() {
 		return getWorld();
 	}
 
+	@Nonnull
 	@Override
 	public final BlockPos getPosition() {
 		return getPos();
+	}
+
+	@Override
+	public void onConverted(TileEntity tile) {
+		super.onConverted(tile);
+		onAdded();
 	}
 }

@@ -1,8 +1,6 @@
 package org.squiddev.cctweaks.core.visualiser;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.squiddev.cctweaks.CCTweaks;
@@ -15,23 +13,27 @@ import org.squiddev.cctweaks.core.utils.DebugLogger;
  * Handles transmitting/receiving the network
  */
 public class VisualisationPacket implements AbstractPacketHandler.IPacket {
-	public VisualisationData data;
+	private NetworkChange change;
 
-	public static VisualisationPacket create(INetworkController controller, IBlockAccess world) {
-		VisualisationPacket packet = new VisualisationPacket();
-		packet.data = Gatherer.gather(controller, world);
-		return packet;
+	public VisualisationPacket() {
 	}
 
-	public static void send(INetworkController controller, EntityPlayerMP player) {
-		CCTweaks.network.sendTo(create(controller, player.worldObj), player);
+	public VisualisationPacket(NetworkChange change) {
+		this.change = change;
+	}
+
+	public static void send(NetworkState state, INetworkController controller) {
+		NetworkChange change = state.calculateChange(controller);
+		if (change != null && !change.isEmpty()) {
+			CCTweaks.network.sendTo(new VisualisationPacket(change), state.player);
+		}
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		byte version = buf.readByte();
-		if (version == 0) {
-			data = EncoderV0.INSTANCE.read(buf);
+		if (version == 1) {
+			change = NetworkChange.read(buf);
 		} else {
 			DebugLogger.error("Unexpected version " + version + " for network visualiser");
 		}
@@ -39,19 +41,15 @@ public class VisualisationPacket implements AbstractPacketHandler.IPacket {
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeByte(0);
-		EncoderV0.INSTANCE.write(buf, data);
+		buf.writeByte(1);
+		change.write(buf);
 	}
 
 	@Override
 	public IMessage handle(MessageContext cxt) {
-		RenderNetworkOverlay.data = data;
+		if (change != null) {
+			RenderNetworkOverlay.apply(change);
+		}
 		return null;
-	}
-
-	public interface Encoder {
-		VisualisationData read(ByteBuf buffer);
-
-		void write(ByteBuf buffer, VisualisationData data);
 	}
 }

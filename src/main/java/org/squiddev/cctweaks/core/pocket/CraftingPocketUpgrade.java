@@ -92,4 +92,13 @@ public class CraftingPocketUpgrade extends Module implements IRecipe {
 		RecipeSorter.register(CCTweaks.ID + ":pocket_upgrade_crafting", CraftingPocketUpgrade.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		GameRegistry.addRecipe(this);
 	}
+
+	public static ItemStack setNBT(ItemStack stack, IPocketUpgrade upgrade) {
+		NBTTagCompound tag = stack.getTagCompound();
+		if (tag == null) stack.setTagCompound(tag = new NBTTagCompound());
+
+		tag.setShort("upgrade", PocketRegistry.FLAG);
+		tag.setString("upgrade_name", upgrade.getUpgradeID().toString());
+		return stack;
+	}
 }

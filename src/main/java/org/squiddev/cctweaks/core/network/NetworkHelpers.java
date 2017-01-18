@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.network;
 
+import com.google.common.base.Preconditions;
 import mcmultipart.multipart.IMultipart;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -13,6 +14,7 @@ import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.controller.NetworkController;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,23 +24,25 @@ import java.util.Set;
  */
 public final class NetworkHelpers implements INetworkHelpers {
 	@Override
-	public boolean canConnect(IBlockAccess world, BlockPos position, EnumFacing direction) {
+	public boolean canConnect(@Nonnull IBlockAccess world, @Nonnull BlockPos position, @Nonnull EnumFacing direction) {
 		IWorldNetworkNode node = NetworkAPI.registry().getNode(world, position.offset(direction));
 		return node != null && node.canConnect(direction.getOpposite());
 	}
 
 	@Override
-	public boolean canConnect(IWorldPosition pos, EnumFacing direction) {
+	public boolean canConnect(@Nonnull IWorldPosition pos, @Nonnull EnumFacing direction) {
 		return canConnect(pos.getBlockAccess(), pos.getPosition(), direction);
 	}
 
+	@Nonnull
 	@Override
-	public Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node) {
+	public Set<INetworkNode> getAdjacentNodes(@Nonnull IWorldNetworkNode node) {
 		return getAdjacentNodes(node, true);
 	}
 
+	@Nonnull
 	@Override
-	public Set<INetworkNode> getAdjacentNodes(IWorldNetworkNode node, boolean checkExists) {
+	public Set<INetworkNode> getAdjacentNodes(@Nonnull IWorldNetworkNode node, boolean checkExists) {
 		IWorldPosition position = node.getPosition();
 		IBlockAccess access = position.getBlockAccess();
 
@@ -66,15 +70,15 @@ public final class NetworkHelpers implements INetworkHelpers {
 	}
 
 	@Override
-	public void joinOrCreateNetwork(IWorldNetworkNode node) {
+	public void joinOrCreateNetwork(@Nonnull IWorldNetworkNode node) {
 		joinOrCreateNetwork(node, getAdjacentNodes(node));
 	}
 
 	@Override
-	public void joinOrCreateNetwork(INetworkNode node, Set<? extends INetworkNode> connections) {
+	public void joinOrCreateNetwork(@Nonnull INetworkNode node, @Nonnull Set<? extends INetworkNode> connections) {
 		for (INetworkNode neighbour : connections) {
-			if (neighbour.getAttachedNetwork() != null) {
-				INetworkController network = neighbour.getAttachedNetwork();
+			INetworkController network = neighbour.getAttachedNetwork();
+			if (network != null) {
 				network.formConnection(neighbour, node);
 			}
 		}
@@ -88,7 +92,7 @@ public final class NetworkHelpers implements INetworkHelpers {
 	}
 
 	@Override
-	public void joinNewNetwork(INetworkNode node) {
+	public void joinNewNetwork(@Nonnull INetworkNode node) {
 		if (node.getAttachedNetwork() != null) {
 			node.getAttachedNetwork().removeNode(node);
 		}
@@ -96,8 +100,8 @@ public final class NetworkHelpers implements INetworkHelpers {
 	}
 
 	@Override
-	public void scheduleJoin(final IWorldNetworkNode node) {
-		if (node == null) throw new IllegalArgumentException("node cannot be null");
+	public void scheduleJoin(@Nonnull final IWorldNetworkNode node) {
+		Preconditions.checkNotNull(node, "node cannot be null");
 		McEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
@@ -107,8 +111,9 @@ public final class NetworkHelpers implements INetworkHelpers {
 	}
 
 	@Override
-	public void scheduleJoin(final IWorldNetworkNode node, final TileEntity tile) {
-		if (node == null) throw new IllegalArgumentException("node cannot be null");
+	public void scheduleJoin(@Nonnull final IWorldNetworkNode node, @Nonnull final TileEntity tile) {
+		Preconditions.checkNotNull(node, "node cannot be null");
+		Preconditions.checkNotNull(tile, "tile cannot be null");
 		McEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
@@ -121,7 +126,7 @@ public final class NetworkHelpers implements INetworkHelpers {
 	}
 
 	public static void scheduleConnect(final AbstractWorldNode node) {
-		if (node == null) throw new IllegalArgumentException("node cannot be null");
+		Preconditions.checkNotNull(node, "node cannot be null");
 		McEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
@@ -131,7 +136,8 @@ public final class NetworkHelpers implements INetworkHelpers {
 	}
 
 	public static void scheduleConnect(final AbstractWorldNode node, final TileEntity tile) {
-		if (node == null) throw new IllegalArgumentException("node cannot be null");
+		Preconditions.checkNotNull(node, "node cannot be null");
+		Preconditions.checkNotNull(tile, "tile cannot be null");
 		McEvents.schedule(new Runnable() {
 			@Override
 			public void run() {
@@ -145,7 +151,8 @@ public final class NetworkHelpers implements INetworkHelpers {
 
 	@Optional.Method(modid = MultipartIntegration.MOD_NAME)
 	public static void scheduleConnect(final AbstractWorldNode node, final IMultipart part) {
-		if (node == null) throw new IllegalArgumentException("node cannot be null");
+		Preconditions.checkNotNull(node, "node cannot be null");
+		Preconditions.checkNotNull(part, "part cannot be null");
 		McEvents.schedule(new Runnable() {
 			@Override
 			public void run() {

@@ -7,7 +7,7 @@ public abstract class CableWithInternalSidedParts extends BasicCable {
 
 	public abstract boolean canConnectInternally(EnumFacing direction);
 
-	public boolean doesConnectInternally(EnumFacing direction) {
+	private boolean doesConnectInternally(EnumFacing direction) {
 		int flag = 1 << direction.ordinal();
 		return (internalConnMap & flag) == flag;
 	}

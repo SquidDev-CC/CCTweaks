@@ -8,6 +8,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Additional peripherals for pocket computers.
  *
@@ -24,6 +27,7 @@ public interface IPocketUpgrade {
 	 * @see ITurtleUpgrade#getUpgradeID()
 	 * @see IPocketRegistry#addUpgrade(IPocketUpgrade)
 	 */
+	@Nonnull
 	ResourceLocation getUpgradeID();
 
 	/**
@@ -33,6 +37,7 @@ public interface IPocketUpgrade {
 	 * @return The unlocalised adjective
 	 * @see ITurtleUpgrade#getUnlocalisedAdjective()
 	 */
+	@Nonnull
 	String getUnlocalisedAdjective();
 
 	/**
@@ -43,6 +48,7 @@ public interface IPocketUpgrade {
 	 * @return The item stack used for crafting. This can be {@code null} if crafting is disabled.
 	 * @see ITurtleUpgrade#getCraftingItem()
 	 */
+	@Nullable
 	ItemStack getCraftingItem();
 
 	/**
@@ -55,7 +61,8 @@ public interface IPocketUpgrade {
 	 * @return The newly created peripheral.
 	 * @see ITurtleUpgrade#createPeripheral(ITurtleAccess, TurtleSide)
 	 */
-	IPeripheral createPeripheral(IPocketAccess access);
+	@Nullable
+	IPeripheral createPeripheral(@Nonnull IPocketAccess access);
 
 	/**
 	 * Called when the pocket computer item stack updates
@@ -63,7 +70,7 @@ public interface IPocketUpgrade {
 	 * @param access     The access object for the pocket item stack
 	 * @param peripheral The peripheral for this upgrade
 	 */
-	void update(IPocketAccess access, IPeripheral peripheral);
+	void update(@Nonnull IPocketAccess access, @Nullable IPeripheral peripheral);
 
 	/**
 	 * Called when the pocket computer is right clicked on something
@@ -73,5 +80,5 @@ public interface IPocketUpgrade {
 	 * @param peripheral The peripheral for this upgrade
 	 * @return {@code true} to stop the gui from opening, otherwise false.
 	 */
-	boolean onRightClick(World world, IPocketAccess access, IPeripheral peripheral);
+	boolean onRightClick(@Nonnull World world, @Nonnull IPocketAccess access, @Nullable IPeripheral peripheral);
 }

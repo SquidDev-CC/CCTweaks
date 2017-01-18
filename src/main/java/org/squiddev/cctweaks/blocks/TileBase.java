@@ -12,10 +12,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
+import javax.annotation.Nonnull;
+
 /**
  * Base tile for all TileEntities
  */
 public abstract class TileBase extends TileEntity implements IWorldPosition {
+	@Nonnull
 	@Override
 	public BlockPos getPosition() {
 		return getPos();
@@ -131,6 +134,7 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	public void onNeighborChanged() {
 	}
 
+	@Nonnull
 	@Override
 	public IBlockAccess getBlockAccess() {
 		return worldObj;

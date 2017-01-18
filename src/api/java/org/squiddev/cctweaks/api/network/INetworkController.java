@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.api.network;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.UnorderedPair;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ public interface INetworkController {
 	 * @throws IllegalArgumentException If attempting to connect to itself
 	 * @throws IllegalArgumentException If {@code existingNode} is not on the network
 	 */
-	void formConnection(INetworkNode existingNode, INetworkNode newNode);
+	void formConnection(@Nonnull INetworkNode existingNode, @Nonnull INetworkNode newNode);
 
 	/**
 	 * Nodes call this when a connection between two nodes is broken.
@@ -43,7 +44,7 @@ public interface INetworkController {
 	 * @param connection A pair of nodes representing the nodes being disconnected.
 	 * @throws IllegalArgumentException If either node is not on the network
 	 */
-	void breakConnection(UnorderedPair<INetworkNode> connection);
+	void breakConnection(@Nonnull UnorderedPair<INetworkNode> connection);
 
 	/**
 	 * Nodes call this when they wish to be removed from the network entirely.
@@ -54,7 +55,7 @@ public interface INetworkController {
 	 * @param node The node being removed.
 	 * @throws IllegalArgumentException If the node is not on the network
 	 */
-	void removeNode(INetworkNode node);
+	void removeNode(@Nonnull INetworkNode node);
 
 	/**
 	 * Gets the peripherals known to be on the network.
@@ -64,6 +65,7 @@ public interface INetworkController {
 	 *
 	 * @return The cached map of peripherals on the network.
 	 */
+	@Nonnull
 	Map<String, IPeripheral> getPeripheralsOnNetwork();
 
 	/**
@@ -80,16 +82,18 @@ public interface INetworkController {
 	 * @param node The node to invalidate.
 	 * @throws IllegalArgumentException If the node is not on the network
 	 */
-	void invalidateNode(INetworkNode node);
+	void invalidateNode(@Nonnull INetworkNode node);
 
 	/**
 	 * @return All nodes on the network.
 	 */
+	@Nonnull
 	Set<INetworkNode> getNodesOnNetwork();
 
 	/**
 	 * @return All the pairs of nodes that are connected.
 	 */
+	@Nonnull
 	Set<UnorderedPair<INetworkNode>> getNodeConnections();
 
 	/**
@@ -99,5 +103,5 @@ public interface INetworkController {
 	 * @param packet The packet being transmitted.
 	 * @throws IllegalArgumentException If the node is not on the network
 	 */
-	void transmitPacket(INetworkNode node, Packet packet);
+	void transmitPacket(@Nonnull INetworkNode node, @Nonnull Packet packet);
 }

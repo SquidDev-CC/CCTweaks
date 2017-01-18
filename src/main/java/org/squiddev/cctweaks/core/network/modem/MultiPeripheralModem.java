@@ -7,6 +7,7 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHidden;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -49,6 +50,7 @@ public abstract class MultiPeripheralModem extends BasicModem {
 		}
 	};
 
+	@Nonnull
 	@Override
 	public Map<String, IPeripheral> getConnectedPeripherals() {
 		if (!isPeripheralEnabled()) return Collections.emptyMap();

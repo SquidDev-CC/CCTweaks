@@ -20,12 +20,16 @@ import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.Module;
 
+import javax.annotation.Nonnull;
+
 public class PocketEnderModem extends Module implements IPocketUpgrade {
+	@Nonnull
 	@Override
 	public ResourceLocation getUpgradeID() {
 		return new ResourceLocation("cctweaks:advancedModem");
 	}
 
+	@Nonnull
 	@Override
 	public String getUnlocalisedAdjective() {
 		return "pocket." + CCTweaks.ID + ".advancedModem.adjective";
@@ -37,12 +41,12 @@ public class PocketEnderModem extends Module implements IPocketUpgrade {
 	}
 
 	@Override
-	public IPeripheral createPeripheral(IPocketAccess access) {
+	public IPeripheral createPeripheral(@Nonnull IPocketAccess access) {
 		return Config.Misc.pocketEnderModem ? new PocketModem(access, true) : null;
 	}
 
 	@Override
-	public void update(IPocketAccess access, IPeripheral peripheral) {
+	public void update(@Nonnull IPocketAccess access, IPeripheral peripheral) {
 		if (Config.Misc.pocketEnderModem && peripheral instanceof PocketModem) {
 			PocketModem modem = (PocketModem) peripheral;
 			access.setModemLight(modem.isActive());
@@ -50,7 +54,7 @@ public class PocketEnderModem extends Module implements IPocketUpgrade {
 	}
 
 	@Override
-	public boolean onRightClick(World world, IPocketAccess access, IPeripheral peripheral) {
+	public boolean onRightClick(@Nonnull World world, @Nonnull IPocketAccess access, IPeripheral peripheral) {
 		return false;
 	}
 

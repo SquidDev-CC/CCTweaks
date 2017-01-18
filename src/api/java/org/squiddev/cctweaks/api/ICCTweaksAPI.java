@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.api;
 
+import org.squiddev.cctweaks.api.block.IRotationRegistry;
 import org.squiddev.cctweaks.api.lua.ILuaEnvironment;
 import org.squiddev.cctweaks.api.network.INetworkHelpers;
 import org.squiddev.cctweaks.api.network.INetworkRegistry;
@@ -25,4 +26,6 @@ public interface ICCTweaksAPI {
 	ILuaEnvironment luaEnvironment();
 
 	IPocketRegistry pocketRegistry();
+
+	IRotationRegistry rotationRegistry();
 }

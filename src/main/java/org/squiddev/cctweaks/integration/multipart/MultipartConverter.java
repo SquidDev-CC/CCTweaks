@@ -53,16 +53,12 @@ public class MultipartConverter implements IPartConverter, IReversePartConverter
 		Collection<? extends IMultipart> parts = container.getParts();
 		if (parts.size() == 0 || parts.size() > 2) return false;
 
-		boolean cable = false;
+		PartCable cable = null;
 		PartModem modem = null;
 
 		for (IMultipart part : parts) {
 			if (part instanceof PartCable) {
-				if (cable) {
-					return false;
-				} else {
-					cable = true;
-				}
+				cable = (PartCable) part;
 			} else if (part instanceof PartModem) {
 				if (modem != null) {
 					return false;
@@ -75,8 +71,8 @@ public class MultipartConverter implements IPartConverter, IReversePartConverter
 		}
 
 		EnumFacing facing = modem == null ? EnumFacing.DOWN : modem.getSide();
-		PeripheralType type = cable ? PeripheralType.Cable : PeripheralType.WiredModem;
-		if (cable && modem != null) type = PeripheralType.WiredModemWithCable;
+		PeripheralType type = cable != null ? PeripheralType.Cable : PeripheralType.WiredModem;
+		if (cable != null && modem != null) type = PeripheralType.WiredModemWithCable;
 
 		World world = container.getWorldIn();
 		BlockPos pos = container.getPosIn();
@@ -87,7 +83,6 @@ public class MultipartConverter implements IPartConverter, IReversePartConverter
 		if (tile instanceof TileCable) {
 			TileCable tCable = (TileCable) tile;
 			if (modem != null) {
-
 				try {
 					SinglePeripheralModem peripheralModem = (SinglePeripheralModem) ComputerAccessor.cableModem.get(tCable);
 
@@ -98,6 +93,9 @@ public class MultipartConverter implements IPartConverter, IReversePartConverter
 				}
 			}
 		}
+
+		if (modem != null) modem.onRemoved();
+		if (cable != null) cable.onRemoved();
 
 		return true;
 	}

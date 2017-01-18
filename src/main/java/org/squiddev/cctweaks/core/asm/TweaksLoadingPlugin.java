@@ -79,5 +79,10 @@ public class TweaksLoadingPlugin implements IFMLLoadingPlugin {
 			bus.register(this);
 			return true;
 		}
+
+		@Override
+		public String getGuiClassName() {
+			return CCTweaks.GUI_FACTORY;
+		}
 	}
 }

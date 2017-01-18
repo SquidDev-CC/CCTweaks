@@ -4,6 +4,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.network.INetworkAccess;
 import org.squiddev.cctweaks.api.network.Packet;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,8 +14,9 @@ import java.util.Set;
  * A {@link INetworkAccess} implementation that delegates to other networks
  */
 public class NetworkAccessDelegate implements INetworkAccess {
-	protected final Set<INetworkAccess> networks = new HashSet<INetworkAccess>();
+	private final Set<INetworkAccess> networks = new HashSet<INetworkAccess>();
 
+	@Nonnull
 	@Override
 	public Map<String, IPeripheral> getPeripheralsOnNetwork() {
 		// We can't cache this at all as we can't receive network changed events
@@ -33,7 +35,7 @@ public class NetworkAccessDelegate implements INetworkAccess {
 	}
 
 	@Override
-	public boolean transmitPacket(Packet packet) {
+	public boolean transmitPacket(@Nonnull Packet packet) {
 		// To consider, should we always fail if one fails, or succeed if one succeeds?
 
 		boolean success = false;

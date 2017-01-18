@@ -5,6 +5,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -16,6 +18,7 @@ public interface IPocketAccess {
 	 *
 	 * @return The holding entity, may be {@code null}.
 	 */
+	@Nullable
 	Entity getEntity();
 
 	/**
@@ -37,6 +40,7 @@ public interface IPocketAccess {
 	 *
 	 * @return The upgrade's NBT
 	 */
+	@Nonnull
 	NBTTagCompound getUpgradeNBTData();
 
 	/**
@@ -45,9 +49,16 @@ public interface IPocketAccess {
 	void updateUpgradeNBTData();
 
 	/**
+	 * Remove the current peripheral and create a new one. You
+	 * may wish to do this if the methods available change.
+	 */
+	void invalidatePeripheral();
+
+	/**
 	 * Get a list of all upgrades for the pocket computer
 	 *
 	 * @return A collection of all upgrade names
 	 */
+	@Nonnull
 	Map<ResourceLocation, IPeripheral> getUpgrades();
 }

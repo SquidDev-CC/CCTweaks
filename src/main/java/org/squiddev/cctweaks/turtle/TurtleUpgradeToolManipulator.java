@@ -11,9 +11,16 @@ import org.squiddev.cctweaks.api.turtle.IExtendedTurtleUpgrade;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.Registry;
 
+import javax.annotation.Nonnull;
+
 public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implements IExtendedTurtleUpgrade {
 	public TurtleUpgradeToolManipulator() {
-		super("toolManipulator", Config.Turtle.ToolHost.advancedUpgradeId, new ItemStack(Registry.itemToolHost, 1, 1));
+		super("toolManipulator", Config.Turtle.ToolHost.advancedUpgradeId);
+	}
+
+	@Override
+	protected ItemStack getStack() {
+		return new ItemStack(Registry.itemToolHost, 1, 1);
 	}
 
 	@Override
@@ -32,7 +39,7 @@ public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implemen
 	}
 
 	@Override
-	public void upgradeChanged(ITurtleAccess turtle, TurtleSide side, ITurtleUpgrade oldUpgrade, ITurtleUpgrade newUpgrade) {
+	public void upgradeChanged(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side, ITurtleUpgrade oldUpgrade, ITurtleUpgrade newUpgrade) {
 	}
 
 	@Override

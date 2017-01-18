@@ -25,6 +25,7 @@ import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.cctweaks.integration.multipart.PartSided;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
 
@@ -96,10 +97,11 @@ public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHo
 	}
 
 	@Override
-	public IPeripheral getPeripheral(EnumFacing side) {
+	public IPeripheral getPeripheral(@Nonnull EnumFacing side) {
 		return binding.getModem().modem;
 	}
 
+	@Nonnull
 	@Override
 	public IWorldNetworkNode getNode() {
 		return binding;

@@ -2,6 +2,8 @@ package org.squiddev.cctweaks.api.peripheral;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 
+import javax.annotation.Nonnull;
+
 /**
  * Useful helpers for peripherals
  */
@@ -12,7 +14,8 @@ public interface IPeripheralHelpers {
 	 * @param peripheral The peripheral
 	 * @return The base peripheral
 	 */
-	IPeripheral getBasePeripheral(IPeripheral peripheral);
+	@Nonnull
+	IPeripheral getBasePeripheral(@Nonnull IPeripheral peripheral);
 
 	/**
 	 * Gets the target peripheral for this peripheral.
@@ -23,5 +26,6 @@ public interface IPeripheralHelpers {
 	 * @param peripheral The peripheral to find
 	 * @return The target or the last peripheral we found
 	 */
-	Object getTarget(IPeripheral peripheral);
+	@Nonnull
+	Object getTarget(@Nonnull IPeripheral peripheral);
 }

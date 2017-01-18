@@ -14,12 +14,13 @@ import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 
 public final class PocketAccess implements IPocketAccess {
-	protected IPocketUpgrade upgrade;
+	protected final IPocketUpgrade upgrade;
 	protected Entity entity;
 	protected ItemStack stack;
 	protected IPeripheral peripheral;
@@ -72,6 +73,7 @@ public final class PocketAccess implements IPocketAccess {
 		}
 	}
 
+	@Nonnull
 	@Override
 	public NBTTagCompound getUpgradeNBTData() {
 		NBTTagCompound tag;
@@ -102,6 +104,16 @@ public final class PocketAccess implements IPocketAccess {
 		}
 	}
 
+	@Override
+	public void invalidatePeripheral() {
+		ServerComputer computer = getComputer();
+		if (computer == null) return;
+
+		peripheral = upgrade.createPeripheral(this);
+		computer.setPeripheral(2, peripheral);
+	}
+
+	@Nonnull
 	@Override
 	public Map<ResourceLocation, IPeripheral> getUpgrades() {
 		return Collections.singletonMap(upgrade.getUpgradeID(), peripheral);

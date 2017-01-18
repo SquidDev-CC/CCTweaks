@@ -6,6 +6,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * A card that can be used to store/retrieve data
  */
@@ -22,7 +25,7 @@ public interface IDataCard {
 	 * @param type  The type of data this card stores. {@link #getType}
 	 * @param data  The data that this card stores {@link #getData}
 	 */
-	void setSettings(ItemStack stack, String type, NBTTagCompound data);
+	void setSettings(@Nonnull ItemStack stack, @Nonnull String type, @Nullable NBTTagCompound data);
 
 	/**
 	 * Get the type this card stores.
@@ -32,7 +35,8 @@ public interface IDataCard {
 	 * @param stack The stack to read the data from
 	 * @return The type this card contains or {@link #EMPTY} if nothing is stored
 	 */
-	String getType(ItemStack stack);
+	@Nonnull
+	String getType(@Nonnull ItemStack stack);
 
 	/**
 	 * Get the data this card stores
@@ -43,7 +47,8 @@ public interface IDataCard {
 	 * @param stack The stack to read the data from
 	 * @return The data that is stored on this card
 	 */
-	NBTTagCompound getData(ItemStack stack);
+	@Nullable
+	NBTTagCompound getData(@Nonnull ItemStack stack);
 
 	/**
 	 * Notify the player of a card event
@@ -51,7 +56,7 @@ public interface IDataCard {
 	 * @param player  The player to notify
 	 * @param message The message to notify the player with
 	 */
-	void notifyPlayer(EntityPlayer player, Messages message);
+	void notifyPlayer(@Nonnull EntityPlayer player, @Nonnull Messages message);
 
 	enum Messages {
 		/**
@@ -74,6 +79,7 @@ public interface IDataCard {
 		 *
 		 * @return The chat message
 		 */
+		@Nonnull
 		public ITextComponent getChatMessage() {
 			return new TextComponentTranslation("chat.cctweaks.data.messages." + this.toString());
 		}

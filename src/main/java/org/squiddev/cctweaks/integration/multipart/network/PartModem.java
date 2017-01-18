@@ -113,13 +113,14 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	public final WiredModem modem = new WiredModem();
 
 	//region Basic getters
+	@Nonnull
 	@Override
 	public IWorldNetworkNode getNode() {
 		return modem;
 	}
 
 	@Override
-	public IPeripheral getPeripheral(EnumFacing side) {
+	public IPeripheral getPeripheral(@Nonnull EnumFacing side) {
 		return side == getSide() ? modem.modem : null;
 	}
 
@@ -258,7 +259,6 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
 			}
 
-			modem.getAttachedNetwork().invalidateNode(modem);
 			refreshPart();
 		}
 
@@ -272,6 +272,7 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	}
 
 	public class WiredModem extends DirectionalPeripheralModem {
+		@Nonnull
 		@Override
 		public IWorldPosition getPosition() {
 			return PartModem.this;

@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.api.network;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -16,6 +17,7 @@ public interface INetworkNode {
 	 * @return Map of name to peripheral. This should *never* be {@code null}.
 	 * @see INetworkController#getPeripheralsOnNetwork()
 	 */
+	@Nonnull
 	Map<String, IPeripheral> getConnectedPeripherals();
 
 	/**
@@ -25,7 +27,7 @@ public interface INetworkNode {
 	 * @param packet            The packet to send
 	 * @param distanceTravelled Distance traveled by the packet
 	 */
-	void receivePacket(Packet packet, double distanceTravelled);
+	void receivePacket(@Nonnull Packet packet, double distanceTravelled);
 
 	/**
 	 * Called when the peripheral map on the network changes
@@ -38,7 +40,7 @@ public interface INetworkNode {
 	 * @param oldPeripherals Peripherals removed from the network
 	 * @param newPeripherals Peripherals added to the network
 	 */
-	void networkInvalidated(Map<String, IPeripheral> oldPeripherals, Map<String, IPeripheral> newPeripherals);
+	void networkInvalidated(@Nonnull Map<String, IPeripheral> oldPeripherals, @Nonnull Map<String, IPeripheral> newPeripherals);
 
 	/**
 	 * Called when the network is detached from this node.
@@ -62,7 +64,7 @@ public interface INetworkNode {
 	 *
 	 * @param networkController The network this node is being added to.
 	 */
-	void attachToNetwork(INetworkController networkController);
+	void attachToNetwork(@Nonnull INetworkController networkController);
 
 	/**
 	 * Should return the network this node was last attached to.

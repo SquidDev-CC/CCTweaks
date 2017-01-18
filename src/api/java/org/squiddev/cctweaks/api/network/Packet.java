@@ -1,5 +1,7 @@
 package org.squiddev.cctweaks.api.network;
 
+import javax.annotation.Nonnull;
+
 /**
  * A packet sent along a wired network
  *
@@ -19,11 +21,13 @@ public final class Packet {
 	/**
 	 * Content of the packet
 	 */
+	@Nonnull
 	public final Object payload;
 
 	/**
 	 * The sender of the packet
 	 */
+	@Nonnull
 	public final Object senderObject;
 
 	/**
@@ -34,7 +38,7 @@ public final class Packet {
 	 * @param payload      Content of the packet
 	 * @param senderObject The sender of the packet
 	 */
-	public Packet(int channel, int replyChannel, Object payload, Object senderObject) {
+	public Packet(int channel, int replyChannel, @Nonnull Object payload, @Nonnull Object senderObject) {
 		this.channel = channel;
 		this.replyChannel = replyChannel;
 		this.payload = payload;

@@ -3,6 +3,9 @@ package org.squiddev.cctweaks.api.peripheral;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.util.EnumFacing;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * An object that hosts a {@link IPeripheral}.
  *
@@ -17,5 +20,6 @@ public interface IPeripheralHost {
 	 * @param side The side to get the peripheral from
 	 * @return The peripheral this object holds
 	 */
-	IPeripheral getPeripheral(EnumFacing side);
+	@Nullable
+	IPeripheral getPeripheral(@Nonnull EnumFacing side);
 }

@@ -36,11 +36,9 @@ import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
-import org.squiddev.cctweaks.core.visualiser.VisualisationPacket;
-import org.squiddev.cctweaks.lua.lib.cobalt.CobaltMachine;
-import org.squiddev.cctweaks.lua.lib.rembulan.RembulanMachine;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 public class ItemDebugger extends ItemComputerAction {
@@ -59,32 +57,14 @@ public class ItemDebugger extends ItemComputerAction {
 	}
 
 	@Override
-	@Nonnull
-	public ActionResult<ItemStack> onItemRightClick(@Nonnull ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
-		// Allow manually refreshing the network
-		if (player.isSneaking() && !world.isRemote && player instanceof EntityPlayerMP && Config.Computer.debugWandEnabled) {
-			handleWatcher((EntityPlayerMP) player, NetworkPlayerWatcher.get(player), true);
-		}
-
-		return super.onItemRightClick(stack, world, player, hand);
-	}
-
-	private void handleWatcher(EntityPlayerMP player, NetworkPlayerWatcher.Watcher watcher, boolean force) {
-		if (watcher == null) return;
-		if (watcher.changed() || force) VisualisationPacket.send(watcher.controller, player);
-		if (watcher.controller == null) NetworkPlayerWatcher.remove(player);
-	}
-
-	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int p_77663_4_, boolean p_77663_5_) {
 		super.onUpdate(stack, world, entity, p_77663_4_, p_77663_5_);
 
-		if (!world.isRemote && entity instanceof EntityPlayerMP && Config.Computer.debugWandEnabled) {
+		if (!world.isRemote && entity instanceof EntityPlayerMP && Config.Network.Visualisation.enabled) {
 			EntityPlayerMP player = ((EntityPlayerMP) entity);
 			if (player.getHeldItem(EnumHand.MAIN_HAND) == stack || player.getHeldItem(EnumHand.OFF_HAND) == stack) {
 				RayTraceResult position = getMovingObjectPositionFromPlayer(world, player);
-				if (position == null || position.typeOfHit != RayTraceResult.Type.BLOCK) return;
-				handleWatcher(player, NetworkPlayerWatcher.update(player, position.getBlockPos()), false);
+				NetworkPlayerWatcher.update(player, position == null ? null : position.getBlockPos());
 			}
 		}
 	}
@@ -124,13 +104,15 @@ public class ItemDebugger extends ItemComputerAction {
 			if (luaMachine instanceof LuaJLuaMachine) {
 				org.luaj.vm2.LuaValue globals = (org.luaj.vm2.LuaValue) ComputerAccessor.luaMachineGlobals.get(luaMachine);
 				globals.load(new org.luaj.vm2.lib.DebugLib());
-			} else if (luaMachine instanceof CobaltMachine) {
-				((CobaltMachine) luaMachine).injectDebug();
-			} else if (luaMachine instanceof RembulanMachine) {
-				((RembulanMachine) luaMachine).injectDebug();
 			} else {
-				DebugLogger.warn("Computer machine is unknown (" + luaMachine.getClass().getName() + "). Cannot inject debug library.");
-				return false;
+				try {
+					Method method = luaMachine.getClass().getMethod("injectDebug");
+					method.setAccessible(true);
+					method.invoke(luaMachine);
+				} catch (NoSuchMethodException e) {
+					DebugLogger.warn("Computer machine (" + luaMachine.getClass().getName() + ") has no .injectDebug() method. Cannot inject debug library.");
+					return false;
+				}
 			}
 		} catch (NullPointerException e) {
 			DebugLogger.warn("Could not add DebugLib", e);
@@ -218,7 +200,7 @@ public class ItemDebugger extends ItemComputerAction {
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 	private static ITextComponent withColor(String message, TextFormatting color) {

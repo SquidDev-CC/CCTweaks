@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.api.network;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -13,6 +14,7 @@ public interface INetworkAccess {
 	 *
 	 * @return The map of these peripherals.
 	 */
+	@Nonnull
 	Map<String, IPeripheral> getPeripheralsOnNetwork();
 
 	/**
@@ -29,5 +31,5 @@ public interface INetworkAccess {
 	 * @param packet The packet to transmit.
 	 * @return Whether the network was able to transmit the packet.
 	 */
-	boolean transmitPacket(Packet packet);
+	boolean transmitPacket(@Nonnull Packet packet);
 }

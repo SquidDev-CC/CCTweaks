@@ -31,20 +31,16 @@ gui.config.cctweaks.computer.computerUpgradeCrafting=Computer Upgrade Crafting
 gui.config.cctweaks.computer.debugWandEnabled=Debug Wand Enabled
 gui.config.cctweaks.computer.debug=Debug API Enabled
 gui.config.cctweaks.computer.computerThreadTimeout=Computer Thread Timeout
-gui.config.cctweaks.computer.luaJC=LuaJC
-gui.config.cctweaks.computer.luaJCVerify=Verify LuaJC
-gui.config.cctweaks.computer.luajc=LuaJC
-gui.config.cctweaks.computer.luajc.enabled=Enabled
-gui.config.cctweaks.computer.luajc.verify=Verify
-gui.config.cctweaks.computer.luajc.threshold=Compile Threshold
-gui.config.cctweaks.computer.cobalt=Cobalt VM
+gui.config.cctweaks.computer.runtime=Runtime
 gui.config.cctweaks.computer.timeoutError=Timeout Error
 gui.config.cctweaks.computer.biosPath=Bios Path
 gui.config.cctweaks.computer.maxFilesHandles=Max File Handles
-gui.config.cctweaks.computer.rembulan=Rembulan
 gui.config.cctweaks.computer.limitedLabels=Limited Labels
+gui.config.cctweaks.computer.suspendInactive=Suspend Inactive (Sponge only)
+gui.config.cctweaks.computer.safeNetworking=Safe networking
 gui.config.cctweaks.computer.multithreading=Multi-threading
 gui.config.cctweaks.computer.multithreading.enabled=Enabled
+gui.config.cctweaks.computer.multithreading.priority=Priority
 gui.config.cctweaks.computer.multithreading.threads=Threads
 
 gui.config.cctweaks.turtle=Turtle
@@ -69,9 +65,12 @@ gui.config.cctweaks.network.wirelessbridge.turtleEnabled=Turtle Enabled
 gui.config.cctweaks.network.wirelessbridge.turtleId=Turtle Upgrade Id
 gui.config.cctweaks.network.wirelessbridge.pocketEnabled=Pocket Enabled
 gui.config.cctweaks.network.wirelessbridge.pocketId=Pocket Upgrade Id
+gui.config.cctweaks.network.visualisation=Visualisation
+gui.config.cctweaks.network.visualisation.enabled=Enabled
+gui.config.cctweaks.network.visualisation.renderDistance=Render distance
+gui.config.cctweaks.network.visualisation.cooldown=Cooldown
 
 gui.config.cctweaks.integration=Integration
-gui.config.cctweaks.integration.openPeripheralInventories=OpenPeripheral Inventories
 gui.config.cctweaks.integration.mcMultipart=MC Multipart Support
 
 gui.config.cctweaks.testing=Testing
@@ -103,3 +102,5 @@ gui.config.cctweaks.apis.debug=debug Enabled
 gui.config.cctweaks.apis.bitop=bitop Enabled
 gui.config.cctweaks.apis.profiler=profiler Enabled
 
+gui.jei.cctweaks.pocket=Pocket upgrades
+gui.jei.cctweaks.turtle=Turtle upgrades

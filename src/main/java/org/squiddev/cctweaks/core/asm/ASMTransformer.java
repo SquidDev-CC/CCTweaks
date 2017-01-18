@@ -1,10 +1,14 @@
 package org.squiddev.cctweaks.core.asm;
 
+import joptsimple.internal.Strings;
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.ICrashCallable;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import org.apache.logging.log4j.Level;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -76,16 +80,6 @@ public class ASMTransformer implements IClassTransformer {
 				}
 			},
 
-			// Open peripheral
-			new ClassMerger(
-				"openperipheral.addons.peripheralproxy.WrappedPeripheral",
-				"org.squiddev.cctweaks.core.patch.op.PeripheralProxy_Patch"
-			),
-
-			// OP Patches: targeted peripherals & network environment
-			new PatchOpenPeripheralAdapter(),
-			new PatchOpenModule(),
-
 			// Targeted peripherals
 			new ClassMerger(
 				"dan200.computercraft.shared.computer.blocks.ComputerPeripheral",
@@ -127,7 +121,42 @@ public class ASMTransformer implements IClassTransformer {
 			new ClassMerger(
 				"dan200.computercraft.shared.computer.blocks.TileComputerBase",
 				"org.squiddev.cctweaks.core.patch.TileComputerBase_Patch"
-			)
+			),
+
+			// Add IContainerComputer to various containers.
+			new ClassMerger(
+				"dan200.computercraft.shared.computer.inventory.ContainerComputer",
+				"org.squiddev.cctweaks.core.patch.ContainerComputer_Patch"
+			),
+			new ClassMerger(
+				"dan200.computercraft.shared.turtle.inventory.ContainerTurtle",
+				"org.squiddev.cctweaks.core.patch.ContainerTurtle_Patch"
+			),
+			new ClassMerger(
+				"dan200.computercraft.shared.media.inventory.ContainerHeldItem",
+				"org.squiddev.cctweaks.core.patch.ContainerHeldItem_Patch"
+			),
+
+			// Allow suspending computers which time out.
+			new SetSuspendable(),
+
+			// Allow specifying direction on turtle.place methods
+			new ClassMerger(
+				"dan200.computercraft.shared.turtle.core.TurtlePlaceCommand",
+				"org.squiddev.cctweaks.core.patch.TurtlePlaceCommand_Patch"
+			),
+
+			// Implement IComputerItemFactory
+			new ClassMerger(
+				"dan200.computercraft.shared.computer.items.ItemComputerBase",
+				"org.squiddev.cctweaks.core.patch.ItemComputerBase_Patch"
+			),
+
+			// Optimisations for terminal packets
+			new ClassMerger(
+				"dan200.computercraft.core.terminal.Terminal",
+				"org.squiddev.cctweaks.core.patch.Terminal_Patch"
+			),
 		});
 
 		patches.finalise();
@@ -164,6 +193,18 @@ public class ASMTransformer implements IClassTransformer {
 					"If you encounter issues then try to reproduce without CCTweaks installed, then report to the appropriate mod author.",
 				};
 				DebugLogger.major(Level.WARN, message);
+
+				FMLCommonHandler.instance().registerCrashCallable(new ICrashCallable() {
+					@Override
+					public String getLabel() {
+						return "CCTweaks version issue";
+					}
+
+					@Override
+					public String call() throws Exception {
+						return Strings.join(message, "\n\t");
+					}
+				});
 			}
 		}
 	}
@@ -200,6 +241,24 @@ public class ASMTransformer implements IClassTransformer {
 	}
 
 	public void writeDump(String className, byte[] bytes) {
+
+		if (className.endsWith("TurtlePlaceCommand")) {
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			ClassReader reader = new ClassReader(bytes);
+			Exception error = null;
+			try {
+				CheckClassAdapter.verify(reader, getClass().getClassLoader(), false, printWriter);
+			} catch (Exception e) {
+				error = e;
+			}
+
+			String contents = writer.toString();
+			if (error != null || contents.length() > 0) {
+				DebugLogger.debug("Cannot load " + className + "\n" + contents, error);
+			}
+		}
+
 		if (org.squiddev.cctweaks.lua.Config.Testing.dumpAsm) {
 			File file = new File(TweaksLoadingPlugin.dump, className.replace('.', '/') + ".class");
 			File directory = file.getParentFile();

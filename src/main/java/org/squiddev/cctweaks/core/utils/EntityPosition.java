@@ -6,6 +6,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
+import javax.annotation.Nonnull;
+
 public class EntityPosition implements IWorldPosition {
 	public Entity entity;
 
@@ -13,11 +15,13 @@ public class EntityPosition implements IWorldPosition {
 		this.entity = entity;
 	}
 
+	@Nonnull
 	@Override
 	public IBlockAccess getBlockAccess() {
 		return entity.worldObj;
 	}
 
+	@Nonnull
 	@Override
 	public BlockPos getPosition() {
 		int y;

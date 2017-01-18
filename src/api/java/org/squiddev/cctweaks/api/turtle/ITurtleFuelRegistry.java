@@ -3,6 +3,9 @@ package org.squiddev.cctweaks.api.turtle;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Register custom fuel providers
  */
@@ -14,7 +17,7 @@ public interface ITurtleFuelRegistry {
 	 *
 	 * @param provider The fuel provider to register with
 	 */
-	void addFuelProvider(ITurtleFuelProvider provider);
+	void addFuelProvider(@Nonnull ITurtleFuelProvider provider);
 
 	/**
 	 * Get a provider for this fuel
@@ -24,5 +27,6 @@ public interface ITurtleFuelRegistry {
 	 * @return The provider, or {@code null} if none found.
 	 * @see ITurtleFuelProvider#canRefuel(ITurtleAccess, ItemStack)
 	 */
-	ITurtleFuelProvider getProvider(ITurtleAccess turtle, ItemStack stack);
+	@Nullable
+	ITurtleFuelProvider getProvider(@Nonnull ITurtleAccess turtle, @Nonnull ItemStack stack);
 }

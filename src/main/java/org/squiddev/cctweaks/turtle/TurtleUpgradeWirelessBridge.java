@@ -34,6 +34,8 @@ import org.squiddev.cctweaks.core.peripheral.PeripheralProxy;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.turtle.LuaDirection;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.vecmath.Matrix4f;
 import java.util.Map;
 
@@ -50,7 +52,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 	private IBakedModel modelRight;
 
 	public TurtleUpgradeWirelessBridge() {
-		super("wirelessBridge", Config.Network.WirelessBridge.turtleId, new ItemStack(Registry.blockNetworked, 1, 1));
+		super("wirelessBridge", Config.Network.WirelessBridge.turtleId);
 	}
 
 	@Override
@@ -59,8 +61,13 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 	}
 
 	@Override
+	protected ItemStack getStack() {
+		return new ItemStack(Registry.blockNetworked, 1, 0);
+	}
+
+	@Override
 	public ItemStack getCraftingItem() {
-		return Config.Network.WirelessBridge.turtleEnabled ? new ItemStack(Registry.blockNetworked, 1, 0) : null;
+		return Config.Network.WirelessBridge.turtleEnabled ? super.getCraftingItem() : null;
 	}
 
 	@Override
@@ -92,7 +99,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 	}
 
 	@Override
-	public void upgradeChanged(ITurtleAccess turtle, TurtleSide side, ITurtleUpgrade oldUpgrade, ITurtleUpgrade newUpgrade) {
+	public void upgradeChanged(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side, ITurtleUpgrade oldUpgrade, ITurtleUpgrade newUpgrade) {
 		if (Config.Network.WirelessBridge.turtleEnabled) {
 			IPeripheral peripheral = turtle.getPeripheral(side);
 			if (peripheral instanceof TurtleBinding.TurtleModemPeripheral) {
@@ -153,6 +160,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 		public class TurtleModem extends BindingModem {
 			protected final PeripheralCollection peripherals = new PeripheralCollection(2) {
 				private final IPeripheral peripheral = new PeripheralProxy("turtle") {
+					@Nonnull
 					@Override
 					protected IPeripheral createPeripheral() {
 						return PeripheralUtil.getPeripheral(turtle.getWorld(), turtle.getPosition(), EnumFacing.DOWN);
@@ -200,6 +208,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 				tag.setIntArray("peripheral_ids", peripherals.ids);
 			}
 
+			@Nonnull
 			@Override
 			public Map<String, IPeripheral> getConnectedPeripherals() {
 				return peripherals.getConnectedPeripherals();
@@ -211,7 +220,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 			}
 
 			@Override
-			public boolean canConnect(EnumFacing side) {
+			public boolean canConnect(@Nullable EnumFacing side) {
 				return side == null;
 			}
 		}
@@ -339,6 +348,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 				return turtle;
 			}
 
+			@Nonnull
 			@Override
 			public IWorldNetworkNode getNode() {
 				return TurtleBinding.this;

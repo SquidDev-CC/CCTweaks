@@ -5,9 +5,12 @@ import org.squiddev.cctweaks.api.peripheral.IPeripheralHelpers;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralProxy;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
 
+import javax.annotation.Nonnull;
+
 public class PeripheralHelpers implements IPeripheralHelpers {
+	@Nonnull
 	@Override
-	public IPeripheral getBasePeripheral(IPeripheral peripheral) {
+	public IPeripheral getBasePeripheral(@Nonnull IPeripheral peripheral) {
 		IPeripheral previous = null;
 
 		while (peripheral != null) {
@@ -20,8 +23,9 @@ public class PeripheralHelpers implements IPeripheralHelpers {
 		return previous;
 	}
 
+	@Nonnull
 	@Override
-	public Object getTarget(IPeripheral peripheral) {
+	public Object getTarget(@Nonnull IPeripheral peripheral) {
 		IPeripheral previous = null;
 
 		while (peripheral != null) {

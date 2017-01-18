@@ -10,6 +10,7 @@ import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.blocks.TileBase;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
 	private final IPeripheral[] sides = new IPeripheral[6];
 
 	@Override
-	public IPeripheral getPeripheral(EnumFacing side) {
+	public IPeripheral getPeripheral(@Nonnull EnumFacing side) {
 		int s = side.ordinal();
 		if (sides[s] != null) return sides[s];
 		return sides[s] = createPeripheral(s);
@@ -46,12 +47,19 @@ public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
 
 		@Override
 		public String[] getMethodNames() {
-			return new String[]{"getSide"};
+			return new String[]{"getSide", "getName"};
 		}
 
 		@Override
 		public Object[] callMethod(IComputerAccess computer, ILuaContext context, int function, Object[] arguments) throws LuaException, InterruptedException {
-			return new Object[]{sideName};
+			switch (function) {
+				case 0:
+					return new Object[]{sideName};
+				case 1:
+					return new Object[]{toString()};
+				default:
+					return null;
+			}
 		}
 
 		@Override

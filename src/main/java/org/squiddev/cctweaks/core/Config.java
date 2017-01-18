@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core;
 
 import net.minecraftforge.common.config.Configuration;
+import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.configgen.*;
 
 import java.io.File;
@@ -39,6 +40,11 @@ public final class Config {
 
 		Network.WirelessBridge.crafting &= Network.WirelessBridge.enabled;
 		Network.WirelessBridge.turtleEnabled &= Network.WirelessBridge.enabled;
+
+		if (Config.Computer.suspendInactive && !org.squiddev.cctweaks.lua.Config.Computer.MultiThreading.enabled) {
+			Config.Computer.suspendInactive = false;
+			DebugLogger.warn("Computer.suspendInactive requires multi-threading to be enabled. Falling back to default.");
+		}
 	}
 
 	/**
@@ -64,6 +70,15 @@ public final class Config {
 		 */
 		@DefaultBoolean(true)
 		public static boolean debugWandEnabled;
+
+		/**
+		 * Suspend computers and turtles which timeout, rather than shutting them down.
+		 *
+		 * Requires multi-threading to be on, though threads can be set to 1.
+		 */
+		@DefaultBoolean(false)
+		@RequiresRestart
+		public static boolean suspendInactive;
 	}
 
 	/**
@@ -201,6 +216,34 @@ public final class Config {
 		}
 
 		/**
+		 * Various configuration options for network visualisation (provided by the debug wand).
+		 */
+		public static class Visualisation {
+			/**
+			 * Whether network visualisation is enabled
+			 */
+			@DefaultBoolean(true)
+			public static boolean enabled;
+
+			/**
+			 * The maximum distance for which the network is sent to the client.
+			 * Further distances may be rendered on the client.
+			 */
+			@DefaultInt(3)
+			@Range(min = 1)
+			public static int renderDistance;
+
+			/**
+			 * The cooldown between sending visualisation packets to the client.
+			 *
+			 * Prevents load on larget networks.
+			 */
+			@DefaultInt(5)
+			@Range(min = 0)
+			public static int cooldown;
+		}
+
+		/**
 		 * Enable the crafting of full block modems.
 		 *
 		 * If you disable, existing ones will still function,
@@ -216,13 +259,6 @@ public final class Config {
 	 */
 	@RequiresRestart
 	public static final class Integration {
-		/**
-		 * Allows pushing items from one inventory
-		 * to another inventory on the network.
-		 */
-		@DefaultBoolean(true)
-		public static boolean openPeripheralInventories;
-
 		/**
 		 * MC Multipart integration
 		 */
@@ -264,6 +300,31 @@ public final class Config {
 		 */
 		@DefaultBoolean(true)
 		public static boolean funRender;
+	}
+
+	/**
+	 * Controls over the packets sent between the server and client.
+	 */
+	public static final class Packets {
+		/**
+		 * Prevent controlling computers without a container on the server side.
+		 * This ensures arbitrary computers can not be used by the client, but may break other mods. Please disable if
+		 * you encounter problems (and report an issue on the tracker).
+		 */
+		@DefaultBoolean(true)
+		public static boolean requireContainer;
+
+		/**
+		 * Only broadcast computer state to those in the current dimension and in range or to those interacting with it.
+		 */
+		@DefaultBoolean(true)
+		public static boolean updateLimiting;
+
+		/**
+		 * Only broadcast terminal state to those in interacting with the computer.
+		 */
+		@DefaultBoolean(true)
+		public static boolean terminalLimiting;
 	}
 
 	/**

@@ -10,7 +10,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.lua.IArguments;
-import org.squiddev.cctweaks.api.lua.IBinaryHandler;
 import org.squiddev.cctweaks.api.lua.IPeripheralWithArguments;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
@@ -24,7 +23,7 @@ import java.util.Map;
  *
  * @see BasicModem
  */
-public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted, IBinaryHandler, IPeripheralWithArguments {
+public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted, IPeripheralWithArguments {
 	public final T modem;
 	private final int methodLength;
 	protected boolean changed;

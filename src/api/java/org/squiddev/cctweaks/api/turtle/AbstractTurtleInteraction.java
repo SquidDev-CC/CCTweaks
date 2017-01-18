@@ -10,6 +10,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.util.FakePlayer;
 
+import javax.annotation.Nonnull;
+
 /**
  * Abstract implementation of {@link ITurtleInteraction} with no methods implemented.
  * It is probably a good idea to override at least one of them.
@@ -19,22 +21,22 @@ import net.minecraftforge.common.util.FakePlayer;
  */
 public abstract class AbstractTurtleInteraction implements ITurtleInteraction {
 	@Override
-	public TurtleCommandResult swing(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) throws LuaException {
+	public TurtleCommandResult swing(@Nonnull ITurtleAccess turtle, @Nonnull IComputerAccess computer, @Nonnull FakePlayer player, @Nonnull ItemStack stack, @Nonnull EnumFacing direction, RayTraceResult hit) throws LuaException {
 		return null;
 	}
 
 	@Override
-	public boolean canSwing(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) {
+	public boolean canSwing(@Nonnull ITurtleAccess turtle, @Nonnull FakePlayer player, @Nonnull ItemStack stack, @Nonnull EnumFacing direction, RayTraceResult hit) {
 		return false;
 	}
 
 	@Override
-	public TurtleCommandResult use(ITurtleAccess turtle, IComputerAccess computer, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) throws LuaException {
+	public TurtleCommandResult use(@Nonnull ITurtleAccess turtle, @Nonnull IComputerAccess computer, @Nonnull FakePlayer player, @Nonnull ItemStack stack, @Nonnull EnumFacing direction, RayTraceResult hit) throws LuaException {
 		return null;
 	}
 
 	@Override
-	public boolean canUse(ITurtleAccess turtle, FakePlayer player, ItemStack stack, EnumFacing direction, RayTraceResult hit) {
+	public boolean canUse(@Nonnull ITurtleAccess turtle, @Nonnull FakePlayer player, @Nonnull ItemStack stack, @Nonnull EnumFacing direction, RayTraceResult hit) {
 		return false;
 	}
 }
