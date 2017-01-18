@@ -16,7 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * - Implement {@link INetworkAccess} on the peripheral wrapper and attach/detach networked peripherals.
+ * - Remove/move synchronisation in a couple of places to solve problems with multi-threading.
+ */
 public class PeripheralAPI_Patch extends PeripheralAPI {
+	@MergeVisitor.Stub
+	private IAPIEnvironment m_environment;
 	@MergeVisitor.Stub
 	private PeripheralWrapper[] m_peripherals;
 	@MergeVisitor.Stub
@@ -91,6 +97,30 @@ public class PeripheralAPI_Patch extends PeripheralAPI {
 		@Override
 		public boolean transmitPacket(@Nonnull Packet packet) {
 			return false;
+		}
+
+		public int getID() {
+			if (!m_attached) {
+				throw new RuntimeException("You are not attached to this Computer");
+			} else {
+				return m_environment.getComputerID();
+			}
+		}
+
+		public void queueEvent(String event, Object[] arguments) {
+			if (!m_attached) {
+				throw new RuntimeException("You are not attached to this Computer");
+			} else {
+				m_environment.queueEvent(event, arguments);
+			}
+		}
+
+		public String getAttachmentName() {
+			if (!m_attached) {
+				throw new RuntimeException("You are not attached to this Computer");
+			} else {
+				return m_side;
+			}
 		}
 	}
 }
