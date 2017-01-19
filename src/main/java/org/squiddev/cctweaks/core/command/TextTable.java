@@ -1,7 +1,6 @@
 package org.squiddev.cctweaks.core.command;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
@@ -9,7 +8,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.util.FakePlayer;
 import org.apache.commons.lang3.StringUtils;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -64,11 +62,6 @@ public class TextTable {
 		String chars = text.getUnformattedTextForChat();
 		for (int i = 0; i < chars.length(); i++) {
 			sum += getWidth(chars.charAt(i), sender);
-		}
-
-		int actual = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text.getUnformattedText());
-		if (actual != sum) {
-			DebugLogger.debug(text.getUnformattedText() + " => " + sum + " vs " + actual);
 		}
 
 		return sum;

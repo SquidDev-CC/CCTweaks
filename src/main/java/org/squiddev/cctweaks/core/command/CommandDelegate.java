@@ -6,8 +6,8 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
-import scala.actors.threadpool.Arrays;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,7 +39,6 @@ public class CommandDelegate extends CommandBase {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 		try {
 			command.execute(server, sender, new CommandContext(command), Arrays.asList(args));
@@ -52,7 +51,6 @@ public class CommandDelegate extends CommandBase {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
 		return command.getCompletion(server, sender, Arrays.asList(args));
 	}
