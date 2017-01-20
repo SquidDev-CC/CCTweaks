@@ -160,7 +160,7 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 			ComputerCraftPacket packet = createStatePacket();
 			writeDescription(packet.m_dataNBT, !Config.Packets.terminalLimiting);
 
-			if (Config.Packets.updateLimiting && m_world != null && m_position != null) {
+			if (Config.Packets.updateLimiting && m_world != null && m_position != null && !initial) {
 				ComputerCraft.networkEventChannel.sendToAllAround(
 					encode(packet),
 					new NetworkRegistry.TargetPoint(

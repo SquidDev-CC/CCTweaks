@@ -3,6 +3,8 @@ package org.squiddev.cctweaks.core.patch;
 import com.google.common.base.Objects;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ClientComputer;
+import dan200.computercraft.shared.util.DirectionUtil;
+import net.minecraft.util.EnumFacing;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
 /**
@@ -15,6 +17,15 @@ import org.squiddev.patcher.visitors.MergeVisitor;
 public abstract class TileComputerBase_Patch extends TileComputerBase {
 	@MergeVisitor.Stub
 	public abstract ServerComputer_Patch createServerComputer();
+
+	/**
+	 * Fix getRedstoneConnectivity to use the opposite side
+	 */
+	public boolean getRedstoneConnectivity(EnumFacing side) {
+		if (side == null) return false;
+		int localDir = this.remapLocalSide(DirectionUtil.toLocal(this, side.getOpposite()));
+		return !this.isRedstoneBlockedOnSide(localDir);
+	}
 
 	/**
 	 * Detect whether various methods have changed and mark as dirty if so.
