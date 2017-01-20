@@ -29,6 +29,8 @@ repositories {
 		name = "CoFHLib"
 		artifactPattern "http://addons-origin.cursecdn.com/files/2235/558/[module]-[revision](.[ext])"
 	}
+
+	maven { url 'http://maven.epoxide.xyz' } // Tesla
 }
 
 configurations {
@@ -44,6 +46,7 @@ dependencies {
 	// For 1.7.10 but including anyway
 	provided "CoFHLib:CoFHLib:[1.7.10]1.0.1-159-dev"
 	provided "net.industrial-craft:industrialcraft-2:2.3.249-ex18:api"
+	provided "net.darkhax.tesla:Tesla:${mc_version}-1.2.1.50:deobf"
 
 	shade('org.squiddev:cctweaks-lua:1.3.0') {
 		// Different versions

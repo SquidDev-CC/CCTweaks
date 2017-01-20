@@ -86,7 +86,7 @@ public final class Config {
 	 */
 	public static final class Turtle {
 		/**
-		 * Amount of RF required for one refuel point
+		 * Amount of RF/FE/Tesla required for one refuel point
 		 * Set to 0 to disable.
 		 */
 		@DefaultInt(100)
