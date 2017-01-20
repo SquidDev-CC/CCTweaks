@@ -37,7 +37,6 @@ gui.config.cctweaks.computer.biosPath=Bios Path
 gui.config.cctweaks.computer.maxFilesHandles=Max File Handles
 gui.config.cctweaks.computer.limitedLabels=Limited Labels
 gui.config.cctweaks.computer.suspendInactive=Suspend Inactive (Sponge only)
-gui.config.cctweaks.computer.safeNetworking=Safe networking
 gui.config.cctweaks.computer.multithreading=Multi-threading
 gui.config.cctweaks.computer.multithreading.enabled=Enabled
 gui.config.cctweaks.computer.multithreading.priority=Priority
@@ -101,6 +100,11 @@ gui.config.cctweaks.apis.bigInteger=biginteger Enabled
 gui.config.cctweaks.apis.debug=debug Enabled
 gui.config.cctweaks.apis.bitop=bitop Enabled
 gui.config.cctweaks.apis.profiler=profiler Enabled
+
+gui.config.cctweaks.packets=ComputerCraft Packets
+gui.config.cctweaks.packets.requireContainer=Require container
+gui.config.cctweaks.packets.updateLimiting=Limited updates
+gui.config.cctweaks.packets.terminalLimiting=Limited terminal updates
 
 gui.jei.cctweaks.pocket=Pocket upgrades
 gui.jei.cctweaks.turtle=Turtle upgrades
