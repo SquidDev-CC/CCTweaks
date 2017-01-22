@@ -39,7 +39,7 @@ public class ForgeIntegration extends Module {
 					change = producer.extractEnergy(fluxLimit - progress, false);
 					progress += change;
 				}
-				return (int) (progress / fluxAmount);
+				return progress / fluxAmount;
 			}
 		});
 	}

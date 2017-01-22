@@ -3,13 +3,12 @@ package org.squiddev.cctweaks.integration.jei;
 import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.turtle.items.TurtleItemFactory;
+import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.BlankRecipeWrapper;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class TurtleUpgradeWrapper extends BlankRecipeWrapper implements IValidRecipeWrapper {
 	public static final ComputerFamily[] FAMILIES = new ComputerFamily[]{
@@ -23,7 +22,7 @@ public class TurtleUpgradeWrapper extends BlankRecipeWrapper implements IValidRe
 	public TurtleUpgradeWrapper(ITurtleUpgrade upgrade, ComputerFamily family) {
 		this.inputStack = TurtleItemFactory.create(-1, null, null, family, null, null, 0, null);
 		this.upgradeStack = upgrade.getCraftingItem();
-		this.outputStack = TurtleItemFactory.create(-1, null, null, family, upgrade, null, 0, null);
+		this.outputStack = TurtleItemFactory.create(-1, null, null, family, null, upgrade, 0, null);
 	}
 
 	@Override
@@ -31,15 +30,9 @@ public class TurtleUpgradeWrapper extends BlankRecipeWrapper implements IValidRe
 		return upgradeStack != null;
 	}
 
-	@Nonnull
 	@Override
-	public List<?> getInputs() {
-		return Arrays.asList(upgradeStack, inputStack);
-	}
-
-	@Nonnull
-	@Override
-	public List<?> getOutputs() {
-		return Collections.singletonList(outputStack);
+	public void getIngredients(@Nonnull IIngredients ingredients) {
+		ingredients.setInputs(ItemStack.class, Arrays.asList(upgradeStack, inputStack));
+		ingredients.setOutput(ItemStack.class, outputStack);
 	}
 }

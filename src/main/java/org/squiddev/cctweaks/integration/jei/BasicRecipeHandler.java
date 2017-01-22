@@ -10,7 +10,7 @@ public class BasicRecipeHandler<T extends IValidRecipeWrapper> implements IRecip
 	private final String id;
 	private final Class<T> klass;
 
-	public BasicRecipeHandler(IRecipeCategory category, Class<T> klass) {
+	public BasicRecipeHandler(IRecipeCategory<?> category, Class<T> klass) {
 		this.id = category.getUid();
 		this.klass = klass;
 	}

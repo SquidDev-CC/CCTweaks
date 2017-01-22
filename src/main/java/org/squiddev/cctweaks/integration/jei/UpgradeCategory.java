@@ -4,6 +4,7 @@ import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
+import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.BlankRecipeCategory;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.util.ResourceLocation;
@@ -11,7 +12,6 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 public class UpgradeCategory extends BlankRecipeCategory<IRecipeWrapper> {
 	private final String id;
@@ -42,17 +42,13 @@ public class UpgradeCategory extends BlankRecipeCategory<IRecipeWrapper> {
 	}
 
 	@Override
-	public void setRecipe(@Nonnull IRecipeLayout recipeLayout, @Nonnull IRecipeWrapper recipeWrapper) {
+	public void setRecipe(@Nonnull IRecipeLayout recipeLayout, @Nonnull IRecipeWrapper recipeWrapper, @Nonnull IIngredients ingredients) {
 		IGuiItemStackGroup guiItemStacks = recipeLayout.getItemStacks();
 
 		guiItemStacks.init(0, true, 18, 16);
 		guiItemStacks.init(1, true, 67, 16);
 		guiItemStacks.init(2, false, 125, 16);
 
-		List<?> inputs = recipeWrapper.getInputs();
-		guiItemStacks.setFromRecipe(0, inputs.get(0));
-		guiItemStacks.setFromRecipe(1, inputs.get(1));
-
-		guiItemStacks.setFromRecipe(2, recipeWrapper.getOutputs());
+		guiItemStacks.set(ingredients);
 	}
 }
