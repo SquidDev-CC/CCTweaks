@@ -1,6 +1,5 @@
 package org.squiddev.cctweaks.integration.jei;
 
-import com.google.common.collect.Lists;
 import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.turtle.items.TurtleItemFactory;
@@ -9,38 +8,38 @@ import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class TurtleUpgradeWrapper extends BlankRecipeWrapper {
-	private static final ComputerFamily[] FAMILIES = new ComputerFamily[]{
+public class TurtleUpgradeWrapper extends BlankRecipeWrapper implements IValidRecipeWrapper {
+	public static final ComputerFamily[] FAMILIES = new ComputerFamily[]{
 		ComputerFamily.Normal, ComputerFamily.Advanced,
 	};
 
-	private final ITurtleUpgrade upgrade;
+	private final ItemStack inputStack;
+	private final ItemStack upgradeStack;
+	private final ItemStack outputStack;
 
-	public TurtleUpgradeWrapper(ITurtleUpgrade upgrade) {
-		this.upgrade = upgrade;
+	public TurtleUpgradeWrapper(ITurtleUpgrade upgrade, ComputerFamily family) {
+		this.inputStack = TurtleItemFactory.create(-1, null, null, family, null, null, 0, null);
+		this.upgradeStack = upgrade.getCraftingItem();
+		this.outputStack = TurtleItemFactory.create(-1, null, null, family, upgrade, null, 0, null);
+	}
+
+	@Override
+	public boolean isValid() {
+		return upgradeStack != null;
 	}
 
 	@Nonnull
 	@Override
 	public List<?> getInputs() {
-		List<ItemStack> turtles = Lists.newArrayListWithExpectedSize(FAMILIES.length);
-		for (ComputerFamily family : FAMILIES) {
-			turtles.add(TurtleItemFactory.create(-1, null, null, family, null, null, 0, null));
-		}
-
-		return Arrays.asList(upgrade.getCraftingItem(), turtles);
+		return Arrays.asList(upgradeStack, inputStack);
 	}
 
 	@Nonnull
 	@Override
 	public List<?> getOutputs() {
-		List<ItemStack> turtles = Lists.newArrayListWithExpectedSize(FAMILIES.length);
-		for (ComputerFamily family : FAMILIES) {
-			turtles.add(TurtleItemFactory.create(-1, null, null, family, upgrade, null, 0, null));
-		}
-
-		return turtles;
+		return Collections.singletonList(outputStack);
 	}
 }
