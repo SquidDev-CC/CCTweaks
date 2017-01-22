@@ -6,10 +6,10 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
-import scala.actors.threadpool.Arrays;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,7 +42,6 @@ public class CommandDelegate extends CommandBase {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
 		try {
 			command.execute(server, sender, new CommandContext(command), Arrays.asList(args));
@@ -56,7 +55,6 @@ public class CommandDelegate extends CommandBase {
 
 	@Nonnull
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
 		return command.getCompletion(server, sender, Arrays.asList(args));
 	}
