@@ -33,7 +33,7 @@ public final class ChatHelpers {
 
 	public static IChatComponent getHelp(ISubCommand command, String prefix) {
 		IChatComponent output = new ChatComponentText("")
-			.appendSibling(coloured(command.getName() + " " + command.getUsage(), HEADER))
+			.appendSibling(coloured("/" + prefix + " " + command.getUsage(), HEADER))
 			.appendText(" ")
 			.appendSibling(coloured(command.getSynopsis(), SYNOPSIS));
 
