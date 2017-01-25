@@ -2,10 +2,10 @@ package org.squiddev.cctweaks.api.block;
 
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.api.ActionResult;
 
 import javax.annotation.Nonnull;
 
@@ -33,8 +33,8 @@ public class PropertyRotationHandler extends BasicRotationHandler {
 
 	@Nonnull
 	@Override
-	public ActionResult rotate(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EnumFacing facing, @Nonnull EnumFacing rotatorFacing) {
-		if (!property.getAllowedValues().contains(facing)) return ActionResult.FAILURE;
+	public EnumActionResult rotate(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EnumFacing facing, @Nonnull EnumFacing rotatorFacing) {
+		if (!property.getAllowedValues().contains(facing)) return EnumActionResult.FAIL;
 
 		return super.rotate(world, pos, state, facing, rotatorFacing);
 	}

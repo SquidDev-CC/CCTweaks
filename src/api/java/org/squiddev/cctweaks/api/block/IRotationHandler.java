@@ -1,10 +1,10 @@
 package org.squiddev.cctweaks.api.block;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.api.ActionResult;
 
 import javax.annotation.Nonnull;
 
@@ -23,5 +23,5 @@ public interface IRotationHandler {
 	 * @return Whether rotating the block was successful
 	 */
 	@Nonnull
-	ActionResult rotate(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EnumFacing facing, @Nonnull EnumFacing rotatorFacing);
+	EnumActionResult rotate(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EnumFacing facing, @Nonnull EnumFacing rotatorFacing);
 }

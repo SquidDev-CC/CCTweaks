@@ -6,10 +6,10 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.api.ActionResult;
 import org.squiddev.cctweaks.api.block.IRotationHandler;
 import org.squiddev.cctweaks.api.block.IRotationRegistry;
 
@@ -44,22 +44,22 @@ public class RotationRegistry implements IRotationRegistry {
 
 	@Nonnull
 	@Override
-	public ActionResult rotate(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EnumFacing facing, @Nonnull EnumFacing rotatorFacing) {
+	public EnumActionResult rotate(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EnumFacing facing, @Nonnull EnumFacing rotatorFacing) {
 		for (IRotationHandler handler : blockHandlers.get(state.getBlock())) {
-			ActionResult result = handler.rotate(world, pos, state, facing, rotatorFacing);
-			if (result != ActionResult.PASS) return result;
+			EnumActionResult result = handler.rotate(world, pos, state, facing, rotatorFacing);
+			if (result != EnumActionResult.PASS) return result;
 		}
 
 		for (IRotationHandler handler : classHandlers.get(state.getBlock().getClass())) {
-			ActionResult result = handler.rotate(world, pos, state, facing, rotatorFacing);
-			if (result != ActionResult.PASS) return result;
+			EnumActionResult result = handler.rotate(world, pos, state, facing, rotatorFacing);
+			if (result != EnumActionResult.PASS) return result;
 		}
 
 		for (IRotationHandler handler : generalHandlers) {
-			ActionResult result = handler.rotate(world, pos, state, facing, rotatorFacing);
-			if (result != ActionResult.PASS) return result;
+			EnumActionResult result = handler.rotate(world, pos, state, facing, rotatorFacing);
+			if (result != EnumActionResult.PASS) return result;
 		}
 
-		return ActionResult.PASS;
+		return EnumActionResult.PASS;
 	}
 }

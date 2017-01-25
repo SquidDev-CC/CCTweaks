@@ -3,10 +3,10 @@ package org.squiddev.cctweaks.core.turtle;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.api.ActionResult;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
 
 /**
@@ -37,11 +37,11 @@ public class TurtleHooks {
 			pos = offsetPos;
 		}
 
-		ActionResult result = CCTweaksAPI.instance().rotationRegistry().rotate(world, pos, state, direction, turtle.getDirection());
+		EnumActionResult result = CCTweaksAPI.instance().rotationRegistry().rotate(world, pos, state, direction, turtle.getDirection());
 
 		if (error != null) {
 			switch (result) {
-				case FAILURE:
+				case FAIL:
 					error[0] = "Could not rotate";
 					break;
 				case PASS:
@@ -50,6 +50,6 @@ public class TurtleHooks {
 			}
 		}
 
-		return result == ActionResult.SUCCESS;
+		return result == EnumActionResult.SUCCESS;
 	}
 }

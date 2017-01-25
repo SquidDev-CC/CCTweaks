@@ -2,10 +2,10 @@ package org.squiddev.cctweaks.core.block;
 
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.api.ActionResult;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.block.BasicRotationHandler;
 import org.squiddev.cctweaks.api.block.IRotationHandler;
@@ -53,8 +53,8 @@ public class VanillaRotationHandlers extends Module {
 		registry.register(BlockPistonBase.class, new PropertyRotationHandler(BlockPistonBase.FACING) {
 			@Nonnull
 			@Override
-			public ActionResult rotate(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EnumFacing facing, @Nonnull EnumFacing rotatorFacing) {
-				if (state.getValue(BlockPistonBase.EXTENDED)) return ActionResult.FAILURE;
+			public EnumActionResult rotate(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EnumFacing facing, @Nonnull EnumFacing rotatorFacing) {
+				if (state.getValue(BlockPistonBase.EXTENDED)) return EnumActionResult.FAIL;
 				return super.rotate(world, pos, state, facing, rotatorFacing);
 			}
 		});
@@ -68,18 +68,18 @@ public class VanillaRotationHandlers extends Module {
 		registry.register(BlockChest.class, new IRotationHandler() {
 			@Nonnull
 			@Override
-			public ActionResult rotate(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EnumFacing facing, @Nonnull EnumFacing rotatorFacing) {
-				if (!BlockChest.FACING.getAllowedValues().contains(facing)) return ActionResult.FAILURE;
+			public EnumActionResult rotate(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EnumFacing facing, @Nonnull EnumFacing rotatorFacing) {
+				if (!BlockChest.FACING.getAllowedValues().contains(facing)) return EnumActionResult.FAIL;
 
 				// Fail if we've got an adjacent chest
 				for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL) {
 					if (world.getBlockState(pos.offset(enumfacing)).getBlock() == state.getBlock()) {
-						return ActionResult.FAILURE;
+						return EnumActionResult.FAIL;
 					}
 				}
 
 				world.setBlockState(pos, state.withProperty(BlockChest.FACING, facing));
-				return ActionResult.SUCCESS;
+				return EnumActionResult.SUCCESS;
 			}
 		});
 
