@@ -14,17 +14,17 @@ Thanks :smile:!
  - Fix the binary strings (for fs, http, rednet and os.queueEvent)
  - TCP socket API (`socket`)
  - Compression API (`data`)
- - [LuaJC](https://github.com/SquidDev/luaj.luajc) compiler (compiles Lua code to Java for performance boost)
  - [Cobalt](https://github.com/SquidDev/Cobalt) VM (reentrant fork of LuaJ)
    - Custom termination handler
    - Several bugs fixed (any object error messages, string pattern matching, number format strings)
+   - Run multiple computers at once
  - Return HTTP handle on failures
  - Allow getting headers from HTTP responses
  - API for adding custom APIs
 
 ### Turtles
  - Blacklist turtle verbs - no more `turtle.inspect` if you don't like it.
- - Turtle refuel using RF/EU
+ - Turtle refuel using RF/EU/Tesla and Forge Energy
  - Turtle tool host - use any tool with turtles
 
 ### Networking
@@ -32,7 +32,6 @@ Thanks :smile:!
  - Multidimensional modems (connect wired networks together)
  - Full block modems (connect to peripherals on 6 sides)
  - Multipart support
- - Item transport through OpenPeripheral
  - Beautiful network visualiser
 
 ### More
@@ -40,11 +39,13 @@ Thanks :smile:!
  - Debug Wand - add the debug API to any computer
  - Monitors emit light
  - Pocket computer upgrades
+ - Packet optimisations, reducing network traffic
+ - Powerful server management commands, allowing monitoring, profiling and controlling computers.
 
 ## Contributing
 ### Code and dependencies:
 You'll need Git installed. If you are using Windows, replace `./gradlew` with `gradlew.bat`
- - `git clone https://github.com/SquidDev-CC/CC-Tweaks`
+ - `git clone https://github.com/SquidDev-CC/CCTweaks`
  - `./gradlew build` This should download all dependencies. You can test with `./gradlew runClient`
  - To get the deobfuscated sources run `./gradlew setupDecompWorkspace`
 
