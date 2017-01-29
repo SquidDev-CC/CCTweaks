@@ -87,7 +87,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 		// Custom handling for networks with 0 connections (single node networks)
 		MovingObjectPosition position = Minecraft.getMinecraft().objectMouseOver;
-		if (position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+		if (position != null && position.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
 			for (UnorderedPair<NetworkNode> connection : state.connections()) {
 				NetworkNode a = connection.x, b = connection.y;
 

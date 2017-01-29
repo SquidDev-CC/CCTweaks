@@ -32,7 +32,7 @@ public class EntityPosition implements IWorldPosition {
 			y = (int) entity.posY;
 		}
 
-		return new BlockPos((int) entity.posX, y, (int) entity.posZ);
+		return new BlockPos(entity.posX, y, entity.posZ);
 	}
 
 }
