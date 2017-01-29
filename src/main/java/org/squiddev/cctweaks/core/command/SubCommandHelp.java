@@ -33,7 +33,7 @@ public class SubCommandHelp implements ISubCommand {
 	@Nonnull
 	@Override
 	public String getSynopsis() {
-		return "Display the help for a specific command";
+		return "Provide help for a specific command";
 	}
 
 	@Nonnull

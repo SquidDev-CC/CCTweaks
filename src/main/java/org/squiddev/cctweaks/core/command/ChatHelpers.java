@@ -37,7 +37,7 @@ public final class ChatHelpers {
 
 	public static ITextComponent getHelp(ISubCommand command, String prefix) {
 		ITextComponent output = new TextComponentString("")
-			.appendSibling(coloured(command.getName() + " " + command.getUsage(), HEADER))
+			.appendSibling(coloured("/" + prefix + " " + command.getUsage(), HEADER))
 			.appendText(" ")
 			.appendSibling(coloured(command.getSynopsis(), SYNOPSIS));
 

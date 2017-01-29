@@ -107,17 +107,10 @@ public final class CommandCCTweaks {
 					for (ComputerMonitor.ComputerEntry entry : entries) {
 						Computer computer = entry.getComputer();
 						ServerComputer serverComputer = lookup.get(computer);
-						ITextComponent position;
-						if (serverComputer == null || serverComputer.getPosition() == null) {
-							position = text("?");
-						} else {
-							position = linkComputer(serverComputer);
-						}
-
 						table.addRow(
-							text(serverComputer == null ? "?" : Integer.toString(serverComputer.getInstanceID())),
+							serverComputer == null ? text("?") : linkComputer(serverComputer),
 							text(Integer.toString(computer.getID())),
-							position,
+							serverComputer == null ? text("?") : linkPosition(serverComputer),
 							formatted("%5d", entry.getTasks()),
 							formatted("%5d", entry.getTime()),
 							formatted("%4.1f", (double) entry.getTime() / entry.getTasks())
@@ -143,14 +136,10 @@ public final class CommandCCTweaks {
 
 					for (ServerComputer computer : ComputerCraft.serverComputerRegistry.getComputers()) {
 						table.addRow(
-							link(
-								text(Integer.toString(computer.getInstanceID())),
-								"/cctweaks dump " + computer.getInstanceID(),
-								"View more info about this computer"
-							),
+							linkComputer(computer),
 							text(Integer.toString(computer.getID())),
 							bool(computer.isOn()),
-							linkComputer(computer)
+							linkPosition(computer)
 						);
 					}
 
@@ -163,7 +152,7 @@ public final class CommandCCTweaks {
 					table.addRow(header("Id"), text(Integer.toString(computer.getID())));
 					table.addRow(header("Label"), text(computer.getLabel()));
 					table.addRow(header("On"), bool(computer.isOn()));
-					table.addRow(header("Position"), linkComputer(computer));
+					table.addRow(header("Position"), linkPosition(computer));
 					table.addRow(header("Family"), text(Helpers.guessFamily(computer).toString()));
 
 					for (int i = 0; i < 6; i++) {
@@ -270,7 +259,7 @@ public final class CommandCCTweaks {
 		root.register(new SubCommandGive());
 
 		root.register(new SubCommandBase(
-			"view", "View the terminal of a computer.",
+			"view", "<id>", "View the terminal of a computer.",
 			"Open the terminal of a computer, allowing remote control of a computer. This does not provide access to " +
 				"turtle's inventories. You can either specify the computer's instance id (e.g. 123) or computer id (e.g #123)."
 		) {
@@ -299,6 +288,14 @@ public final class CommandCCTweaks {
 	}
 
 	private static ITextComponent linkComputer(ServerComputer computer) {
+		return link(
+			text(Integer.toString(computer.getInstanceID())),
+			"/cctweaks dump " + computer.getInstanceID(),
+			"View more info about this computer"
+		);
+	}
+
+	private static ITextComponent linkPosition(ServerComputer computer) {
 		return link(
 			position(computer.getPosition()),
 			"/cctweaks tp " + computer.getInstanceID(),
