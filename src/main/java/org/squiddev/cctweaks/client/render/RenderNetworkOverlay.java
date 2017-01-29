@@ -93,7 +93,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 		// Custom handling for networks with 0 connections (single node networks)
 		RayTraceResult position = Minecraft.getMinecraft().objectMouseOver;
-		if (position.typeOfHit == RayTraceResult.Type.BLOCK) {
+		if (position != null && position.typeOfHit == RayTraceResult.Type.BLOCK) {
 			for (UnorderedPair<NetworkNode> connection : state.connections()) {
 				NetworkNode a = connection.x, b = connection.y;
 

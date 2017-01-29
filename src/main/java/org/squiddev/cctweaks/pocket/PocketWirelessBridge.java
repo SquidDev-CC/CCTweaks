@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.pocket;
 
+import com.google.common.collect.Maps;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
@@ -13,6 +14,7 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.IDataCard;
+import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
 import org.squiddev.cctweaks.api.pocket.IPocketAccess;
 import org.squiddev.cctweaks.api.pocket.IPocketRegistry;
 import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
@@ -27,7 +29,7 @@ import org.squiddev.cctweaks.core.utils.EntityPosition;
 import javax.annotation.Nonnull;
 import java.util.Map;
 
-public class PocketWirelessBinding extends Module implements IPocketUpgrade {
+public class PocketWirelessBridge extends Module implements IPocketUpgrade {
 	@Nonnull
 	@Override
 	public ResourceLocation getUpgradeID() {
@@ -118,7 +120,14 @@ public class PocketWirelessBinding extends Module implements IPocketUpgrade {
 			protected final DynamicPeripheralCollection<ResourceLocation> peripherals = new DynamicPeripheralCollection<ResourceLocation>() {
 				@Override
 				protected Map<ResourceLocation, IPeripheral> getPeripherals() {
-					return pocket.getUpgrades();
+					Map<ResourceLocation, IPeripheral> peripherals = Maps.newHashMap();
+					for (Map.Entry<ResourceLocation, IPeripheral> entry : pocket.getUpgrades().entrySet()) {
+						if (entry.getValue() instanceof INetworkCompatiblePeripheral) {
+							peripherals.put(entry.getKey(), entry.getValue());
+						}
+					}
+
+					return peripherals;
 				}
 
 				@Override

@@ -23,7 +23,7 @@ import org.squiddev.cctweaks.items.ItemDebugger;
 import org.squiddev.cctweaks.items.ItemToolHost;
 import org.squiddev.cctweaks.lua.lib.ApiRegister;
 import org.squiddev.cctweaks.pocket.PocketEnderModem;
-import org.squiddev.cctweaks.pocket.PocketWirelessBinding;
+import org.squiddev.cctweaks.pocket.PocketWirelessBridge;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
 
 import java.util.HashSet;
@@ -69,7 +69,7 @@ public final class Registry {
 
 		// CCTweaks providers
 		addModule(new DefaultTurtleProviders());
-		addModule(new PocketWirelessBinding());
+		addModule(new PocketWirelessBridge());
 		addModule(new PocketEnderModem());
 		addModule(new CraftingPocketUpgrade());
 		addModule(new VanillaRotationHandlers());
