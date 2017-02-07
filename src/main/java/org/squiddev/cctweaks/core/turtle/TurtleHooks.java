@@ -14,7 +14,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import org.squiddev.cctweaks.api.ActionResult;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.core.Config;
 
@@ -76,7 +75,7 @@ public class TurtleHooks {
 
 	public static boolean isBlockBreakable(World world, BlockPos pos, EntityPlayer player) {
 		if (Config.Turtle.useServerProtected) {
-			MinecraftServer server = MinecraftServer.getServer();
+			MinecraftServer server = player.getServer();
 			if (server != null && !world.isRemote && server.isBlockProtected(world, pos, player)) {
 				return false;
 			}
