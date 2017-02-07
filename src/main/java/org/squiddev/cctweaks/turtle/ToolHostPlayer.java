@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.turtle;
 
+import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.api.turtle.TurtleCommandResult;
 import dan200.computercraft.shared.turtle.core.TurtlePlayer;
@@ -22,6 +23,7 @@ import net.minecraft.world.WorldServer;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.McEvents;
+import org.squiddev.cctweaks.core.turtle.TurtleHooks;
 import org.squiddev.cctweaks.core.utils.FakeNetHandler;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 
@@ -87,6 +89,10 @@ public class ToolHostPlayer extends TurtlePlayer {
 		if (block != digBlock || !pos.equals(digPosition)) setState(block, pos);
 
 		if (!world.isAirBlock(pos) && !state.getMaterial().isLiquid()) {
+			if (ComputerCraft.turtlesObeyBlockProtection && !TurtleHooks.isBlockBreakable(world, pos, this)) {
+				return TurtleCommandResult.failure("Cannot break protected block");
+			}
+
 			if (block == Blocks.BEDROCK || state.getBlockHardness(world, pos) <= -1) {
 				return TurtleCommandResult.failure("Unbreakable block detected");
 			}
