@@ -216,7 +216,7 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 
 	private ComputerCraftPacket createStatePacket() {
 		ComputerCraftPacket packet = new ComputerCraftPacket();
-		packet.m_packetType = 7;
+		packet.m_packetType = ComputerCraftPacket.ComputerChanged;
 		packet.m_dataInt = new int[]{getInstanceID()};
 		packet.m_dataNBT = new NBTTagCompound();
 		return packet;

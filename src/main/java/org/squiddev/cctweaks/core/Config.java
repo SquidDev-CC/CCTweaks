@@ -110,6 +110,20 @@ public final class Config {
 		public static String[] disabledActions;
 
 		/**
+		 * Whether turtles should use MinecraftServer.isBlockProtected
+		 * to check if a block can be dug.
+		 */
+		@DefaultBoolean(true)
+		public static boolean useServerProtected;
+
+		/**
+		 * Whether turtles should use Forge events
+		 * to check if a block can be dug.
+		 */
+		@DefaultBoolean(true)
+		public static boolean useBlockEvent;
+
+		/**
 		 * Various tool host options
 		 */
 		public static class ToolHost {
