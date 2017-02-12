@@ -12,12 +12,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.blocks.TileBase;
@@ -28,7 +30,6 @@ import org.squiddev.cctweaks.items.ItemMultiBlock;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * A bridge between two networks so they can communicate with each other
@@ -93,7 +94,7 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	public void getSubBlocks(@Nonnull Item item, CreativeTabs tab, List<ItemStack> itemStacks) {
+	public void getSubBlocks(@Nonnull Item item, CreativeTabs tab, NonNullList<ItemStack> itemStacks) {
 		itemStacks.add(new ItemStack(this, 1, 0));
 		itemStacks.add(new ItemStack(this, 1, 1));
 	}

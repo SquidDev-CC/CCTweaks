@@ -30,8 +30,9 @@ public abstract class TileComputerBase_Patch extends TileComputerBase {
 	/**
 	 * Detect whether various methods have changed and mark as dirty if so.
 	 */
+	@Override
 	public void update() {
-		if (!worldObj.isRemote) {
+		if (!getWorld().isRemote) {
 			ServerComputer_Patch computer = this.createServerComputer();
 			if (computer != null) {
 				boolean oldOn = m_on || m_startOn;

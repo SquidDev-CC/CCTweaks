@@ -74,7 +74,7 @@ public class CommandRoot implements ISubCommand {
 	@Override
 	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
 		if (arguments.size() == 0) {
-			sender.addChatMessage(ChatHelpers.getHelp(this, context.getFullPath()));
+			sender.sendMessage(ChatHelpers.getHelp(this, context.getFullPath()));
 		} else {
 			ISubCommand command = subCommands.get(arguments.get(0));
 			if (command == null) throw new CommandException(getName() + " " + getUsage());

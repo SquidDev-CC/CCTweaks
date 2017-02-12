@@ -10,6 +10,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.IWorldPosition;
 
 import javax.annotation.Nonnull;
@@ -38,7 +39,8 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 
 	@Override
 	public void validate() {
-		if (worldObj == null || !worldObj.isRemote) {
+		World world = getWorld();
+		if (world == null || !world.isRemote) {
 			create();
 		}
 	}
@@ -46,7 +48,8 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	@Override
 	public void onChunkUnload() {
 		super.onChunkUnload();
-		if (worldObj == null || !worldObj.isRemote) {
+		World world = getWorld();
+		if (world == null || !world.isRemote) {
 			destroy();
 		}
 	}
@@ -54,7 +57,8 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	@Override
 	public void invalidate() {
 		super.invalidate();
-		if (worldObj == null || !worldObj.isRemote) {
+		World world = getWorld();
+		if (world == null || !world.isRemote) {
 			destroy();
 		}
 	}
@@ -77,6 +81,7 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	protected void readDescription(NBTTagCompound tag) {
 	}
 
+	@Nonnull
 	@Override
 	public NBTTagCompound getUpdateTag() {
 		NBTTagCompound tag = super.getUpdateTag();
@@ -85,7 +90,7 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	}
 
 	@Override
-	public void handleUpdateTag(NBTTagCompound tag) {
+	public void handleUpdateTag(@Nonnull NBTTagCompound tag) {
 		super.handleUpdateTag(tag);
 		readDescription(tag);
 	}
@@ -108,12 +113,13 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	public void markForUpdate() {
 		markDirty();
 		BlockPos pos = getPos();
-		IBlockState state = worldObj.getBlockState(pos);
-		worldObj.notifyBlockUpdate(getPos(), state, state, 3);
+		World world = getWorld();
+		IBlockState state = world.getBlockState(pos);
+		world.notifyBlockUpdate(getPos(), state, state, 3);
 	}
 
 	public void markRenderDirty() {
-		worldObj.markBlockRangeForRenderUpdate(pos, pos);
+		getWorld().markBlockRangeForRenderUpdate(pos, pos);
 	}
 
 	/**
@@ -137,6 +143,6 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	@Nonnull
 	@Override
 	public IBlockAccess getBlockAccess() {
-		return worldObj;
+		return getWorld();
 	}
 }

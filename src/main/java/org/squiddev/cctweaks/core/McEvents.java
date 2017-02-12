@@ -131,7 +131,7 @@ public class McEvents {
 
 	@SubscribeEvent
 	public void onContainerOpen(PlayerContainerEvent.Open open) {
-		if (open.getEntityPlayer().worldObj.isRemote) return;
+		if (open.getEntityPlayer().getEntityWorld().isRemote) return;
 
 		Container container = open.getContainer();
 		if (container instanceof IContainerComputer) {

@@ -158,6 +158,7 @@ public class ASMTransformer implements IClassTransformer {
 				"org.squiddev.cctweaks.core.patch.Terminal_Patch"
 			),
 			new TurtlePermissions(),
+			new AddWorldConstructor(),
 		});
 
 		patches.finalise();

@@ -45,9 +45,9 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 
 	@Nonnull
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos position, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (Config.Computer.computerUpgradeEnabled) {
-			return super.onItemUse(stack, player, world, position, hand, side, hitX, hitY, hitZ);
+			return super.onItemUse(player, world, position, hand, side, hitX, hitY, hitZ);
 		} else {
 			return EnumActionResult.PASS;
 		}
@@ -94,7 +94,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 		if (!player.capabilities.isCreativeMode) {
 			int remaining = InventoryUtils.extractItems(player.inventory, Items.GOLD_INGOT, 7);
 			if (remaining > 0) {
-				player.addChatMessage(new TextComponentString("7 gold required. Need " + remaining + " more.").setStyle(new Style().setColor(TextFormatting.DARK_RED)));
+				player.sendMessage(new TextComponentString("7 gold required. Need " + remaining + " more.").setStyle(new Style().setColor(TextFormatting.DARK_RED)));
 				return false;
 			}
 

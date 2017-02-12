@@ -5,6 +5,7 @@ import dan200.computercraft.shared.util.WorldUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import org.apache.commons.lang3.tuple.Pair;
@@ -84,6 +85,10 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 	@Override
 	public void preInit() {
 		super.preInit();
-		EntityRegistry.registerModEntity(ToolHostPlayer.class, CCTweaks.ID + ":fakePlayer", 0, CCTweaks.instance, Integer.MAX_VALUE, Integer.MAX_VALUE, false);
+		EntityRegistry.registerModEntity(
+			new ResourceLocation(CCTweaks.ID, "fakePlayer"),
+			ToolHostPlayer.class, CCTweaks.ID + ":fakePlayer", 0, CCTweaks.instance,
+			Integer.MAX_VALUE, Integer.MAX_VALUE, false
+		);
 	}
 }

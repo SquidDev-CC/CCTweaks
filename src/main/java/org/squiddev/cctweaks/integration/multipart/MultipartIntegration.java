@@ -104,7 +104,7 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void clientPreInit() {
-		Helpers.setupModel(itemPart, 0, "wirelessBridgeSmall");
+		Helpers.setupModel(itemPart, 0, "wireless_bridge_small");
 	}
 
 	@Override

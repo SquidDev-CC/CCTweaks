@@ -11,7 +11,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -48,9 +47,9 @@ public class ItemDebugger extends ItemComputerAction {
 
 	@Nonnull
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos position, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (Config.Computer.debugWandEnabled) {
-			return super.onItemUse(stack, player, world, position, hand, side, hitX, hitY, hitZ);
+			return super.onItemUse(player, world, position, hand, side, hitX, hitY, hitZ);
 		} else {
 			return EnumActionResult.PASS;
 		}
@@ -132,7 +131,7 @@ public class ItemDebugger extends ItemComputerAction {
 	protected boolean useGeneric(ItemStack stack, EntityPlayer player, TileEntity tile, EnumFacing side) {
 		IWorldPosition position = new WorldPosition(tile);
 
-		player.addChatMessage(
+		player.sendMessage(
 			withColor("Tile: ", TextFormatting.DARK_PURPLE)
 				.appendSibling(info(tile.getClass().getSimpleName() + ": " + tile.getBlockType().getLocalizedName()))
 		);
@@ -140,7 +139,7 @@ public class ItemDebugger extends ItemComputerAction {
 		{
 			IPeripheral peripheral = PeripheralUtil.getPeripheral(tile.getWorld(), tile.getPos(), side);
 			if (peripheral != null) {
-				player.addChatMessage(withColor("Peripheral: ", TextFormatting.AQUA).appendSibling(info(peripheral.getType())));
+				player.sendMessage(withColor("Peripheral: ", TextFormatting.AQUA).appendSibling(info(peripheral.getType())));
 
 				if (peripheral instanceof TileDebugPeripheral.SidedPeripheral) {
 					Set<IComputerAccess> computers = ((TileDebugPeripheral.SidedPeripheral) peripheral).computers();
@@ -166,7 +165,7 @@ public class ItemDebugger extends ItemComputerAction {
 						boundList.appendSibling(new TextComponentString(text).setStyle(style));
 					}
 
-					player.addChatMessage(boundList);
+					player.sendMessage(boundList);
 				}
 			}
 		}
@@ -175,9 +174,9 @@ public class ItemDebugger extends ItemComputerAction {
 			INetworkNode node = NetworkAPI.registry().getNode(tile);
 			INetworkController controller = node != null ? node.getAttachedNetwork() : null;
 			if (controller != null) {
-				player.addChatMessage(withColor("Network", TextFormatting.LIGHT_PURPLE));
+				player.sendMessage(withColor("Network", TextFormatting.LIGHT_PURPLE));
 				Set<INetworkNode> nodes = controller.getNodesOnNetwork();
-				player.addChatMessage(withColor(" Size: ", TextFormatting.AQUA).appendSibling(info(nodes.size() + " nodes")));
+				player.sendMessage(withColor(" Size: ", TextFormatting.AQUA).appendSibling(info(nodes.size() + " nodes")));
 
 				boolean writtenHeader = false;
 				for (INetworkNode remoteNode : nodes) {
@@ -186,16 +185,16 @@ public class ItemDebugger extends ItemComputerAction {
 						if (!peripherals.isEmpty()) {
 							if (!writtenHeader) {
 								writtenHeader = true;
-								player.addChatMessage(withColor(" Locals: ", TextFormatting.AQUA));
+								player.sendMessage(withColor(" Locals: ", TextFormatting.AQUA));
 							}
-							player.addChatMessage(withColor("  " + remoteNode.toString() + " ", TextFormatting.DARK_AQUA).appendSibling(info(peripherals)));
+							player.sendMessage(withColor("  " + remoteNode.toString() + " ", TextFormatting.DARK_AQUA).appendSibling(info(peripherals)));
 						}
 					}
 				}
 
 				Set<String> remotes = controller.getPeripheralsOnNetwork().keySet();
 				if (!remotes.isEmpty()) {
-					player.addChatMessage(withColor(" Remotes: ", TextFormatting.AQUA).appendSibling(info(remotes)));
+					player.sendMessage(withColor(" Remotes: ", TextFormatting.AQUA).appendSibling(info(remotes)));
 				}
 			}
 		}

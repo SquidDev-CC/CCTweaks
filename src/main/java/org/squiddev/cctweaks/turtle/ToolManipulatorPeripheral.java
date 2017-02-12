@@ -36,6 +36,8 @@ import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
 import org.squiddev.cctweaks.core.turtle.TurtleRegistry;
 import org.squiddev.cctweaks.lua.lib.DelayedTask;
 
+import javax.annotation.Nonnull;
+
 public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatiblePeripheral {
 	private final ITurtleAccess access;
 	private final ToolHostPlayer player;
@@ -131,12 +133,12 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 
 		RayTraceResult hit = findHit(direction, 0.65);
 		ItemStack stack = player.getItem(access);
-		World world = player.worldObj;
+		World world = player.getEntityWorld();
 
 		player.posY += 1.5;
 
 		try {
-			if (stack != null) {
+			if (!stack.isEmpty()) {
 				TurtleCommandResult result = TurtleRegistry.instance.use(access, computer, player, stack, direction, hit);
 				if (result != null) return toObjectArray(result);
 			}
@@ -144,8 +146,8 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			if (hit != null) {
 				switch (hit.typeOfHit) {
 					case ENTITY:
-						if (stack != null) {
-							EnumActionResult result = player.interact(hit.entityHit, stack, EnumHand.MAIN_HAND);
+						if (!stack.isEmpty()) {
+							EnumActionResult result = player.interactOn(hit.entityHit, EnumHand.MAIN_HAND);
 							if (result != EnumActionResult.PASS) {
 								return new Object[]{result == EnumActionResult.SUCCESS, "entity", "interact"};
 							}
@@ -162,7 +164,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				}
 			}
 
-			if (stack != null) {
+			if (!stack.isEmpty()) {
 				if (MinecraftForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickEmpty(player, EnumHand.MAIN_HAND))) {
 					return new Object[]{true, "item", "use"};
 				}
@@ -172,7 +174,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				player.posZ += direction.getFrontOffsetZ() * 0.6;
 
 				duration = Math.min(duration, stack.getMaxItemUseDuration());
-				ActionResult<ItemStack> result = stack.useItemRightClick(player.worldObj, player, EnumHand.MAIN_HAND);
+				ActionResult<ItemStack> result = stack.useItemRightClick(player.getEntityWorld(), player, EnumHand.MAIN_HAND);
 
 				switch (result.getType()) {
 					case FAIL:
@@ -180,8 +182,8 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 					case SUCCESS:
 						task.delay = duration;
 						ItemStack active = player.getActiveItemStack();
-						if (active != null && !ForgeEventFactory.onUseItemStop(player, active, duration)) {
-							active.onPlayerStoppedUsing(player.worldObj, player, active.getMaxItemUseDuration() - duration);
+						if (!active.isEmpty() && !ForgeEventFactory.onUseItemStop(player, active, duration)) {
+							active.onPlayerStoppedUsing(player.getEntityWorld(), player, active.getMaxItemUseDuration() - duration);
 							player.resetActiveHand();
 						}
 
@@ -197,10 +199,10 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		}
 	}
 
-	public Object[] tryUseOnBlock(World world, RayTraceResult hit, ItemStack stack, EnumFacing side) {
+	public Object[] tryUseOnBlock(World world, RayTraceResult hit, @Nonnull ItemStack stack, EnumFacing side) {
 		IBlockState state = world.getBlockState(hit.getBlockPos());
 		if (!state.getBlock().isAir(state, world, hit.getBlockPos())) {
-			if (MinecraftForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickBlock(player, EnumHand.MAIN_HAND, stack, hit.getBlockPos(), side, hit.hitVec))) {
+			if (MinecraftForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickBlock(player, EnumHand.MAIN_HAND, hit.getBlockPos(), side, hit.hitVec))) {
 				return new Object[]{true, "block", "interact"};
 			}
 
@@ -211,24 +213,24 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		return null;
 	}
 
-	public Object[] onPlayerRightClick(ItemStack stack, BlockPos pos, EnumFacing side, Vec3d look) {
+	public Object[] onPlayerRightClick(@Nonnull ItemStack stack, BlockPos pos, EnumFacing side, Vec3d look) {
 		float xCoord = (float) look.xCoord - (float) pos.getX();
 		float yCoord = (float) look.yCoord - (float) pos.getY();
 		float zCoord = (float) look.zCoord - (float) pos.getZ();
-		World world = player.worldObj;
+		World world = player.getEntityWorld();
 
-		if (stack != null && stack.getItem().onItemUseFirst(stack, player, world, pos, side, xCoord, yCoord, zCoord, EnumHand.MAIN_HAND) == EnumActionResult.SUCCESS) {
+		if (!stack.isEmpty() && stack.getItem().onItemUseFirst(player, world, pos, side, xCoord, yCoord, zCoord, EnumHand.MAIN_HAND) == EnumActionResult.SUCCESS) {
 			return new Object[]{true, "item", "use"};
 		}
 
-		if (!player.isSneaking() || stack == null || stack.getItem().doesSneakBypassUse(stack, world, pos, player)) {
+		if (!player.isSneaking() || stack.isEmpty() || stack.getItem().doesSneakBypassUse(stack, world, pos, player)) {
 			IBlockState state = world.getBlockState(pos);
-			if (state.getBlock().onBlockActivated(world, pos, state, player, EnumHand.MAIN_HAND, stack, side, xCoord, yCoord, zCoord)) {
+			if (state.getBlock().onBlockActivated(world, pos, state, player, EnumHand.MAIN_HAND, side, xCoord, yCoord, zCoord)) {
 				return new Object[]{true, "block", "interact"};
 			}
 		}
 
-		if (stack == null) return null;
+		if (stack.isEmpty()) return null;
 
 		if (stack.getItem() instanceof ItemBlock) {
 			ItemBlock itemBlock = (ItemBlock) stack.getItem();
@@ -242,13 +244,13 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				shiftPos = pos.offset(side);
 			}
 
-			if (!world.canBlockBePlaced(itemBlock.block, shiftPos, false, shiftSide, null, stack)) {
+			if (!world.mayPlace(itemBlock.block, shiftPos, false, shiftSide, null)) {
 				return null;
 			}
 		}
 
 		if (stack.onItemUse(player, world, pos, EnumHand.MAIN_HAND, side, xCoord, yCoord, zCoord) == EnumActionResult.SUCCESS) {
-			if (stack.stackSize <= 0) {
+			if (stack.getCount() <= 0) {
 				MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(player, stack, EnumHand.MAIN_HAND));
 			}
 
@@ -295,7 +297,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		player.posY += 1.5;
 
 		try {
-			if (stack != null) {
+			if (!stack.isEmpty()) {
 				TurtleCommandResult result = TurtleRegistry.instance.swing(access, computer, player, stack, direction, hit);
 				if (result != null) {
 					if (result.isSuccess()) access.playAnimation(animation);
@@ -340,7 +342,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				player.posY += 1.5;
 
 				try {
-					if (stack != null) {
+					if (!stack.isEmpty()) {
 						boolean result = TurtleRegistry.instance.canUse(access, player, stack, direction, hit);
 						if (result) return new Object[]{true};
 					}
@@ -366,13 +368,13 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				player.posY += 1.5;
 
 				try {
-					if (stack != null) {
+					if (!stack.isEmpty()) {
 						boolean result = TurtleRegistry.instance.canSwing(access, player, stack, direction, hit);
 						if (result) return new Object[]{true};
 
 						if (hit != null && hit.entityHit != null) {
 							@SuppressWarnings("unchecked") Multimap<String, AttributeModifier> map = stack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
-							for (AttributeModifier modifier : map.get(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName())) {
+							for (AttributeModifier modifier : map.get(SharedMonsterAttributes.ATTACK_DAMAGE.getName())) {
 								if (modifier.getAmount() > 0) {
 									return new Object[]{true};
 								}
@@ -409,8 +411,8 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 			facing.getFrontOffsetZ() * range
 		);
 
-		RayTraceResult hit = player.worldObj.rayTraceBlocks(origin, target);
-		Pair<Entity, Vec3d> pair = WorldUtil.rayTraceEntities(player.worldObj, origin, target, 1.1);
+		RayTraceResult hit = player.getEntityWorld().rayTraceBlocks(origin, target);
+		Pair<Entity, Vec3d> pair = WorldUtil.rayTraceEntities(player.getEntityWorld(), origin, target, 1.1);
 		Entity entity = pair == null ? null : pair.getLeft();
 
 		if (entity instanceof EntityLivingBase && (hit == null || player.getDistanceSq(hit.getBlockPos()) > player.getDistanceSqToEntity(entity))) {

@@ -107,7 +107,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 				@Override
 				public boolean canConnect(@Nonnull EnumFacing direction) {
 					// Can't be visited by other nodes if it is destroyed
-					if (m_destroyed || worldObj == null) return false;
+					if (m_destroyed || getWorld() == null) return false;
 
 					// Or has no cable or is the side it is facing
 					PeripheralType type = getPeripheralTypeSafe();
@@ -142,7 +142,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	@Override
 	public void validate() {
 		super.validate();
-		if (!worldObj.isRemote) {
+		if (!getWorld().isRemote) {
 			McEvents.schedule(new Runnable() {
 				@MergeVisitor.Rewrite
 				protected boolean ANNOTATION;
@@ -150,7 +150,8 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 				@Override
 				public void run() {
 					// In case the tile is removed within this tick
-					if (worldObj != null && worldObj.getBlockState(pos).getBlock() == ComputerCraft.Blocks.cable) {
+					World world = getWorld();
+					if (world != null && world.getBlockState(pos).getBlock() == ComputerCraft.Blocks.cable) {
 						getCable().connect();
 						if (lazyTag != null) {
 							readLazyNBT(lazyTag);
@@ -184,9 +185,10 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	}
 
 	private PeripheralType getPeripheralTypeSafe() {
-		if (worldObj == null) return null;
+		World world = getWorld();
+		if (world == null) return null;
 
-		IBlockState state = worldObj.getBlockState(pos);
+		IBlockState state = world.getBlockState(pos);
 		if (state.getBlock() != ComputerCraft.Blocks.cable) return null;
 
 		return ComputerCraft.Blocks.cable.getPeripheralType(state);
@@ -195,7 +197,8 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	@Override
 	public boolean onActivate(EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (getPeripheralTypeSafe() == PeripheralType.WiredModemWithCable && !player.isSneaking()) {
-			if (!worldObj.isRemote) {
+			World world = getWorld();
+			if (!world.isRemote) {
 
 				String oldPeriphName = getModem().getPeripheralName();
 				getModem().toggleEnabled();
@@ -203,10 +206,10 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 
 				if (!Helpers.equals(periphName, oldPeriphName)) {
 					if (oldPeriphName != null) {
-						player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", oldPeriphName));
+						player.sendMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", oldPeriphName));
 					}
 					if (periphName != null) {
-						player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", periphName));
+						player.sendMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", periphName));
 					}
 
 					updateAnim();
@@ -223,7 +226,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
 		getModem().id = tag.getInteger("peripheralID");
-		if (worldObj == null) {
+		if (getWorld() == null) {
 			lazyTag = tag;
 		} else {
 			readLazyNBT(tag);
@@ -234,6 +237,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 		getModem().setPeripheralEnabled(tag.getBoolean("peripheralAccess"));
 	}
 
+	@Nonnull
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag = super.writeToNBT(tag);
@@ -279,7 +283,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	@Override
 	public void update() {
 		super.update();
-		if (worldObj.isRemote) return;
+		if (getWorld().isRemote) return;
 
 		if (getModem().modem.pollChanged()) updateAnim();
 	}
@@ -326,7 +330,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	@Override
 	public void networkChanged() {
 		getCable().updateConnections();
-		if (!worldObj.isRemote) {
+		if (!getWorld().isRemote) {
 			INetworkController controller = getModem().getAttachedNetwork();
 			if (controller != null) controller.invalidateNode(modem);
 		}
@@ -378,7 +382,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	@Override
 	public AxisAlignedBB getCableBounds() {
 		BlockPos pos = this.pos;
-		IBlockAccess world = worldObj;
+		IBlockAccess world = getWorld();
 
 		INetworkHelpers helpers = NetworkAPI.helpers();
 		return new AxisAlignedBB(
@@ -400,7 +404,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	@Nonnull
 	@Override
 	public IBlockAccess getBlockAccess() {
-		return worldObj;
+		return getWorld();
 	}
 
 	@Nonnull

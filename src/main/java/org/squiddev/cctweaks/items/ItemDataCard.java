@@ -50,7 +50,7 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 
 	@Override
 	public void notifyPlayer(@Nonnull EntityPlayer player, @Nonnull Messages message) {
-		player.addChatMessage(message.getChatMessage());
+		player.sendMessage(message.getChatMessage());
 	}
 
 	@Override
@@ -59,10 +59,11 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 	}
 
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (player.isSneaking()) {
 			if (world.isRemote) return EnumActionResult.SUCCESS;
 
+			ItemStack stack = player.getHeldItem(hand);
 			((IDataCard) stack.getItem()).notifyPlayer(player, Messages.Cleared);
 			stack.setTagCompound(null);
 			return EnumActionResult.SUCCESS;

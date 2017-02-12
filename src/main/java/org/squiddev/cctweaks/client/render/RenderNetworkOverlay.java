@@ -56,12 +56,12 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 		if (data.nodes().size() == 0) return;
 
 		Minecraft minecraft = Minecraft.getMinecraft();
-		ItemStack stack = minecraft.thePlayer.getHeldItemMainhand();
-		ItemStack otherStack = minecraft.thePlayer.getHeldItemOffhand();
+		ItemStack stack = minecraft.player.getHeldItemMainhand();
+		ItemStack otherStack = minecraft.player.getHeldItemOffhand();
 
 		if (
-			(stack == null || stack.getItem() != Registry.itemDebugger) &&
-				(otherStack == null || otherStack.getItem() != Registry.itemDebugger)) {
+			(stack.isEmpty() || stack.getItem() != Registry.itemDebugger) &&
+				(otherStack.isEmpty() || otherStack.getItem() != Registry.itemDebugger)) {
 			return;
 		}
 
@@ -209,11 +209,11 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void clientPreInit() {
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void clientInit() {
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 }

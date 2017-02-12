@@ -4,6 +4,8 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.core.McEvents;
 
+import javax.annotation.Nonnull;
+
 /**
  * A tile entity that lazy loads NBT.
  *
@@ -46,13 +48,14 @@ public abstract class TileLazyNBT extends TileBase {
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
-		if (worldObj == null) {
+		if (getWorld() == null) {
 			lazyTag = tag;
 		} else {
 			readLazyNBT(tag);
 		}
 	}
 
+	@Nonnull
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag = super.writeToNBT(tag);

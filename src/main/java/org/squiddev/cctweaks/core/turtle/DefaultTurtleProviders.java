@@ -10,6 +10,7 @@ import dan200.computercraft.shared.util.InventoryUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
@@ -28,7 +29,11 @@ import javax.annotation.Nonnull;
 public class DefaultTurtleProviders extends Module {
 	@Override
 	public void preInit() {
-		EntityRegistry.registerModEntity(TurtlePlayer.class, CCTweaks.ID + ":ccFakePlayer", 1, CCTweaks.instance, Integer.MAX_VALUE, Integer.MAX_VALUE, false);
+		EntityRegistry.registerModEntity(
+			new ResourceLocation(CCTweaks.ID, "ccFakePlayer"),
+			TurtlePlayer.class, CCTweaks.ID + ":ccFakePlayer", 1, CCTweaks.instance,
+			Integer.MAX_VALUE, Integer.MAX_VALUE, false
+		);
 	}
 
 	@Override
@@ -47,7 +52,7 @@ public class DefaultTurtleProviders extends Module {
 
 				// Remove 'n' items from the stack.
 				InventoryUtil.takeItems(limit, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
-				if (replacementStack != null) {
+				if (!replacementStack.isEmpty()) {
 					// If item is empty (bucket) then add it back
 					InventoryUtil.storeItems(replacementStack, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
 				}

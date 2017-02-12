@@ -68,7 +68,7 @@ public class SubCommandHelp implements ISubCommand {
 		for (String argument : arguments) {
 			prefix.append(' ').append(argument);
 		}
-		sender.addChatMessage(ChatHelpers.getHelp(command, prefix.toString()));
+		sender.sendMessage(ChatHelpers.getHelp(command, prefix.toString()));
 	}
 
 	@Nonnull

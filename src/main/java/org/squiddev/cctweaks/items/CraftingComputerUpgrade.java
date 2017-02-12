@@ -15,8 +15,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+
+import javax.annotation.Nonnull;
 
 /**
  * Handles crafting with ComputerUpgrades
@@ -24,14 +27,15 @@ import net.minecraftforge.common.ForgeHooks;
 public class CraftingComputerUpgrade implements IRecipe {
 
 	@Override
-	public boolean matches(InventoryCrafting inventorycrafting, World world) {
+	public boolean matches(@Nonnull InventoryCrafting inventorycrafting, @Nonnull World world) {
 		return getComputerStack(inventorycrafting) != null;
 	}
 
+	@Nonnull
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
+	public ItemStack getCraftingResult(@Nonnull InventoryCrafting inventorycrafting) {
 		ItemStack computerStack = getComputerStack(inventorycrafting);
-		if (computerStack == null) return null;
+		if (computerStack == null) return ItemStack.EMPTY;
 
 		IComputerItem computerItem = (IComputerItem) computerStack.getItem();
 
@@ -64,7 +68,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 
 			return stack;
 		} else {
-			return null;
+			return ItemStack.EMPTY;
 		}
 	}
 
@@ -83,7 +87,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 
 		for (int i = 0; i < size; i++) {
 			ItemStack itemStack = crafting.getStackInSlot(i);
-			if (itemStack == null) {
+			if (itemStack.isEmpty()) {
 				continue;
 			}
 
@@ -120,17 +124,19 @@ public class CraftingComputerUpgrade implements IRecipe {
 		return 2;
 	}
 
+	@Nonnull
 	@Override
 	public ItemStack getRecipeOutput() {
 		return ComputerItemFactory.create(-1, null, ComputerFamily.Advanced);
 	}
 
+	@Nonnull
 	@Override
-	public ItemStack[] getRemainingItems(InventoryCrafting inventory) {
-		ItemStack[] result = new ItemStack[inventory.getSizeInventory()];
+	public NonNullList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inventory) {
+		NonNullList<ItemStack> result = NonNullList.withSize(inventory.getSizeInventory(), ItemStack.EMPTY);
 
-		for (int i = 0; i < result.length; ++i) {
-			result[i] = ForgeHooks.getContainerItem(inventory.getStackInSlot(i));
+		for (int i = 0; i < result.size(); ++i) {
+			result.set(i, ForgeHooks.getContainerItem(inventory.getStackInSlot(i)));
 		}
 
 		return result;

@@ -28,7 +28,7 @@ public class NetworkPlayerWatcher extends AbstractPacketHandler<VisualisationPac
 	}
 
 	public static void update(EntityPlayerMP player, BlockPos pos) {
-		INetworkNode node = pos == null ? null : NetworkAPI.registry().getNode(player.worldObj, pos);
+		INetworkNode node = pos == null ? null : NetworkAPI.registry().getNode(player.getEntityWorld(), pos);
 		NetworkState state = watchers.get(player);
 
 		INetworkController controller = node == null ? null : node.getAttachedNetwork();

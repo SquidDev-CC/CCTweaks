@@ -39,7 +39,9 @@ configurations {
 }
 
 dependencies {
-	compile "ComputerCraft:ComputerCraft:${project.cc_version}"
+	// We modify the CC jar so we cannot include it in the normal compile configuration
+	provided "ComputerCraft:ComputerCraft:${project.cc_version}"
+	testRuntime "ComputerCraft:ComputerCraft:${project.cc_version}"
 	deobfProvided "MCMultiPart:MCMultiPart:1.3.0:universal"
 	deobfCompile "mezz.jei:jei_${project.mc_version}:4.2.5.233"
 

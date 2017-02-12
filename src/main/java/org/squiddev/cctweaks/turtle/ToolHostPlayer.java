@@ -27,6 +27,8 @@ import org.squiddev.cctweaks.core.turtle.TurtleHooks;
 import org.squiddev.cctweaks.core.utils.FakeNetHandler;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 
+import javax.annotation.Nonnull;
+
 /**
  * Handles various turtle actions.
  */
@@ -138,6 +140,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 	/**
 	 * Basically just {@link #getHeldItemMainhand()}
 	 */
+	@Nonnull
 	public ItemStack getItem(ITurtleAccess turtle) {
 		return turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
 	}
@@ -159,7 +162,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 
 		// Apply item stack properties
 		ItemStack currentStack = getItem(turtle);
-		if (currentStack != null) {
+		if (!currentStack.isEmpty()) {
 			getAttributeMap().applyAttributeModifiers(currentStack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 			activeStack = currentStack.copy();
 		}
@@ -175,13 +178,13 @@ public class ToolHostPlayer extends TurtlePlayer {
 			inventory.setInventorySlotContents(i, turtleInventory.getStackInSlot(i));
 		}
 		for (int i = size; i < largerSize; i++) {
-			inventory.setInventorySlotContents(i, null);
+			inventory.setInventorySlotContents(i, ItemStack.EMPTY);
 		}
 	}
 
 	public void unload(ITurtleAccess turtle) {
 		// Revert to old properties
-		if (activeStack != null) {
+		if (activeStack != null && !activeStack.isEmpty()) {
 			getAttributeMap().removeAttributeModifiers(activeStack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 			activeStack = null;
 		}
@@ -196,13 +199,13 @@ public class ToolHostPlayer extends TurtlePlayer {
 
 		for (int i = 0; i < size; i++) {
 			ItemStack stack = inventory.getStackInSlot(i);
-			turtleInventory.setInventorySlotContents(i, stack == null || stack.stackSize <= 0 ? null : stack);
-			inventory.setInventorySlotContents(i, null);
+			turtleInventory.setInventorySlotContents(i, stack.isEmpty() ? ItemStack.EMPTY : stack);
+			inventory.setInventorySlotContents(i, ItemStack.EMPTY);
 		}
 
 		for (int i = size; i < largerSize; i++) {
 			storeItem(inventory.getStackInSlot(i), turtleInventory, turtle);
-			inventory.setInventorySlotContents(i, null);
+			inventory.setInventorySlotContents(i, ItemStack.EMPTY);
 		}
 	}
 

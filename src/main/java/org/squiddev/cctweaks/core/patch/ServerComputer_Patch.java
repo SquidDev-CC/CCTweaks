@@ -173,7 +173,7 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 						m_position.getX() + 0.5,
 						m_position.getY() + 0.5,
 						m_position.getZ() + 0.5,
-						MathHelper.clamp_int(server.getPlayerList().getViewDistance(), 3, 32) * 16
+						MathHelper.clamp(server.getPlayerList().getViewDistance(), 3, 32) * 16
 					)
 				);
 			} else {
@@ -200,7 +200,7 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 
 			// Send the terminal data to those watching. Sadly this does mean we send
 			// it twice, but I can live.
-			for (EntityPlayerMP player : server.getPlayerList().getPlayerList()) {
+			for (EntityPlayerMP player : server.getPlayerList().getPlayers()) {
 				Container container = player.openContainer;
 				if (container instanceof IContainerComputer && ((IContainerComputer) container).getComputer() == this) {
 					ComputerCraft.sendToPlayer(player, termPacket);

@@ -133,7 +133,7 @@ public class PocketWirelessBridge extends Module implements IPocketUpgrade {
 				@Override
 				protected World getWorld() {
 					Entity entity = pocket.getEntity();
-					return entity == null ? null : entity.worldObj;
+					return entity == null ? null : entity.getEntityWorld();
 				}
 			};
 
@@ -184,7 +184,7 @@ public class PocketWirelessBridge extends Module implements IPocketUpgrade {
 						int size = inventory.getSizeInventory(), held = inventory.currentItem;
 						for (int i = 0; i < size; i++) {
 							ItemStack stack = inventory.getStackInSlot((i + held) % size);
-							if (stack != null && stack.getItem() instanceof IDataCard) {
+							if (!stack.isEmpty() && stack.getItem() instanceof IDataCard) {
 								IDataCard card = (IDataCard) stack.getItem();
 								if (PocketBinding.this.load(stack, card)) {
 									PocketBinding.this.save();
@@ -204,7 +204,7 @@ public class PocketWirelessBridge extends Module implements IPocketUpgrade {
 						int size = inventory.getSizeInventory(), held = inventory.currentItem;
 						for (int i = 0; i < size; i++) {
 							ItemStack stack = inventory.getStackInSlot((i + held) % size);
-							if (stack != null && stack.getItem() instanceof IDataCard) {
+							if (!stack.isEmpty() && stack.getItem() instanceof IDataCard) {
 								IDataCard card = (IDataCard) stack.getItem();
 								PocketBinding.this.save(stack, card);
 								return new Object[]{true};

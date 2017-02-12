@@ -52,7 +52,8 @@ public final class NetworkState {
 		if (cooldown > 0) return null;
 
 		boolean clear = false;
-		if (controller != this.controller || player.worldObj != world) {
+		World newWorld = player.getEntityWorld();
+		if (controller != this.controller || newWorld != world) {
 			clear = true;
 
 			intMapping.clear();
@@ -60,7 +61,7 @@ public final class NetworkState {
 			connections.clear();
 
 			this.controller = controller;
-			this.world = player.worldObj;
+			this.world = newWorld;
 		}
 
 		Set<INetworkNode> networkNodes = controller.getNodesOnNetwork();
@@ -196,7 +197,7 @@ public final class NetworkState {
 	}
 
 	private static boolean isWithinRange(IWorldPosition position, EntityPlayer player) {
-		if (position.getBlockAccess() != player.worldObj) return false;
+		if (position.getBlockAccess() != player.getEntityWorld()) return false;
 
 		double distance = player.getPosition().distanceSq(position.getPosition());
 

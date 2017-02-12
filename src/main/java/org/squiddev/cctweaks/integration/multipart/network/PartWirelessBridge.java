@@ -77,7 +77,7 @@ public class PartWirelessBridge extends PartSided implements IWorldNetworkNodeHo
 
 	@Override
 	public ResourceLocation getModelPath() {
-		return new ResourceLocation(CCTweaks.ID, "wirelessBridgeSmall");
+		return new ResourceLocation(CCTweaks.ID, "wireless_bridge_small");
 	}
 
 	@Override

@@ -23,11 +23,12 @@ public abstract class ItemComputerAction extends ItemBase {
 
 	@Nonnull
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos position, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (!player.isSneaking()) {
 			return EnumActionResult.PASS;
 		}
 
+		ItemStack stack = player.getHeldItem(hand);
 		TileEntity tile = world.getTileEntity(position);
 		if (tile == null) return EnumActionResult.PASS;
 
@@ -47,7 +48,7 @@ public abstract class ItemComputerAction extends ItemBase {
 
 		if (result) {
 			if (!player.capabilities.isCreativeMode) {
-				stack.stackSize -= 1;
+				stack.grow(-1);
 			}
 		}
 

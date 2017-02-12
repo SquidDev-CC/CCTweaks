@@ -25,19 +25,19 @@ public class CommandDelegate extends CommandBase {
 
 	@Nonnull
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return command.getName();
 	}
 
 	@Nonnull
 	@Override
-	public String getCommandUsage(@Nonnull ICommandSender sender) {
+	public String getUsage(@Nonnull ICommandSender sender) {
 		return command.getUsage();
 	}
 
 	@Nonnull
 	@Override
-	public List<String> getCommandAliases() {
+	public List<String> getAliases() {
 		return Collections.emptyList();
 	}
 
@@ -55,7 +55,7 @@ public class CommandDelegate extends CommandBase {
 
 	@Nonnull
 	@Override
-	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
 		return command.getCompletion(server, sender, Arrays.asList(args));
 	}
 

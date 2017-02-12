@@ -20,6 +20,8 @@ import org.squiddev.cctweaks.integration.multipart.network.PartCable;
 import org.squiddev.cctweaks.integration.multipart.network.PartModem;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
+import javax.annotation.Nonnull;
+
 public class ItemCable_Patch extends ItemCable {
 	public ItemCable_Patch(Block block) {
 		super(block);
@@ -36,13 +38,15 @@ public class ItemCable_Patch extends ItemCable {
 		}
 	}
 
+	@Nonnull
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer player, World world, @Nonnull BlockPos pos, @Nonnull EnumHand hand, @Nonnull EnumFacing side, float hitX, float hitY, float hitZ) {
+		ItemStack stack = player.getHeldItem(hand);
 		IBlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 
 		// We can always place in an air block or a cable block that doesn't have a modem already.
-		if (block.isAir(state, world, pos) && nativePlace(stack, player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
+		if (block.isAir(state, world, pos) && nativePlace(player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
 			return EnumActionResult.SUCCESS;
 		}
 		if (block == ComputerCraft.Blocks.cable) {
@@ -50,10 +54,10 @@ public class ItemCable_Patch extends ItemCable {
 			PeripheralType type = cable.getPeripheralType();
 			PeripheralType stackType = getPeripheralType(stack);
 			if ((type == PeripheralType.Cable && stackType == PeripheralType.WiredModem)
-				&& nativePlace(stack, player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
+				&& nativePlace(player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
 				return EnumActionResult.SUCCESS;
 			} else if ((type == PeripheralType.WiredModem && stackType == PeripheralType.Cable)
-				&& nativePlace(stack, player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
+				&& nativePlace(player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
 				return EnumActionResult.SUCCESS;
 			}
 		}
@@ -61,19 +65,19 @@ public class ItemCable_Patch extends ItemCable {
 		Vec3d hit = new Vec3d(hitX, hitY, hitZ);
 		double depth = (hit.xCoord * 2.0D - 1.0D) * (double) side.getFrontOffsetX() + (hit.yCoord * 2.0D - 1.0D) * (double) side.getFrontOffsetY() + (hit.zCoord * 2.0D - 1.0D) * (double) side.getFrontOffsetZ();
 		return (depth < 1.0D && place(stack, player, world, pos, side))
-			|| nativePlace(stack, player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS
+			|| nativePlace(player, world, pos, hand, side, hitX, hitY, hitZ) == EnumActionResult.SUCCESS
 			|| place(stack, player, world, pos.offset(side), side) ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
 	}
 
 	/**
-	 * The original {@link ItemCable#onItemUse(ItemStack, EntityPlayer, World, BlockPos, EnumHand, EnumFacing, float, float, float)} method
+	 * The original {@link ItemCable#onItemUse(EntityPlayer, World, BlockPos, EnumHand, EnumFacing, float, float, float)} method
 	 * We keep this to ensure cables can be placed in existing modem blocks
 	 *
 	 * @return Success at placing the cable
 	 */
 	@MergeVisitor.Stub
 	@MergeVisitor.Rename(from = {"onItemUse", "func_180614_a"})
-	public EnumActionResult nativePlace(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public EnumActionResult nativePlace(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		return EnumActionResult.SUCCESS;
 	}
 
@@ -87,7 +91,7 @@ public class ItemCable_Patch extends ItemCable {
 
 		if (part == null || !MultipartHelper.canAddPart(world, pos, part)) return false;
 		if (!world.isRemote) MultipartHelper.addPart(world, pos, part);
-		if (!player.capabilities.isCreativeMode) item.stackSize--;
+		if (!player.capabilities.isCreativeMode) item.grow(-1);
 
 		return true;
 	}

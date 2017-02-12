@@ -18,7 +18,7 @@ public class EntityPosition implements IWorldPosition {
 	@Nonnull
 	@Override
 	public IBlockAccess getBlockAccess() {
-		return entity.worldObj;
+		return entity.getEntityWorld();
 	}
 
 	@Nonnull

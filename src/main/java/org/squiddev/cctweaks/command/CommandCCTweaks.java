@@ -75,7 +75,7 @@ public final class CommandCCTweaks {
 
 					ComputerMonitor.start();
 
-					sender.addChatMessage(list(
+					sender.sendMessage(list(
 						text("Run "),
 						link(text("/cctweaks profile stop"), "/cctweaks profile stop", "Click to stop profiling"),
 						text(" to stop profiling and view the results")
@@ -198,7 +198,7 @@ public final class CommandCCTweaks {
 					if (computer.isOn()) shutdown++;
 					computer.unload();
 				}
-				sender.addChatMessage(text("Shutdown " + shutdown + " / " + computers.size()));
+				sender.sendMessage(text("Shutdown " + shutdown + " / " + computers.size()));
 			}
 
 			@Nonnull

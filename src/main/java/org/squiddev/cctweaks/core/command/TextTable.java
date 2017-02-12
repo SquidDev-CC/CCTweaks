@@ -166,7 +166,7 @@ public class TextTable {
 			}
 		}
 
-		sender.addChatMessage(out);
+		sender.sendMessage(out);
 	}
 
 	private static void appendFixed(ITextComponent out, ICommandSender sender, ITextComponent entry, int maxWidth) {

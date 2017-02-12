@@ -3,6 +3,8 @@ package org.squiddev.cctweaks.core.network.mock;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Biomes;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -13,6 +15,7 @@ import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.core.network.PacketTest;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -95,7 +98,7 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockPos, 
 	}
 
 	@Override
-	public TileEntity getTileEntity(BlockPos pos) {
+	public TileEntity getTileEntity(@Nonnull BlockPos pos) {
 		return world.get(pos);
 	}
 
@@ -104,23 +107,25 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockPos, 
 	}
 
 	@Override
-	public int getCombinedLight(BlockPos pos, int p_175626_2_) {
+	public int getCombinedLight(@Nonnull BlockPos pos, int p_175626_2_) {
 		return 0;
 	}
 
+	@Nonnull
 	@Override
-	public IBlockState getBlockState(BlockPos pos) {
-		return null;
+	public IBlockState getBlockState(@Nonnull BlockPos pos) {
+		return Blocks.AIR.getDefaultState();
 	}
 
 	@Override
-	public boolean isAirBlock(BlockPos pos) {
+	public boolean isAirBlock(@Nonnull BlockPos pos) {
 		return false;
 	}
 
+	@Nonnull
 	@Override
-	public Biome getBiomeGenForCoords(BlockPos pos) {
-		return null;
+	public Biome getBiome(@Nonnull BlockPos pos) {
+		return Biomes.PLAINS;
 	}
 
 	@Override
@@ -129,17 +134,18 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockPos, 
 	}
 
 	@Override
-	public int getStrongPower(BlockPos pos, EnumFacing direction) {
+	public int getStrongPower(@Nonnull BlockPos pos, @Nonnull EnumFacing direction) {
 		return 0;
 	}
 
+	@Nonnull
 	@Override
 	public WorldType getWorldType() {
 		return WorldType.DEBUG_WORLD;
 	}
 
 	@Override
-	public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
+	public boolean isSideSolid(@Nonnull BlockPos pos, @Nonnull EnumFacing side, boolean _default) {
 		return false;
 	}
 }

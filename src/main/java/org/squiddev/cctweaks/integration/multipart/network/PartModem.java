@@ -252,11 +252,11 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 
 		if (!Helpers.equals(name, newName)) {
 			if (name != null) {
-				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", name));
+				player.sendMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", name));
 			}
 
 			if (newName != null) {
-				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
+				player.sendMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", newName));
 			}
 
 			refreshPart();

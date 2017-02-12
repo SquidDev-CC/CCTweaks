@@ -49,7 +49,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 
 	@Override
 	public void update() {
-		if (worldObj.isRemote) return;
+		if (getWorld().isRemote) return;
 
 		if (modem.modem.pollChanged()) markForUpdate();
 	}
@@ -65,7 +65,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	@Override
 	public boolean onActivated(EntityPlayer player, EnumFacing side, EnumHand hand) {
 		if (player.isSneaking()) return false;
-		if (worldObj.isRemote) return true;
+		if (getWorld().isRemote) return true;
 
 		Set<String> names = modem.getPeripheralNames();
 
@@ -75,11 +75,11 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 
 		if (!Helpers.equals(names, newNames)) {
 			if (names != null && !names.isEmpty()) {
-				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", StringUtils.join(names, ", ")));
+				player.sendMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_disconnected", StringUtils.join(names, ", ")));
 			}
 
 			if (newNames != null && !newNames.isEmpty()) {
-				player.addChatMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", StringUtils.join(newNames, ", ")));
+				player.sendMessage(new TextComponentTranslation("gui.computercraft:wired_modem.peripheral_connected", StringUtils.join(newNames, ", ")));
 			}
 
 			markForUpdate();
@@ -88,6 +88,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 		return true;
 	}
 
+	@Nonnull
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag = super.writeToNBT(tag);
@@ -131,7 +132,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 
 	@Override
 	public void markForUpdate() {
-		if (!worldObj.isRemote) modem.refreshState();
+		if (!getWorld().isRemote) modem.refreshState();
 		super.markForUpdate();
 	}
 

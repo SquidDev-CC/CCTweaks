@@ -107,12 +107,12 @@ public class SubCommandGive extends SubCommandBase {
 		EntityPlayer player = (EntityPlayer) sender;
 		boolean ok = player.inventory.addItemStackToInventory(stack);
 		if (ok) {
-			player.worldObj.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F, ((player.getRNG().nextFloat() - player.getRNG().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+			player.getEntityWorld().playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F, ((player.getRNG().nextFloat() - player.getRNG().nextFloat()) * 0.7F + 1.0F) * 2.0F);
 			player.inventoryContainer.detectAndSendChanges();
 		}
 
-		if (ok && stack.stackSize <= 0) {
-			stack.stackSize = 1;
+		if (ok && stack.getCount() <= 0) {
+			stack.setCount(1);
 			EntityItem entity = player.dropItem(stack, false);
 			if (entity != null) entity.makeFakeItem();
 		} else {

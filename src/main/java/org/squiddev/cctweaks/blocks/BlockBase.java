@@ -7,7 +7,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
@@ -23,7 +22,7 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 /**
  * Base class for all blocks
@@ -62,13 +61,14 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 		return getMetaFromState(state);
 	}
 
+	@Nonnull
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState p_getRenderType_1_) {
 		return EnumBlockRenderType.MODEL;
 	}
 
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
 		T tile = getTile(world, pos);
 
 		super.breakBlock(world, pos, state);
@@ -77,15 +77,15 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		TileBase tile = getTile(world, pos);
 		return tile != null && tile.onActivated(player, side, hand);
 	}
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock) {
-		super.neighborChanged(state, world, pos, neighborBlock);
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
+		super.neighborChanged(state, world, pos, blockIn, fromPos);
 
 		if (world.isRemote) return;
 
@@ -115,7 +115,7 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 	}
 
 	protected static void registerTileEntity(Class<? extends TileEntity> klass, String name) {
-		GameRegistry.registerTileEntityWithAlternatives(klass, CCTweaks.ID + ":" + name, name);
+		GameRegistry.registerTileEntity(klass, CCTweaks.ID + ":" + name);
 	}
 
 	protected void register(Item item) {

@@ -7,6 +7,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -15,42 +16,45 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.registry.Module;
 
+import javax.annotation.Nonnull;
+
 public class CraftingPocketUpgrade extends Module implements IRecipe {
 	@Override
-	public boolean matches(InventoryCrafting crafting, World worldIn) {
-		return getCraftingResult(crafting) != null;
+	public boolean matches(@Nonnull InventoryCrafting crafting, @Nonnull World worldIn) {
+		return !getCraftingResult(crafting).isEmpty();
 	}
 
+	@Nonnull
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inventory) {
+	public ItemStack getCraftingResult(@Nonnull InventoryCrafting inventory) {
 		IPocketUpgrade upgrade = null;
 		ItemStack pocket = null;
 
 		int size = inventory.getSizeInventory();
 		for (int i = 0; i < size; i++) {
 			ItemStack stack = inventory.getStackInSlot(i);
-			if (stack == null) continue;
+			if (stack.isEmpty()) continue;
 
 			if (stack.getItem() == ComputerCraft.Items.pocketComputer) {
 				// If we already found a pocket computer, then abort
-				if (pocket != null) return null;
+				if (pocket != null) return ItemStack.EMPTY;
 
 				// If we have an upgrade then abort
-				if (stack.hasTagCompound() && stack.getTagCompound().getShort("upgrade") != 0) return null;
+				if (stack.hasTagCompound() && stack.getTagCompound().getShort("upgrade") != 0) return ItemStack.EMPTY;
 
 				pocket = stack;
 			} else {
 				// If we already found an upgrade then abort
-				if (upgrade != null) return null;
+				if (upgrade != null) return ItemStack.EMPTY;
 
 				upgrade = PocketRegistry.instance.getFromItemStack(stack);
 
 				// If it isn't a valid one then abort
-				if (upgrade == null) return null;
+				if (upgrade == null) return ItemStack.EMPTY;
 			}
 		}
 
-		if (upgrade == null || pocket == null) return null;
+		if (upgrade == null || pocket == null) return ItemStack.EMPTY;
 
 		pocket = pocket.copy();
 		if (!pocket.hasTagCompound()) pocket.setTagCompound(new NBTTagCompound());
@@ -70,18 +74,20 @@ public class CraftingPocketUpgrade extends Module implements IRecipe {
 		return 2;
 	}
 
+	@Nonnull
 	@Override
 	public ItemStack getRecipeOutput() {
 		return PocketComputerItemFactory.create(-1, null, ComputerFamily.Normal, false);
 	}
 
+	@Nonnull
 	@Override
-	public ItemStack[] getRemainingItems(InventoryCrafting inventory) {
-		ItemStack[] results = new ItemStack[inventory.getSizeInventory()];
+	public NonNullList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inventory) {
+		NonNullList<ItemStack> results = NonNullList.withSize(inventory.getSizeInventory(), ItemStack.EMPTY);
 
-		for (int i = 0; i < results.length; ++i) {
+		for (int i = 0; i < results.size(); ++i) {
 			ItemStack stack = inventory.getStackInSlot(i);
-			results[i] = ForgeHooks.getContainerItem(stack);
+			results.set(i, ForgeHooks.getContainerItem(stack));
 		}
 
 		return results;

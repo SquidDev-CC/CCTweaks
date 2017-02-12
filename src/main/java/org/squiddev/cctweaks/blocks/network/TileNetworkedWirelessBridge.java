@@ -42,6 +42,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 		}
 	};
 
+	@Nonnull
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag = super.writeToNBT(tag);
@@ -74,7 +75,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	@Override
 	public boolean onActivated(EntityPlayer player, EnumFacing side, EnumHand hand) {
 		ItemStack stack = player.getHeldItem(hand);
-		if (stack != null && stack.getItem() instanceof IDataCard) {
+		if (!stack.isEmpty() && stack.getItem() instanceof IDataCard) {
 			return onActivated(stack, (IDataCard) stack.getItem(), player);
 		}
 
@@ -82,7 +83,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 	}
 
 	public boolean onActivated(ItemStack stack, IDataCard card, EntityPlayer player) {
-		if (worldObj.isRemote) return true;
+		if (getWorld().isRemote) return true;
 
 		if (player.isSneaking()) {
 			binding.save(stack, card);
