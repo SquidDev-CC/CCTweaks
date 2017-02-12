@@ -40,13 +40,13 @@ configurations {
 
 dependencies {
 	compile "ComputerCraft:ComputerCraft:${project.cc_version}"
-	deobfCompile "MCMultiPart:MCMultiPart:1.3.0:universal"
-	deobfCompile "mezz.jei:jei_${project.mc_version}:3.14.3.403"
+	deobfProvided "MCMultiPart:MCMultiPart:1.3.0:universal"
+	deobfCompile "mezz.jei:jei_${project.mc_version}:4.2.5.233"
 
 	// For 1.7.10 but including anyway
 	provided "CoFHLib:CoFHLib:[1.7.10]1.0.1-159-dev"
 	provided "net.industrial-craft:industrialcraft-2:2.3.249-ex18:api"
-	provided "net.darkhax.tesla:Tesla:${mc_version}-1.2.1.50:deobf"
+	provided "net.darkhax.tesla:Tesla:1.11-1.3.0.51:deobf"
 
 	shade('org.squiddev:cctweaks-lua:1.3.0') {
 		// Different versions
@@ -55,7 +55,7 @@ dependencies {
 	}
 
 	shade('org.squiddev:Patcher:1.2.3') { exclude group: 'org.ow2.asm' }
-	compile "org.squiddev:unborked:${mc_version}-${cc_version}-1.0.4:dev"
+	compile "org.squiddev:unborked:${mc_version}-${cc_version}-1.1.2:dev"
 
 	provided('org.squiddev:ConfigGen:1.2.5') { exclude group: 'net.minecraftforge' }
 
