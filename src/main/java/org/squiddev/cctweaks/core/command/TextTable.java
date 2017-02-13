@@ -39,7 +39,7 @@ public class TextTable {
 	private static final IChatComponent SEPARATOR = coloured(" | ", EnumChatFormatting.GRAY);
 	private static final IChatComponent LINE = text("\n");
 
-	public static int getWidth(char character, ICommandSender sender) {
+	private static int getWidth(char character, ICommandSender sender) {
 		if (sender instanceof EntityPlayerMP && !(sender instanceof FakePlayer)) {
 			// Use font widths here.
 			if (character == 167) {
@@ -57,7 +57,7 @@ public class TextTable {
 		}
 	}
 
-	public static int getWidth(IChatComponent text, ICommandSender sender) {
+	private static int getWidth(IChatComponent text, ICommandSender sender) {
 		int sum = 0;
 		String chars = text.getUnformattedTextForChat();
 		for (int i = 0; i < chars.length(); i++) {
@@ -67,8 +67,12 @@ public class TextTable {
 		return sum;
 	}
 
-	public static int getMaxWidth(ICommandSender sender) {
-		return sender instanceof EntityPlayerMP && !(sender instanceof FakePlayer) ? 320 : 80;
+	private static boolean isPlayer(ICommandSender sender) {
+		return sender instanceof EntityPlayerMP && !(sender instanceof FakePlayer);
+	}
+
+	private static int getMaxWidth(ICommandSender sender) {
+		return isPlayer(sender) ? 320 : 80;
 	}
 
 	private int columns = -1;
@@ -173,7 +177,7 @@ public class TextTable {
 			delta = -delta;
 
 			// We have to remove some padding as there is a padding added between formatted and unformatted text
-			if (!entry.getChatStyle().isEmpty()) delta -= 1;
+			if (!entry.getChatStyle().isEmpty() && isPlayer(sender)) delta -= 1;
 
 			out.appendSibling(entry);
 
@@ -191,14 +195,14 @@ public class TextTable {
 			}
 
 			out.appendSibling(component);
-		} else if (delta < 0) {
+		} else if (delta > 0) {
 			out.appendSibling(entry);
 		} else {
 			out.appendSibling(entry);
 
 			// We have to add some padding as we expect a padding between formatted and unformatted text
 			// and there won't be.
-			if (entry.getChatStyle().isEmpty()) out.appendText(" ");
+			if (entry.getChatStyle().isEmpty() && isPlayer(sender)) out.appendText(" ");
 		}
 	}
 }
