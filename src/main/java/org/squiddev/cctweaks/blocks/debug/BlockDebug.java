@@ -120,9 +120,9 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	@Override
 	public void preInit() {
 		GameRegistry.registerBlock(this, ItemMultiBlock.class, name);
-		GameRegistry.registerTileEntity(TileDebugPeripheral.class, "debugPeripheral");
-		GameRegistry.registerTileEntity(TileDebugNetworkedPeripheral.class, "debugNetworkedPeripheral");
-		GameRegistry.registerTileEntity(TileDebugNode.class, "debugNode");
+		registerTileEntity(TileDebugPeripheral.class, "debugPeripheral");
+		registerTileEntity(TileDebugNetworkedPeripheral.class, "debugNetworkedPeripheral");
+		registerTileEntity(TileDebugNode.class, "debugNode");
 	}
 
 	@Override

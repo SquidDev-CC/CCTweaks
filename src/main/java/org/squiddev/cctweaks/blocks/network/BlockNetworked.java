@@ -126,8 +126,8 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	@Override
 	public void preInit() {
 		GameRegistry.registerBlock(this, ItemMultiBlock.class, name);
-		GameRegistry.registerTileEntity(TileNetworkedWirelessBridge.class, "wirelessBridge");
-		GameRegistry.registerTileEntity(TileNetworkedModem.class, "wiredModem");
+		registerTileEntity(TileNetworkedWirelessBridge.class, "wirelessBridge");
+		registerTileEntity(TileNetworkedModem.class, "wiredModem");
 	}
 
 	@Override

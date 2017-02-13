@@ -103,7 +103,11 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 	@Override
 	public void preInit() {
 		GameRegistry.registerBlock(this, name);
-		GameRegistry.registerTileEntity(klass, name);
+		registerTileEntity(klass, name);
+	}
+
+	protected static void registerTileEntity(Class<? extends TileEntity> klass, String name) {
+		GameRegistry.registerTileEntityWithAlternatives(klass, CCTweaks.RESOURCE_DOMAIN + ":" + name, name);
 	}
 
 	@Override
