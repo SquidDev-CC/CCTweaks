@@ -52,7 +52,12 @@ public abstract class ItemBase extends Item implements IClientModule {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void clientInit() {
+	public void clientPreInit() {
 		Helpers.setupModel(this, 0, name);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void clientInit() {
 	}
 }

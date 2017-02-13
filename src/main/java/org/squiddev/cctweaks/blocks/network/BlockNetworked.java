@@ -16,6 +16,8 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.blocks.TileBase;
@@ -167,7 +169,8 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	public void clientInit() {
+	@SideOnly(Side.CLIENT)
+	public void clientPreInit() {
 		for (BlockNetworkedType type : BlockNetworkedType.VALUES) {
 			Helpers.setupModel(Item.getItemFromBlock(this), type.ordinal(), type.getName());
 		}

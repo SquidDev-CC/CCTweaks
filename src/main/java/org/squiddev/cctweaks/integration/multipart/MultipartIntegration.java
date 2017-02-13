@@ -15,6 +15,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.network.INetworkNodeProvider;
@@ -99,7 +101,13 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 	}
 
 	@Override
-	public void clientInit() {
+	@SideOnly(Side.CLIENT)
+	public void clientPreInit() {
 		Helpers.setupModel(itemPart, 0, "wirelessBridgeSmall");
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void clientInit() {
 	}
 }

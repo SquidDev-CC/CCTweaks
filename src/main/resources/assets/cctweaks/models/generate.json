@@ -9,18 +9,18 @@
 	},
 	"simple": {
 		"item": {
-			"computerUpgrade": "cctweaks:items/computerUpgrade",
-			"dataCard": "cctweaks:items/dataCard",
+			"computer_upgrade": "cctweaks:items/computer_upgrade",
+			"data_card": "cctweaks:items/data_card",
 			"debugger": "cctweaks:items/debugger",
-			"toolHost": "cctweaks:items/toolHost",
-			"toolHostAdvanced": "cctweaks:items/toolHostAdvanced"
+			"tool_host": "cctweaks:items/tool_host",
+			"tool_host_advanced": "cctweaks:items/tool_host_advanced"
 		},
 		"both": {
-			"debug_networked_peripheral": "cctweaks:blocks/debugNetworkedPeripheral",
-			"debug_node": "cctweaks:blocks/debugNode",
-			"debug_peripheral": "cctweaks:blocks/debugPeripheral",
+			"debug_networked_peripheral": "cctweaks:blocks/debug_networked_peripheral",
+			"debug_node": "cctweaks:blocks/debug_node",
+			"debug_peripheral": "cctweaks:blocks/debug_peripheral",
 			"modem": "computercraft:blocks/wiredModemFace",
-			"wireless_bridge": "cctweaks:blocks/wirelessBridge"
+			"wireless_bridge": "cctweaks:blocks/wireless_bridge"
 		},
 		"block": {
 			"modem_m": "computercraft:blocks/wiredModemFaceOn",

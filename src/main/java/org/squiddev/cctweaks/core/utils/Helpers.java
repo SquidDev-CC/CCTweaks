@@ -7,8 +7,6 @@ import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.util.IDAssigner;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,6 +14,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -127,11 +126,10 @@ public class Helpers {
 
 	@SideOnly(Side.CLIENT)
 	public static void setupModel(Item item, int damage, String name) {
-		name = CCTweaks.RESOURCE_DOMAIN + ":" + name;
+		name = CCTweaks.RESOURCE_DOMAIN + ":" + snakeCase(name);
 
 		ModelResourceLocation res = new ModelResourceLocation(name, "inventory");
-		ModelBakery.registerItemVariants(item, res);
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, damage, res);
+		ModelLoader.setCustomModelResourceLocation(item, damage, res);
 	}
 
 	public static int THREAD_PRIORITY = Thread.MIN_PRIORITY + (Thread.NORM_PRIORITY - Thread.MIN_PRIORITY) / 2;

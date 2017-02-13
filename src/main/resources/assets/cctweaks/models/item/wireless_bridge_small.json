@@ -1,5 +1,5 @@
 {
-	"parent": "cctweaks:block/wirelessBridgeSmall",
+	"parent": "cctweaks:block/wireless_bridge_small",
 	"display": {
 		"thirdperson": {
 			"rotation": [ -10, 180, 170 ],

@@ -14,6 +14,8 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.core.Config;
@@ -199,12 +201,13 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 	}
 
 	@Override
-	public void clientInit() {
+	@SideOnly(Side.CLIENT)
+	public void clientPreInit() {
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
-	@SubscribeEvent
-	public void onWorldRenderLast(PlayerEvent.PlayerLoggedOutEvent ev) {
-
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void clientInit() {
 	}
 }

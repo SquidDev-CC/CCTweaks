@@ -1,7 +1,7 @@
 {
 	"textures": {
-		"particle": "cctweaks:blocks/wirelessBridgeSmall",
-		"all": "cctweaks:blocks/wirelessBridgeSmall"
+		"particle": "cctweaks:blocks/wireless_bridge_small",
+		"all": "cctweaks:blocks/wireless_bridge_small"
 	},
 	"elements": [
 		{
