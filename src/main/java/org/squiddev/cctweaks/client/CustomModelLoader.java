@@ -34,7 +34,7 @@ public class CustomModelLoader extends Module implements IClientModule {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchEvent(TextureStitchEvent.Pre event) {
 		// I didn't think I had to do this. Odd.
-		event.getMap().registerSprite(new ResourceLocation(CCTweaks.ID, "blocks/wirelessBridgeSmall"));
+		event.getMap().registerSprite(new ResourceLocation(CCTweaks.ID, "blocks/wireless_bridge_small"));
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -53,7 +53,12 @@ public class CustomModelLoader extends Module implements IClientModule {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void clientInit() {
+	public void clientPreInit() {
 		MinecraftForge.EVENT_BUS.register(this);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void clientInit() {
 	}
 }

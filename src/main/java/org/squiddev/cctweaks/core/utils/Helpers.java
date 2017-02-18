@@ -16,6 +16,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -133,11 +134,10 @@ public class Helpers {
 
 	@SideOnly(Side.CLIENT)
 	public static void setupModel(Item item, int damage, String name) {
-		name = CCTweaks.ID + ":" + name;
+		name = CCTweaks.ID + ":" + snakeCase(name);
 
-		net.minecraft.client.renderer.block.model.ModelResourceLocation res = new ModelResourceLocation(name, "inventory");
-		ModelBakery.registerItemVariants(item, res);
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, damage, res);
+		ModelResourceLocation res = new ModelResourceLocation(name, "inventory");
+		ModelLoader.setCustomModelResourceLocation(item, damage, res);
 	}
 
 	public static int THREAD_PRIORITY = Thread.MIN_PRIORITY + (Thread.NORM_PRIORITY - Thread.MIN_PRIORITY) / 2;

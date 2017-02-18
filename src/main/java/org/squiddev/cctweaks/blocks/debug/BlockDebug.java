@@ -10,6 +10,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.blocks.TileBase;
@@ -121,9 +123,9 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	@Override
 	public void preInit() {
 		register(new ItemMultiBlock(this));
-		GameRegistry.registerTileEntity(TileDebugPeripheral.class, "debugPeripheral");
-		GameRegistry.registerTileEntity(TileDebugNetworkedPeripheral.class, "debugNetworkedPeripheral");
-		GameRegistry.registerTileEntity(TileDebugNode.class, "debugNode");
+		registerTileEntity(TileDebugPeripheral.class, "debugPeripheral");
+		registerTileEntity(TileDebugNetworkedPeripheral.class, "debugNetworkedPeripheral");
+		registerTileEntity(TileDebugNode.class, "debugNode");
 	}
 
 	@Override
@@ -132,7 +134,8 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	public void clientInit() {
+	@SideOnly(Side.CLIENT)
+	public void clientPreInit() {
 		for (BlockDebugType type : BlockDebugType.VALUES) {
 			Helpers.setupModel(Item.getItemFromBlock(this), type.ordinal(), "debug_" + type.getName());
 		}

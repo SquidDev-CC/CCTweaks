@@ -111,7 +111,11 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 	@Override
 	public void preInit() {
 		register(new ItemBlock(this));
-		GameRegistry.registerTileEntity(klass, name);
+		registerTileEntity(klass, name);
+	}
+
+	protected static void registerTileEntity(Class<? extends TileEntity> klass, String name) {
+		GameRegistry.registerTileEntityWithAlternatives(klass, CCTweaks.ID + ":" + name, name);
 	}
 
 	protected void register(Item item) {
@@ -129,7 +133,12 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void clientInit() {
+	public void clientPreInit() {
 		Helpers.setupModel(Item.getItemFromBlock(this), 0, name);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void clientInit() {
 	}
 }

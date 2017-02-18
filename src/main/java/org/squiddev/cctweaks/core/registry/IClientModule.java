@@ -11,5 +11,11 @@ public interface IClientModule extends IModule {
 	 * Register custom handlers on the client
 	 */
 	@SideOnly(Side.CLIENT)
+	void clientPreInit();
+
+	/**
+	 * Register custom handlers on the client
+	 */
+	@SideOnly(Side.CLIENT)
 	void clientInit();
 }

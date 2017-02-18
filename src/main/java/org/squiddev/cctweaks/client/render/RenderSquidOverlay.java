@@ -167,4 +167,9 @@ public class RenderSquidOverlay extends Module implements IClientModule {
 			renderer.pos(WIDTH, 0, WIDTH / 2).endVertex();
 		}
 	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void clientPreInit() {
+	}
 }

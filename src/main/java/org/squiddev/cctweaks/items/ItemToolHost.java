@@ -7,6 +7,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeToolHost;
@@ -82,7 +84,8 @@ public class ItemToolHost extends ItemBase {
 	}
 
 	@Override
-	public void clientInit() {
+	@SideOnly(Side.CLIENT)
+	public void clientPreInit() {
 		Helpers.setupModel(this, 0, name);
 		Helpers.setupModel(this, 1, "toolHostAdvanced");
 	}

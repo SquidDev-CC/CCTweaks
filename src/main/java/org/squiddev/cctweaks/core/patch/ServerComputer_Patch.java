@@ -181,9 +181,14 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 			}
 		}
 
-		// We'll have sent the terminal above if terminal limiting isn't enabled. Obviously we only want
-		// to send it if it has changed
-		if (Config.Packets.terminalLimiting && hasTerminalChanged()) {
+		// We'll have sent the terminal above if terminal limiting isn't enabled.
+		// If terminal limiting is enabled then we obviously need to send the terminal to those interacting with it.
+		// We send this even if there hasn't been a terminal change for two reasons:
+		//  - Update the computer state of those out of range
+		//  - Correct the terminal for those within range (it will have been cleared by the above packet).
+		// However this does mean we end up sending packets twice to those within range and interacting with it.
+		// Thankfully computer state doesn't change too much so this shouldn't be much of an issue.
+		if (Config.Packets.terminalLimiting) {
 			ComputerCraftPacket termPacket = createStatePacket();
 			writeDescription(termPacket.m_dataNBT, true);
 

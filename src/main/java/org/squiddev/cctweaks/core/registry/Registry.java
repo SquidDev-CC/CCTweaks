@@ -181,6 +181,13 @@ public final class Registry {
 
 		@Override
 		@SideOnly(Side.CLIENT)
+		public void preInit() {
+			super.preInit();
+			base.clientPreInit();
+		}
+
+		@Override
+		@SideOnly(Side.CLIENT)
 		public void init() {
 			super.init();
 			base.clientInit();
