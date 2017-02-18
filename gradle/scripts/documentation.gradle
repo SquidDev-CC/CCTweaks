@@ -7,7 +7,7 @@ class DocumentationParser extends DefaultTask {
 	@Optional
 	public FileCollection sources;
 
-	private static final Pattern regex = Pattern.compile(/.+\/([a-z]+)\/docs\/([a-z]+_[A-Z]+)\/([a-z]+)\/(.+)\.txt/);
+	private static final Pattern regex = Pattern.compile(/.+\/([a-z]+)\/docs\/([a-z]+_[a-z]+)\/([a-z]+)\/(.+)\.txt/);
 	public Map<String, StringBuilder> languages = new HashMap<String, StringBuilder>();
 
 	@TaskAction
