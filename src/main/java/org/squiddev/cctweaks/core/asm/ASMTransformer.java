@@ -163,6 +163,16 @@ public class ASMTransformer implements IClassTransformer {
 				"org.squiddev.cctweaks.core.patch.Terminal_Patch"
 			),
 			new TurtlePermissions(),
+
+			// Fix JEI preventing repeat events
+			new ClassMerger(
+				"dan200.computercraft.client.gui.GuiTurtle",
+				"org.squiddev.cctweaks.core.patch.GuiContainer_Extension"
+			),
+			new ClassMerger(
+				"dan200.computercraft.client.gui.GuiComputer",
+				"org.squiddev.cctweaks.core.patch.GuiContainer_Extension"
+			),
 		});
 
 		patches.finalise();
