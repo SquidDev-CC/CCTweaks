@@ -9,6 +9,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.pocket.IPocketAccess;
 import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
@@ -20,17 +21,14 @@ import java.util.Collections;
 import java.util.Map;
 
 public final class PocketAccess implements IPocketAccess {
-	protected final IPocketUpgrade upgrade;
-	protected Entity entity;
-	protected ItemStack stack;
-	protected IPeripheral peripheral;
+	private IPocketUpgrade upgrade;
+	private IPeripheral peripheral;
+	Entity entity;
+	ItemStack stack;
 
-	public PocketAccess(IPocketUpgrade upgrade, Entity entity, ItemStack stack) {
-		this.upgrade = upgrade;
+	public PocketAccess(Entity entity, ItemStack stack) {
 		this.entity = entity;
 		this.stack = stack;
-
-		this.peripheral = upgrade.createPeripheral(this);
 	}
 
 	@Override
@@ -109,13 +107,47 @@ public final class PocketAccess implements IPocketAccess {
 		ServerComputer computer = getComputer();
 		if (computer == null) return;
 
-		peripheral = upgrade.createPeripheral(this);
-		computer.setPeripheral(2, peripheral);
+		invalidatePeripheral(computer);
 	}
 
 	@Nonnull
 	@Override
 	public Map<ResourceLocation, IPeripheral> getUpgrades() {
-		return Collections.singletonMap(upgrade.getUpgradeID(), peripheral);
+		if (upgrade == null) {
+			return Collections.emptyMap();
+		} else {
+			return Collections.singletonMap(upgrade.getUpgradeID(), peripheral);
+		}
+	}
+
+	public IPocketUpgrade getUpgrade() {
+		return upgrade;
+	}
+
+	private void invalidatePeripheral(ServerComputer computer) {
+		peripheral = upgrade == null ? null : upgrade.createPeripheral(this);
+		computer.setPeripheral(2, peripheral);
+	}
+
+	synchronized void setUpgrade(IPocketUpgrade upgrade, ServerComputer computer) {
+		// Clear the old upgrade NBT
+		if (stack.hasTagCompound()) {
+			NBTTagCompound tag = stack.getTagCompound();
+			if (tag.hasKey("upgrade_info", 10)) {
+				tag.removeTag("upgrade_info");
+				updateUpgradeNBTData();
+			}
+		}
+
+		this.upgrade = upgrade;
+		invalidatePeripheral(computer);
+	}
+
+	synchronized void update() {
+		if (upgrade != null) upgrade.update(this, peripheral);
+	}
+
+	synchronized boolean rightClick(World world) {
+		return upgrade != null && upgrade.onRightClick(world, this, peripheral);
 	}
 }
