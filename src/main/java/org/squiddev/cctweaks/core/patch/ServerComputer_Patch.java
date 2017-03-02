@@ -41,12 +41,12 @@ import java.io.File;
 	from = {
 		"org/squiddev/cctweaks/lua/patch/Computer_Patch",
 		"org/squiddev/cctweaks/lua/patch/ComputerThread_Rewrite",
-		"org/squiddev/cctweaks/core/patch/Terminal_Patch",
+		"org/squiddev/cctweaks/core/patch/Terminal_Patch"
 	},
 	to = {
 		"dan200/computercraft/core/computer/Computer",
 		"dan200/computercraft/core/computer/ComputerThread",
-		"dan200/computercraft/core/terminal/Terminal",
+		"dan200/computercraft/core/terminal/Terminal"
 	}
 )
 public class ServerComputer_Patch extends ServerComputer implements IComputerEnvironmentExtended, IExtendedServerComputer {

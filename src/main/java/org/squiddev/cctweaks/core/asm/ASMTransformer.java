@@ -26,7 +26,7 @@ import java.io.*;
 public class ASMTransformer implements IClassTransformer {
 	private final CustomChain patches = new CustomChain();
 
-	protected void add(Object[] patchers) {
+	private void add(Object[] patchers) {
 		for (Object patcher : patchers) {
 			if (patcher instanceof IPatcher) patches.add((IPatcher) patcher);
 			if (patcher instanceof ISource) patches.add((ISource) patcher);
@@ -266,8 +266,7 @@ public class ASMTransformer implements IClassTransformer {
 		DebugLogger.debug("Dump for " + className + "\n" + writer.toString());
 	}
 
-	public void writeDump(String className, byte[] bytes) {
-
+	private void writeDump(String className, byte[] bytes) {
 		if (className.endsWith("TurtlePlaceCommand")) {
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(writer);
