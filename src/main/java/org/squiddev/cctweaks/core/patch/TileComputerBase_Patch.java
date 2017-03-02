@@ -3,9 +3,15 @@ package org.squiddev.cctweaks.core.patch;
 import com.google.common.base.Objects;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ClientComputer;
+import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.util.DirectionUtil;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import org.squiddev.cctweaks.api.computer.IExtendedServerComputer;
+import org.squiddev.cctweaks.core.patch.iface.IExtendedComputerTile;
 import org.squiddev.patcher.visitors.MergeVisitor;
+
+import javax.annotation.Nonnull;
 
 /**
  * Ensures NBT data sync
@@ -14,17 +20,22 @@ import org.squiddev.patcher.visitors.MergeVisitor;
 	from = "org/squiddev/cctweaks/core/patch/ServerComputer_Patch",
 	to = "dan200/computercraft/shared/computer/core/ServerComputer"
 )
-public abstract class TileComputerBase_Patch extends TileComputerBase {
+public abstract class TileComputerBase_Patch extends TileComputerBase implements IExtendedComputerTile {
+	public boolean hasDisk;
+	public int diskId;
+
 	@MergeVisitor.Stub
-	public abstract ServerComputer_Patch createServerComputer();
+	public ServerComputer createServerComputer() {
+		return null;
+	}
 
 	/**
 	 * Fix getRedstoneConnectivity to use the opposite side
 	 */
 	public boolean getRedstoneConnectivity(EnumFacing side) {
 		if (side == null) return false;
-		int localDir = this.remapLocalSide(DirectionUtil.toLocal(this, side.getOpposite()));
-		return !this.isRedstoneBlockedOnSide(localDir);
+		int localDir = remapLocalSide(DirectionUtil.toLocal(this, side.getOpposite()));
+		return !isRedstoneBlockedOnSide(localDir);
 	}
 
 	/**
@@ -32,7 +43,7 @@ public abstract class TileComputerBase_Patch extends TileComputerBase {
 	 */
 	public void update() {
 		if (!worldObj.isRemote) {
-			ServerComputer_Patch computer = this.createServerComputer();
+			ServerComputer computer = createServerComputer();
 			if (computer != null) {
 				boolean oldOn = m_on || m_startOn;
 
@@ -62,7 +73,7 @@ public abstract class TileComputerBase_Patch extends TileComputerBase {
 					changed = true;
 				}
 
-				boolean on = computer.isMostlyOn();
+				boolean on = ((IExtendedServerComputer) computer).isMostlyOn();
 				if (on != oldOn) {
 					m_on = on;
 					changed = true;
@@ -75,6 +86,53 @@ public abstract class TileComputerBase_Patch extends TileComputerBase {
 		} else {
 			ClientComputer computer = createClientComputer();
 			if (computer != null && computer.hasOutputChanged()) updateBlock();
+		}
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound compound) {
+		native_readFromNBT(compound);
+		if (compound.hasKey("rom_id", 99)) {
+			hasDisk = true;
+			diskId = compound.getInteger("rom_id");
+		}
+	}
+
+	@MergeVisitor.Rename(from = {"readFromNBT", "func_145839_a"})
+	@MergeVisitor.Stub
+	public void native_readFromNBT(NBTTagCompound compound) {
+	}
+
+	@Nonnull
+	@Override
+	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+		native_writeToNBT(compound);
+		if (hasDisk) {
+			compound.setInteger("rom_id", diskId);
+		} else {
+			compound.removeTag("rom_id");
+		}
+		return compound;
+	}
+
+	@MergeVisitor.Rename(from = {"writeToNBT", "func_145841_b"})
+	@MergeVisitor.Stub
+	public NBTTagCompound native_writeToNBT(NBTTagCompound compound) {
+		return compound;
+	}
+
+	public void writeDescription(NBTTagCompound tag) {
+		super.writeDescription(tag);
+		tag.setInteger("instanceID", createServerComputer().getInstanceID());
+		if (hasDisk) tag.setInteger("rom_id", diskId);
+	}
+
+	public void readDescription(NBTTagCompound gag) {
+		super.readDescription(gag);
+		m_instanceID = gag.getInteger("instanceID");
+		if (gag.hasKey("rom_id", 99)) {
+			hasDisk = true;
+			diskId = gag.getInteger("rom_id");
 		}
 	}
 }

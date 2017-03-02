@@ -26,7 +26,7 @@ import java.io.*;
 public class ASMTransformer implements IClassTransformer {
 	private final CustomChain patches = new CustomChain();
 
-	protected void add(Object[] patchers) {
+	private void add(Object[] patchers) {
 		for (Object patcher : patchers) {
 			if (patcher instanceof IPatcher) patches.add((IPatcher) patcher);
 			if (patcher instanceof ISource) patches.add((ISource) patcher);
@@ -95,7 +95,6 @@ public class ASMTransformer implements IClassTransformer {
 			),
 
 			// Pocket upgrades
-			new PocketUpgrades(),
 			new ClassMerger(
 				"dan200.computercraft.shared.pocket.items.ItemPocketComputer",
 				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"
@@ -158,6 +157,27 @@ public class ASMTransformer implements IClassTransformer {
 				"org.squiddev.cctweaks.core.patch.Terminal_Patch"
 			),
 			new TurtlePermissions(),
+
+			// Fix JEI preventing repeat events
+			new ClassMerger(
+				"dan200.computercraft.client.gui.GuiTurtle",
+				"org.squiddev.cctweaks.core.patch.GuiContainer_Extension"
+			),
+			new ClassMerger(
+				"dan200.computercraft.client.gui.GuiComputer",
+				"org.squiddev.cctweaks.core.patch.GuiContainer_Extension"
+			),
+
+			// Custom ROM booting
+			new SetCustomRom(),
+			new ClassMerger(
+				"dan200.computercraft.shared.computer.items.ComputerItemFactory",
+				"org.squiddev.cctweaks.core.patch.ComputerItemFactory_Patch"
+			),
+			new ClassMerger(
+				"dan200.computercraft.shared.turtle.items.TurtleItemFactory",
+				"org.squiddev.cctweaks.core.patch.TurtleItemFactory_Patch"
+			),
 		});
 
 		patches.finalise();
@@ -241,8 +261,7 @@ public class ASMTransformer implements IClassTransformer {
 		DebugLogger.debug("Dump for " + className + "\n" + writer.toString());
 	}
 
-	public void writeDump(String className, byte[] bytes) {
-
+	private void writeDump(String className, byte[] bytes) {
 		if (className.endsWith("TurtlePlaceCommand")) {
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(writer);

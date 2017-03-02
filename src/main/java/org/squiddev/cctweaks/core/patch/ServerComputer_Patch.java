@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.patch;
 
 import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.api.filesystem.IMount;
 import dan200.computercraft.core.terminal.Terminal;
 import dan200.computercraft.shared.computer.core.IComputer;
 import dan200.computercraft.shared.computer.core.ServerComputer;
@@ -20,12 +21,17 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import org.squiddev.cctweaks.api.IContainerComputer;
+import org.squiddev.cctweaks.api.computer.IExtendedServerComputer;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.cctweaks.lua.lib.LuaEnvironment;
+import org.squiddev.cctweaks.lua.lib.ReadOnlyFileMount;
 import org.squiddev.cctweaks.lua.patch.ComputerThread_Rewrite;
 import org.squiddev.cctweaks.lua.patch.Computer_Patch;
 import org.squiddev.cctweaks.lua.patch.iface.IComputerEnvironmentExtended;
 import org.squiddev.patcher.visitors.MergeVisitor;
+
+import java.io.File;
 
 /**
  * - Adds {@link IComputerEnvironmentExtended} and suspending events on timeout
@@ -36,15 +42,15 @@ import org.squiddev.patcher.visitors.MergeVisitor;
 	from = {
 		"org/squiddev/cctweaks/lua/patch/Computer_Patch",
 		"org/squiddev/cctweaks/lua/patch/ComputerThread_Rewrite",
-		"org/squiddev/cctweaks/core/patch/Terminal_Patch",
+		"org/squiddev/cctweaks/core/patch/Terminal_Patch"
 	},
 	to = {
 		"dan200/computercraft/core/computer/Computer",
 		"dan200/computercraft/core/computer/ComputerThread",
-		"dan200/computercraft/core/terminal/Terminal",
+		"dan200/computercraft/core/terminal/Terminal"
 	}
 )
-public class ServerComputer_Patch extends ServerComputer implements IComputerEnvironmentExtended {
+public class ServerComputer_Patch extends ServerComputer implements IComputerEnvironmentExtended, IExtendedServerComputer {
 	private static final int TIMEOUT = 100;
 
 	private boolean suspendable;
@@ -69,6 +75,7 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 		super(null, -1, null, -1, null, -1, -1);
 	}
 
+	@Override
 	public boolean isMostlyOn() {
 		return m_computer.isMostlyOn();
 	}
@@ -95,6 +102,14 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 
 	private boolean isSuspendable() {
 		return Config.Computer.suspendInactive && suspendable;
+	}
+
+	@Override
+	public void setCustomRom(int diskID) {
+		if (diskID < 0 || !Config.Computer.CustomRom.enabled) return;
+
+		IMount mount = new ReadOnlyFileMount(new File(ComputerCraft.getWorldDir(getWorld()), "computer/disk/" + diskID));
+		m_computer.setRomMount(LuaEnvironment.getPreBios(), mount);
 	}
 
 	@Override

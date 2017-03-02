@@ -79,6 +79,23 @@ public final class Config {
 		@DefaultBoolean(false)
 		@RequiresRestart
 		public static boolean suspendInactive;
+
+		/**
+		 * Config options about creating custom ROMs.
+		 */
+		public static class CustomRom {
+			/**
+			 * Whether custom ROMs are enabled.
+			 */
+			@DefaultBoolean(true)
+			public static boolean enabled;
+
+			/**
+			 * Whether crafting of custom ROMs is enabled.
+			 */
+			@DefaultBoolean(true)
+			public static boolean crafting;
+		}
 	}
 
 	/**
