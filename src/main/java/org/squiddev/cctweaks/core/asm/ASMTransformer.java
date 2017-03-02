@@ -100,7 +100,6 @@ public class ASMTransformer implements IClassTransformer {
 			),
 
 			// Pocket upgrades
-			new PocketUpgrades(),
 			new ClassMerger(
 				"dan200.computercraft.shared.pocket.items.ItemPocketComputer",
 				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"
@@ -172,6 +171,17 @@ public class ASMTransformer implements IClassTransformer {
 			new ClassMerger(
 				"dan200.computercraft.client.gui.GuiComputer",
 				"org.squiddev.cctweaks.core.patch.GuiContainer_Extension"
+			),
+
+			// Custom ROM booting
+			new SetCustomRom(),
+			new ClassMerger(
+				"dan200.computercraft.shared.computer.items.ComputerItemFactory",
+				"org.squiddev.cctweaks.core.patch.ComputerItemFactory_Patch"
+			),
+			new ClassMerger(
+				"dan200.computercraft.shared.turtle.items.TurtleItemFactory",
+				"org.squiddev.cctweaks.core.patch.TurtleItemFactory_Patch"
 			),
 		});
 
