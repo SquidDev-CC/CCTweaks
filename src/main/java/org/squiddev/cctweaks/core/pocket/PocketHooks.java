@@ -5,60 +5,52 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Hooks for pocket upgrades
  */
 public class PocketHooks {
-	private static final Map<Integer, PocketAccess> upgradeInstance = new HashMap<Integer, PocketAccess>();
+	private static final WeakHashMap<ServerComputer, PocketAccess> upgradeInstance = new WeakHashMap<ServerComputer, PocketAccess>();
 
-	private static PocketAccess getAccess(ItemStack stack, ServerComputer computer) {
-		if (!stack.hasTagCompound()) return null;
-
-		NBTTagCompound tag = stack.getTagCompound();
-		if (!tag.hasKey("upgrade")) return null;
-
-		short id = tag.getShort("upgrade");
-		if (id == 0 || id == 1) return null;
-
-		return upgradeInstance.get(computer.getInstanceID());
+	public static PocketAccess getAccess(ServerComputer computer) {
+		return upgradeInstance.get(computer);
 	}
 
 	public static void update(Entity entity, ItemStack stack, ServerComputer computer) {
-		PocketAccess access = getAccess(stack, computer);
+		PocketAccess access = getAccess(computer);
 		if (access == null) return;
 
 		access.stack = stack;
 		access.entity = entity;
-		access.upgrade.update(access, access.peripheral);
+		access.update();
 	}
 
 	public static boolean rightClick(World world, Entity entity, ItemStack stack, ServerComputer computer) {
-		PocketAccess access = getAccess(stack, computer);
+		PocketAccess access = getAccess(computer);
 		if (access == null) return false;
 
 		access.stack = stack;
 		access.entity = entity;
-		return access.upgrade.onRightClick(world, access, access.peripheral);
+		return access.rightClick(world);
 	}
 
 	public static void create(IInventory inventory, ItemStack stack, ServerComputer computer) {
-		IPocketUpgrade upgrade = PocketRegistry.instance.getUpgrade(stack, inventory);
-		if (upgrade == null) return;
-
 		Entity entity = inventory instanceof InventoryPlayer ? ((InventoryPlayer) inventory).player : null;
-		PocketAccess access = new PocketAccess(upgrade, entity, stack);
-		computer.setPeripheral(2, access.peripheral);
-		upgradeInstance.put(computer.getInstanceID(), access);
+
+		PocketAccess access = new PocketAccess(entity, stack);
+		upgradeInstance.put(computer, access);
+
+		access.setUpgrade(PocketRegistry.instance.getUpgrade(stack, inventory), computer);
 	}
 
 	public static void destroy(ServerComputer computer) {
-		upgradeInstance.remove(computer.getInstanceID());
+		upgradeInstance.remove(computer);
+	}
+
+	public static boolean hasPocketUpgrade(ItemStack stack) {
+		return stack.hasTagCompound() && stack.getTagCompound().getInteger("upgrade") != 0;
 	}
 }

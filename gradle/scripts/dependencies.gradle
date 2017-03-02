@@ -50,7 +50,7 @@ dependencies {
 	provided "net.industrial-craft:industrialcraft-2:2.3.249-ex18:api"
 	provided "net.darkhax.tesla:Tesla:1.11-1.3.0.51:deobf"
 
-	shade('org.squiddev:cctweaks-lua:1.3.0') {
+	shade('org.squiddev:cctweaks-lua:1.3.1') {
 		// Different versions
 		exclude group: 'com.google.guava'
 		exclude group: 'org.ow2.asm'

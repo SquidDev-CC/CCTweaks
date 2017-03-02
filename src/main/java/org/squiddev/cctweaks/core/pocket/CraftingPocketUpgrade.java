@@ -40,7 +40,7 @@ public class CraftingPocketUpgrade extends Module implements IRecipe {
 				if (pocket != null) return ItemStack.EMPTY;
 
 				// If we have an upgrade then abort
-				if (stack.hasTagCompound() && stack.getTagCompound().getShort("upgrade") != 0) return ItemStack.EMPTY;
+				if (PocketHooks.hasPocketUpgrade(stack)) return ItemStack.EMPTY;
 
 				pocket = stack;
 			} else {
