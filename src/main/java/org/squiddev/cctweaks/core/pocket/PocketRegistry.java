@@ -8,14 +8,17 @@ import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.api.pocket.IPocketRegistry;
 import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
+import org.squiddev.cctweaks.pocket.PocketModem;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class PocketRegistry implements IPocketRegistry {
 	public static final short FLAG = 0xFF;
+	public static final short MODEM = 1;
 
 	public static final PocketRegistry instance = new PocketRegistry();
 
@@ -50,8 +53,6 @@ public final class PocketRegistry implements IPocketRegistry {
 		if (!tag.hasKey("upgrade")) return null;
 
 		int id = tag.getShort("upgrade");
-		if (id == 0 || id == 1) return null;
-
 		return getUpgradeInternal(tag, id, inventory);
 	}
 
@@ -62,23 +63,27 @@ public final class PocketRegistry implements IPocketRegistry {
 		if (!tag.hasKey("upgrade")) return null;
 
 		int id = tag.getShort("upgrade");
-		if (id == 0) return null;
-		if (id == 1) return "upgrade.computercraft:wireless_modem.adjective";
-
 		IPocketUpgrade upgrade = getUpgradeInternal(tag, id, inventory);
 		return upgrade == null ? null : upgrade.getUnlocalisedAdjective();
 	}
 
 	private IPocketUpgrade getUpgradeInternal(NBTTagCompound tag, int id, IInventory inventory) {
 		IPocketUpgrade upgrade;
-		if (id == FLAG) {
-			upgrade = upgrades.get(tag.getString("upgrade_name"));
-		} else {
-			upgrade = legacyUpgrades.get(id);
-			if (upgrade != null) {
-				tag.setInteger("upgrade", FLAG);
-				tag.setString("upgrade_name", upgrade.getUpgradeID().toString());
-			}
+		switch (id) {
+			case 0:
+				return null;
+			case MODEM:
+				return PocketModem.INSTANCE;
+			case FLAG:
+				upgrade = upgrades.get(tag.getString("upgrade_name"));
+				break;
+			default:
+				upgrade = legacyUpgrades.get(id);
+				if (upgrade != null) {
+					tag.setInteger("upgrade", FLAG);
+					tag.setString("upgrade_name", upgrade.getUpgradeID().toString());
+				}
+				break;
 		}
 
 		if (upgrade == null) {
@@ -94,7 +99,8 @@ public final class PocketRegistry implements IPocketRegistry {
 		return upgrade;
 	}
 
-	public IPocketUpgrade getFromItemStack(ItemStack stack) {
+	@Nullable
+	public IPocketUpgrade getFromItemStack(@Nonnull ItemStack stack) {
 		for (IPocketUpgrade entry : upgrades.values()) {
 			ItemStack craftingStack = entry.getCraftingItem();
 			if (craftingStack != null && InventoryUtil.areItemsStackable(stack, craftingStack)) {
@@ -103,6 +109,23 @@ public final class PocketRegistry implements IPocketRegistry {
 		}
 
 		return null;
+	}
+
+	public void setToItemStack(@Nonnull ItemStack stack, @Nullable IPocketUpgrade upgrade) {
+		NBTTagCompound tag = stack.getTagCompound();
+		if (tag == null) stack.setTagCompound(tag = new NBTTagCompound());
+
+		tag.removeTag("upgrade_info");
+		if (upgrade == null) {
+			tag.setInteger("upgrade", 0);
+			tag.removeTag("upgrade_name");
+		} else if (upgrade == PocketModem.INSTANCE) {
+			tag.setInteger("upgrade", 1);
+			tag.removeTag("upgrade_name");
+		} else {
+			tag.setInteger("upgrade", FLAG);
+			tag.setString("upgrade_name", upgrade.getUpgradeID().toString());
+		}
 	}
 
 	public Collection<IPocketUpgrade> getUpgrades() {
