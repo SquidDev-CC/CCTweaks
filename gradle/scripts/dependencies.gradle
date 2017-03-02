@@ -41,7 +41,7 @@ configurations {
 dependencies {
 	// We modify the CC jar so we cannot include it in the normal compile configuration
 	provided "ComputerCraft:ComputerCraft:${project.cc_version}"
-	testRuntime "ComputerCraft:ComputerCraft:${project.cc_version}"
+	testCompile "ComputerCraft:ComputerCraft:${project.cc_version}"
 	deobfProvided "MCMultiPart:MCMultiPart:1.3.0:universal"
 	deobfCompile "mezz.jei:jei_${project.mc_version}:4.2.5.233"
 
@@ -57,7 +57,7 @@ dependencies {
 	}
 
 	shade('org.squiddev:Patcher:1.2.3') { exclude group: 'org.ow2.asm' }
-	compile "org.squiddev:unborked:${mc_version}-${cc_version}-1.1.2:dev"
+	compile "org.squiddev:unborked:${mc_version}-${cc_version}-1.1.4:dev"
 
 	provided('org.squiddev:ConfigGen:1.2.5') { exclude group: 'net.minecraftforge' }
 

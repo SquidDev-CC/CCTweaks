@@ -48,13 +48,13 @@ public class PocketAPIExtensions extends PocketAPI {
 				int size = inventory.getSizeInventory(), held = inventory.currentItem;
 				for (int i = 0; i < size; i++) {
 					ItemStack invStack = inventory.getStackInSlot((i + held) % size);
-					if (invStack != null) {
+					if (!invStack.isEmpty()) {
 						newUpgrade = PocketRegistry.instance.getFromItemStack(invStack);
 						if (newUpgrade != null && newUpgrade != previousUpgrade) {
 							// Consume an item from this stack and exit the loop
 							invStack = invStack.copy();
-							invStack.stackSize--;
-							inventory.setInventorySlotContents((i + held) % size, invStack.stackSize <= 0 ? null : invStack);
+							invStack.grow(-1);
+							inventory.setInventorySlotContents((i + held) % size, invStack.isEmpty() ? ItemStack.EMPTY : invStack);
 
 							break;
 						}
@@ -66,10 +66,10 @@ public class PocketAPIExtensions extends PocketAPI {
 				// Remove the current upgrade
 				if (previousUpgrade != null) {
 					ItemStack stack = previousUpgrade.getCraftingItem();
-					if (stack != null) {
+					if (stack != null && !stack.isEmpty()) {
 						stack = InventoryUtil.storeItems(stack, inventory, 0, 36, inventory.currentItem);
-						if (stack != null) {
-							WorldUtil.dropItemStack(stack, player.worldObj, player.posX, player.posY, player.posZ);
+						if (stack != null && !stack.isEmpty()) {
+							WorldUtil.dropItemStack(stack, player.getEntityWorld(), player.posX, player.posY, player.posZ);
 						}
 					}
 				}
@@ -108,10 +108,10 @@ public class PocketAPIExtensions extends PocketAPI {
 				access.setUpgrade(null, computer);
 
 				ItemStack stack = previousUpgrade.getCraftingItem();
-				if (stack != null) {
+				if (stack != null && !stack.isEmpty()) {
 					stack = InventoryUtil.storeItems(stack, inventory, 0, 36, inventory.currentItem);
-					if (stack != null) {
-						WorldUtil.dropItemStack(stack, player.worldObj, player.posX, player.posY, player.posZ);
+					if (stack != null && !stack.isEmpty()) {
+						WorldUtil.dropItemStack(stack, player.getEntityWorld(), player.posX, player.posY, player.posZ);
 					}
 				}
 

@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
@@ -53,9 +54,10 @@ public class CraftingSetRom extends Module implements IRecipe {
 
 	@Override
 	public boolean matches(@Nonnull InventoryCrafting inv, @Nonnull World world) {
-		return Config.Computer.CustomRom.enabled && Config.Computer.CustomRom.crafting && getCraftingResult(inv) != null;
+		return Config.Computer.CustomRom.enabled && Config.Computer.CustomRom.crafting && !getCraftingResult(inv).isEmpty();
 	}
 
+	@Nonnull
 	@Override
 	public ItemStack getCraftingResult(@Nonnull InventoryCrafting inv) {
 		ICustomRomItem customRom = null;
@@ -66,35 +68,35 @@ public class CraftingSetRom extends Module implements IRecipe {
 
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			ItemStack stack = inv.getStackInSlot(i);
-			if (stack == null) continue;
+			if (stack.isEmpty()) continue;
 
 			// We don't want to craft multiple items at once.
-			if (stack.stackSize > 1) return null;
+			if (stack.getCount() > 1) return ItemStack.EMPTY;
 
 			Item item = stack.getItem();
 			if (item instanceof ItemDiskLegacy) {
-				if (disk != null) return null;
+				if (disk != null) return ItemStack.EMPTY;
 				disk = (ItemDiskLegacy) item;
 				diskStack = stack;
 
 				// Ensure this disk exists
-				if (disk.getDiskID(stack) < 0) return null;
+				if (disk.getDiskID(stack) < 0) return ItemStack.EMPTY;
 			} else if (item instanceof ICustomRomItem) {
-				if (customRom != null) return null;
+				if (customRom != null) return ItemStack.EMPTY;
 				customRom = (ICustomRomItem) item;
 				romStack = stack;
 			} else {
-				return null;
+				return ItemStack.EMPTY;
 			}
 		}
 
-		if (customRom == null) return null;
+		if (customRom == null) return ItemStack.EMPTY;
 
 		if (customRom.hasCustomRom(romStack)) {
 			// Crafting with a disk will result in a disk with the old ROM
 			return newDisk(customRom.getCustomRom(romStack));
 		} else {
-			if (diskStack == null) return null;
+			if (diskStack == null) return ItemStack.EMPTY;
 
 			// Crafting without a disk will remove the ROM
 			ItemStack result = romStack.copy();
@@ -108,15 +110,16 @@ public class CraftingSetRom extends Module implements IRecipe {
 		return 2;
 	}
 
+	@Nonnull
 	@Override
 	public ItemStack getRecipeOutput() {
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	@Nonnull
 	@Override
-	public ItemStack[] getRemainingItems(@Nonnull InventoryCrafting inv) {
-		ItemStack[] out = new ItemStack[inv.getSizeInventory()];
+	public NonNullList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inv) {
+		NonNullList<ItemStack> out = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 
 		int romSlot = -1;
 		ICustomRomItem customRom = null;
@@ -127,7 +130,7 @@ public class CraftingSetRom extends Module implements IRecipe {
 
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			ItemStack stack = inv.getStackInSlot(i);
-			if (stack == null) continue;
+			if (stack.isEmpty()) continue;
 
 			Item item = stack.getItem();
 			if (item instanceof ItemDiskLegacy) {
@@ -148,11 +151,13 @@ public class CraftingSetRom extends Module implements IRecipe {
 		if (customRom.hasCustomRom(romStack)) {
 			if (diskStack != null) {
 				// Crafting with a disk will set the current computer's ROM
-				ItemStack result = out[romSlot] = romStack.copy();
+				ItemStack result = romStack.copy();
+				out.set(romSlot, result);
 				customRom.setCustomRom(result, disk.getDiskID(diskStack));
 			} else {
 				// Crafting with a disk will clear the current computer's ROM
-				ItemStack result = out[romSlot] = romStack.copy();
+				ItemStack result = romStack.copy();
+				out.set(romSlot, result);
 				customRom.clearCustomRom(result);
 			}
 		}
