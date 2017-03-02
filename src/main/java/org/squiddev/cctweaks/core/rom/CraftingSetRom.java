@@ -9,6 +9,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
@@ -163,5 +164,17 @@ public class CraftingSetRom extends Module implements IRecipe {
 		ItemStack result = new ItemStack(ComputerCraft.Items.diskExpanded);
 		ItemBase.getTag(result).setInteger("diskID", id);
 		return result;
+	}
+
+	public static ItemStack copyRom(ItemStack to, ItemStack from) {
+		NBTTagCompound fromTag = from.getTagCompound();
+		if (fromTag != null) {
+			NBTTagCompound toTag = to.getTagCompound();
+			if (toTag == null) to.setTagCompound(toTag = new NBTTagCompound());
+
+			if (fromTag.hasKey("rom_id")) toTag.setTag("rom_id", fromTag.getTag("rom_id"));
+		}
+
+		return to;
 	}
 }

@@ -49,4 +49,8 @@ public class PocketHooks {
 	public static void destroy(ServerComputer computer) {
 		upgradeInstance.remove(computer);
 	}
+
+	public static boolean hasPocketUpgrade(ItemStack stack) {
+		return stack.hasTagCompound() && stack.getTagCompound().getInteger("upgrade") != 0;
+	}
 }
