@@ -1,18 +1,15 @@
 package org.squiddev.cctweaks.core.network;
 
 import com.google.common.base.Preconditions;
-import mcmultipart.multipart.IMultipart;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Optional;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.api.network.*;
 import org.squiddev.cctweaks.core.McEvents;
 import org.squiddev.cctweaks.core.network.controller.NetworkController;
-import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -143,20 +140,6 @@ public final class NetworkHelpers implements INetworkHelpers {
 			public void run() {
 				World world = tile.getWorld();
 				if (world != null && world.getTileEntity(tile.getPos()) == tile) {
-					node.connect();
-				}
-			}
-		});
-	}
-
-	@Optional.Method(modid = MultipartIntegration.MOD_NAME)
-	public static void scheduleConnect(final AbstractWorldNode node, final IMultipart part) {
-		Preconditions.checkNotNull(node, "node cannot be null");
-		Preconditions.checkNotNull(part, "part cannot be null");
-		McEvents.schedule(new Runnable() {
-			@Override
-			public void run() {
-				if (part.getWorld() != null) {
 					node.connect();
 				}
 			}

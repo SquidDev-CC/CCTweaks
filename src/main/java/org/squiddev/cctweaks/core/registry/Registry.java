@@ -17,7 +17,6 @@ import org.squiddev.cctweaks.integration.ForgeIntegration;
 import org.squiddev.cctweaks.integration.IndustrialCraftIntegration;
 import org.squiddev.cctweaks.integration.RedstoneFluxIntegration;
 import org.squiddev.cctweaks.integration.TeslaIntegration;
-import org.squiddev.cctweaks.integration.multipart.MultipartIntegration;
 import org.squiddev.cctweaks.items.ItemComputerUpgrade;
 import org.squiddev.cctweaks.items.ItemDataCard;
 import org.squiddev.cctweaks.items.ItemDebugger;
@@ -78,7 +77,6 @@ public final class Registry {
 		// Integration
 		addModule(new RedstoneFluxIntegration());
 		addModule(new IndustrialCraftIntegration());
-		addModule(new MultipartIntegration());
 		addModule(new TeslaIntegration());
 		addModule(new ForgeIntegration());
 
