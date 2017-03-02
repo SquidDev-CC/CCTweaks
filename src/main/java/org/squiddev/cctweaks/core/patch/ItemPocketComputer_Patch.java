@@ -39,8 +39,9 @@ import java.util.Set;
  * @see org.squiddev.cctweaks.core.pocket.PocketHooks
  */
 public class ItemPocketComputer_Patch extends ItemPocketComputer implements IComputerItemFactory, ICustomRomItem {
+	@Nonnull
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(@Nonnull ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
 		if (!world.isRemote) {
 			ServerComputer computer = createServerComputer(world, player.inventory, stack);
 			if (computer != null) computer.turnOn();
@@ -55,8 +56,9 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 		return ActionResult.newResult(EnumActionResult.PASS, stack);
 	}
 
+	@Nonnull
 	@Override
-	public String getItemStackDisplayName(ItemStack stack) {
+	public String getItemStackDisplayName(@Nonnull ItemStack stack) {
 		String baseName = getUnlocalizedName(stack);
 		String adjective = PocketRegistry.instance.getUpgradeAdjective(stack, null);
 

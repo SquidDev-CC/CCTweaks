@@ -52,12 +52,12 @@ public class CraftingSetRom extends Module implements IRecipe {
 	}
 
 	@Override
-	public boolean matches(InventoryCrafting inv, World world) {
+	public boolean matches(@Nonnull InventoryCrafting inv, @Nonnull World world) {
 		return Config.Computer.CustomRom.enabled && Config.Computer.CustomRom.crafting && getCraftingResult(inv) != null;
 	}
 
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inv) {
+	public ItemStack getCraftingResult(@Nonnull InventoryCrafting inv) {
 		ICustomRomItem customRom = null;
 		ItemStack romStack = null;
 
@@ -115,7 +115,7 @@ public class CraftingSetRom extends Module implements IRecipe {
 
 	@Nonnull
 	@Override
-	public ItemStack[] getRemainingItems(InventoryCrafting inv) {
+	public ItemStack[] getRemainingItems(@Nonnull InventoryCrafting inv) {
 		ItemStack[] out = new ItemStack[inv.getSizeInventory()];
 
 		int romSlot = -1;

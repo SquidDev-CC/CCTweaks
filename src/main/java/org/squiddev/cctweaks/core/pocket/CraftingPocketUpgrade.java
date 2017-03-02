@@ -15,14 +15,16 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.registry.Module;
 
+import javax.annotation.Nonnull;
+
 public class CraftingPocketUpgrade extends Module implements IRecipe {
 	@Override
-	public boolean matches(InventoryCrafting crafting, World worldIn) {
+	public boolean matches(@Nonnull InventoryCrafting crafting, @Nonnull World worldIn) {
 		return getCraftingResult(crafting) != null;
 	}
 
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inventory) {
+	public ItemStack getCraftingResult(@Nonnull InventoryCrafting inventory) {
 		IPocketUpgrade upgrade = null;
 		ItemStack pocket = null;
 
@@ -75,8 +77,9 @@ public class CraftingPocketUpgrade extends Module implements IRecipe {
 		return PocketComputerItemFactory.create(-1, null, ComputerFamily.Normal, false);
 	}
 
+	@Nonnull
 	@Override
-	public ItemStack[] getRemainingItems(InventoryCrafting inventory) {
+	public ItemStack[] getRemainingItems(@Nonnull InventoryCrafting inventory) {
 		ItemStack[] results = new ItemStack[inventory.getSizeInventory()];
 
 		for (int i = 0; i < results.length; ++i) {

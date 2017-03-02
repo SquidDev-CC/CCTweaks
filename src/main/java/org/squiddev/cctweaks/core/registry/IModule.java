@@ -1,5 +1,7 @@
 package org.squiddev.cctweaks.core.registry;
 
+import net.minecraftforge.fml.common.Mod;
+
 /**
  * An item that can be registered
  */

@@ -19,19 +19,21 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import org.squiddev.cctweaks.core.rom.CraftingSetRom;
 
+import javax.annotation.Nonnull;
+
 /**
  * Handles crafting with ComputerUpgrades
  */
 public class CraftingComputerUpgrade implements IRecipe {
 
 	@Override
-	public boolean matches(InventoryCrafting inventorycrafting, World world) {
+	public boolean matches(@Nonnull InventoryCrafting inventorycrafting, @Nonnull World world) {
 		return getComputerStack(inventorycrafting) != null;
 	}
 
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
-		ItemStack computerStack = getComputerStack(inventorycrafting);
+	public ItemStack getCraftingResult(@Nonnull InventoryCrafting crafting) {
+		ItemStack computerStack = getComputerStack(crafting);
 		if (computerStack == null) return null;
 
 		IComputerItem computerItem = (IComputerItem) computerStack.getItem();
@@ -127,7 +129,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 	}
 
 	@Override
-	public ItemStack[] getRemainingItems(InventoryCrafting inventory) {
+	public ItemStack[] getRemainingItems(@Nonnull InventoryCrafting inventory) {
 		ItemStack[] result = new ItemStack[inventory.getSizeInventory()];
 
 		for (int i = 0; i < result.length; ++i) {
