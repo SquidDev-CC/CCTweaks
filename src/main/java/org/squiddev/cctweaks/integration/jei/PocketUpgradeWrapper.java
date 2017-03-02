@@ -5,7 +5,7 @@ import dan200.computercraft.shared.pocket.items.PocketComputerItemFactory;
 import mezz.jei.api.recipe.BlankRecipeWrapper;
 import net.minecraft.item.ItemStack;
 import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
-import org.squiddev.cctweaks.core.pocket.CraftingPocketUpgrade;
+import org.squiddev.cctweaks.core.pocket.PocketRegistry;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -30,7 +30,7 @@ public class PocketUpgradeWrapper extends BlankRecipeWrapper implements IValidRe
 	public PocketUpgradeWrapper(IPocketUpgrade upgrade, ComputerFamily family) {
 		inputStack = PocketComputerItemFactory.create(-1, null, family, false);
 		upgradeStack = upgrade.getCraftingItem();
-		outputStack = CraftingPocketUpgrade.setNBT(inputStack.copy(), upgrade);
+		PocketRegistry.instance.setToItemStack(outputStack = inputStack.copy(), upgrade);
 	}
 
 	@Override
