@@ -26,7 +26,7 @@ public class PocketEnderModem extends Module implements IPocketUpgrade {
 	@Nonnull
 	@Override
 	public ResourceLocation getUpgradeID() {
-		return new ResourceLocation(CCTweaks.RESOURCE_DOMAIN, "advancedModem");
+		return new ResourceLocation(CCTweaks.ID, "advancedModem");
 	}
 
 	@Nonnull

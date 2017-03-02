@@ -33,7 +33,7 @@ public class PocketWirelessBridge extends Module implements IPocketUpgrade {
 	@Nonnull
 	@Override
 	public ResourceLocation getUpgradeID() {
-		return new ResourceLocation(CCTweaks.RESOURCE_DOMAIN, "wirelessBridge");
+		return new ResourceLocation(CCTweaks.ID, "wirelessBridge");
 	}
 
 	@Nonnull

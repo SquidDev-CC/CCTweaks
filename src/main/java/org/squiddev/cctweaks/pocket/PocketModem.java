@@ -25,7 +25,7 @@ public class PocketModem implements IPocketUpgrade {
 	@Nonnull
 	@Override
 	public ResourceLocation getUpgradeID() {
-		return new ResourceLocation(CCTweaks.RESOURCE_DOMAIN, "modem");
+		return new ResourceLocation(CCTweaks.ID, "modem");
 	}
 
 	@Nonnull
