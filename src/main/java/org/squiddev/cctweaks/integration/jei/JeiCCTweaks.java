@@ -5,8 +5,6 @@ import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import dan200.computercraft.api.turtle.TurtleSide;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
-import dan200.computercraft.shared.peripheral.PeripheralType;
-import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import dan200.computercraft.shared.pocket.items.PocketComputerItemFactory;
 import dan200.computercraft.shared.proxy.CCTurtleProxyCommon;
 import dan200.computercraft.shared.turtle.items.ITurtleItem;
@@ -18,6 +16,7 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.pocket.PocketRegistry;
 import org.squiddev.cctweaks.core.registry.Registry;
+import org.squiddev.cctweaks.pocket.PocketModem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,11 +59,7 @@ public class JeiCCTweaks extends BlankModPlugin {
 				registry.addRecipeCategoryCraftingItem(PocketComputerItemFactory.create(-1, null, family, false), pocketCat.getUid());
 
 				// Hack to ensure the default modem is added too
-				pocketWrappers.add(new PocketUpgradeWrapper(
-					PocketComputerItemFactory.create(-1, null, family, false),
-					PeripheralItemFactory.create(PeripheralType.WirelessModem, null, 1),
-					PocketComputerItemFactory.create(-1, null, family, true)
-				));
+				pocketWrappers.add(new PocketUpgradeWrapper(PocketModem.INSTANCE, family));
 
 				for (IPocketUpgrade upgrade : pocketUpgrades) {
 					pocketWrappers.add(new PocketUpgradeWrapper(upgrade, family));

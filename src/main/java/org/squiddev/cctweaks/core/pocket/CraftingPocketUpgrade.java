@@ -59,8 +59,8 @@ public class CraftingPocketUpgrade extends Module implements IRecipe {
 		pocket = pocket.copy();
 		if (!pocket.hasTagCompound()) pocket.setTagCompound(new NBTTagCompound());
 		NBTTagCompound tag = pocket.getTagCompound();
-		tag.setShort("upgrade", PocketRegistry.FLAG);
-		tag.setString("upgrade_name", upgrade.getUpgradeID().toString());
+
+		PocketRegistry.instance.setToItemStack(pocket, upgrade);
 
 		// Ensure a new computer is created
 		tag.removeTag("instanceID");

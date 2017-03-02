@@ -9,8 +9,8 @@ import dan200.computercraft.shared.util.WorldUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
+import org.squiddev.cctweaks.pocket.PocketModem;
 
 public class PocketAPIExtensions extends PocketAPI {
 	private final ServerComputer computer;
@@ -49,7 +49,11 @@ public class PocketAPIExtensions extends PocketAPI {
 				for (int i = 0; i < size; i++) {
 					ItemStack invStack = inventory.getStackInSlot((i + held) % size);
 					if (!invStack.isEmpty()) {
-						newUpgrade = PocketRegistry.instance.getFromItemStack(invStack);
+						if (InventoryUtil.areItemsStackable(invStack, PocketModem.INSTANCE.getCraftingItem())) {
+							newUpgrade = PocketModem.INSTANCE;
+						} else {
+							newUpgrade = PocketRegistry.instance.getFromItemStack(invStack);
+						}
 						if (newUpgrade != null && newUpgrade != previousUpgrade) {
 							// Consume an item from this stack and exit the loop
 							invStack = invStack.copy();
@@ -75,12 +79,7 @@ public class PocketAPIExtensions extends PocketAPI {
 				}
 
 				// Set the new upgrade
-				NBTTagCompound tag = pocketStack.getTagCompound();
-				if (tag == null) pocketStack.setTagCompound(tag = new NBTTagCompound());
-
-				tag.setShort("upgrade", PocketRegistry.FLAG);
-				tag.setString("upgrade_name", newUpgrade.getUpgradeID().toString());
-
+				PocketRegistry.instance.setToItemStack(pocketStack, newUpgrade);
 				access.setUpgrade(newUpgrade, computer);
 
 				return null;
@@ -100,11 +99,7 @@ public class PocketAPIExtensions extends PocketAPI {
 
 				if (previousUpgrade == null) throw new LuaException("Nothing to unequip");
 
-				NBTTagCompound tag = pocketStack.getTagCompound();
-				if (tag == null) pocketStack.setTagCompound(tag = new NBTTagCompound());
-
-				tag.removeTag("upgrade");
-				tag.removeTag("upgrade_name");
+				PocketRegistry.instance.setToItemStack(pocketStack, null);
 				access.setUpgrade(null, computer);
 
 				ItemStack stack = previousUpgrade.getCraftingItem();
