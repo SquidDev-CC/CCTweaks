@@ -2,13 +2,10 @@ package org.squiddev.cctweaks.core.patch;
 
 import com.google.common.base.Objects;
 import dan200.computercraft.ComputerCraft;
-import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
-import dan200.computercraft.shared.pocket.peripherals.PocketModemPeripheral;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -84,23 +81,6 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 
 				// Update pocket hooks
 				PocketHooks.update(entity, stack, computer);
-
-				IPeripheral peripheral = computer.getPeripheral(2);
-				if (peripheral instanceof PocketModemPeripheral) {
-					PocketModemPeripheral modem = (PocketModemPeripheral) peripheral;
-					if (entity instanceof EntityLivingBase) {
-						EntityLivingBase player = (EntityLivingBase) entity;
-						modem.setLocation(world, player.posX, player.posY + player.getEyeHeight(), player.posZ);
-					} else {
-						modem.setLocation(world, entity.posX, entity.posY, entity.posZ);
-					}
-					boolean modemLight = modem.isActive();
-					NBTTagCompound modemNBT = computer.getUserData();
-					if (modemNBT.getBoolean("modemLight") != modemLight) {
-						modemNBT.setBoolean("modemLight", modemLight);
-						computer.updateUserData();
-					}
-				}
 			}
 		} else {
 			createClientComputer(stack);
@@ -138,8 +118,6 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 
 			computer.addAPI(new PocketAPIExtensions(computer));
 			PocketHooks.create(inventory, stack, computer);
-
-			if (getHasModem(stack)) computer.setPeripheral(2, new PocketModemPeripheral(false));
 			ComputerCraft.serverComputerRegistry.add(instanceID, computer);
 
 			if (inventory != null) inventory.markDirty();
