@@ -35,8 +35,7 @@ public class SetCustomRom implements IPatcher {
 
 				visitor.visitVarInsn(ALOAD, 0);
 				visitor.visitFieldInsn(GETFIELD, "dan200/computercraft/shared/computer/blocks/TileComputerBase", "hasDisk", "Z");
-				visitor.visitInsn(ICONST_0);
-				visitor.visitJumpInsn(IF_ICMPEQ, finish);
+				visitor.visitJumpInsn(IFEQ, finish);
 
 				visitor.visitVarInsn(ALOAD, 2);
 				visitor.visitVarInsn(ALOAD, 0);
