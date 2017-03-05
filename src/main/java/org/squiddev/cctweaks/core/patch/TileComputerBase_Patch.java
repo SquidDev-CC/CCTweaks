@@ -115,7 +115,7 @@ public abstract class TileComputerBase_Patch extends TileComputerBase implements
 		return compound;
 	}
 
-	@MergeVisitor.Rename(from = {"writeToNBT", "func_145841_b"})
+	@MergeVisitor.Rename(from = {"writeToNBT", "func_189515_b"})
 	@MergeVisitor.Stub
 	public NBTTagCompound native_writeToNBT(NBTTagCompound compound) {
 		return compound;
