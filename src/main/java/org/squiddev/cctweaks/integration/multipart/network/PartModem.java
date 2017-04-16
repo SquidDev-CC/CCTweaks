@@ -18,6 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.*;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
@@ -200,7 +201,8 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	public void onNeighborBlockChange(Block block) {
 		if (modem.updateEnabled()) {
 			refreshPart();
-			modem.getAttachedNetwork().invalidateNode(modem);
+			INetworkController controller = modem.getAttachedNetwork();
+			if (controller != null) controller.invalidateNode(modem);
 		}
 	}
 
@@ -208,7 +210,8 @@ public class PartModem extends PartSided implements IWorldNetworkNodeHost, IPeri
 	public void onNeighborTileChange(EnumFacing facing) {
 		if (facing == getSide() && modem.updateEnabled()) {
 			refreshPart();
-			modem.getAttachedNetwork().invalidateNode(modem);
+			INetworkController controller = modem.getAttachedNetwork();
+			if (controller != null) controller.invalidateNode(modem);
 		}
 	}
 
