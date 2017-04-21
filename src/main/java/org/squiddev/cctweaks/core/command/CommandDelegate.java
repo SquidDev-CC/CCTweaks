@@ -30,7 +30,7 @@ public class CommandDelegate extends CommandBase {
 
 	@Override
 	public String getCommandUsage(ICommandSender sender) {
-		return command.getUsage(new CommandContext(server, sender, command));
+		return "/" + command.getName() + " " + command.getUsage(new CommandContext(server, sender, command));
 	}
 
 	@Override
