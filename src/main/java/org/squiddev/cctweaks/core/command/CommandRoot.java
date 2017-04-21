@@ -1,12 +1,9 @@
 package org.squiddev.cctweaks.core.command;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -42,8 +39,22 @@ public class CommandRoot implements ISubCommand {
 
 	@Nonnull
 	@Override
-	public String getUsage() {
-		return "<" + Joiner.on('|').join(subCommands.keySet()) + ">";
+	public String getUsage(CommandContext context) {
+		StringBuilder out = new StringBuilder("<");
+		boolean first = true;
+		for (ISubCommand command : subCommands.values()) {
+			if (command.userLevel().canExecute(context)) {
+				if (first) {
+					first = false;
+				} else {
+					out.append("|");
+				}
+
+				out.append(command.getName());
+			}
+		}
+
+		return out.append(">").toString();
 	}
 
 	@Nonnull
@@ -59,12 +70,16 @@ public class CommandRoot implements ISubCommand {
 	}
 
 	@Override
-	public boolean requiresAdmin() {
+	public UserLevel userLevel() {
+		UserLevel minimum = UserLevel.OWNER;
 		for (ISubCommand command : subCommands.values()) {
 			if (command instanceof SubCommandHelp) continue;
-			if (!command.requiresAdmin()) return false;
+
+			UserLevel level = command.userLevel();
+			if (level.ordinal() >= minimum.ordinal()) minimum = level;
 		}
-		return true;
+
+		return minimum;
 	}
 
 	public Map<String, ISubCommand> getSubCommands() {
@@ -72,38 +87,40 @@ public class CommandRoot implements ISubCommand {
 	}
 
 	@Override
-	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
+	public void execute(@Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
 		if (arguments.size() == 0) {
-			sender.addChatMessage(ChatHelpers.getHelp(this, context.getFullPath()));
+			context.getSender().addChatMessage(ChatHelpers.getHelp(context, this, context.getFullPath()));
 		} else {
 			ISubCommand command = subCommands.get(arguments.get(0));
-			if (command == null) throw new CommandException(getName() + " " + getUsage());
+			if (command == null || !command.userLevel().canExecute(context)) {
+				throw new CommandException(getName() + " " + getUsage(context));
+			}
 
-			command.execute(server, sender, context.enter(command), arguments.subList(1, arguments.size()));
+			command.execute(context.enter(command), arguments.subList(1, arguments.size()));
 		}
 	}
 
 	@Nonnull
 	@Override
-	public List<String> getCompletion(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull List<String> arguments) {
+	public List<String> getCompletion(@Nonnull CommandContext context, @Nonnull List<String> arguments) {
 		if (arguments.size() == 0) {
 			return Lists.newArrayList(subCommands.keySet());
 		} else if (arguments.size() == 1) {
 			List<String> list = Lists.newArrayList();
 			String match = arguments.get(0);
 
-			for (String entry : subCommands.keySet()) {
-				if (CommandBase.doesStringStartWith(match, entry)) {
-					list.add(entry);
+			for (ISubCommand command : subCommands.values()) {
+				if (CommandBase.doesStringStartWith(match, command.getName()) && command.userLevel().canExecute(context)) {
+					list.add(command.getName());
 				}
 			}
 
 			return list;
 		} else {
 			ISubCommand command = subCommands.get(arguments.get(0));
-			if (command == null) return Collections.emptyList();
+			if (command == null || !command.userLevel().canExecute(context)) return Collections.emptyList();
 
-			return command.getCompletion(server, sender, arguments.subList(1, arguments.size()));
+			return command.getCompletion(context, arguments.subList(1, arguments.size()));
 		}
 	}
 }

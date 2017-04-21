@@ -11,12 +11,12 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameData;
 import org.squiddev.cctweaks.api.IComputerItemFactory;
 import org.squiddev.cctweaks.core.command.CommandContext;
 import org.squiddev.cctweaks.core.command.SubCommandBase;
+import org.squiddev.cctweaks.core.command.UserLevel;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -51,7 +51,7 @@ public class SubCommandGive extends SubCommandBase {
 
 	public SubCommandGive() {
 		super(
-			"give", "<item> <id> [label] [family]", "Spawn in a computer item with the specified id.",
+			"give", "<item> <id> [label] [family]", "Spawn in a computer item with the specified id.", UserLevel.OP,
 			"You can optionally specify the label and computer family of the item. Valid families are normal, " +
 				"advanced, and command."
 		);
@@ -59,9 +59,10 @@ public class SubCommandGive extends SubCommandBase {
 
 
 	@Override
-	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
+	public void execute(@Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
 		if (arguments.size() < 2) throw new CommandException(context.getFullUsage());
 
+		ICommandSender sender = context.getSender();
 		if (!(sender instanceof EntityPlayer)) throw new CommandException("Must be executed by the player");
 
 		ResourceLocation item = new ResourceLocation(arguments.get(0));
@@ -124,7 +125,7 @@ public class SubCommandGive extends SubCommandBase {
 
 	@Nonnull
 	@Override
-	public List<String> getCompletion(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull List<String> arguments) {
+	public List<String> getCompletion(@Nonnull CommandContext context, @Nonnull List<String> arguments) {
 		switch (arguments.size()) {
 			default:
 				return Collections.emptyList();

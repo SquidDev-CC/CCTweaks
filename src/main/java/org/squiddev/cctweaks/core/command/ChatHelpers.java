@@ -31,9 +31,9 @@ public final class ChatHelpers {
 		return component;
 	}
 
-	public static IChatComponent getHelp(ISubCommand command, String prefix) {
+	public static IChatComponent getHelp(CommandContext context, ISubCommand command, String prefix) {
 		IChatComponent output = new ChatComponentText("")
-			.appendSibling(coloured("/" + prefix + " " + command.getUsage(), HEADER))
+			.appendSibling(coloured("/" + prefix + " " + command.getUsage(context), HEADER))
 			.appendText(" ")
 			.appendSibling(coloured(command.getSynopsis(), SYNOPSIS));
 
@@ -42,6 +42,8 @@ public final class ChatHelpers {
 
 		if (command instanceof CommandRoot) {
 			for (ISubCommand subCommand : ((CommandRoot) command).getSubCommands().values()) {
+				if (!subCommand.userLevel().canExecute(context)) continue;
+
 				output.appendText("\n");
 
 				IChatComponent component = coloured(subCommand.getName(), NAME);

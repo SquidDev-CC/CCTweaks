@@ -30,7 +30,7 @@ public class CommandDelegate extends CommandBase {
 
 	@Override
 	public String getCommandUsage(ICommandSender sender) {
-		return command.getUsage();
+		return command.getUsage(new CommandContext(server, sender, command));
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class CommandDelegate extends CommandBase {
 	@Override
 	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 		try {
-			command.execute(server, sender, new CommandContext(command), Arrays.asList(args));
+			command.execute(new CommandContext(server, sender, command), Arrays.asList(args));
 		} catch (CommandException e) {
 			throw e;
 		} catch (Throwable e) {
@@ -52,20 +52,16 @@ public class CommandDelegate extends CommandBase {
 
 	@Override
 	public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-		return command.getCompletion(server, sender, Arrays.asList(args));
+		return command.getCompletion(new CommandContext(server, sender, command), Arrays.asList(args));
 	}
 
 	@Override
 	public boolean canCommandSenderUseCommand(ICommandSender sender) {
-		if (command.requiresAdmin() || server.isDedicatedServer()) {
-			return super.canCommandSenderUseCommand(sender);
-		} else {
-			return true;
-		}
+		return command.userLevel().canExecute(new CommandContext(server, sender, command));
 	}
 
 	@Override
 	public int getRequiredPermissionLevel() {
-		return 4;
+		return command.userLevel().toLevel();
 	}
 }
