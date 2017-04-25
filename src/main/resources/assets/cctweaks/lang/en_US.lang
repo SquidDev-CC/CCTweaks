@@ -89,6 +89,7 @@ gui.config.cctweaks.misc=Miscellaneous
 gui.config.cctweaks.misc.monitorLight=Monitor Light
 gui.config.cctweaks.misc.advancedMonitorLight=Advanced Monitor Light
 gui.config.cctweaks.misc.pocketEnderModem=Pocket Ender Modem
+gui.config.cctweaks.misc.pocketMapRender=Pocket map rendering
 gui.config.cctweaks.misc.funRender=Fun Rendering
 
 gui.config.cctweaks.apis=APIs
