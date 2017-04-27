@@ -3,6 +3,7 @@ package org.squiddev.cctweaks.core.network;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
@@ -43,7 +44,8 @@ public abstract class AbstractWorldNode extends AbstractNode implements IWorldNe
 	 * Remove this node from the network
 	 */
 	public void destroy() {
-		if (networkController != null) networkController.removeNode(this);
+		INetworkController controller = getAttachedNetwork();
+		if (controller != null) controller.removeNode(this);
 	}
 
 	@Override

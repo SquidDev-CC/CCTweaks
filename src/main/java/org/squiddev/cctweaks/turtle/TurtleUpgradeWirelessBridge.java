@@ -104,8 +104,8 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 			IPeripheral peripheral = turtle.getPeripheral(side);
 			if (peripheral instanceof TurtleBinding.TurtleModemPeripheral) {
 				IWorldNetworkNode binding = ((TurtleBinding.TurtleModemPeripheral) peripheral).getNode();
-				INetworkController network = binding.getAttachedNetwork();
-				if (network != null) network.invalidateNode(binding);
+				INetworkController controller = binding.getAttachedNetwork();
+				if (controller != null) controller.invalidateNode(binding);
 			}
 		}
 	}

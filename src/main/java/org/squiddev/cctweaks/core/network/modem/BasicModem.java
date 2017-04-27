@@ -10,6 +10,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractNode;
@@ -64,7 +65,10 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 
 	@Override
 	public void transmit(int channel, int replyChannel, Object payload, World world, Vec3d pos, double range, boolean interdimensional, Object senderObject) {
-		networkController.transmitPacket(this, new Packet(channel, replyChannel, payload, senderObject));
+		INetworkController controller = getAttachedNetwork();
+		if (controller != null) {
+			controller.transmitPacket(this, new Packet(channel, replyChannel, payload, senderObject));
+		}
 	}
 
 	/**
@@ -241,7 +245,8 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	}
 
 	public void destroy() {
-		if (networkController != null) networkController.removeNode(this);
+		INetworkController controller = getAttachedNetwork();
+		if (controller != null) controller.removeNode(this);
 		modem.destroy();
 	}
 
@@ -256,7 +261,9 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 		if (peripheralEnabled == this.peripheralEnabled) return;
 
 		this.peripheralEnabled = peripheralEnabled;
-		if (getAttachedNetwork() != null) getAttachedNetwork().invalidateNode(this);
+
+		INetworkController controller = getAttachedNetwork();
+		if (controller != null) controller.invalidateNode(this);
 	}
 
 	@Override

@@ -17,7 +17,7 @@ public abstract class AbstractNode implements INetworkNode {
 	/**
 	 * The network this modem is attached to.
 	 */
-	protected INetworkController networkController;
+	private INetworkController networkController;
 
 	@Nonnull
 	@Override

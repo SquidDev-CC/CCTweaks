@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.client.render;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -16,8 +17,11 @@ import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.registry.Module;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class RenderSquidOverlay extends Module implements IClientModule {
+	private static final UUID uuid = UUID.fromString("d3156e4b-c712-4fd3-87b0-b24b8ca94209");
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void clientInit() {
@@ -56,8 +60,8 @@ public class RenderSquidOverlay extends Module implements IClientModule {
 		@Override
 		@SideOnly(Side.CLIENT)
 		public void doRenderLayer(EntityPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-			String name = player.getDisplayName().getUnformattedText();
-			if (!name.equals("SquidDev") || !Config.Misc.funRender) return;
+			GameProfile profile = player.getGameProfile();
+			if (profile == null || !profile.getId().equals(uuid) || !Config.Misc.funRender) return;
 
 			GlStateManager.disableLighting();
 			GlStateManager.disableTexture2D();

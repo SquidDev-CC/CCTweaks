@@ -32,7 +32,7 @@ public class CommandDelegate extends CommandBase {
 	@Nonnull
 	@Override
 	public String getCommandUsage(@Nonnull ICommandSender sender) {
-		return command.getUsage();
+		return "/" + command.getName() + " " + command.getUsage(new CommandContext(server, sender, command));
 	}
 
 	@Nonnull
@@ -44,7 +44,7 @@ public class CommandDelegate extends CommandBase {
 	@Override
 	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
 		try {
-			command.execute(server, sender, new CommandContext(command), Arrays.asList(args));
+			command.execute(new CommandContext(server, sender, command), Arrays.asList(args));
 		} catch (CommandException e) {
 			throw e;
 		} catch (Throwable e) {
@@ -56,21 +56,17 @@ public class CommandDelegate extends CommandBase {
 	@Nonnull
 	@Override
 	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
-		return command.getCompletion(server, sender, Arrays.asList(args));
+		return command.getCompletion(new CommandContext(server, sender, command), Arrays.asList(args));
 	}
 
 	@Override
 	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		if (command.requiresAdmin() || server.isDedicatedServer()) {
-			return super.checkPermission(server, sender);
-		} else {
-			return true;
-		}
+		return command.userLevel().canExecute(new CommandContext(server, sender, command));
 	}
 
 
 	@Override
 	public int getRequiredPermissionLevel() {
-		return 4;
+		return command.userLevel().toLevel();
 	}
 }
