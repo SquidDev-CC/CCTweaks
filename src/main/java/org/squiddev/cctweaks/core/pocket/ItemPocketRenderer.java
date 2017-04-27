@@ -65,7 +65,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 	@SubscribeEvent
 	public void renderItem(RenderSpecificHandEvent event) {
 		ItemStack stack = event.getItemStack();
-		if (stack == null || !(stack.getItem() instanceof ItemPocketComputer)) return;
+		if (stack.isEmpty() || !(stack.getItem() instanceof ItemPocketComputer)) return;
 		if (!Config.Misc.pocketMapRender) return;
 
 		event.setCanceled(true);
@@ -73,7 +73,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 		EntityPlayer player = Minecraft.getMinecraft().player;
 
 		GlStateManager.pushMatrix();
-		if (event.getHand() == EnumHand.MAIN_HAND && player.getHeldItemOffhand() == null) {
+		if (event.getHand() == EnumHand.MAIN_HAND && player.getHeldItemOffhand().isEmpty()) {
 			renderMapFirstPerson(
 				player,
 				event.getInterpolatedPitch(),
