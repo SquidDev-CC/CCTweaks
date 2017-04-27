@@ -21,8 +21,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import org.squiddev.cctweaks.api.IContainerComputer;
-import org.squiddev.cctweaks.api.computer.IExtendedServerComputer;
 import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.patch.iface.IExtendedServerComputer;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.lua.lib.LuaEnvironment;
 import org.squiddev.cctweaks.lua.lib.ReadOnlyFileMount;
@@ -50,7 +50,7 @@ import java.io.File;
 		"dan200/computercraft/core/terminal/Terminal"
 	}
 )
-public class ServerComputer_Patch extends ServerComputer implements IComputerEnvironmentExtended, IExtendedServerComputer {
+public class ServerComputer_Patch extends ServerComputer implements IComputerEnvironmentExtended, org.squiddev.cctweaks.api.computer.IExtendedServerComputer, IExtendedServerComputer {
 	private static final int TIMEOUT = 100;
 
 	private boolean suspendable;
@@ -234,7 +234,7 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 		ComputerCraft.sendToPlayer(player, packet);
 	}
 
-	private ComputerCraftPacket createStatePacket() {
+	public ComputerCraftPacket createStatePacket() {
 		ComputerCraftPacket packet = new ComputerCraftPacket();
 		packet.m_packetType = ComputerCraftPacket.ComputerChanged;
 		packet.m_dataInt = new int[]{getInstanceID()};
@@ -262,7 +262,7 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 		if (m_userData != null) tag.setTag("userData", m_userData.copy());
 	}
 
-	private static FMLProxyPacket encode(ComputerCraftPacket packet) {
+	public FMLProxyPacket encode(ComputerCraftPacket packet) {
 		PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
 		packet.toBytes(buffer);
 		return new FMLProxyPacket(buffer, "CC");

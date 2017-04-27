@@ -11,18 +11,15 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
-import org.squiddev.cctweaks.lua.asm.CustomChain;
+import org.squiddev.cctweaks.lua.TweaksLogger;
 import org.squiddev.cctweaks.lua.asm.Tweaks;
 import org.squiddev.patcher.Logger;
-import org.squiddev.patcher.transformer.ClassMerger;
-import org.squiddev.patcher.transformer.ClassReplacer;
-import org.squiddev.patcher.transformer.IPatcher;
-import org.squiddev.patcher.transformer.ISource;
+import org.squiddev.patcher.transformer.*;
 
 import java.io.*;
 
 public class ASMTransformer implements IClassTransformer {
-	private final CustomChain patches = new CustomChain();
+	private final TransformationChain patches = new TransformationChain();
 
 	private void add(Object[] patchers) {
 		for (Object patcher : patchers) {
@@ -32,146 +29,8 @@ public class ASMTransformer implements IClassTransformer {
 	}
 
 	public ASMTransformer() {
-		Tweaks.setup(patches);
-
-		add(new Object[]{
-			// General stuff
-			new ClassReplacer(
-				"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
-				"org.squiddev.cctweaks.core.patch.TurtleRefuelCommand_Rewrite"
-			),
-			new ClassMerger(
-				"dan200.computercraft.shared.peripheral.common.BlockPeripheral",
-				"org.squiddev.cctweaks.core.patch.BlockPeripheral_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.shared.turtle.core.TurtleBrain",
-				"org.squiddev.cctweaks.core.patch.TurtleBrain_Patch"
-			),
-			new DisableTurtleCommand(),
-			new TurtleBrainAlsoPeripheral(),
-
-			// Networking
-			new ClassMerger(
-				"dan200.computercraft.shared.peripheral.common.BlockCable",
-				"org.squiddev.cctweaks.core.patch.BlockCable_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.shared.peripheral.modem.TileCable",
-				"org.squiddev.cctweaks.core.patch.TileCable_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.core.apis.PeripheralAPI",
-				"org.squiddev.cctweaks.core.patch.PeripheralAPI_Patch"
-			),
-
-			// Targeted peripherals
-			new ClassMerger(
-				"dan200.computercraft.shared.computer.blocks.ComputerPeripheral",
-				"org.squiddev.cctweaks.core.patch.targeted.ComputerPeripheral_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.shared.peripheral.diskdrive.DiskDrivePeripheral",
-				"org.squiddev.cctweaks.core.patch.targeted.DiskDrivePeripheral_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.shared.peripheral.printer.PrinterPeripheral",
-				"org.squiddev.cctweaks.core.patch.targeted.PrinterPeripheral_Patch"
-			),
-
-			// Pocket upgrades
-			new PreventModemUpgrade(),
-			new ClassMerger(
-				"dan200.computercraft.shared.pocket.items.ItemPocketComputer",
-				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"
-			),
-
-			// Ugly kludge to fix deadlocks.
-			new ClassMerger(
-				"dan200.computercraft.shared.peripheral.modem.ModemPeripheral",
-				"org.squiddev.cctweaks.core.patch.ModemPeripheral_Patch"
-			),
-
-			// Attempt to fix concurrent modification exceptions.
-			new ClassMerger(
-				"dan200.computercraft.shared.computer.core.ServerComputerRegistry",
-				"org.squiddev.cctweaks.core.patch.ServerComputerRegistry_Patch"
-			),
-
-			// Attempt to fix computers not starting up
-			new ClassMerger(
-				"dan200.computercraft.shared.computer.core.ServerComputer",
-				"org.squiddev.cctweaks.core.patch.ServerComputer_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.shared.computer.blocks.TileComputerBase",
-				"org.squiddev.cctweaks.core.patch.TileComputerBase_Patch"
-			),
-
-			// Add IContainerComputer to various containers.
-			new ClassMerger(
-				"dan200.computercraft.shared.computer.inventory.ContainerComputer",
-				"org.squiddev.cctweaks.core.patch.ContainerComputer_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.shared.turtle.inventory.ContainerTurtle",
-				"org.squiddev.cctweaks.core.patch.ContainerTurtle_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.shared.media.inventory.ContainerHeldItem",
-				"org.squiddev.cctweaks.core.patch.ContainerHeldItem_Patch"
-			),
-
-			// Allow suspending computers which time out.
-			new SetSuspendable(),
-
-			// Allow specifying direction on turtle.place methods
-			new ClassMerger(
-				"dan200.computercraft.shared.turtle.core.TurtlePlaceCommand",
-				"org.squiddev.cctweaks.core.patch.TurtlePlaceCommand_Patch"
-			),
-
-			// Implement IComputerItemFactory
-			new ClassMerger(
-				"dan200.computercraft.shared.computer.items.ItemComputerBase",
-				"org.squiddev.cctweaks.core.patch.ItemComputerBase_Patch"
-			),
-
-			// Optimisations for terminal packets
-			new ClassMerger(
-				"dan200.computercraft.core.terminal.Terminal",
-				"org.squiddev.cctweaks.core.patch.Terminal_Patch"
-			),
-			new TurtlePermissions(),
-			new AddWorldConstructor(),
-
-			// Fix JEI preventing repeat events
-			new ClassMerger(
-				"dan200.computercraft.client.gui.GuiTurtle",
-				"org.squiddev.cctweaks.core.patch.GuiContainer_Extension"
-			),
-			new ClassMerger(
-				"dan200.computercraft.client.gui.GuiComputer",
-				"org.squiddev.cctweaks.core.patch.GuiContainer_Extension"
-			),
-
-			// Custom ROM booting
-			new SetCustomRom(),
-			new CopyRom(),
-			new ClassMerger(
-				"dan200.computercraft.shared.computer.items.ComputerItemFactory",
-				"org.squiddev.cctweaks.core.patch.ComputerItemFactory_Patch"
-			),
-			new ClassMerger(
-				"dan200.computercraft.shared.turtle.items.TurtleItemFactory",
-				"org.squiddev.cctweaks.core.patch.TurtleItemFactory_Patch"
-			),
-		});
-
-		patches.finalise();
-
 		// Patch the logger instance
-		Logger.instance = new Logger() {
+		TweaksLogger.instance = new Logger() {
 			@Override
 			public void doDebug(String message) {
 				DebugLogger.debug(message);
@@ -187,6 +46,149 @@ public class ASMTransformer implements IClassTransformer {
 				DebugLogger.warn(message);
 			}
 		};
+
+		/*
+			TODO: Look into moving some rewrites into compile-time processing instead.
+			This probably includes *_Rewrite as well as many of the binary handlers as they only exist
+			because they need to stub classes that we patch anyway.
+		 */
+		Tweaks.setup(patches);
+
+		add(new Object[]{
+			// General stuff
+			new ClassReplacer(TweaksLogger.instance,
+				"dan200.computercraft.shared.turtle.core.TurtleRefuelCommand",
+				"org.squiddev.cctweaks.core.patch.TurtleRefuelCommand_Rewrite"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.peripheral.common.BlockPeripheral",
+				"org.squiddev.cctweaks.core.patch.BlockPeripheral_Patch"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.turtle.core.TurtleBrain",
+				"org.squiddev.cctweaks.core.patch.TurtleBrain_Patch"
+			),
+			new DisableTurtleCommand(),
+			new TurtleBrainAlsoPeripheral(),
+
+			// Networking
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.peripheral.common.BlockCable",
+				"org.squiddev.cctweaks.core.patch.BlockCable_Patch"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.peripheral.modem.TileCable",
+				"org.squiddev.cctweaks.core.patch.TileCable_Patch"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.core.apis.PeripheralAPI",
+				"org.squiddev.cctweaks.core.patch.PeripheralAPI_Patch"
+			),
+
+			// Targeted peripherals
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.computer.blocks.ComputerPeripheral",
+				"org.squiddev.cctweaks.core.patch.targeted.ComputerPeripheral_Patch"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.peripheral.diskdrive.DiskDrivePeripheral",
+				"org.squiddev.cctweaks.core.patch.targeted.DiskDrivePeripheral_Patch"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.peripheral.printer.PrinterPeripheral",
+				"org.squiddev.cctweaks.core.patch.targeted.PrinterPeripheral_Patch"
+			),
+
+			// Pocket upgrades
+			new PreventModemUpgrade(),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.pocket.items.ItemPocketComputer",
+				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"
+			),
+
+			// Ugly kludge to fix deadlocks.
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.peripheral.modem.ModemPeripheral",
+				"org.squiddev.cctweaks.core.patch.ModemPeripheral_Patch"
+			),
+
+			// Attempt to fix concurrent modification exceptions.
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.computer.core.ServerComputerRegistry",
+				"org.squiddev.cctweaks.core.patch.ServerComputerRegistry_Patch"
+			),
+
+			// Attempt to fix computers not starting up
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.computer.core.ServerComputer",
+				"org.squiddev.cctweaks.core.patch.ServerComputer_Patch"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.computer.blocks.TileComputerBase",
+				"org.squiddev.cctweaks.core.patch.TileComputerBase_Patch"
+			),
+
+			// Add IContainerComputer to various containers.
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.computer.inventory.ContainerComputer",
+				"org.squiddev.cctweaks.core.patch.ContainerComputer_Patch"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.turtle.inventory.ContainerTurtle",
+				"org.squiddev.cctweaks.core.patch.ContainerTurtle_Patch"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.media.inventory.ContainerHeldItem",
+				"org.squiddev.cctweaks.core.patch.ContainerHeldItem_Patch"
+			),
+
+			// Allow suspending computers which time out.
+			new SetSuspendable(),
+
+			// Allow specifying direction on turtle.place methods
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.turtle.core.TurtlePlaceCommand",
+				"org.squiddev.cctweaks.core.patch.TurtlePlaceCommand_Patch"
+			),
+
+			// Implement IComputerItemFactory
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.computer.items.ItemComputerBase",
+				"org.squiddev.cctweaks.core.patch.ItemComputerBase_Patch"
+			),
+
+			// Optimisations for terminal packets
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.core.terminal.Terminal",
+				"org.squiddev.cctweaks.core.patch.Terminal_Patch"
+			),
+			new TurtlePermissions(),
+			new AddWorldConstructor(),
+
+			// Fix JEI preventing repeat events
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.client.gui.GuiTurtle",
+				"org.squiddev.cctweaks.core.patch.GuiContainer_Extension"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.client.gui.GuiComputer",
+				"org.squiddev.cctweaks.core.patch.GuiContainer_Extension"
+			),
+
+			// Custom ROM booting
+			new SetCustomRom(),
+			new CopyRom(),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.computer.items.ComputerItemFactory",
+				"org.squiddev.cctweaks.core.patch.ComputerItemFactory_Patch"
+			),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.turtle.items.TurtleItemFactory",
+				"org.squiddev.cctweaks.core.patch.TurtleItemFactory_Patch"
+			),
+		});
+
+		patches.finalise();
 	}
 
 	private boolean loadedCC = false;

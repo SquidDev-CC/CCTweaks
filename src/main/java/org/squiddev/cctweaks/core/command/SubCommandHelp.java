@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import joptsimple.internal.Strings;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -26,7 +24,7 @@ public class SubCommandHelp implements ISubCommand {
 
 	@Nonnull
 	@Override
-	public String getUsage() {
+	public String getUsage(CommandContext context) {
 		return "[command]";
 	}
 
@@ -43,12 +41,12 @@ public class SubCommandHelp implements ISubCommand {
 	}
 
 	@Override
-	public boolean requiresAdmin() {
-		return false;
+	public UserLevel userLevel() {
+		return UserLevel.ANYONE;
 	}
 
 	@Override
-	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
+	public void execute(@Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
 		ISubCommand command = this.branchCommand;
 
 		for (int i = 0; i < arguments.size(); i++) {
@@ -68,12 +66,12 @@ public class SubCommandHelp implements ISubCommand {
 		for (String argument : arguments) {
 			prefix.append(' ').append(argument);
 		}
-		sender.sendMessage(ChatHelpers.getHelp(command, prefix.toString()));
+		context.getSender().sendMessage(ChatHelpers.getHelp(context, command, prefix.toString()));
 	}
 
 	@Nonnull
 	@Override
-	public List<String> getCompletion(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull List<String> arguments) {
+	public List<String> getCompletion(@Nonnull CommandContext context, @Nonnull List<String> arguments) {
 		CommandRoot command = this.branchCommand;
 
 		for (int i = 0; i < arguments.size() - 1; i++) {

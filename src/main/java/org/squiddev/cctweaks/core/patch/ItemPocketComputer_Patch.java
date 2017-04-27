@@ -20,9 +20,11 @@ import org.squiddev.cctweaks.api.computer.IExtendedServerComputer;
 import org.squiddev.cctweaks.core.pocket.PocketAPIExtensions;
 import org.squiddev.cctweaks.core.pocket.PocketHooks;
 import org.squiddev.cctweaks.core.pocket.PocketRegistry;
+import org.squiddev.cctweaks.core.pocket.PocketServerComputer;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.patcher.visitors.MergeVisitor;
+import org.squiddev.unborked.ProxyServer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,17 +43,15 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
 		ItemStack stack = player.getHeldItem(hand);
 		if (!world.isRemote) {
-			ServerComputer computer = createServerComputer(world, player.inventory, stack);
+			ServerComputer computer = this.createServerComputer(world, player.inventory, stack);
 			if (computer != null) computer.turnOn();
 
-			if (PocketHooks.rightClick(world, player, stack, computer)) {
-				return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+			if (!PocketHooks.rightClick(world, player, stack, computer)) {
+				ProxyServer.openPocketComputerGUI(player, hand);
 			}
-
-			ComputerCraft.openPocketComputerGUI(player);
 		}
 
-		return ActionResult.newResult(EnumActionResult.PASS, stack);
+		return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
 	}
 
 	@Nonnull
@@ -72,8 +72,9 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 				computer.keepAlive();
 				computer.setWorld(world);
 
-				// Correctly sync pocket computer position
+				// Correctly sync pocket computer position & entity
 				computer.setPosition(entity.getPosition());
+				((PocketServerComputer) computer).setOwner(entity);
 
 				int id = computer.getID();
 				if (id != getComputerID(stack)) {
@@ -118,7 +119,7 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 				setComputerID(stack, computerID);
 			}
 
-			computer = new ServerComputer(world, computerID, getLabel(stack), instanceID, getFamily(stack), 26, 20);
+			computer = new PocketServerComputer(world, computerID, getLabel(stack), instanceID, getFamily(stack), 26, 20);
 			if (hasCustomRom(stack)) {
 				DebugLogger.debug("Setting custom ROM from " + stack);
 				((IExtendedServerComputer) computer).setCustomRom(getCustomRom(stack));

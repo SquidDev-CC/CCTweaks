@@ -9,6 +9,7 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.text.TextComponentTranslation;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
@@ -57,7 +58,8 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 	@Override
 	public void onNeighborChanged() {
 		if (modem.hasChanged()) {
-			modem.getAttachedNetwork().invalidateNode(modem);
+			INetworkController controller = modem.getAttachedNetwork();
+			if (controller != null) controller.invalidateNode(modem);
 			markForUpdate();
 		}
 	}

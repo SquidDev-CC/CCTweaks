@@ -64,18 +64,18 @@ public final class CommandCCTweaks {
 			);
 
 			profile.register(new SubCommandBase(
-				"start", "Start profiling all computers",
+				"start", "Start profiling all computers", UserLevel.OWNER_OP,
 				"Start monitoring the the execution time for all computers. Fails if the profiler is already running."
 			) {
 				@Override
-				public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
+				public void execute(@Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
 					if (!Config.Computer.MultiThreading.enabled) {
 						throw new CommandException("You must enable multi-threading to use the computer monitor");
 					}
 
 					ComputerMonitor.start();
 
-					sender.sendMessage(list(
+					context.getSender().sendMessage(list(
 						text("Run "),
 						link(text("/cctweaks profile stop"), "/cctweaks profile stop", "Click to stop profiling"),
 						text(" to stop profiling and view the results")
@@ -84,11 +84,11 @@ public final class CommandCCTweaks {
 			});
 
 			profile.register(new SubCommandBase(
-				"stop", "Stop profiling all computers.",
+				"stop", "Stop profiling all computers.", UserLevel.OWNER_OP,
 				"Stop the monitoring of execution time and print the results. Fails if the profiler is not running."
 			) {
 				@Override
-				public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
+				public void execute(@Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
 					List<ComputerMonitor.ComputerEntry> entries = Lists.newArrayList(ComputerMonitor.stop().getEntries());
 					Collections.sort(entries, PROFILE_COMPARATOR);
 
@@ -110,14 +110,14 @@ public final class CommandCCTweaks {
 						table.addRow(
 							serverComputer == null ? text("?") : linkComputer(serverComputer),
 							text(Integer.toString(computer.getID())),
-							serverComputer == null ? text("?") : linkPosition(serverComputer),
+							serverComputer == null ? text("?") : linkPosition(context, serverComputer),
 							formatted("%5d", entry.getTasks()),
 							formatted("%5d", entry.getTime()),
 							formatted("%4.1f", (double) entry.getTime() / entry.getTasks())
 						);
 					}
 
-					table.displayTo(sender);
+					table.displayTo(context.getSender());
 				}
 			});
 
@@ -125,12 +125,12 @@ public final class CommandCCTweaks {
 		}
 
 		root.register(new SubCommandBase(
-			"dump", "[id]", "Display the status of computers.", false,
+			"dump", "[id]", "Display the status of computers.", UserLevel.OWNER_OP,
 			"Display the status of all computers or specific information about one computer. You can either specify the computer's instance " +
 				"id (e.g. 123) or computer id (e.g #123)."
 		) {
 			@Override
-			public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
+			public void execute(@Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
 				if (arguments.size() == 0) {
 					TextTable table = new TextTable("Inst", "Id", "On", "Position");
 
@@ -139,11 +139,11 @@ public final class CommandCCTweaks {
 							linkComputer(computer),
 							text(Integer.toString(computer.getID())),
 							bool(computer.isOn()),
-							linkPosition(computer)
+							linkPosition(context, computer)
 						);
 					}
 
-					table.displayTo(sender);
+					table.displayTo(context.getSender());
 				} else if (arguments.size() == 1) {
 					ServerComputer computer = ComputerSelector.getComputer(arguments.get(0));
 
@@ -152,7 +152,7 @@ public final class CommandCCTweaks {
 					table.addRow(header("Id"), text(Integer.toString(computer.getID())));
 					table.addRow(header("Label"), text(computer.getLabel()));
 					table.addRow(header("On"), bool(computer.isOn()));
-					table.addRow(header("Position"), linkPosition(computer));
+					table.addRow(header("Position"), linkPosition(context, computer));
 					table.addRow(header("Family"), text(Helpers.guessFamily(computer).toString()));
 
 					for (int i = 0; i < 6; i++) {
@@ -162,7 +162,7 @@ public final class CommandCCTweaks {
 						}
 					}
 
-					table.displayTo(sender);
+					table.displayTo(context.getSender());
 				} else {
 					throw new CommandException(context.getFullUsage());
 				}
@@ -170,7 +170,7 @@ public final class CommandCCTweaks {
 
 			@Nonnull
 			@Override
-			public List<String> getCompletion(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull List<String> arguments) {
+			public List<String> getCompletion(@Nonnull CommandContext context, @Nonnull List<String> arguments) {
 				return arguments.size() == 1
 					? ComputerSelector.completeComputer(arguments.get(0))
 					: Collections.<String>emptyList();
@@ -178,12 +178,12 @@ public final class CommandCCTweaks {
 		});
 
 		root.register(new SubCommandBase(
-			"shutdown", "[ids...]", "Shutdown computers remotely.",
+			"shutdown", "[ids...]", "Shutdown computers remotely.", UserLevel.OWNER_OP,
 			"Shutdown the listed computers or all if none are specified. You can either specify the computer's instance " +
 				"id (e.g. 123) or computer id (e.g #123)."
 		) {
 			@Override
-			public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
+			public void execute(@Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
 				List<ServerComputer> computers = Lists.newArrayList();
 				if (arguments.size() > 0) {
 					for (String arg : arguments) {
@@ -198,12 +198,12 @@ public final class CommandCCTweaks {
 					if (computer.isOn()) shutdown++;
 					computer.unload();
 				}
-				sender.sendMessage(text("Shutdown " + shutdown + " / " + computers.size()));
+				context.getSender().sendMessage(text("Shutdown " + shutdown + " / " + computers.size()));
 			}
 
 			@Nonnull
 			@Override
-			public List<String> getCompletion(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull List<String> arguments) {
+			public List<String> getCompletion(@Nonnull CommandContext context, @Nonnull List<String> arguments) {
 				return arguments.size() == 0
 					? Collections.<String>emptyList()
 					: ComputerSelector.completeComputer(arguments.get(arguments.size() - 1));
@@ -211,12 +211,12 @@ public final class CommandCCTweaks {
 		});
 
 		root.register(new SubCommandBase(
-			"tp", "<id>", "Teleport to a specific computer.",
+			"tp", "<id>", "Teleport to a specific computer.", UserLevel.OP,
 			"Teleport to the location of a computer. You can either specify the computer's instance " +
 				"id (e.g. 123) or computer id (e.g #123)."
 		) {
 			@Override
-			public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
+			public void execute(@Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
 				if (arguments.size() != 1) throw new CommandException(context.getFullUsage());
 
 				ServerComputer computer = ComputerSelector.getComputer(arguments.get(0));
@@ -225,12 +225,13 @@ public final class CommandCCTweaks {
 
 				if (world == null || pos == null) throw new CommandException("Cannot locate computer in world");
 
+				ICommandSender sender = context.getSender();
 				if (!(sender instanceof Entity)) throw new CommandException("Sender is not an entity");
 
 				if (sender instanceof EntityPlayerMP) {
 					EntityPlayerMP entity = (EntityPlayerMP) sender;
 					if (entity.getEntityWorld() != world) {
-						server.getPlayerList().changePlayerDimension(entity, world.provider.getDimension());
+						context.getServer().getPlayerList().changePlayerDimension(entity, world.provider.getDimension());
 					}
 
 					entity.setPositionAndUpdate(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
@@ -249,7 +250,7 @@ public final class CommandCCTweaks {
 
 			@Nonnull
 			@Override
-			public List<String> getCompletion(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull List<String> arguments) {
+			public List<String> getCompletion(@Nonnull CommandContext context, @Nonnull List<String> arguments) {
 				return arguments.size() == 1
 					? ComputerSelector.completeComputer(arguments.get(0))
 					: Collections.<String>emptyList();
@@ -259,14 +260,15 @@ public final class CommandCCTweaks {
 		root.register(new SubCommandGive());
 
 		root.register(new SubCommandBase(
-			"view", "<id>", "View the terminal of a computer.",
+			"view", "<id>", "View the terminal of a computer.", UserLevel.OP,
 			"Open the terminal of a computer, allowing remote control of a computer. This does not provide access to " +
 				"turtle's inventories. You can either specify the computer's instance id (e.g. 123) or computer id (e.g #123)."
 		) {
 			@Override
-			public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
+			public void execute(@Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException {
 				if (arguments.size() != 1) throw new CommandException(context.getFullUsage());
 
+				ICommandSender sender = context.getSender();
 				if (!(sender instanceof EntityPlayerMP)) {
 					throw new CommandException("Cannot open terminal for non-player");
 				}
@@ -277,7 +279,7 @@ public final class CommandCCTweaks {
 
 			@Nonnull
 			@Override
-			public List<String> getCompletion(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull List<String> arguments) {
+			public List<String> getCompletion(@Nonnull CommandContext context, @Nonnull List<String> arguments) {
 				return arguments.size() == 1
 					? ComputerSelector.completeComputer(arguments.get(0))
 					: Collections.<String>emptyList();
@@ -295,11 +297,15 @@ public final class CommandCCTweaks {
 		);
 	}
 
-	private static ITextComponent linkPosition(ServerComputer computer) {
-		return link(
-			position(computer.getPosition()),
-			"/cctweaks tp " + computer.getInstanceID(),
-			"Teleport to this computer"
-		);
+	private static ITextComponent linkPosition(CommandContext context, ServerComputer computer) {
+		if (UserLevel.OP.canExecute(context)) {
+			return link(
+				position(computer.getPosition()),
+				"/cctweaks tp " + computer.getInstanceID(),
+				"Teleport to this computer"
+			);
+		} else {
+			return position(computer.getPosition());
+		}
 	}
 }

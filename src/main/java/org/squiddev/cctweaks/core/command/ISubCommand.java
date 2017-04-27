@@ -1,8 +1,6 @@
 package org.squiddev.cctweaks.core.command;
 
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -23,9 +21,10 @@ public interface ISubCommand {
 	 * Get the usage of this command
 	 *
 	 * @return The usage of this command
+	 * @param context
 	 */
 	@Nonnull
-	String getUsage();
+	String getUsage(CommandContext context);
 
 	/**
 	 * Get a short description of this command, including its usage.
@@ -44,30 +43,27 @@ public interface ISubCommand {
 	String getDescription();
 
 	/**
-	 * If this requires an admin to execute
+	 * Determine the level this command requires.
 	 *
-	 * @return If this requires an admin.
+	 * @return The user level the player must have in order to execute it.
 	 */
-	boolean requiresAdmin();
+	UserLevel userLevel();
 
 	/**
 	 * Execute this command
 	 *
-	 * @param server    The server we are executing under
-	 * @param sender    The thing which executed this command
-	 * @param context   The path taken to this command
+	 * @param context   The current command context.
 	 * @param arguments The arguments passed  @throws CommandException When an error occurs
 	 */
-	void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException;
+	void execute(@Nonnull CommandContext context, @Nonnull List<String> arguments) throws CommandException;
 
 	/**
 	 * Get a list of possible completions
 	 *
-	 * @param server    The server we are executing under
-	 * @param sender    The thing which executed this command
+	 * @param context   The current command context.
 	 * @param arguments The arguments passed. You should complete the last one.
 	 * @return List of possible completions
 	 */
 	@Nonnull
-	List<String> getCompletion(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull List<String> arguments);
+	List<String> getCompletion(@Nonnull CommandContext context, @Nonnull List<String> arguments);
 }

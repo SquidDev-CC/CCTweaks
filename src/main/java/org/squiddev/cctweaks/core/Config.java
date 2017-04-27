@@ -326,6 +326,15 @@ public final class Config {
 		public static boolean pocketEnderModem;
 
 		/**
+		 * Render pocket computers like maps.
+		 *
+		 * This means the terminal is visible when you hold a pocket computer,
+		 * and can be interacted with as a map.
+		 */
+		@DefaultBoolean(true)
+		public static boolean pocketMapRender;
+
+		/**
 		 * Fun rendering overlay for various objects.
 		 * Basically I'm slightly vain.
 		 */
