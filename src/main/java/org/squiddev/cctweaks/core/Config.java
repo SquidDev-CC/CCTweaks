@@ -17,7 +17,6 @@ public final class Config {
 	public static Set<String> turtleDisabledActions;
 
 	public static void init(File file) {
-		org.squiddev.cctweaks.lua.Config.mcVersion = "${mc_version}";
 		org.squiddev.cctweaks.lua.ConfigForgeLoader.init(file);
 		org.squiddev.cctweaks.core.ConfigForgeLoader.init(org.squiddev.cctweaks.lua.ConfigForgeLoader.getConfiguration());
 	}

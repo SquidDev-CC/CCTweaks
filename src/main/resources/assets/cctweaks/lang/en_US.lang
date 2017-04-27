@@ -93,11 +93,13 @@ gui.config.cctweaks.misc.funRender=Fun Rendering
 
 gui.config.cctweaks.apis=APIs
 gui.config.cctweaks.apis.socket=Socket
-gui.config.cctweaks.apis.socket.enabled=Enabled
+gui.config.cctweaks.apis.socket.tcp=TCP enabled
+gui.config.cctweaks.apis.socket.websocket=Websocket enabled
 gui.config.cctweaks.apis.socket.blacklist=Blacklist
 gui.config.cctweaks.apis.socket.whitelist=Whitelist
-gui.config.cctweaks.apis.socket.maxTcpConnections=Max Connections
-gui.config.cctweaks.apis.socket.threads=Number of Threads
+gui.config.cctweaks.apis.socket.maxConnections=Max connections
+gui.config.cctweaks.apis.socket.threads=Number of threads
+gui.config.cctweaks.apis.socket.nettyThreads=Number of Netty threads
 gui.config.cctweaks.apis.socket.maxRead=Max read length
 gui.config.cctweaks.apis.data=Data
 gui.config.cctweaks.apis.data.enabled=Enabled
