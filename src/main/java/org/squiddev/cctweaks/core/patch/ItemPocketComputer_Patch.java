@@ -24,6 +24,7 @@ import org.squiddev.cctweaks.core.pocket.PocketServerComputer;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.patcher.visitors.MergeVisitor;
+import org.squiddev.unborked.ProxyServer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,17 +42,15 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(@Nonnull ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
 		if (!world.isRemote) {
-			ServerComputer computer = createServerComputer(world, player.inventory, stack);
+			ServerComputer computer = this.createServerComputer(world, player.inventory, stack);
 			if (computer != null) computer.turnOn();
 
-			if (PocketHooks.rightClick(world, player, stack, computer)) {
-				return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+			if (!PocketHooks.rightClick(world, player, stack, computer)) {
+				ProxyServer.openPocketComputerGUI(player, hand);
 			}
-
-			ComputerCraft.openPocketComputerGUI(player);
 		}
 
-		return ActionResult.newResult(EnumActionResult.PASS, stack);
+		return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
 	}
 
 	@Nonnull

@@ -18,9 +18,6 @@ import javax.annotation.Nullable;
  */
 public abstract class ContainerHeldItem_Patch extends ContainerHeldItem implements IContainerComputer {
 	@MergeVisitor.Stub
-	private final ItemStack m_stack = null;
-
-	@MergeVisitor.Stub
 	public ContainerHeldItem_Patch() {
 		super(null);
 	}
@@ -28,7 +25,10 @@ public abstract class ContainerHeldItem_Patch extends ContainerHeldItem implemen
 	@Nullable
 	@Override
 	public IComputer getComputer() {
-		NBTTagCompound compound = m_stack.getTagCompound();
+		ItemStack stack = getStack();
+		if (stack == null) return null;
+
+		NBTTagCompound compound = stack.getTagCompound();
 		if (compound == null) return null;
 
 		if (!compound.hasKey("instanceID", 99) || !compound.hasKey("sessionID", 99)) return null;

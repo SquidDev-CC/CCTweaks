@@ -32,7 +32,7 @@ public class CommandDelegate extends CommandBase {
 	@Nonnull
 	@Override
 	public String getCommandUsage(@Nonnull ICommandSender sender) {
-		return "/" + command.getName() + " " + command.getUsage(new CommandContext(server, sender, command));
+		return "/" + command.getName() + " " + command.getUsage(new CommandContext(sender.getServer(), sender, command));
 	}
 
 	@Nonnull
