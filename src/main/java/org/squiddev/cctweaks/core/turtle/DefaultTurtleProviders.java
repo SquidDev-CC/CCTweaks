@@ -7,6 +7,7 @@ import dan200.computercraft.api.turtle.TurtleSide;
 import dan200.computercraft.shared.turtle.blocks.ITurtleTile;
 import dan200.computercraft.shared.turtle.core.TurtlePlayer;
 import dan200.computercraft.shared.util.InventoryUtil;
+import dan200.computercraft.shared.util.WorldUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.item.ItemStack;
@@ -51,14 +52,20 @@ public class DefaultTurtleProviders extends Module {
 
 			@Override
 			public int refuel(@Nonnull ITurtleAccess turtle, @Nonnull ItemStack stack, int limit) {
+				if (limit > stack.stackSize) limit = stack.stackSize;
+
 				int fuelToGive = TileEntityFurnace.getItemBurnTime(stack) * 5 / 100 * limit;
 				ItemStack replacementStack = stack.getItem().getContainerItem(stack);
 
 				// Remove 'n' items from the stack.
-				InventoryUtil.takeItems(limit, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
+				int slot = turtle.getSelectedSlot();
+				InventoryUtil.takeItems(limit, turtle.getInventory(), slot, 1, slot);
 				if (replacementStack != null) {
 					// If item is empty (bucket) then add it back
-					InventoryUtil.storeItems(replacementStack, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
+					replacementStack = InventoryUtil.storeItems(replacementStack, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), slot);
+					if (replacementStack != null) {
+						WorldUtil.dropItemStack(replacementStack, turtle.getWorld(), turtle.getPosition(), turtle.getDirection().getOpposite());
+					}
 				}
 
 				return fuelToGive;
