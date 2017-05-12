@@ -52,17 +52,19 @@ import static dan200.computercraft.client.gui.FixedWidthFontRenderer.FONT_WIDTH;
  */
 public class ItemPocketRenderer extends Module implements IClientModule {
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void clientPreInit() {
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void clientInit() {
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 
-	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
 	public void renderItem(RenderSpecificHandEvent event) {
 		ItemStack stack = event.getItemStack();
 		if (stack == null || !(stack.getItem() instanceof ItemPocketComputer)) return;
@@ -92,6 +94,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 		GlStateManager.popMatrix();
 	}
 
+	@SideOnly(Side.CLIENT)
 	private void renderMapFirstPerson(ItemStack stack) {
 		GlStateManager.disableLighting();
 
@@ -194,6 +197,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 	}
 
 	//region Map functions
+	@SideOnly(Side.CLIENT)
 	private void renderMapFirstPersonSide(EnumHandSide side, float equipProgress, float swingProgress, ItemStack stack) {
 		float offset = side == EnumHandSide.RIGHT ? 1f : -1f;
 		GlStateManager.translate(offset * 0.125f, -0.125f, 0f);
@@ -220,6 +224,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 		GlStateManager.popMatrix();
 	}
 
+	@SideOnly(Side.CLIENT)
 	private void renderMapFirstPerson(EntityPlayer player, float pitch, float equipProgress, float swingProgress, ItemStack stack) {
 		float f = MathHelper.sqrt_float(swingProgress);
 		float f1 = -0.2f * MathHelper.sin(swingProgress * (float) Math.PI);
@@ -235,6 +240,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 		renderMapFirstPerson(stack);
 	}
 
+	@SideOnly(Side.CLIENT)
 	private float getMapAngleFromPitch(float pitch) {
 		float f = 1f - pitch / 45f + 0.1f;
 		f = MathHelper.clamp_float(f, 0f, 1f);
@@ -244,6 +250,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 	//endregion
 
 	//region Arm Rendering
+	@SideOnly(Side.CLIENT)
 	private void renderArms(Entity player) {
 		if (!player.isInvisible()) {
 			GlStateManager.disableCull();
@@ -256,6 +263,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 		}
 	}
 
+	@SideOnly(Side.CLIENT)
 	private void renderArmFirstPerson(float equipProgress, float swingProgress, EnumHandSide side) {
 		Minecraft minecraft = Minecraft.getMinecraft();
 		RenderManager manager = minecraft.getRenderManager();
@@ -294,6 +302,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 		GlStateManager.enableCull();
 	}
 
+	@SideOnly(Side.CLIENT)
 	private void renderArm(EnumHandSide side) {
 		Minecraft minecraft = Minecraft.getMinecraft();
 		RenderManager manager = minecraft.getRenderManager();
@@ -320,6 +329,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 	//endregion
 
 	//region Render helpers
+	@SideOnly(Side.CLIENT)
 	private void renderModel(IBakedModel model) {
 		Minecraft mc = Minecraft.getMinecraft();
 		Tessellator tessellator = Tessellator.getInstance();
@@ -335,6 +345,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 		tessellator.draw();
 	}
 
+	@SideOnly(Side.CLIENT)
 	private void renderQuads(VertexBuffer renderer, List<BakedQuad> quads) {
 		for (BakedQuad quad : quads) {
 			LightUtil.renderQuadColor(renderer, quad, -1);
