@@ -58,6 +58,7 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 		return true;
 	}
 
+	@Nonnull
 	@Override
 	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (player.isSneaking()) {

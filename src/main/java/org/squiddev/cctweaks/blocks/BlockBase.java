@@ -23,6 +23,7 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -62,13 +63,14 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 		return getMetaFromState(state);
 	}
 
+	@Nonnull
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState p_getRenderType_1_) {
 		return EnumBlockRenderType.MODEL;
 	}
 
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
 		T tile = getTile(world, pos);
 
 		super.breakBlock(world, pos, state);

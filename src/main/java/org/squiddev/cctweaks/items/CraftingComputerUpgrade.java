@@ -56,7 +56,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 			);
 		} else if (computerItem instanceof ItemPocketComputer) {
 			ItemPocketComputer pocket = (ItemPocketComputer) computerItem;
-			stack = PocketComputerItemFactory.create(id, label, ComputerFamily.Advanced, pocket.getHasModem(computerStack));
+			stack = PocketComputerItemFactory.create(id, label, pocket.getColour(computerStack), ComputerFamily.Advanced, pocket.getUpgrade(computerStack));
 
 			NBTTagCompound toTag = ItemBase.getTag(stack);
 			NBTTagCompound fromTag = ItemBase.getTag(computerStack);
@@ -128,6 +128,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 		return ComputerItemFactory.create(-1, null, ComputerFamily.Advanced);
 	}
 
+	@Nonnull
 	@Override
 	public ItemStack[] getRemainingItems(@Nonnull InventoryCrafting inventory) {
 		ItemStack[] result = new ItemStack[inventory.getSizeInventory()];

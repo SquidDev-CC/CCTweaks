@@ -9,6 +9,7 @@ import net.minecraft.inventory.Container;
 import org.squiddev.cctweaks.api.IContainerComputer;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class ContainerAnyComputer extends Container implements IContainerComputer {
@@ -19,7 +20,7 @@ public class ContainerAnyComputer extends Container implements IContainerCompute
 	}
 
 	@Override
-	public boolean canInteractWith(EntityPlayer player) {
+	public boolean canInteractWith(@Nonnull EntityPlayer player) {
 		if (computer instanceof ServerComputer) {
 			ServerComputer computer = (ServerComputer) this.computer;
 

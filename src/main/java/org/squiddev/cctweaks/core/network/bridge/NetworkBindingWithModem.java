@@ -59,13 +59,14 @@ public abstract class NetworkBindingWithModem extends NetworkBinding {
 			methodOffset = methods.length;
 		}
 
+		@Nonnull
 		@Override
 		public String[] getMethodNames() {
 			return methodNames;
 		}
 
 		@Override
-		public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
+		public Object[] callMethod(@Nonnull IComputerAccess computer, @Nonnull ILuaContext context, int method, @Nonnull Object[] arguments) throws LuaException, InterruptedException {
 			int offset = method - methodOffset;
 			if (offset >= 0) {
 				return bindingPeripheral.callMethod(computer, context, offset, arguments);
@@ -80,7 +81,7 @@ public abstract class NetworkBindingWithModem extends NetworkBinding {
 		}
 
 		@Override
-		protected boolean isInterdimensional() {
+		public boolean isInterdimensional() {
 			return true;
 		}
 	}

@@ -9,13 +9,17 @@ import dan200.computercraft.shared.util.WorldUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.pocket.PocketModem;
+
+import javax.annotation.Nonnull;
 
 public class PocketAPIExtensions extends PocketAPI {
 	private final ServerComputer computer;
 
 	public PocketAPIExtensions(ServerComputer computer) {
+		super((dan200.computercraft.shared.pocket.core.PocketServerComputer) computer);
 		this.computer = computer;
 	}
 
@@ -24,13 +28,14 @@ public class PocketAPIExtensions extends PocketAPI {
 		PocketHooks.destroy(computer);
 	}
 
+	@Nonnull
 	@Override
 	public String[] getMethodNames() {
 		return new String[]{"equip", "unequip"};
 	}
 
 	@Override
-	public Object[] callMethod(ILuaContext context, int method, Object[] arguments) throws LuaException {
+	public Object[] callMethod(@Nonnull ILuaContext context, int method, @Nonnull Object[] arguments) throws LuaException {
 		switch (method) {
 			case 0: {
 				PocketAccess access = PocketHooks.getAccess(computer);
@@ -72,7 +77,7 @@ public class PocketAPIExtensions extends PocketAPI {
 				if (previousUpgrade != null) {
 					ItemStack stack = previousUpgrade.getCraftingItem();
 					if (stack != null) {
-						stack = InventoryUtil.storeItems(stack, inventory, 0, 36, inventory.currentItem);
+						stack = InventoryUtil.storeItems(stack, new PlayerMainInvWrapper(inventory), 0, 36, inventory.currentItem);
 						if (stack != null) {
 							WorldUtil.dropItemStack(stack, player.worldObj, player.posX, player.posY, player.posZ);
 						}
@@ -105,7 +110,7 @@ public class PocketAPIExtensions extends PocketAPI {
 
 				ItemStack stack = previousUpgrade.getCraftingItem();
 				if (stack != null) {
-					stack = InventoryUtil.storeItems(stack, inventory, 0, 36, inventory.currentItem);
+					stack = InventoryUtil.storeItems(stack, new PlayerMainInvWrapper(inventory), 0, 36, inventory.currentItem);
 					if (stack != null) {
 						WorldUtil.dropItemStack(stack, player.worldObj, player.posX, player.posY, player.posZ);
 					}

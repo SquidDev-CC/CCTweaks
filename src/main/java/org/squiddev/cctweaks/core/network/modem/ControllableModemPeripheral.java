@@ -4,6 +4,8 @@ import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 
+import javax.annotation.Nonnull;
+
 /**
  * A modem peripheral that can be enabled/disabled
  */
@@ -15,6 +17,7 @@ public class ControllableModemPeripheral<T extends BasicModem> extends BasicMode
 		methodLength = super.getMethodNames().length;
 	}
 
+	@Nonnull
 	@Override
 	public String[] getMethodNames() {
 		String[] methods = super.getMethodNames();
@@ -29,7 +32,7 @@ public class ControllableModemPeripheral<T extends BasicModem> extends BasicMode
 	}
 
 	@Override
-	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
+	public Object[] callMethod(@Nonnull IComputerAccess computer, @Nonnull ILuaContext context, int method, @Nonnull Object[] arguments) throws LuaException, InterruptedException {
 		switch (method - methodLength) {
 			case 0: { // enableRemote
 				if (!modem.isPeripheralEnabled()) {

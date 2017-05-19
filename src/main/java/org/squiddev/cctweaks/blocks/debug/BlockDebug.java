@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.blocks.BlockBase;
@@ -70,14 +69,15 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> itemStacks) {
+	public void getSubBlocks(@Nonnull Item item, CreativeTabs tab, List<ItemStack> itemStacks) {
 		for (BlockDebugType type : BlockDebugType.VALUES) {
 			itemStacks.add(new ItemStack(this, 1, type.ordinal()));
 		}
 	}
 
+	@Nonnull
 	@Override
-	public TileEntity createNewTileEntity(World world, int meta) {
+	public TileEntity createNewTileEntity(@Nonnull World world, int meta) {
 		switch (meta) {
 			case 0:
 				return new TileDebugPeripheral();
@@ -90,6 +90,7 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 		return null;
 	}
 
+	@Nonnull
 	@Override
 	@SuppressWarnings("deprecation")
 	public IBlockState getStateFromMeta(int meta) {
@@ -102,6 +103,7 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 		return state.getValue(TYPE).ordinal();
 	}
 
+	@Nonnull
 	@Override
 	protected BlockStateContainer createBlockState() {
 		return new BlockStateContainer(this, TYPE);

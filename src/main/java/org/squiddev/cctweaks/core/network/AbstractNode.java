@@ -1,10 +1,10 @@
 package org.squiddev.cctweaks.core.network;
 
 import com.google.common.base.Preconditions;
+import dan200.computercraft.api.network.Packet;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
-import org.squiddev.cctweaks.api.network.Packet;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;

@@ -21,7 +21,7 @@ public interface ISubCommand {
 	 * Get the usage of this command
 	 *
 	 * @return The usage of this command
-	 * @param context
+	 * @param context The context this command is executed in
 	 */
 	@Nonnull
 	String getUsage(CommandContext context);

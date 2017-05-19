@@ -66,8 +66,9 @@ public class PocketEnderModem extends Module implements IPocketUpgrade {
 			this.access = access;
 		}
 
+		@Nonnull
 		@Override
-		protected World getWorld() {
+		public World getWorld() {
 			/**
 			 * Normal modem updates this, but I don't think we need this as {@link #getNetwork()} always returns
 			 * {@link WirelessNetwork#getUniversal()}
@@ -79,8 +80,9 @@ public class PocketEnderModem extends Module implements IPocketUpgrade {
 			return entity == null ? null : entity.getEntityWorld();
 		}
 
+		@Nonnull
 		@Override
-		protected Vec3d getPosition() {
+		public Vec3d getPosition() {
 			Entity entity = this.access.getEntity();
 			if (entity instanceof EntityLivingBase) {
 				EntityLivingBase modemLight = (EntityLivingBase) entity;

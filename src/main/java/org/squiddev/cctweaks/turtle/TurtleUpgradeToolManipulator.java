@@ -24,15 +24,17 @@ public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implemen
 	}
 
 	@Override
-	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
+	public IPeripheral createPeripheral(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side) {
 		return new ToolManipulatorPeripheral(turtle, getPlayer(turtle), side);
 	}
 
+	@Nonnull
 	@Override
 	public String getUnlocalisedAdjective() {
 		return "turtle." + CCTweaks.ID + ".toolHost.advanced.adjective";
 	}
 
+	@Nonnull
 	@Override
 	public TurtleUpgradeType getType() {
 		return TurtleUpgradeType.Tool;

@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.registry.Module;
 
+import javax.annotation.Nonnull;
 import javax.vecmath.Matrix4f;
 
 public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade {
@@ -35,6 +36,7 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 		location = new ResourceLocation(CCTweaks.ID, name);
 	}
 
+	@Nonnull
 	@Override
 	public ResourceLocation getUpgradeID() {
 		return location;
@@ -45,6 +47,7 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 		return id;
 	}
 
+	@Nonnull
 	@Override
 	public String getUnlocalisedAdjective() {
 		return "turtle." + CCTweaks.ID + "." + name + ".adjective";
@@ -57,10 +60,11 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 		return getStack();
 	}
 
+	@Nonnull
 	@Override
 	@SideOnly(Side.CLIENT)
 	@SuppressWarnings("deprecation")
-	public Pair<net.minecraft.client.renderer.block.model.IBakedModel, Matrix4f> getModel(ITurtleAccess access, TurtleSide side) {
+	public Pair<net.minecraft.client.renderer.block.model.IBakedModel, Matrix4f> getModel(ITurtleAccess access, @Nonnull TurtleSide side) {
 		float xOffset = side == TurtleSide.Left ? -0.40625F : 0.40625F;
 		Matrix4f transform = new Matrix4f(0.0F, 0.0F, -1.0F, 1.0F + xOffset, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 1.0F);
 
@@ -69,17 +73,18 @@ public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade
 	}
 
 	@Override
-	public void update(ITurtleAccess iTurtleAccess, TurtleSide turtleSide) {
+	public void update(@Nonnull ITurtleAccess iTurtleAccess, @Nonnull TurtleSide turtleSide) {
 	}
 
 	@Override
-	public IPeripheral createPeripheral(ITurtleAccess iTurtleAccess, TurtleSide turtleSide) {
+	public IPeripheral createPeripheral(@Nonnull ITurtleAccess iTurtleAccess, @Nonnull TurtleSide turtleSide) {
 		return null;
 	}
 
+	@Nonnull
 	@Override
-	public TurtleCommandResult useTool(ITurtleAccess iTurtleAccess, TurtleSide turtleSide, TurtleVerb turtleVerb, EnumFacing enumFacing) {
-		return null;
+	public TurtleCommandResult useTool(@Nonnull ITurtleAccess iTurtleAccess, @Nonnull TurtleSide turtleSide, @Nonnull TurtleVerb turtleVerb, @Nonnull EnumFacing enumFacing) {
+		return TurtleCommandResult.failure();
 	}
 
 	@SideOnly(Side.CLIENT)

@@ -121,13 +121,13 @@ public abstract class TileComputerBase_Patch extends TileComputerBase implements
 		return compound;
 	}
 
-	public void writeDescription(NBTTagCompound tag) {
+	public void writeDescription(@Nonnull NBTTagCompound tag) {
 		super.writeDescription(tag);
 		tag.setInteger("instanceID", createServerComputer().getInstanceID());
 		if (hasDisk) tag.setInteger("rom_id", diskId);
 	}
 
-	public void readDescription(NBTTagCompound gag) {
+	public void readDescription(@Nonnull NBTTagCompound gag) {
 		super.readDescription(gag);
 		m_instanceID = gag.getInteger("instanceID");
 		if (gag.hasKey("rom_id", 99)) {

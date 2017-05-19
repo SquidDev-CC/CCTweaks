@@ -14,6 +14,7 @@ import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeToolHost;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeToolManipulator;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -27,11 +28,12 @@ public class ItemToolHost extends ItemBase {
 
 	@Override
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public void getSubItems(Item item, CreativeTabs tab, List list) {
+	public void getSubItems(@Nonnull Item item, CreativeTabs tab, List list) {
 		list.add(new ItemStack(this, 1, 0));
 		list.add(new ItemStack(this, 1, 1));
 	}
 
+	@Nonnull
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 		switch (stack.getItemDamage()) {

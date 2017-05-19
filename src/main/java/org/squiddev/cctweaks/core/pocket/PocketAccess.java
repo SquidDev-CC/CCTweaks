@@ -42,7 +42,7 @@ public final class PocketAccess implements IPocketAccess {
 
 		InventoryPlayer inventory = entity instanceof EntityPlayer ? ((EntityPlayer) entity).inventory : null;
 		try {
-			Object computer = ComputerAccessor.pocketServerComputer.invoke(ComputerCraft.Items.pocketComputer, entity.worldObj, inventory, stack);
+			Object computer = ComputerAccessor.pocketServerComputer.invoke(ComputerCraft.Items.pocketComputer, entity.worldObj, inventory, entity, stack);
 			return computer == null ? null : (ServerComputer) computer;
 		} catch (InvocationTargetException e) {
 			DebugLogger.error("Cannot find computer", e);

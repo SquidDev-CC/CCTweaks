@@ -42,6 +42,7 @@ public class TileNetworkedWirelessBridge extends TileLazyNBT implements IPeriphe
 		}
 	};
 
+	@Nonnull
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag = super.writeToNBT(tag);

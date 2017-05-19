@@ -20,6 +20,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.McEvents;
@@ -54,7 +57,7 @@ public class ToolHostPlayer extends TurtlePlayer {
 		return new McEvents.IDropConsumer() {
 			@Override
 			public void consumeDrop(ItemStack drop) {
-				storeItem(drop, inventory, turtle);
+				storeItem(drop, new PlayerMainInvWrapper(inventory), turtle);
 			}
 		};
 	}
@@ -190,13 +193,13 @@ public class ToolHostPlayer extends TurtlePlayer {
 		setSneaking(false);
 
 		// Place items back into turtle, or world
-		IInventory turtleInventory = turtle.getInventory();
-		int size = turtleInventory.getSizeInventory();
+		IItemHandlerModifiable turtleInventory = turtle.getItemHandler();
+		int size = turtleInventory.getSlots();
 		int largerSize = inventory.getSizeInventory();
 
 		for (int i = 0; i < size; i++) {
 			ItemStack stack = inventory.getStackInSlot(i);
-			turtleInventory.setInventorySlotContents(i, stack == null || stack.stackSize <= 0 ? null : stack);
+			turtleInventory.setStackInSlot(i, stack == null || stack.stackSize <= 0 ? null : stack);
 			inventory.setInventorySlotContents(i, null);
 		}
 
@@ -206,8 +209,8 @@ public class ToolHostPlayer extends TurtlePlayer {
 		}
 	}
 
-	private static void storeItem(ItemStack stack, IInventory inventory, ITurtleAccess turtle) {
-		ItemStack remainder = InventoryUtil.storeItems(stack, inventory, 0, inventory.getSizeInventory(), turtle.getSelectedSlot());
+	private static void storeItem(ItemStack stack, IItemHandler inventory, ITurtleAccess turtle) {
+		ItemStack remainder = InventoryUtil.storeItems(stack, inventory, turtle.getSelectedSlot());
 		if (remainder != null) {
 			BlockPos position = turtle.getPosition();
 			WorldUtil.dropItemStack(remainder, turtle.getWorld(), position, turtle.getDirection().getOpposite());

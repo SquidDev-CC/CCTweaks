@@ -6,6 +6,7 @@ import dan200.computercraft.core.terminal.Terminal;
 import dan200.computercraft.core.terminal.TextBuffer;
 import dan200.computercraft.shared.computer.core.ClientComputer;
 import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
+import dan200.computercraft.shared.util.Palette;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -168,12 +169,13 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 
 					FixedWidthFontRenderer fontRenderer = (FixedWidthFontRenderer) ComputerCraft.getFixedWidthFontRenderer();
 					boolean greyscale = !computer.isColour();
+					Palette palette = terminal.getPalette();
 
 					// Render the margin above/below
 					if (marginV > 0) {
 						TextBuffer emptyLine = new TextBuffer(' ', tw);
-						fontRenderer.drawString(emptyLine, marginH, startY, terminal.getTextColourLine(0), terminal.getBackgroundColourLine(0), marginH, marginH, greyscale);
-						fontRenderer.drawString(emptyLine, marginH, startY + 2 * marginV + (th - 1) * FixedWidthFontRenderer.FONT_HEIGHT, terminal.getTextColourLine(th - 1), terminal.getBackgroundColourLine(th - 1), marginH, marginH, greyscale);
+						fontRenderer.drawString(emptyLine, marginH, startY, terminal.getTextColourLine(0), terminal.getBackgroundColourLine(0), marginH, marginH, greyscale, palette);
+						fontRenderer.drawString(emptyLine, marginH, startY + 2 * marginV + (th - 1) * FixedWidthFontRenderer.FONT_HEIGHT, terminal.getTextColourLine(th - 1), terminal.getBackgroundColourLine(th - 1), marginH, marginH, greyscale, palette);
 					}
 
 					// Render the actual text
@@ -182,7 +184,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 						TextBuffer text = terminal.getLine(line);
 						TextBuffer colour = terminal.getTextColourLine(line);
 						TextBuffer backgroundColour = terminal.getBackgroundColourLine(line);
-						fontRenderer.drawString(text, marginH, y, colour, backgroundColour, marginH, marginH, greyscale);
+						fontRenderer.drawString(text, marginH, y, colour, backgroundColour, marginH, marginH, greyscale, palette);
 
 						y += FONT_HEIGHT;
 					}

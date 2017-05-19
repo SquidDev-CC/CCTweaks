@@ -121,12 +121,6 @@ public class ASMTransformer implements IClassTransformer {
 				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"
 			),
 
-			// Ugly kludge to fix deadlocks.
-			new ClassMerger(TweaksLogger.instance,
-				"dan200.computercraft.shared.peripheral.modem.ModemPeripheral",
-				"org.squiddev.cctweaks.core.patch.ModemPeripheral_Patch"
-			),
-
 			// Attempt to fix concurrent modification exceptions.
 			new ClassMerger(TweaksLogger.instance,
 				"dan200.computercraft.shared.computer.core.ServerComputerRegistry",

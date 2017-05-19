@@ -9,6 +9,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import javax.annotation.Nonnull;
 import javax.crypto.SecretKey;
 
 public class FakeNetHandler extends NetHandlerPlayServer {
@@ -22,7 +23,7 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 		}
 
 		@Override
-		public void setConnectionState(EnumConnectionState state) {
+		public void setConnectionState(@Nonnull EnumConnectionState state) {
 		}
 
 		@Override
@@ -30,7 +31,7 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 		}
 
 		@Override
-		public void exceptionCaught(ChannelHandlerContext context, Throwable e) {
+		public void exceptionCaught(ChannelHandlerContext context, @Nonnull Throwable e) {
 		}
 
 		@Override
@@ -42,7 +43,7 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 		}
 
 		@Override
-		public void closeChannel(ITextComponent channel) {
+		public void closeChannel(@Nonnull ITextComponent channel) {
 		}
 
 		@Override
@@ -60,11 +61,13 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 			return false;
 		}
 
+		@Nonnull
 		@Override
 		public INetHandler getNetHandler() {
 			return null;
 		}
 
+		@Nonnull
 		@Override
 		public ITextComponent getExitMessage() {
 			return null;
@@ -74,6 +77,7 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 		public void disableAutoRead() {
 		}
 
+		@Nonnull
 		@Override
 		public Channel channel() {
 			return null;
@@ -90,7 +94,7 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 	}
 
 	@Override
-	public void kickPlayerFromServer(String player) {
+	public void kickPlayerFromServer(@Nonnull String player) {
 	}
 
 	@Override
@@ -114,12 +118,12 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 	}
 
 	@Override
-	public void onDisconnect(ITextComponent chat) {
+	public void onDisconnect(@Nonnull ITextComponent chat) {
 	}
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public void sendPacket(final Packet packet) {
+	public void sendPacket(@Nonnull final Packet packet) {
 
 	}
 
@@ -128,7 +132,7 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 	}
 
 	@Override
-	public void processChatMessage(CPacketChatMessage packet) {
+	public void processChatMessage(@Nonnull CPacketChatMessage packet) {
 	}
 
 	@Override
@@ -144,7 +148,7 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 	}
 
 	@Override
-	public void processCloseWindow(CPacketCloseWindow packet) {
+	public void processCloseWindow(@Nonnull CPacketCloseWindow packet) {
 	}
 
 	@Override
@@ -156,11 +160,11 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 	}
 
 	@Override
-	public void processCreativeInventoryAction(CPacketCreativeInventoryAction packet) {
+	public void processCreativeInventoryAction(@Nonnull CPacketCreativeInventoryAction packet) {
 	}
 
 	@Override
-	public void processConfirmTransaction(CPacketConfirmTransaction packet) {
+	public void processConfirmTransaction(@Nonnull CPacketConfirmTransaction packet) {
 	}
 
 	@Override
@@ -180,7 +184,7 @@ public class FakeNetHandler extends NetHandlerPlayServer {
 	}
 
 	@Override
-	public void processClientSettings(CPacketClientSettings packet) {
+	public void processClientSettings(@Nonnull CPacketClientSettings packet) {
 	}
 
 	@Override

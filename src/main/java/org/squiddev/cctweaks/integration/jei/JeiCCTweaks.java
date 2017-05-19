@@ -56,7 +56,7 @@ public class JeiCCTweaks extends BlankModPlugin {
 			Collection<IPocketUpgrade> pocketUpgrades = PocketRegistry.instance.getUpgrades();
 			List<PocketUpgradeWrapper> pocketWrappers = Lists.newArrayListWithExpectedSize((pocketUpgrades.size() + 1) * PocketUpgradeWrapper.FAMILIES.length);
 			for (ComputerFamily family : PocketUpgradeWrapper.FAMILIES) {
-				registry.addRecipeCategoryCraftingItem(PocketComputerItemFactory.create(-1, null, family, false), pocketCat.getUid());
+				registry.addRecipeCategoryCraftingItem(PocketComputerItemFactory.create(-1, null, -1, family, null), pocketCat.getUid());
 
 				// Hack to ensure the default modem is added too
 				pocketWrappers.add(new PocketUpgradeWrapper(PocketModem.INSTANCE, family));
@@ -74,7 +74,7 @@ public class JeiCCTweaks extends BlankModPlugin {
 			Map<String, ITurtleUpgrade> turtleUpgrades = ReflectionHelper.getPrivateValue(CCTurtleProxyCommon.class, (CCTurtleProxyCommon) ComputerCraft.turtleProxy, "m_turtleUpgrades");
 			List<TurtleUpgradeWrapper> turtleWrappers = Lists.newArrayListWithExpectedSize(turtleUpgrades.size() * PocketUpgradeWrapper.FAMILIES.length);
 			for (ComputerFamily family : TurtleUpgradeWrapper.FAMILIES) {
-				registry.addRecipeCategoryCraftingItem(TurtleItemFactory.create(-1, null, null, family, null, null, 0, null), turtleCat.getUid());
+				registry.addRecipeCategoryCraftingItem(TurtleItemFactory.create(-1, null, -1, family, null, null, 0, null), turtleCat.getUid());
 
 				for (ITurtleUpgrade upgrade : turtleUpgrades.values()) {
 					turtleWrappers.add(new TurtleUpgradeWrapper(upgrade, family));

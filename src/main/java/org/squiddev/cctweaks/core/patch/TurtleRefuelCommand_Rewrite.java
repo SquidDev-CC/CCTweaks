@@ -9,6 +9,8 @@ import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelRegistry;
 
+import javax.annotation.Nonnull;
+
 /**
  * Complete rewrite of {@link dan200.computercraft.shared.turtle.core.TurtleRefuelCommand}
  * Uses the turtle refuel registry instead {@link ITurtleFuelRegistry}.
@@ -21,8 +23,9 @@ public class TurtleRefuelCommand_Rewrite implements ITurtleCommand {
 		m_limit = limit;
 	}
 
+	@Nonnull
 	@Override
-	public TurtleCommandResult execute(ITurtleAccess turtle) {
+	public TurtleCommandResult execute(@Nonnull ITurtleAccess turtle) {
 		ItemStack stack = turtle.getInventory().getStackInSlot(turtle.getSelectedSlot());
 		if (stack == null) {
 			return TurtleCommandResult.failure("No items to combust");

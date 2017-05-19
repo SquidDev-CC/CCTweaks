@@ -3,12 +3,12 @@ package org.squiddev.cctweaks.blocks.debug;
 import com.google.common.collect.Maps;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
+import dan200.computercraft.api.network.Packet;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.network.INetworkAccess;
 import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
-import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.NetworkAccessDelegate;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 
@@ -32,11 +32,13 @@ public class TileDebugNetworkedPeripheral extends TileDebugPeripheral {
 			super(side);
 		}
 
+		@Nonnull
 		@Override
 		public String getType() {
 			return "networked";
 		}
 
+		@Nonnull
 		@Override
 		public String[] getMethodNames() {
 			String[] names = super.getMethodNames();
@@ -46,7 +48,7 @@ public class TileDebugNetworkedPeripheral extends TileDebugPeripheral {
 		}
 
 		@Override
-		public Object[] callMethod(IComputerAccess computer, ILuaContext context, int function, Object[] arguments) throws LuaException, InterruptedException {
+		public Object[] callMethod(@Nonnull IComputerAccess computer, @Nonnull ILuaContext context, int function, @Nonnull Object[] arguments) throws LuaException, InterruptedException {
 			int parentFunctions = super.getMethodNames().length;
 
 			switch (function - parentFunctions) {

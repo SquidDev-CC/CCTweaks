@@ -11,11 +11,14 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.integration.multipart.network.PartWirelessBridge;
 
+import javax.annotation.Nonnull;
+
 public class ItemCustomPart extends ItemMultiPart {
 	public ItemCustomPart() {
 		setCreativeTab(CCTweaks.getCreativeTab());
 	}
 
+	@Nonnull
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 		switch (stack.getItemDamage()) {

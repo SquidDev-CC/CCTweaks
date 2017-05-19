@@ -90,6 +90,7 @@ public class TileNetworkedModem extends TileLazyNBT implements IPeripheralHost, 
 		return true;
 	}
 
+	@Nonnull
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag = super.writeToNBT(tag);

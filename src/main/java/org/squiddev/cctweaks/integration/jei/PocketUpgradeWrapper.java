@@ -27,7 +27,7 @@ public class PocketUpgradeWrapper extends BlankRecipeWrapper implements IValidRe
 	}
 
 	public PocketUpgradeWrapper(IPocketUpgrade upgrade, ComputerFamily family) {
-		inputStack = PocketComputerItemFactory.create(-1, null, family, false);
+		inputStack = PocketComputerItemFactory.create(-1, null, -1, family, null);
 		upgradeStack = upgrade.getCraftingItem();
 		PocketRegistry.instance.setToItemStack(outputStack = inputStack.copy(), upgrade);
 	}

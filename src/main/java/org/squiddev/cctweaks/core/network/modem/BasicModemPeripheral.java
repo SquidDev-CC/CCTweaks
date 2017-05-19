@@ -2,19 +2,18 @@ package org.squiddev.cctweaks.core.network.modem;
 
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
+import dan200.computercraft.api.network.IPacketNetwork;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.shared.peripheral.modem.INetwork;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.squiddev.cctweaks.api.lua.IArguments;
-import org.squiddev.cctweaks.api.lua.IPeripheralWithArguments;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralTargeted;
 import org.squiddev.cctweaks.lua.lib.BinaryConverter;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +22,7 @@ import java.util.Map;
  *
  * @see BasicModem
  */
-public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted, IPeripheralWithArguments {
+public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral implements IPeripheralTargeted {
 	public final T modem;
 	private final int methodLength;
 	protected boolean changed;
@@ -33,29 +32,31 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 		methodLength = super.getMethodNames().length;
 	}
 
+	@Nonnull
 	@Override
-	protected World getWorld() {
+	public World getWorld() {
 		return (World) modem.getPosition().getBlockAccess();
 	}
 
+	@Nonnull
 	@Override
-	protected Vec3d getPosition() {
+	public Vec3d getPosition() {
 		BlockPos position = modem.getPosition().getPosition();
 		return new Vec3d(position.getX(), position.getY(), position.getZ());
 	}
 
 	@Override
-	protected double getTransmitRange() {
+	public double getRange() {
 		return 256;
 	}
 
 	@Override
-	protected boolean isInterdimensional() {
+	public boolean isInterdimensional() {
 		return false;
 	}
 
 	@Override
-	protected INetwork getNetwork() {
+	protected IPacketNetwork getNetwork() {
 		return modem;
 	}
 
@@ -64,6 +65,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 		return other instanceof BasicModemPeripheral && ((BasicModemPeripheral) other).modem.equals(this.modem);
 	}
 
+	@Nonnull
 	@Override
 	public String[] getMethodNames() {
 		String[] methods = super.getMethodNames();
@@ -81,7 +83,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	}
 
 	@Override
-	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
+	public Object[] callMethod(@Nonnull IComputerAccess computer, @Nonnull ILuaContext context, int method, @Nonnull Object[] arguments) throws LuaException, InterruptedException {
 		switch (method - methodLength) {
 			case 0: { // getNamesRemote
 				int idx = 1;
@@ -131,23 +133,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	}
 
 	@Override
-	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, IArguments arguments) throws LuaException, InterruptedException {
-		if (method - methodLength == 4) {
-			// This is kinda ugly. Sorry!
-			String remoteName = arguments.getString(0);
-			String methodName = arguments.getString(1);
-
-			// Get the peripheral and call it
-			PeripheralAccess access = modem.getPeripheral(remoteName);
-			if (access == null) throw new LuaException("No peripheral: " + remoteName);
-			return access.callMethod(context, methodName, arguments.subArgs(2));
-		} else {
-			return callMethod(computer, context, method, arguments.asBinary());
-		}
-	}
-
-	@Override
-	public void attach(IComputerAccess computer) {
+	public void attach(@Nonnull IComputerAccess computer) {
 		super.attach(computer);
 
 		INetworkController controller = modem.getAttachedNetwork();
@@ -159,7 +145,7 @@ public class BasicModemPeripheral<T extends BasicModem> extends ModemPeripheral 
 	}
 
 	@Override
-	public void detach(IComputerAccess computer) {
+	public void detach(@Nonnull IComputerAccess computer) {
 		modem.detachPeripherals();
 		super.detach(computer);
 	}

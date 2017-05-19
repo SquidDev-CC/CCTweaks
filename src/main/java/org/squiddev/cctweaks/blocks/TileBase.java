@@ -77,6 +77,7 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	protected void readDescription(NBTTagCompound tag) {
 	}
 
+	@Nonnull
 	@Override
 	public NBTTagCompound getUpdateTag() {
 		NBTTagCompound tag = super.getUpdateTag();
@@ -85,7 +86,7 @@ public abstract class TileBase extends TileEntity implements IWorldPosition {
 	}
 
 	@Override
-	public void handleUpdateTag(NBTTagCompound tag) {
+	public void handleUpdateTag(@Nonnull NBTTagCompound tag) {
 		super.handleUpdateTag(tag);
 		readDescription(tag);
 	}

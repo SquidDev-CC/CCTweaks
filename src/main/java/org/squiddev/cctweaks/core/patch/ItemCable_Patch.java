@@ -20,6 +20,8 @@ import org.squiddev.cctweaks.integration.multipart.network.PartCable;
 import org.squiddev.cctweaks.integration.multipart.network.PartModem;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
+import javax.annotation.Nonnull;
+
 public class ItemCable_Patch extends ItemCable {
 	public ItemCable_Patch(Block block) {
 		super(block);
@@ -36,8 +38,9 @@ public class ItemCable_Patch extends ItemCable {
 		}
 	}
 
+	@Nonnull
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(ItemStack stack, @Nonnull EntityPlayer player, World world, @Nonnull BlockPos pos, EnumHand hand, @Nonnull EnumFacing side, float hitX, float hitY, float hitZ) {
 		IBlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 

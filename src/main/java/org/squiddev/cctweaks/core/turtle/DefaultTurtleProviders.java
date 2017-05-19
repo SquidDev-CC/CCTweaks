@@ -46,10 +46,10 @@ public class DefaultTurtleProviders extends Module {
 				ItemStack replacementStack = stack.getItem().getContainerItem(stack);
 
 				// Remove 'n' items from the stack.
-				InventoryUtil.takeItems(limit, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
+				InventoryUtil.takeItems(limit, turtle.getItemHandler(), turtle.getSelectedSlot());
 				if (replacementStack != null) {
 					// If item is empty (bucket) then add it back
-					InventoryUtil.storeItems(replacementStack, turtle.getInventory(), 0, turtle.getInventory().getSizeInventory(), turtle.getSelectedSlot());
+					InventoryUtil.storeItems(replacementStack, turtle.getItemHandler(), turtle.getSelectedSlot());
 				}
 
 				return fuelToGive;

@@ -74,7 +74,7 @@ public class CraftingPocketUpgrade extends Module implements IRecipe {
 
 	@Override
 	public ItemStack getRecipeOutput() {
-		return PocketComputerItemFactory.create(-1, null, ComputerFamily.Normal, false);
+		return PocketComputerItemFactory.create(-1, null, -1, ComputerFamily.Normal, null);
 	}
 
 	@Nonnull

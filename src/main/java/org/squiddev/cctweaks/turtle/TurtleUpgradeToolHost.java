@@ -12,6 +12,7 @@ import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.Registry;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -29,6 +30,7 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 		super(name, id);
 	}
 
+	@Nonnull
 	@Override
 	public TurtleUpgradeType getType() {
 		return TurtleUpgradeType.Tool;
@@ -39,9 +41,10 @@ public class TurtleUpgradeToolHost extends TurtleUpgradeBase {
 		return new ItemStack(Registry.itemToolHost, 1, 0);
 	}
 
+	@Nonnull
 	@Override
-	public TurtleCommandResult useTool(ITurtleAccess turtle, TurtleSide side, TurtleVerb verb, EnumFacing direction) {
-		if (!Config.Turtle.ToolHost.enabled) return null;
+	public TurtleCommandResult useTool(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side, @Nonnull TurtleVerb verb, @Nonnull EnumFacing direction) {
+		if (!Config.Turtle.ToolHost.enabled) return TurtleCommandResult.failure("Tool host not enabled");
 
 		switch (verb) {
 			case Attack: {

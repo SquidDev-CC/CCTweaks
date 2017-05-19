@@ -24,7 +24,6 @@ import org.squiddev.cctweaks.core.pocket.PocketServerComputer;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.patcher.visitors.MergeVisitor;
-import org.squiddev.unborked.ProxyServer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -46,7 +45,7 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 			if (computer != null) computer.turnOn();
 
 			if (!PocketHooks.rightClick(world, player, stack, computer)) {
-				ProxyServer.openPocketComputerGUI(player, hand);
+				ComputerCraft.openPocketComputerGUI(player, hand);
 			}
 		}
 
@@ -155,7 +154,7 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 	@Nonnull
 	@Override
 	public ItemStack createComputer(int id, @Nullable String label, @Nonnull ComputerFamily family) {
-		return create(id, label, family, false);
+		return create(id, label, -1, family, null);
 	}
 
 	@Nonnull

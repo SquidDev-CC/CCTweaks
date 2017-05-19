@@ -2,11 +2,11 @@ package org.squiddev.cctweaks.core.network.mock;
 
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
+import dan200.computercraft.api.network.Packet;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractWorldNode;
 
 import javax.annotation.Nonnull;

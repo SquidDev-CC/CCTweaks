@@ -55,6 +55,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 		super("wirelessBridge", Config.Network.WirelessBridge.turtleId);
 	}
 
+	@Nonnull
 	@Override
 	public TurtleUpgradeType getType() {
 		return TurtleUpgradeType.Peripheral;
@@ -71,19 +72,21 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 	}
 
 	@Override
-	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
+	public IPeripheral createPeripheral(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side) {
 		return Config.Network.WirelessBridge.turtleEnabled ? new TurtleBinding(turtle, side).getModem().modem : null;
 	}
 
+	@Nonnull
 	@Override
-	public TurtleCommandResult useTool(ITurtleAccess turtle, TurtleSide side, TurtleVerb verb, EnumFacing direction) {
-		return null;
+	public TurtleCommandResult useTool(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side, @Nonnull TurtleVerb verb, @Nonnull EnumFacing direction) {
+		return TurtleCommandResult.failure();
 	}
 
+	@Nonnull
 	@Override
 	@SideOnly(Side.CLIENT)
 	@SuppressWarnings("deprecation")
-	public Pair<IBakedModel, Matrix4f> getModel(ITurtleAccess access, TurtleSide side) {
+	public Pair<IBakedModel, Matrix4f> getModel(ITurtleAccess access, @Nonnull TurtleSide side) {
 		if (modelLeft == null) {
 			ModelManager manager = getMesher().getModelManager();
 			modelLeft = manager.getModel(new ModelResourceLocation("cctweaks:wireless_bridge_turtle_left", "inventory"));
@@ -235,6 +238,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 				super(modem);
 			}
 
+			@Nonnull
 			@Override
 			public String[] getMethodNames() {
 				String[] methods = super.getMethodNames();
@@ -252,7 +256,7 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 			}
 
 			@Override
-			public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
+			public Object[] callMethod(@Nonnull IComputerAccess computer, @Nonnull ILuaContext context, int method, @Nonnull Object[] arguments) throws LuaException, InterruptedException {
 				String[] methods = super.getMethodNames();
 				switch (method - methods.length) {
 					case 0: { // bindFromCard
@@ -333,13 +337,13 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 			}
 
 			@Override
-			public synchronized void attach(IComputerAccess computer) {
+			public synchronized void attach(@Nonnull IComputerAccess computer) {
 				TurtleBinding.this.connect();
 				super.attach(computer);
 			}
 
 			@Override
-			public synchronized void detach(IComputerAccess computer) {
+			public synchronized void detach(@Nonnull IComputerAccess computer) {
 				super.detach(computer);
 				TurtleBinding.this.destroy();
 			}

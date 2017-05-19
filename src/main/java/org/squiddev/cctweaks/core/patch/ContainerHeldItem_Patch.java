@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
 public abstract class ContainerHeldItem_Patch extends ContainerHeldItem implements IContainerComputer {
 	@MergeVisitor.Stub
 	public ContainerHeldItem_Patch() {
-		super(null);
+		super(null, null);
 	}
 
 	@Nullable

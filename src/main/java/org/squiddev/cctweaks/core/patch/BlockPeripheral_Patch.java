@@ -8,6 +8,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.squiddev.cctweaks.core.Config;
 
+import javax.annotation.Nonnull;
+
 /**
  * Lets monitors emit light
  *
@@ -16,7 +18,7 @@ import org.squiddev.cctweaks.core.Config;
  */
 public abstract class BlockPeripheral_Patch extends BlockPeripheralBase {
 	@Override
-	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+	public int getLightValue(@Nonnull IBlockState state, IBlockAccess world, @Nonnull BlockPos pos) {
 		if (state.getBlock() != this) return state.getBlock().getLightValue(state, world, pos);
 
 		PeripheralType type = getPeripheralType(state);

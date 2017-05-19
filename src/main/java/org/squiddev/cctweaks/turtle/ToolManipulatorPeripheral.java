@@ -36,6 +36,8 @@ import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
 import org.squiddev.cctweaks.core.turtle.TurtleRegistry;
 import org.squiddev.cctweaks.lua.lib.DelayedTask;
 
+import javax.annotation.Nonnull;
+
 public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatiblePeripheral {
 	private final ITurtleAccess access;
 	private final ToolHostPlayer player;
@@ -47,11 +49,13 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		this.side = side;
 	}
 
+	@Nonnull
 	@Override
 	public String getType() {
 		return "tool_manipulator";
 	}
 
+	@Nonnull
 	@Override
 	public String[] getMethodNames() {
 		return new String[]{
@@ -63,7 +67,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 	}
 
 	@Override
-	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] args) throws LuaException, InterruptedException {
+	public Object[] callMethod(@Nonnull IComputerAccess computer, @Nonnull ILuaContext context, int method, @Nonnull Object[] args) throws LuaException, InterruptedException {
 		switch (method) {
 			case 0:
 				return use(computer, context, InteractDirection.Forward, args);
@@ -274,8 +278,9 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 		final EnumFacing dir = direction.toWorldDir(access);
 
 		return access.executeCommand(context, new ITurtleCommand() {
+			@Nonnull
 			@Override
-			public TurtleCommandResult execute(ITurtleAccess iTurtleAccess) {
+			public TurtleCommandResult execute(@Nonnull ITurtleAccess iTurtleAccess) {
 				try {
 					return doSwing(computer, dir, sneak);
 				} catch (LuaException e) {
@@ -421,11 +426,11 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 	}
 
 	@Override
-	public void attach(IComputerAccess computer) {
+	public void attach(@Nonnull IComputerAccess computer) {
 	}
 
 	@Override
-	public void detach(IComputerAccess computer) {
+	public void detach(@Nonnull IComputerAccess computer) {
 	}
 
 	@Override

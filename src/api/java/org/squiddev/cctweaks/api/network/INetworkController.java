@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.api.network;
 
+import dan200.computercraft.api.network.Packet;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.UnorderedPair;
 

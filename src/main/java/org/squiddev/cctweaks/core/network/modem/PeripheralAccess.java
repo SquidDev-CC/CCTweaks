@@ -6,9 +6,8 @@ import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import org.squiddev.cctweaks.api.lua.ArgumentDelegator;
-import org.squiddev.cctweaks.api.lua.IArguments;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,30 +64,23 @@ public class PeripheralAccess implements IComputerAccess {
 		throw new LuaException("No such method " + methodName);
 	}
 
-	public Object[] callMethod(ILuaContext context, String methodName, IArguments arguments) throws InterruptedException, LuaException {
-		Integer method = methodMap.get(methodName);
-		if (method != null) return ArgumentDelegator.delegatePeripheral(peripheral, this, context, method, arguments);
-
-		throw new LuaException("No such method " + methodName);
-	}
-
 	@Override
-	public String mount(String desiredLocation, IMount mount) {
+	public String mount(@Nonnull String desiredLocation, @Nonnull IMount mount) {
 		return computer.mount(desiredLocation, mount, name);
 	}
 
 	@Override
-	public String mount(String desiredLocation, IMount mount, String driveName) {
+	public String mount(@Nonnull String desiredLocation, @Nonnull IMount mount, @Nonnull String driveName) {
 		return computer.mount(desiredLocation, mount, driveName);
 	}
 
 	@Override
-	public String mountWritable(String desiredLocation, IWritableMount mount) {
+	public String mountWritable(@Nonnull String desiredLocation, @Nonnull IWritableMount mount) {
 		return computer.mountWritable(desiredLocation, mount, name);
 	}
 
 	@Override
-	public String mountWritable(String desiredLocation, IWritableMount mount, String driveName) {
+	public String mountWritable(@Nonnull String desiredLocation, @Nonnull IWritableMount mount, @Nonnull String driveName) {
 		return computer.mountWritable(desiredLocation, mount, driveName);
 	}
 
@@ -103,10 +95,11 @@ public class PeripheralAccess implements IComputerAccess {
 	}
 
 	@Override
-	public void queueEvent(String event, Object[] arguments) {
+	public void queueEvent(@Nonnull String event, Object[] arguments) {
 		computer.queueEvent(event, arguments);
 	}
 
+	@Nonnull
 	@Override
 	public String getAttachmentName() {
 		return name;

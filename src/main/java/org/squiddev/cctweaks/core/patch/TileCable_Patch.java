@@ -2,9 +2,10 @@ package org.squiddev.cctweaks.core.patch;
 
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.network.IPacketReceiver;
+import dan200.computercraft.api.network.Packet;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.PeripheralType;
-import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,7 +13,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -135,7 +135,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	}
 
 	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+	public boolean shouldRefresh(World world, BlockPos pos, @Nonnull IBlockState oldState, @Nonnull IBlockState newState) {
 		return oldState.getBlock() != newState.getBlock();
 	}
 
@@ -234,6 +234,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 		getModem().setPeripheralEnabled(tag.getBoolean("peripheralAccess"));
 	}
 
+	@Nonnull
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag = super.writeToNBT(tag);
@@ -247,7 +248,7 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 		return tag;
 	}
 
-	public void writeDescription(NBTTagCompound tag) {
+	public void writeDescription(@Nonnull NBTTagCompound tag) {
 		// Manually refresh the state to ensure modems display correctly.
 		updateAnim();
 		super.writeDescription(tag);
@@ -285,18 +286,23 @@ public class TileCable_Patch extends TileCable_Ignore implements IWorldNetworkNo
 	}
 
 	@Override
-	public void addReceiver(IReceiver receiver) {
+	public void addReceiver(@Nonnull IPacketReceiver receiver) {
 		getModem().addReceiver(receiver);
 	}
 
 	@Override
-	public void removeReceiver(IReceiver receiver) {
+	public void removeReceiver(@Nonnull IPacketReceiver receiver) {
 		getModem().removeReceiver(receiver);
 	}
 
 	@Override
-	public void transmit(int channel, int replyChannel, Object payload, World world, Vec3d pos, double range, boolean interdimensional, Object senderObject) {
-		getModem().transmit(channel, replyChannel, payload, world, pos, range, interdimensional, senderObject);
+	public void transmitSameDimension(@Nonnull Packet packet, double range) {
+		getModem().transmitSameDimension(packet, range);
+	}
+
+	@Override
+	public void transmitInterdimensional(@Nonnull Packet packet) {
+		getModem().transmitInterdimensional(packet);
 	}
 
 	private void attachPeripheral(String name, IPeripheral peripheral) {

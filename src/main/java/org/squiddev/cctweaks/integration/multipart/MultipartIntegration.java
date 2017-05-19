@@ -84,7 +84,7 @@ public class MultipartIntegration extends ModIntegration implements IClientModul
 		});
 		ComputerCraftAPI.registerPeripheralProvider(new IPeripheralProvider() {
 			@Override
-			public IPeripheral getPeripheral(World world, BlockPos position, EnumFacing enumFacing) {
+			public IPeripheral getPeripheral(@Nonnull World world, @Nonnull BlockPos position, @Nonnull EnumFacing enumFacing) {
 				TileEntity tile = world.getTileEntity(position);
 				if (tile instanceof IMultipartContainer) {
 					IMultipart part = ((IMultipartContainer) tile).getPartInSlot(PartSlot.getFaceSlot(enumFacing));

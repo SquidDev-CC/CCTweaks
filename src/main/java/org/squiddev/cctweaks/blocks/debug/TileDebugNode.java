@@ -1,9 +1,9 @@
 package org.squiddev.cctweaks.blocks.debug;
 
+import dan200.computercraft.api.network.Packet;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
-import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.blocks.network.TileNetworked;
 import org.squiddev.cctweaks.core.network.AbstractWorldNode;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
