@@ -37,15 +37,10 @@ public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implemen
 	@Nonnull
 	@Override
 	public TurtleUpgradeType getType() {
-		return TurtleUpgradeType.Tool;
+		return TurtleUpgradeType.Both;
 	}
 
 	@Override
 	public void upgradeChanged(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side, ITurtleUpgrade oldUpgrade, ITurtleUpgrade newUpgrade) {
-	}
-
-	@Override
-	public boolean alsoPeripheral() {
-		return true;
 	}
 }

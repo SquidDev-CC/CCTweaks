@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.core.patch;
 
 import dan200.computercraft.core.terminal.Terminal;
 import dan200.computercraft.core.terminal.TextBuffer;
+import dan200.computercraft.shared.util.Palette;
 import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
@@ -24,6 +25,8 @@ public class Terminal_Patch extends Terminal {
 	private TextBuffer[] m_backgroundColour;
 	@MergeVisitor.Stub
 	private int m_height;
+	@MergeVisitor.Stub
+	private final Palette m_palette = null;
 
 	@MergeVisitor.Stub
 	public Terminal_Patch() {
@@ -43,6 +46,11 @@ public class Terminal_Patch extends Terminal {
 				nbttagcompound.setString("term_textColour_" + i, m_textColour[i].toString());
 				nbttagcompound.setString("term_textBgColour_" + i, m_backgroundColour[i].toString());
 			}
+		}
+
+		if (m_palette != null) {
+			// TODO: Move to if(lines) when we update to the next commit (see dan200/ComputerCraft#259)
+			m_palette.writeToNBT(nbttagcompound);
 		}
 	}
 }

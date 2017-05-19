@@ -4,9 +4,7 @@ import com.google.common.base.Objects;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ClientComputer;
 import dan200.computercraft.shared.computer.core.ServerComputer;
-import dan200.computercraft.shared.util.DirectionUtil;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
 import org.squiddev.cctweaks.api.computer.IExtendedServerComputer;
 import org.squiddev.cctweaks.core.patch.iface.IExtendedComputerTile;
 import org.squiddev.patcher.visitors.MergeVisitor;
@@ -27,15 +25,6 @@ public abstract class TileComputerBase_Patch extends TileComputerBase implements
 	@MergeVisitor.Stub
 	public ServerComputer createServerComputer() {
 		return null;
-	}
-
-	/**
-	 * Fix getRedstoneConnectivity to use the opposite side
-	 */
-	public boolean getRedstoneConnectivity(EnumFacing side) {
-		if (side == null) return false;
-		int localDir = remapLocalSide(DirectionUtil.toLocal(this, side.getOpposite()));
-		return !isRedstoneBlockedOnSide(localDir);
 	}
 
 	/**

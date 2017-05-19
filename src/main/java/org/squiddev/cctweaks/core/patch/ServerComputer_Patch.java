@@ -4,6 +4,7 @@ import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.filesystem.IMount;
 import dan200.computercraft.core.terminal.Terminal;
 import dan200.computercraft.shared.computer.core.IComputer;
+import dan200.computercraft.shared.computer.core.IContainerComputer;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.network.ComputerCraftPacket;
 import dan200.computercraft.shared.util.NBTUtil;
@@ -20,7 +21,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import org.squiddev.cctweaks.api.IContainerComputer;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.patch.iface.IExtendedServerComputer;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
@@ -115,7 +115,7 @@ public class ServerComputer_Patch extends ServerComputer implements IComputerEnv
 	@Override
 	public void handlePacket(ComputerCraftPacket packet, EntityPlayer sender) {
 		// Allow Computer/Tile updates as they may happen at any time.
-		if (Config.Packets.requireContainer && packet.m_packetType != ComputerCraftPacket.RequestComputerUpdate && packet.m_packetType != ComputerCraftPacket.RequestTileEntityUpdate) {
+		if (packet.requiresContainer()) {
 			if (sender == null) {
 				DebugLogger.warn("Attempt to interact with computer #" + getInstanceID() + " at position " + getPosition() + " with no player");
 				return;

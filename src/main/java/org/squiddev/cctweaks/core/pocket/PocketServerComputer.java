@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.core.pocket;
 
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
+import dan200.computercraft.shared.computer.core.IContainerComputer;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.network.ComputerCraftPacket;
 import net.minecraft.entity.Entity;
@@ -11,7 +12,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import org.squiddev.cctweaks.api.IContainerComputer;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.patch.ServerComputer_Patch;
 import org.squiddev.cctweaks.core.patch.iface.IExtendedServerComputer;

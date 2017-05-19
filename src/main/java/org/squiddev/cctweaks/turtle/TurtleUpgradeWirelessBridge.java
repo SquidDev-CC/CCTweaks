@@ -113,11 +113,6 @@ public class TurtleUpgradeWirelessBridge extends TurtleUpgradeBase implements IE
 		}
 	}
 
-	@Override
-	public boolean alsoPeripheral() {
-		return true;
-	}
-
 	public static class TurtleBinding extends NetworkBindingWithModem {
 		public final ITurtleAccess turtle;
 		public final TurtleSide side;
