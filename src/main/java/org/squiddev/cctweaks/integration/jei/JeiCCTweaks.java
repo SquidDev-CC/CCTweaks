@@ -2,6 +2,7 @@ package org.squiddev.cctweaks.integration.jei;
 
 import com.google.common.collect.Lists;
 import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.api.pocket.IPocketUpgrade;
 import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import dan200.computercraft.api.turtle.TurtleSide;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
@@ -13,14 +14,10 @@ import mezz.jei.api.*;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
-import org.squiddev.cctweaks.core.pocket.PocketRegistry;
 import org.squiddev.cctweaks.core.registry.Registry;
-import org.squiddev.cctweaks.pocket.PocketModem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -53,15 +50,12 @@ public class JeiCCTweaks extends BlankModPlugin {
 
 		// Register all pocket upgrades
 		{
-			Collection<IPocketUpgrade> pocketUpgrades = PocketRegistry.instance.getUpgrades();
+			Map<String, IPocketUpgrade> pocketUpgrades = ReflectionHelper.getPrivateValue(ComputerCraft.class, null, "pocketUpgrades");
 			List<PocketUpgradeWrapper> pocketWrappers = Lists.newArrayListWithExpectedSize((pocketUpgrades.size() + 1) * PocketUpgradeWrapper.FAMILIES.length);
 			for (ComputerFamily family : PocketUpgradeWrapper.FAMILIES) {
 				registry.addRecipeCategoryCraftingItem(PocketComputerItemFactory.create(-1, null, -1, family, null), pocketCat.getUid());
 
-				// Hack to ensure the default modem is added too
-				pocketWrappers.add(new PocketUpgradeWrapper(PocketModem.INSTANCE, family));
-
-				for (IPocketUpgrade upgrade : pocketUpgrades) {
+				for (IPocketUpgrade upgrade : pocketUpgrades.values()) {
 					pocketWrappers.add(new PocketUpgradeWrapper(upgrade, family));
 				}
 			}
@@ -99,11 +93,11 @@ public class JeiCCTweaks extends BlankModPlugin {
 		public String getSubtypeInfo(@Nonnull ItemStack stack) {
 			ComputerFamily family = ComputerCraft.Items.pocketComputer.getFamily(stack);
 
-			String adjective = PocketRegistry.instance.getUpgradeAdjective(stack, null);
-			if (adjective == null) {
+			IPocketUpgrade upgrade = ComputerCraft.Items.pocketComputer.getUpgrade(stack);
+			if (upgrade == null) {
 				return family.toString();
 			} else {
-				return family + ":" + adjective;
+				return family + "-" + upgrade.getUpgradeID();
 			}
 		}
 	};
@@ -123,8 +117,8 @@ public class JeiCCTweaks extends BlankModPlugin {
 			ITurtleUpgrade right = turtle.getUpgrade(stack, TurtleSide.Right);
 
 			// We do it like this so we can appear to be "neutral" with respect to side.
-			if (left != null) name += ":" + left.getUnlocalisedAdjective();
-			if (right != null) name += ":" + right.getUnlocalisedAdjective();
+			if (left != null) name += "-" + left.getUpgradeID();
+			if (right != null) name += "-" + right.getUpgradeID();
 
 			return name;
 		}

@@ -27,7 +27,7 @@ public class CopyRom implements IPatcher {
 		if (className.endsWith("TurtleUpgradeRecipe")) {
 			return new FindingVisitor(
 				delegate,
-				new MethodInsnNode(INVOKESTATIC, "dan200/computercraft/shared/turtle/items/TurtleItemFactory", "create", "(ILjava/lang/String;Ldan200/computercraft/shared/util/Colour;Ldan200/computercraft/shared/computer/core/ComputerFamily;Ldan200/computercraft/api/turtle/ITurtleUpgrade;Ldan200/computercraft/api/turtle/ITurtleUpgrade;ILnet/minecraft/util/ResourceLocation;)Lnet/minecraft/item/ItemStack;", false),
+				new MethodInsnNode(INVOKESTATIC, "dan200/computercraft/shared/turtle/items/TurtleItemFactory", "create", "(ILjava/lang/String;ILdan200/computercraft/shared/computer/core/ComputerFamily;Ldan200/computercraft/api/turtle/ITurtleUpgrade;Ldan200/computercraft/api/turtle/ITurtleUpgrade;ILnet/minecraft/util/ResourceLocation;)Lnet/minecraft/item/ItemStack;", false),
 				new InsnNode(ARETURN)
 			) {
 				@Override
@@ -41,7 +41,7 @@ public class CopyRom implements IPatcher {
 		} else {
 			return new FindingVisitor(
 				delegate,
-				new MethodInsnNode(INVOKESTATIC, "dan200/computercraft/shared/pocket/items/PocketComputerItemFactory", "create", "(ILjava/lang/String;Ldan200/computercraft/shared/computer/core/ComputerFamily;Z)Lnet/minecraft/item/ItemStack;", false),
+				new MethodInsnNode(INVOKESTATIC, "dan200/computercraft/shared/pocket/items/PocketComputerItemFactory", "create", "(ILjava/lang/String;ILdan200/computercraft/shared/computer/core/ComputerFamily;Ldan200/computercraft/api/pocket/IPocketUpgrade;)Lnet/minecraft/item/ItemStack;", false),
 				new InsnNode(ARETURN)
 			) {
 				@Override

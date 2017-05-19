@@ -110,7 +110,10 @@ public class ASMTransformer implements IClassTransformer {
 			),
 
 			// Pocket upgrades
-			new PreventModemUpgrade(),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.pocket.core.PocketServerComputer",
+				"org.squiddev.cctweaks.core.patch.PocketServerComputer_Patch"
+			),
 			new ClassMerger(TweaksLogger.instance,
 				"dan200.computercraft.shared.pocket.items.ItemPocketComputer",
 				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"

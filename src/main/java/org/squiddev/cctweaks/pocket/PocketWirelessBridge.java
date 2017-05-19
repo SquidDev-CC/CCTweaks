@@ -1,10 +1,13 @@
 package org.squiddev.cctweaks.pocket;
 
 import com.google.common.collect.Maps;
+import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.api.pocket.IPocketAccess;
+import dan200.computercraft.api.pocket.IPocketUpgrade;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -12,12 +15,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.IDataCard;
 import org.squiddev.cctweaks.api.network.INetworkCompatiblePeripheral;
-import org.squiddev.cctweaks.api.pocket.IPocketAccess;
-import org.squiddev.cctweaks.api.pocket.IPocketRegistry;
-import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
@@ -99,7 +98,7 @@ public class PocketWirelessBridge extends Module implements IPocketUpgrade {
 			save(pocket.getUpgradeNBTData());
 			pocket.updateUpgradeNBTData();
 
-			pocket.setModemLight(modem.isActive());
+			pocket.setLight(modem.isActive() ? 0xBA0000 : -1);
 		}
 
 		public void update() {
@@ -239,8 +238,6 @@ public class PocketWirelessBridge extends Module implements IPocketUpgrade {
 
 	@Override
 	public void preInit() {
-		IPocketRegistry registry = CCTweaksAPI.instance().pocketRegistry();
-		registry.addUpgrade(this);
-		registry.addLegacyUpgrade(Config.Network.WirelessBridge.pocketId, this);
+		ComputerCraft.registerPocketUpgrade(this);
 	}
 }

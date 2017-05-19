@@ -235,15 +235,6 @@ public final class Config {
 			@DefaultBoolean(true)
 			@RequiresRestart(mc = false, world = true)
 			public static boolean pocketEnabled;
-
-			/**
-			 * The pocket upgrade Id
-			 * Requires Peripherals++
-			 */
-			@DefaultInt(331)
-			@Range(min = 1)
-			@RequiresRestart
-			public static int pocketId;
 		}
 
 		/**
@@ -302,13 +293,6 @@ public final class Config {
 	 * Various tweaks that don't belong to anything
 	 */
 	public static final class Misc {
-		/**
-		 * Enable the Ender modem pocket computer upgrade
-		 */
-		@DefaultBoolean(true)
-		@RequiresRestart(mc = false, world = true)
-		public static boolean pocketEnderModem;
-
 		/**
 		 * Render pocket computers like maps.
 		 *

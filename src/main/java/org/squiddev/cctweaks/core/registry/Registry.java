@@ -9,7 +9,6 @@ import org.squiddev.cctweaks.client.render.RenderNetworkOverlay;
 import org.squiddev.cctweaks.client.render.RenderSquidOverlay;
 import org.squiddev.cctweaks.core.block.VanillaRotationHandlers;
 import org.squiddev.cctweaks.core.peripheral.PeripheralHostProvider;
-import org.squiddev.cctweaks.core.pocket.CraftingPocketUpgrade;
 import org.squiddev.cctweaks.core.pocket.ItemPocketRenderer;
 import org.squiddev.cctweaks.core.rom.CraftingSetRom;
 import org.squiddev.cctweaks.core.turtle.DefaultTurtleProviders;
@@ -24,7 +23,6 @@ import org.squiddev.cctweaks.items.ItemDataCard;
 import org.squiddev.cctweaks.items.ItemDebugger;
 import org.squiddev.cctweaks.items.ItemToolHost;
 import org.squiddev.cctweaks.lua.lib.ApiRegister;
-import org.squiddev.cctweaks.pocket.PocketEnderModem;
 import org.squiddev.cctweaks.pocket.PocketWirelessBridge;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeWirelessBridge;
 
@@ -72,8 +70,6 @@ public final class Registry {
 		// CCTweaks providers
 		addModule(new DefaultTurtleProviders());
 		addModule(new PocketWirelessBridge());
-		addModule(new PocketEnderModem());
-		addModule(new CraftingPocketUpgrade());
 		addModule(new VanillaRotationHandlers());
 
 		// Integration
