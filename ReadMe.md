@@ -11,15 +11,12 @@ Thanks :smile:!
 ### Programming ([More up-to-date list here](https://github.com/SquidDev-CC/CCTweaks-Lua))
  - Custom computer timeout
  - Whitelist globals (such as debug)
- - Fix the binary strings (for fs, http, rednet and os.queueEvent)
  - TCP socket API (`socket`)
  - Compression API (`data`)
  - [Cobalt](https://github.com/SquidDev/Cobalt) VM (reentrant fork of LuaJ)
    - Custom termination handler
    - Several bugs fixed (any object error messages, string pattern matching, number format strings)
    - Run multiple computers at once
- - Return HTTP handle on failures
- - Allow getting headers from HTTP responses
  - API for adding custom APIs
 
 ### Turtles
@@ -37,8 +34,6 @@ Thanks :smile:!
 ### More
  - Computer upgrades - convert normal computers to advanced!
  - Debug Wand - add the debug API to any computer
- - Monitors emit light
- - Pocket computer upgrades
  - Packet optimisations, reducing network traffic
  - Powerful server management commands, allowing monitoring, profiling and controlling computers.
 
