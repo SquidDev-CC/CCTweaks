@@ -7,13 +7,11 @@ import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.util.IDAssigner;
-import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -48,7 +46,9 @@ public class Helpers {
 	@SuppressWarnings("deprecation")
 	public static String translateOrDefault(String def, String... strings) {
 		for (String string : strings) {
-			if (I18n.canTranslate(string)) return I18n.translateToLocal(string);
+			if (net.minecraft.util.text.translation.I18n.canTranslate(string)) {
+				return net.minecraft.util.text.translation.I18n.translateToLocal(string);
+			}
 		}
 
 		return def;
@@ -56,7 +56,7 @@ public class Helpers {
 
 	@SuppressWarnings("deprecation")
 	public static String translateToLocal(String str) {
-		return I18n.translateToLocal(str);
+		return net.minecraft.util.text.translation.I18n.translateToLocal(str);
 	}
 
 	public static void twoWayCrafting(ItemStack a, ItemStack b) {
@@ -138,8 +138,6 @@ public class Helpers {
 		ModelResourceLocation res = new ModelResourceLocation(name, "inventory");
 		ModelLoader.setCustomModelResourceLocation(item, damage, res);
 	}
-
-	public static int THREAD_PRIORITY = Thread.MIN_PRIORITY + (Thread.NORM_PRIORITY - Thread.MIN_PRIORITY) / 2;
 
 	@Nullable
 	public static TileComputerBase getTile(ServerComputer computer) {
