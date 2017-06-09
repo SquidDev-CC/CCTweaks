@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.utils;
 
+import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.core.computer.Computer;
 import dan200.computercraft.core.lua.LuaJLuaMachine;
 import dan200.computercraft.shared.computer.core.ServerComputer;
@@ -27,7 +28,15 @@ public final class ComputerAccessor {
 	 *
 	 * @see dan200.computercraft.shared.turtle.blocks.TileTurtle#m_moveState
 	 */
-	public static Field turtleTileMoved;
+	public static Field tileTurtleMoveState;
+
+	/**
+	 * Set the fact that the turtle has moved. This is so we can muck about with it
+	 * without the broken event being set
+	 *
+	 * @see dan200.computercraft.shared.turtle.blocks.TileTurtle.MoveState#MOVED
+	 */
+	public static Object tileTurtleMoveStateMoved;
 
 	/**
 	 * The ServerComputer's {@link dan200.computercraft.core.computer.Computer}
@@ -66,8 +75,9 @@ public final class ComputerAccessor {
 
 	static {
 		try {
-			turtleTileMoved = findField(TileTurtle.class, "m_movedState");
+			tileTurtleMoveState = findField(TileTurtle.class, "m_moveState");
 			serverComputerComputer = findField(ServerComputer.class, "m_computer");
+			tileTurtleMoveStateMoved = findField(ComputerCraft.class.getClassLoader().loadClass("dan200.computercraft.shared.turtle.blocks.TileTurtle$MoveState"), "MOVED");
 			computerMachine = findField(Computer.class, "m_machine");
 			luaMachineGlobals = findField(LuaJLuaMachine.class, "m_globals");
 			cableModem = findField(TileCable.class, "modem");

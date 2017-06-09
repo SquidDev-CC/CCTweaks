@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.RecipeSorter;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.Config;
+import org.squiddev.cctweaks.core.utils.ComputerAccessor;
 import org.squiddev.cctweaks.core.utils.DebugLogger;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.core.utils.InventoryUtils;
@@ -107,8 +108,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 
 		// If we set the turtle as moved, the destroy method won't drop the items
 		try {
-			// TODO: Fix this accessor
-			// ComputerAccessor.turtleTileMoved.setBoolean(computerTile, true);
+			ComputerAccessor.tileTurtleMoveState.set(computerTile, ComputerAccessor.tileTurtleMoveStateMoved);
 		} catch (Exception e) {
 			DebugLogger.warn("Cannot set TurtleTile m_moved in ItemComputerUpgrade", e);
 			return false;
