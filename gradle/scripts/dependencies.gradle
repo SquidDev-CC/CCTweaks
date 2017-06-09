@@ -37,7 +37,7 @@ configurations {
 
 dependencies {
 
-	compile "dan200.computercraft:ComputerCraft:${project.cc_version}"
+	compile "dan200.computercraft:ComputerCraft:${project.cc_version}-${project.cc_minor_version}"
 	deobfCompile "MCMultiPart:MCMultiPart:1.3.0:universal"
 	deobfCompile "mezz.jei:jei_${project.mc_version}:3.14.3.403"
 
@@ -46,7 +46,7 @@ dependencies {
 	provided "net.industrial-craft:industrialcraft-2:2.3.249-ex18:api"
 	provided "net.darkhax.tesla:Tesla:${mc_version}-1.2.1.50:deobf"
 
-	shade('org.squiddev:cctweaks-lua:1.5.0-nightly-2017051909') {
+	shade("org.squiddev:cctweaks-lua:1.5.0-nightly-${project.cc_minor_version}") {
 		// Different versions
 		exclude group: 'com.google.guava'
 		exclude group: 'org.ow2.asm'
