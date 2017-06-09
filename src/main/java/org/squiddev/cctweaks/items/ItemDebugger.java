@@ -1,8 +1,8 @@
 package org.squiddev.cctweaks.items;
 
+import com.google.common.base.Joiner;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.core.lua.LuaJLuaMachine;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.util.PeripheralUtil;
@@ -24,8 +24,8 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.StringUtils;
 import org.squiddev.cctweaks.api.IWorldPosition;
+import org.squiddev.cctweaks.api.lua.IExtendedLuaMachine;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
@@ -38,7 +38,6 @@ import org.squiddev.cctweaks.core.utils.WorldPosition;
 import org.squiddev.cctweaks.core.visualiser.NetworkPlayerWatcher;
 
 import javax.annotation.Nonnull;
-import java.lang.reflect.Method;
 import java.util.Set;
 
 public class ItemDebugger extends ItemComputerAction {
@@ -101,18 +100,11 @@ public class ItemDebugger extends ItemComputerAction {
 			Object computer = ComputerAccessor.serverComputerComputer.get(serverComputer);
 			Object luaMachine = ComputerAccessor.computerMachine.get(computer);
 
-			if (luaMachine instanceof LuaJLuaMachine) {
-				org.luaj.vm2.LuaValue globals = (org.luaj.vm2.LuaValue) ComputerAccessor.luaMachineGlobals.get(luaMachine);
-				globals.load(new org.luaj.vm2.lib.DebugLib());
+			if (luaMachine instanceof IExtendedLuaMachine) {
+				((IExtendedLuaMachine) luaMachine).enableDebug();
 			} else {
-				try {
-					Method method = luaMachine.getClass().getMethod("injectDebug");
-					method.setAccessible(true);
-					method.invoke(luaMachine);
-				} catch (NoSuchMethodException e) {
-					DebugLogger.warn("Computer machine (" + luaMachine.getClass().getName() + ") has no .injectDebug() method. Cannot inject debug library.");
-					return false;
-				}
+				DebugLogger.warn("Do not know how to inject debug library into " + luaMachine.getClass().getName());
+				return false;
 			}
 		} catch (NullPointerException e) {
 			DebugLogger.warn("Could not add DebugLib", e);
@@ -208,7 +200,7 @@ public class ItemDebugger extends ItemComputerAction {
 	}
 
 	private static ITextComponent info(Iterable<String> message) {
-		return info(StringUtils.join(message, ", "));
+		return info(Joiner.on(", ").join(message));
 	}
 
 	private static ITextComponent info(String message) {
