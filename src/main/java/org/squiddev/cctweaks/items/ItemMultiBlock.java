@@ -5,6 +5,8 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 
+import javax.annotation.Nonnull;
+
 /**
  * An item to place instances of {@link IMultiBlock}
  */
@@ -23,6 +25,7 @@ public class ItemMultiBlock extends ItemBlock {
 		return meta;
 	}
 
+	@Nonnull
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 		return ((IMultiBlock) block).getUnlocalizedName(stack.getItemDamage());

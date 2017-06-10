@@ -19,13 +19,13 @@
 			"debug_networked_peripheral": "cctweaks:blocks/debug_networked_peripheral",
 			"debug_node": "cctweaks:blocks/debug_node",
 			"debug_peripheral": "cctweaks:blocks/debug_peripheral",
-			"modem": "computercraft:blocks/wiredmodemface",
+			"modem": "computercraft:blocks/wired_modem_face",
 			"wireless_bridge": "cctweaks:blocks/wireless_bridge"
 		},
 		"block": {
-			"modem_m": "computercraft:blocks/wiredmodemfaceon",
-			"modem_mp": "computercraft:blocks/wiredmodemfaceperipheralOn",
-			"modem_p": "computercraft:blocks/wiredmodemfaceperipheral"
+			"modem_m": "computercraft:blocks/wired_modem_face_on",
+			"modem_mp": "computercraft:blocks/wired_modem_face_peripheral_on",
+			"modem_p": "computercraft:blocks/wired_modem_face_peripheral"
 		}
 	}
 }

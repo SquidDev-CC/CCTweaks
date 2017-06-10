@@ -18,32 +18,30 @@ public class TurtleUpgradeToolManipulator extends TurtleUpgradeToolHost implemen
 		super("toolManipulator", Config.Turtle.ToolHost.advancedUpgradeId);
 	}
 
+	@Nonnull
 	@Override
 	protected ItemStack getStack() {
 		return new ItemStack(Registry.itemToolHost, 1, 1);
 	}
 
 	@Override
-	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
+	public IPeripheral createPeripheral(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side) {
 		return new ToolManipulatorPeripheral(turtle, getPlayer(turtle), side);
 	}
 
+	@Nonnull
 	@Override
 	public String getUnlocalisedAdjective() {
 		return "turtle." + CCTweaks.ID + ".toolHost.advanced.adjective";
 	}
 
+	@Nonnull
 	@Override
 	public TurtleUpgradeType getType() {
-		return TurtleUpgradeType.Tool;
+		return TurtleUpgradeType.Both;
 	}
 
 	@Override
 	public void upgradeChanged(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side, ITurtleUpgrade oldUpgrade, ITurtleUpgrade newUpgrade) {
-	}
-
-	@Override
-	public boolean alsoPeripheral() {
-		return true;
 	}
 }

@@ -10,6 +10,8 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
 import org.squiddev.cctweaks.core.registry.Module;
 
+import javax.annotation.Nonnull;
+
 /**
  * Adds support for {@link org.squiddev.cctweaks.api.peripheral.IPeripheralHost}
  */
@@ -20,7 +22,7 @@ public class PeripheralHostProvider extends Module implements IPeripheralProvide
 	}
 
 	@Override
-	public IPeripheral getPeripheral(World world, BlockPos pos, EnumFacing side) {
+	public IPeripheral getPeripheral(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull EnumFacing side) {
 		TileEntity tile = world.getTileEntity(pos);
 		if (tile != null && tile instanceof IPeripheralHost) {
 			return ((IPeripheralHost) tile).getPeripheral(side);

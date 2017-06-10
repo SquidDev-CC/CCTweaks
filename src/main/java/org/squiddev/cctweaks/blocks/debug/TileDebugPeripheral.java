@@ -40,18 +40,20 @@ public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
 			this.sideName = EnumFacing.VALUES[side].getName();
 		}
 
+		@Nonnull
 		@Override
 		public String getType() {
 			return "sided";
 		}
 
+		@Nonnull
 		@Override
 		public String[] getMethodNames() {
 			return new String[]{"getSide", "getName"};
 		}
 
 		@Override
-		public Object[] callMethod(IComputerAccess computer, ILuaContext context, int function, Object[] arguments) throws LuaException, InterruptedException {
+		public Object[] callMethod(@Nonnull IComputerAccess computer, @Nonnull ILuaContext context, int function, @Nonnull Object[] arguments) throws LuaException, InterruptedException {
 			switch (function) {
 				case 0:
 					return new Object[]{sideName};
@@ -63,7 +65,7 @@ public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
 		}
 
 		@Override
-		public void attach(IComputerAccess computer) {
+		public void attach(@Nonnull IComputerAccess computer) {
 			DebugLogger.debug("Attaching to computer " + computer + " #" + computer.getID() + " with " + computer.getAttachmentName() + " for side " + sideName);
 			if (!computers.add(computer)) {
 				DebugLogger.warn("Already attached");
@@ -71,7 +73,7 @@ public class TileDebugPeripheral extends TileBase implements IPeripheralHost {
 		}
 
 		@Override
-		public void detach(IComputerAccess computer) {
+		public void detach(@Nonnull IComputerAccess computer) {
 			DebugLogger.debug("Detaching from computer " + computer + " #" + computer.getID() + " with " + computer.getAttachmentName() + " for side " + sideName);
 			if (!computers.remove(computer)) {
 				DebugLogger.warn("Not attached");

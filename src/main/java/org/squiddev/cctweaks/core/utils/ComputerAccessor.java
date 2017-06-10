@@ -1,11 +1,13 @@
 package org.squiddev.cctweaks.core.utils;
 
+import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.core.computer.Computer;
 import dan200.computercraft.core.lua.LuaJLuaMachine;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.peripheral.modem.TileCable;
 import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
 import dan200.computercraft.shared.turtle.blocks.TileTurtle;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -24,9 +26,17 @@ public final class ComputerAccessor {
 	 * Set the fact that the turtle has moved. This is so we can muck about with it
 	 * without the broken event being set
 	 *
-	 * @see dan200.computercraft.shared.turtle.blocks.TileTurtle#m_moved
+	 * @see dan200.computercraft.shared.turtle.blocks.TileTurtle#m_moveState
 	 */
-	public static Field turtleTileMoved;
+	public static Field tileTurtleMoveState;
+
+	/**
+	 * Set the fact that the turtle has moved. This is so we can muck about with it
+	 * without the broken event being set
+	 *
+	 * @see dan200.computercraft.shared.turtle.blocks.TileTurtle.MoveState#MOVED
+	 */
+	public static Object tileTurtleMoveStateMoved;
 
 	/**
 	 * The ServerComputer's {@link dan200.computercraft.core.computer.Computer}
@@ -59,18 +69,19 @@ public final class ComputerAccessor {
 	/**
 	 * Get the computer for pocket computers
 	 *
-	 * @see ItemPocketComputer#createServerComputer(World, IInventory, ItemStack)
+	 * @see ItemPocketComputer#createServerComputer(World, IInventory, Entity, ItemStack)
 	 */
 	public static Method pocketServerComputer;
 
 	static {
 		try {
-			turtleTileMoved = findField(TileTurtle.class, "m_moved");
+			tileTurtleMoveState = findField(TileTurtle.class, "m_moveState");
 			serverComputerComputer = findField(ServerComputer.class, "m_computer");
+			tileTurtleMoveStateMoved = findField(ComputerCraft.class.getClassLoader().loadClass("dan200.computercraft.shared.turtle.blocks.TileTurtle$MoveState"), "MOVED");
 			computerMachine = findField(Computer.class, "m_machine");
 			luaMachineGlobals = findField(LuaJLuaMachine.class, "m_globals");
 			cableModem = findField(TileCable.class, "modem");
-			pocketServerComputer = findMethod(ItemPocketComputer.class, "createServerComputer", World.class, IInventory.class, ItemStack.class);
+			pocketServerComputer = findMethod(ItemPocketComputer.class, "createServerComputer", World.class, IInventory.class, Entity.class, ItemStack.class);
 		} catch (Exception e) {
 			DebugLogger.error("ComputerCraft not found", e);
 			e.printStackTrace();

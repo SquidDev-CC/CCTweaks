@@ -8,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import org.squiddev.cctweaks.api.turtle.IExtendedTurtleUpgrade;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ public class TurtleBrain_Patch extends TurtleBrain {
 	}
 
 	@Override
-	public void setUpgrade(TurtleSide side, ITurtleUpgrade upgrade) {
+	public void setUpgrade(@Nonnull TurtleSide side, ITurtleUpgrade upgrade) {
 		ITurtleUpgrade oldUpgrade = m_upgrades.get(side);
 		if (oldUpgrade == upgrade) {
 			return;

@@ -1,8 +1,8 @@
 package org.squiddev.cctweaks.core.network;
 
+import dan200.computercraft.api.network.Packet;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.network.INetworkAccess;
-import org.squiddev.cctweaks.api.network.Packet;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;

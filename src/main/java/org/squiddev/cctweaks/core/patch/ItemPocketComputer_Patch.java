@@ -1,30 +1,16 @@
 package org.squiddev.cctweaks.core.patch;
 
-import com.google.common.base.Objects;
 import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.api.pocket.IPocketUpgrade;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
-import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import org.squiddev.cctweaks.api.IComputerItemFactory;
 import org.squiddev.cctweaks.api.computer.ICustomRomItem;
-import org.squiddev.cctweaks.api.computer.IExtendedServerComputer;
-import org.squiddev.cctweaks.core.pocket.PocketAPIExtensions;
-import org.squiddev.cctweaks.core.pocket.PocketHooks;
-import org.squiddev.cctweaks.core.pocket.PocketRegistry;
-import org.squiddev.cctweaks.core.pocket.PocketServerComputer;
-import org.squiddev.cctweaks.core.utils.DebugLogger;
-import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.patcher.visitors.MergeVisitor;
-import org.squiddev.unborked.ProxyServer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,107 +21,12 @@ import java.util.Set;
 /**
  * Patches for pocket computers.
  *
- * @see org.squiddev.cctweaks.core.pocket.PocketHooks
+ * Also converts CCTweaks upgrades to the new system.
+ *
+ * @see IComputerItemFactory
+ * @see ICustomRomItem
  */
 public class ItemPocketComputer_Patch extends ItemPocketComputer implements IComputerItemFactory, ICustomRomItem {
-	@Nonnull
-	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
-		ItemStack stack = player.getHeldItem(hand);
-		if (!world.isRemote) {
-			ServerComputer computer = this.createServerComputer(world, player.inventory, stack);
-			if (computer != null) computer.turnOn();
-
-			if (!PocketHooks.rightClick(world, player, stack, computer)) {
-				ProxyServer.openPocketComputerGUI(player, hand);
-			}
-		}
-
-		return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
-	}
-
-	@Nonnull
-	@Override
-	public String getItemStackDisplayName(@Nonnull ItemStack stack) {
-		String baseName = getUnlocalizedName(stack);
-		String adjective = PocketRegistry.instance.getUpgradeAdjective(stack, null);
-
-		if (adjective == null) return Helpers.translateToLocal(baseName + ".name");
-		return Helpers.translateToLocal(baseName + ".upgraded.name").replace("%s", Helpers.translateToLocal(adjective));
-	}
-
-	public void onUpdate(ItemStack stack, World world, Entity entity, int slotNum, boolean selected) {
-		if (!world.isRemote) {
-			IInventory inventory = entity instanceof EntityPlayer ? ((EntityPlayer) entity).inventory : null;
-			ServerComputer computer = createServerComputer(world, inventory, stack);
-			if (computer != null) {
-				computer.keepAlive();
-				computer.setWorld(world);
-
-				// Correctly sync pocket computer position & entity
-				computer.setPosition(entity.getPosition());
-				((PocketServerComputer) computer).setOwner(entity);
-
-				int id = computer.getID();
-				if (id != getComputerID(stack)) {
-					setComputerID(stack, id);
-					if (inventory != null) inventory.markDirty();
-				}
-
-				String label = computer.getLabel();
-				if (!Objects.equal(label, getLabel(stack))) {
-					setLabel(stack, label);
-					if (inventory != null) inventory.markDirty();
-				}
-
-				// Update pocket hooks
-				PocketHooks.update(entity, stack, computer);
-			}
-		} else {
-			createClientComputer(stack);
-		}
-	}
-
-	private ServerComputer createServerComputer(World world, IInventory inventory, ItemStack stack) {
-		if (world.isRemote) {
-			return null;
-		}
-		int instanceID = getInstanceID(stack);
-		int sessionID = getSessionID(stack);
-		int correctSessionID = ComputerCraft.serverComputerRegistry.getSessionID();
-		ServerComputer computer;
-		if (instanceID >= 0 && sessionID == correctSessionID && ComputerCraft.serverComputerRegistry.contains(instanceID)) {
-			computer = ComputerCraft.serverComputerRegistry.get(instanceID);
-		} else {
-			if (instanceID < 0 || sessionID != correctSessionID) {
-				instanceID = ComputerCraft.serverComputerRegistry.getUnusedInstanceID();
-				setInstanceID(stack, instanceID);
-				setSessionID(stack, correctSessionID);
-			}
-
-			int computerID = getComputerID(stack);
-			if (computerID < 0) {
-				computerID = ComputerCraft.createUniqueNumberedSaveDir(world, "computer");
-				setComputerID(stack, computerID);
-			}
-
-			computer = new PocketServerComputer(world, computerID, getLabel(stack), instanceID, getFamily(stack), 26, 20);
-			if (hasCustomRom(stack)) {
-				DebugLogger.debug("Setting custom ROM from " + stack);
-				((IExtendedServerComputer) computer).setCustomRom(getCustomRom(stack));
-			}
-
-			computer.addAPI(new PocketAPIExtensions(computer));
-			PocketHooks.create(inventory, stack, computer);
-			ComputerCraft.serverComputerRegistry.add(instanceID, computer);
-
-			if (inventory != null) inventory.markDirty();
-		}
-
-		computer.setWorld(world);
-		return computer;
-	}
-
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 		if (advanced) {
@@ -153,10 +44,32 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 		}
 	}
 
+	public IPocketUpgrade getUpgrade(@Nonnull ItemStack stack) {
+		NBTTagCompound compound = stack.getTagCompound();
+		if (compound != null) {
+			if (compound.hasKey("upgrade_name", Constants.NBT.TAG_STRING)) {
+				IPocketUpgrade upgrade = ComputerCraft.getPocketUpgrade(compound.getString("upgrade_name"));
+				if (upgrade != null) return upgrade;
+			}
+
+			if (compound.hasKey("upgrade", Constants.NBT.TAG_STRING)) {
+				String name = compound.getString("upgrade");
+				return ComputerCraft.getPocketUpgrade(name);
+			} else if (compound.hasKey("upgrade", Constants.NBT.TAG_ANY_NUMERIC)) {
+				int id = compound.getInteger("upgrade");
+				if (id == 1) {
+					return ComputerCraft.getPocketUpgrade("computercraft:wireless_modem");
+				}
+			}
+		}
+
+		return null;
+	}
+
 	@Nonnull
 	@Override
 	public ItemStack createComputer(int id, @Nullable String label, @Nonnull ComputerFamily family) {
-		return create(id, label, family, false);
+		return create(id, label, -1, family, null);
 	}
 
 	@Nonnull
@@ -214,7 +127,7 @@ public class ItemPocketComputer_Patch extends ItemPocketComputer implements ICom
 	}
 
 	@MergeVisitor.Stub
-	public int getComputerID(ItemStack stack) {
+	public int getComputerID(@Nonnull ItemStack stack) {
 		return -1;
 	}
 

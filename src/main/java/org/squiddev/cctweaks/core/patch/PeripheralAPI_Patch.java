@@ -1,5 +1,6 @@
 package org.squiddev.cctweaks.core.patch;
 
+import dan200.computercraft.api.network.Packet;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.core.apis.IAPIEnvironment;
@@ -8,7 +9,6 @@ import dan200.computercraft.core.computer.Computer;
 import dan200.computercraft.core.filesystem.FileSystem;
 import org.squiddev.cctweaks.api.network.INetworkAccess;
 import org.squiddev.cctweaks.api.network.INetworkedPeripheral;
-import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
 import javax.annotation.Nonnull;
@@ -107,7 +107,7 @@ public class PeripheralAPI_Patch extends PeripheralAPI {
 			}
 		}
 
-		public void queueEvent(String event, Object[] arguments) {
+		public void queueEvent(@Nonnull String event, Object[] arguments) {
 			if (!m_attached) {
 				throw new RuntimeException("You are not attached to this Computer");
 			} else {
@@ -115,6 +115,7 @@ public class PeripheralAPI_Patch extends PeripheralAPI {
 			}
 		}
 
+		@Nonnull
 		public String getAttachmentName() {
 			if (!m_attached) {
 				throw new RuntimeException("You are not attached to this Computer");

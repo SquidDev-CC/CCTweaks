@@ -16,10 +16,8 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.blocks.TileBase;
@@ -82,6 +80,7 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 		);
 	}
 
+	@Nonnull
 	@Override
 	public TileEntity createNewTileEntity(@Nonnull World world, int meta) {
 		switch (meta) {

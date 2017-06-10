@@ -235,15 +235,6 @@ public final class Config {
 			@DefaultBoolean(true)
 			@RequiresRestart(mc = false, world = true)
 			public static boolean pocketEnabled;
-
-			/**
-			 * The pocket upgrade Id
-			 * Requires Peripherals++
-			 */
-			@DefaultInt(331)
-			@Range(min = 1)
-			@RequiresRestart
-			public static int pocketId;
 		}
 
 		/**
@@ -303,29 +294,6 @@ public final class Config {
 	 */
 	public static final class Misc {
 		/**
-		 * The light level given off by normal monitors.
-		 * Redstone torches are 7, normal torches are 14.
-		 */
-		@DefaultInt(7)
-		@Range(min = 0, max = 15)
-		public static int monitorLight;
-
-		/**
-		 * The light level given off by advanced monitors.
-		 * Redstone torches are 7, normal torches are 14.
-		 */
-		@DefaultInt(10)
-		@Range(min = 0, max = 15)
-		public static int advancedMonitorLight;
-
-		/**
-		 * Enable the Ender modem pocket computer upgrade
-		 */
-		@DefaultBoolean(true)
-		@RequiresRestart(mc = false, world = true)
-		public static boolean pocketEnderModem;
-
-		/**
 		 * Render pocket computers like maps.
 		 *
 		 * This means the terminal is visible when you hold a pocket computer,
@@ -346,14 +314,6 @@ public final class Config {
 	 * Controls over the packets sent between the server and client.
 	 */
 	public static final class Packets {
-		/**
-		 * Prevent controlling computers without a container on the server side.
-		 * This ensures arbitrary computers can not be used by the client, but may break other mods. Please disable if
-		 * you encounter problems (and report an issue on the tracker).
-		 */
-		@DefaultBoolean(true)
-		public static boolean requireContainer;
-
 		/**
 		 * Only broadcast computer state to those in the current dimension and in range or to those interacting with it.
 		 */

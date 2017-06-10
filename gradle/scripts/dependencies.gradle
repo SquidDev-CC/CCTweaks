@@ -20,10 +20,7 @@ repositories {
 	maven { url "http://maven.amadornes.com/" }
 	maven { url "http://dvs1.progwml6.com/files/maven" }
 
-	ivy {
-		name = "ComputerCraft"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2311/39/[module][revision](.[ext])"
-	}
+	maven { url = "https://crzd.me/files/maven/" } // ComputerCraft
 
 	ivy {
 		name = "CoFHLib"
@@ -40,8 +37,7 @@ configurations {
 
 dependencies {
 	// We modify the CC jar so we cannot include it in the normal compile configuration
-	provided "ComputerCraft:ComputerCraft:${project.cc_version}"
-	testCompile "ComputerCraft:ComputerCraft:${project.cc_version}"
+	compile "dan200.computercraft:ComputerCraft-SquidDev-CC-ComputerCraft-feature-minecraft-1.11.2:${project.cc_version}-${project.cc_minor_version}"
 	deobfProvided "MCMultiPart:MCMultiPart:1.3.0:universal"
 	deobfCompile "mezz.jei:jei_${project.mc_version}:4.2.5.233"
 
@@ -50,7 +46,7 @@ dependencies {
 	provided "net.industrial-craft:industrialcraft-2:2.3.249-ex18:api"
 	provided "net.darkhax.tesla:Tesla:1.11-1.3.0.51:deobf"
 
-	shade('org.squiddev:cctweaks-lua:1.4.0') {
+	shade("org.squiddev:cctweaks-lua:1.5.0-nightly-${project.cc_minor_version}") {
 		// Different versions
 		exclude group: 'com.google.guava'
 		exclude group: 'org.ow2.asm'
@@ -58,7 +54,7 @@ dependencies {
 	}
 
 	shade('org.squiddev:Patcher:1.2.4') { exclude group: 'org.ow2.asm' }
-	compile "org.squiddev:unborked:${mc_version}-${cc_version}-1.1.5:dev"
+
 	provided('org.squiddev:ConfigGen:1.2.5') { exclude group: 'net.minecraftforge' }
 
 	testCompile group: "junit", name: "junit", version: "4.12"

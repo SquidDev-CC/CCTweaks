@@ -10,10 +10,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.blocks.TileBase;
@@ -77,6 +75,7 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 		}
 	}
 
+	@Nonnull
 	@Override
 	public TileEntity createNewTileEntity(@Nonnull World world, int meta) {
 		switch (meta) {

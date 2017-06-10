@@ -1,36 +1,34 @@
 package org.squiddev.cctweaks.core.network.modem;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
+import dan200.computercraft.api.network.IPacketNetwork;
+import dan200.computercraft.api.network.IPacketReceiver;
+import dan200.computercraft.api.network.Packet;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.shared.peripheral.modem.INetwork;
-import dan200.computercraft.shared.peripheral.modem.IReceiver;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
-import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.AbstractNode;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Basic wired modem that handles peripherals and computer interaction
  */
-public abstract class BasicModem extends AbstractNode implements INetwork, IWorldNetworkNode {
+public abstract class BasicModem extends AbstractNode implements IPacketNetwork, IWorldNetworkNode {
 	public static final byte MODEM_ON = 1;
 	public static final byte MODEM_PERIPHERAL = 2;
 
 	/**
 	 * Set of receivers to use
 	 */
-	private final SetMultimap<Integer, IReceiver> receivers = MultimapBuilder.hashKeys().hashSetValues().build();
+	private final Set<IPacketReceiver> receivers = Sets.newHashSet();
 
 	/**
 	 * List of wrappers for peripherals on the remote network
@@ -50,24 +48,32 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	public byte state;
 
 	@Override
-	public void addReceiver(IReceiver receiver) {
+	public void addReceiver(@Nonnull IPacketReceiver receiver) {
 		synchronized (receivers) {
-			receivers.put(receiver.getChannel(), receiver);
+			receivers.add(receiver);
 		}
 	}
 
 	@Override
-	public void removeReceiver(IReceiver receiver) {
+	public void removeReceiver(@Nonnull IPacketReceiver receiver) {
 		synchronized (receivers) {
-			receivers.remove(receiver.getChannel(), receiver);
+			receivers.remove(receiver);
 		}
 	}
 
 	@Override
-	public void transmit(int channel, int replyChannel, Object payload, World world, Vec3d pos, double range, boolean interdimensional, Object senderObject) {
+	public void transmitSameDimension(@Nonnull Packet packet, double v) {
 		INetworkController controller = getAttachedNetwork();
 		if (controller != null) {
-			controller.transmitPacket(this, new Packet(channel, replyChannel, payload, senderObject));
+			controller.transmitPacket(this, packet);
+		}
+	}
+
+	@Override
+	public void transmitInterdimensional(@Nonnull dan200.computercraft.api.network.Packet packet) {
+		INetworkController controller = getAttachedNetwork();
+		if (controller != null) {
+			controller.transmitPacket(this, packet);
 		}
 	}
 
@@ -128,8 +134,8 @@ public abstract class BasicModem extends AbstractNode implements INetwork, IWorl
 	@Override
 	public void receivePacket(@Nonnull Packet packet, double distanceTravelled) {
 		synchronized (receivers) {
-			for (IReceiver receiver : receivers.get(packet.channel)) {
-				receiver.receiveSameDimension(packet.replyChannel, packet.payload, distanceTravelled, packet.senderObject);
+			for (IPacketReceiver receiver : receivers) {
+				receiver.receiveSameDimension(packet, distanceTravelled);
 			}
 		}
 	}

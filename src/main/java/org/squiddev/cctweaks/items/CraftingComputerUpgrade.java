@@ -22,8 +22,6 @@ import org.squiddev.cctweaks.core.rom.CraftingSetRom;
 
 import javax.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
-
 /**
  * Handles crafting with ComputerUpgrades
  */
@@ -60,7 +58,7 @@ public class CraftingComputerUpgrade implements IRecipe {
 			);
 		} else if (computerItem instanceof ItemPocketComputer) {
 			ItemPocketComputer pocket = (ItemPocketComputer) computerItem;
-			stack = PocketComputerItemFactory.create(id, label, ComputerFamily.Advanced, pocket.getHasModem(computerStack));
+			stack = PocketComputerItemFactory.create(id, label, pocket.getColour(computerStack), ComputerFamily.Advanced, pocket.getUpgrade(computerStack));
 
 			NBTTagCompound toTag = ItemBase.getTag(stack);
 			NBTTagCompound fromTag = ItemBase.getTag(computerStack);

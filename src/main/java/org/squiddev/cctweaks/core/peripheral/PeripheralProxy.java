@@ -45,23 +45,25 @@ public abstract class PeripheralProxy implements IPeripheral, IPeripheralProxy {
 		return instance;
 	}
 
+	@Nonnull
 	@Override
 	public String getType() {
 		return instance == null && defaultType != null ? defaultType : getBasePeripheral().getType();
 	}
 
+	@Nonnull
 	@Override
 	public String[] getMethodNames() {
 		return getBasePeripheral().getMethodNames();
 	}
 
 	@Override
-	public Object[] callMethod(IComputerAccess access, ILuaContext context, int i, Object[] objects) throws LuaException, InterruptedException {
+	public Object[] callMethod(@Nonnull IComputerAccess access, @Nonnull ILuaContext context, int i, @Nonnull Object[] objects) throws LuaException, InterruptedException {
 		return getBasePeripheral().callMethod(access, context, i, objects);
 	}
 
 	@Override
-	public void attach(IComputerAccess access) {
+	public void attach(@Nonnull IComputerAccess access) {
 		if (instance == null) {
 			// We want to be as lazy as possible with loading
 			mounts.add(access);
@@ -71,7 +73,7 @@ public abstract class PeripheralProxy implements IPeripheral, IPeripheralProxy {
 	}
 
 	@Override
-	public void detach(IComputerAccess access) {
+	public void detach(@Nonnull IComputerAccess access) {
 		mounts.remove(access);
 		if (instance != null) {
 			getBasePeripheral().detach(access);

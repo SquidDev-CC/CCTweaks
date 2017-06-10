@@ -10,12 +10,14 @@ import net.minecraft.util.math.BlockPos;
 import org.squiddev.cctweaks.core.turtle.TurtleHooks;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
+import javax.annotation.Nonnull;
+
 public class TurtlePlaceCommand_Patch extends TurtlePlaceCommand {
 	public TurtlePlaceCommand_Patch() {
 		super(null, null);
 	}
 
-	public static ItemStack deploy(ItemStack stack, ITurtleAccess turtle, EnumFacing direction, Object[] extraArguments, String[] errorMessage) {
+	public static ItemStack deploy(@Nonnull ItemStack stack, ITurtleAccess turtle, EnumFacing direction, Object[] extraArguments, String[] errorMessage) {
 		BlockPos playerPosition = WorldUtil.moveCoords(turtle.getPosition(), direction);
 		TurtlePlayer turtlePlayer = createPlayer(turtle, playerPosition, direction);
 		ItemStack remainder = deployOnEntity(stack, turtle, turtlePlayer, direction, extraArguments, errorMessage);
@@ -48,12 +50,12 @@ public class TurtlePlaceCommand_Patch extends TurtlePlaceCommand {
 	}
 
 	@MergeVisitor.Stub
-	private static ItemStack deployOnEntity(ItemStack stack, final ITurtleAccess turtle, TurtlePlayer turtlePlayer, EnumFacing direction, Object[] extraArguments, String[] o_errorMessage) {
+	private static ItemStack deployOnEntity(@Nonnull ItemStack stack, final ITurtleAccess turtle, TurtlePlayer turtlePlayer, EnumFacing direction, Object[] extraArguments, String[] o_errorMessage) {
 		throw new RuntimeException("Never");
 	}
 
 	@MergeVisitor.Stub
-	private static ItemStack deployOnBlock(ItemStack stack, ITurtleAccess turtle, TurtlePlayer turtlePlayer, BlockPos position, EnumFacing side, Object[] extraArguments, boolean allowReplace, String[] o_errorMessage) {
+	private static ItemStack deployOnBlock(@Nonnull ItemStack stack, ITurtleAccess turtle, TurtlePlayer turtlePlayer, BlockPos position, EnumFacing side, Object[] extraArguments, boolean allowReplace, String[] o_errorMessage) {
 		throw new RuntimeException("Never");
 	}
 }

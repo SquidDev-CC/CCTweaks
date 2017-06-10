@@ -20,9 +20,9 @@ public class TurtleUpgradeWrapper extends BlankRecipeWrapper implements IValidRe
 	private final ItemStack outputStack;
 
 	public TurtleUpgradeWrapper(ITurtleUpgrade upgrade, ComputerFamily family) {
-		this.inputStack = TurtleItemFactory.create(-1, null, null, family, null, null, 0, null);
+		this.inputStack = TurtleItemFactory.create(-1, null, -1, family, null, null, 0, null);
 		this.upgradeStack = upgrade.getCraftingItem();
-		this.outputStack = TurtleItemFactory.create(-1, null, null, family, null, upgrade, 0, null);
+		this.outputStack = TurtleItemFactory.create(-1, null, -1, family, null, upgrade, 0, null);
 	}
 
 	@Override

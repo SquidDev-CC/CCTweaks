@@ -61,15 +61,10 @@ public class ASMTransformer implements IClassTransformer {
 				"org.squiddev.cctweaks.core.patch.TurtleRefuelCommand_Rewrite"
 			),
 			new ClassMerger(TweaksLogger.instance,
-				"dan200.computercraft.shared.peripheral.common.BlockPeripheral",
-				"org.squiddev.cctweaks.core.patch.BlockPeripheral_Patch"
-			),
-			new ClassMerger(TweaksLogger.instance,
 				"dan200.computercraft.shared.turtle.core.TurtleBrain",
 				"org.squiddev.cctweaks.core.patch.TurtleBrain_Patch"
 			),
 			new DisableTurtleCommand(),
-			new TurtleBrainAlsoPeripheral(),
 
 			// Networking
 			new ClassMerger(TweaksLogger.instance,
@@ -100,16 +95,13 @@ public class ASMTransformer implements IClassTransformer {
 			),
 
 			// Pocket upgrades
-			new PreventModemUpgrade(),
+			new ClassMerger(TweaksLogger.instance,
+				"dan200.computercraft.shared.pocket.core.PocketServerComputer",
+				"org.squiddev.cctweaks.core.patch.PocketServerComputer_Patch"
+			),
 			new ClassMerger(TweaksLogger.instance,
 				"dan200.computercraft.shared.pocket.items.ItemPocketComputer",
 				"org.squiddev.cctweaks.core.patch.ItemPocketComputer_Patch"
-			),
-
-			// Ugly kludge to fix deadlocks.
-			new ClassMerger(TweaksLogger.instance,
-				"dan200.computercraft.shared.peripheral.modem.ModemPeripheral",
-				"org.squiddev.cctweaks.core.patch.ModemPeripheral_Patch"
 			),
 
 			// Attempt to fix concurrent modification exceptions.
@@ -126,20 +118,6 @@ public class ASMTransformer implements IClassTransformer {
 			new ClassMerger(TweaksLogger.instance,
 				"dan200.computercraft.shared.computer.blocks.TileComputerBase",
 				"org.squiddev.cctweaks.core.patch.TileComputerBase_Patch"
-			),
-
-			// Add IContainerComputer to various containers.
-			new ClassMerger(TweaksLogger.instance,
-				"dan200.computercraft.shared.computer.inventory.ContainerComputer",
-				"org.squiddev.cctweaks.core.patch.ContainerComputer_Patch"
-			),
-			new ClassMerger(TweaksLogger.instance,
-				"dan200.computercraft.shared.turtle.inventory.ContainerTurtle",
-				"org.squiddev.cctweaks.core.patch.ContainerTurtle_Patch"
-			),
-			new ClassMerger(TweaksLogger.instance,
-				"dan200.computercraft.shared.media.inventory.ContainerHeldItem",
-				"org.squiddev.cctweaks.core.patch.ContainerHeldItem_Patch"
 			),
 
 			// Allow suspending computers which time out.
@@ -163,7 +141,6 @@ public class ASMTransformer implements IClassTransformer {
 				"org.squiddev.cctweaks.core.patch.Terminal_Patch"
 			),
 			new TurtlePermissions(),
-			new AddWorldConstructor(),
 
 			// Fix JEI preventing repeat events
 			new ClassMerger(TweaksLogger.instance,

@@ -3,7 +3,6 @@ package org.squiddev.cctweaks.api.turtle;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import dan200.computercraft.api.turtle.TurtleSide;
-import dan200.computercraft.api.turtle.TurtleUpgradeType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,14 +20,4 @@ public interface IExtendedTurtleUpgrade extends ITurtleUpgrade {
 	 * @param newUpgrade The new upgrade. May be {@code null}.
 	 */
 	void upgradeChanged(@Nonnull ITurtleAccess turtle, @Nonnull TurtleSide side, @Nullable ITurtleUpgrade oldUpgrade, @Nullable ITurtleUpgrade newUpgrade);
-
-	/**
-	 * Check if this upgrade is a peripheral and a tool.
-	 *
-	 * You should return {@link TurtleUpgradeType#Tool} from {@link ITurtleUpgrade#getType()} to allow
-	 * this tool exposing a peripheral and being usable as a tool.
-	 *
-	 * @return If this is also a peripheral
-	 */
-	boolean alsoPeripheral();
 }

@@ -1,12 +1,11 @@
 package org.squiddev.cctweaks.integration.jei;
 
+import dan200.computercraft.api.pocket.IPocketUpgrade;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.pocket.items.PocketComputerItemFactory;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.BlankRecipeWrapper;
 import net.minecraft.item.ItemStack;
-import org.squiddev.cctweaks.api.pocket.IPocketUpgrade;
-import org.squiddev.cctweaks.core.pocket.PocketRegistry;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -27,9 +26,9 @@ public class PocketUpgradeWrapper extends BlankRecipeWrapper implements IValidRe
 	}
 
 	public PocketUpgradeWrapper(IPocketUpgrade upgrade, ComputerFamily family) {
-		inputStack = PocketComputerItemFactory.create(-1, null, family, false);
+		inputStack = PocketComputerItemFactory.create(-1, null, -1, family, null);
 		upgradeStack = upgrade.getCraftingItem();
-		PocketRegistry.instance.setToItemStack(outputStack = inputStack.copy(), upgrade);
+		outputStack = PocketComputerItemFactory.create(-1, null, -1, family, upgrade);
 	}
 
 	@Override

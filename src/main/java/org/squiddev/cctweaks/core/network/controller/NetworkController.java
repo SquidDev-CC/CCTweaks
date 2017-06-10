@@ -2,12 +2,12 @@ package org.squiddev.cctweaks.core.network.controller;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+import dan200.computercraft.api.network.Packet;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.api.network.INetworkController;
 import org.squiddev.cctweaks.api.network.INetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
-import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.collections.MapChanges;
 import org.squiddev.cctweaks.core.collections.MapsX;
 

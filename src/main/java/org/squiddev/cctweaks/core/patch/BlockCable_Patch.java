@@ -10,6 +10,8 @@ import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.patcher.visitors.MergeVisitor;
 
+import javax.annotation.Nonnull;
+
 /**
  * Patches {@link dan200.computercraft.shared.peripheral.common.BlockCable#isCable(IBlockAccess, BlockPos)}
  */
@@ -32,9 +34,10 @@ public final class BlockCable_Patch extends BlockCable {
 		}
 	}
 
+	@Nonnull
 	@Override
 	@MergeVisitor.Stub
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
 		return null;
 	}
 }

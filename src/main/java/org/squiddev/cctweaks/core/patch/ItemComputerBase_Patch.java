@@ -43,7 +43,7 @@ public abstract class ItemComputerBase_Patch extends ItemComputerBase implements
 	@Override
 	public ItemStack createComputer(int id, @Nullable String label, @Nonnull ComputerFamily family) {
 		if (ItemTurtleBase.class.isInstance(this)) {
-			return TurtleItemFactory.create(id, label, null, family, null, null, 0, null);
+			return TurtleItemFactory.create(id, label, -1, family, null, null, 0, null);
 		} else {
 			return ComputerItemFactory.create(id, label, family);
 		}

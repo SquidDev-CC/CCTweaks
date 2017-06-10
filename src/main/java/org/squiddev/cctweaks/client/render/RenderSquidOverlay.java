@@ -16,6 +16,7 @@ import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.IClientModule;
 import org.squiddev.cctweaks.core.registry.Module;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.UUID;
 
@@ -59,7 +60,7 @@ public class RenderSquidOverlay extends Module implements IClientModule {
 
 		@Override
 		@SideOnly(Side.CLIENT)
-		public void doRenderLayer(EntityPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+		public void doRenderLayer(@Nonnull EntityPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 			GameProfile profile = player.getGameProfile();
 			if (profile == null || !profile.getId().equals(uuid) || !Config.Misc.funRender) return;
 

@@ -1,17 +1,21 @@
 package org.squiddev.cctweaks.core.network;
 
 import com.google.gson.Gson;
+import dan200.computercraft.api.network.IPacketSender;
+import dan200.computercraft.api.network.Packet;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.squiddev.cctweaks.api.network.INetworkNode;
+import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
-import org.squiddev.cctweaks.api.network.Packet;
 import org.squiddev.cctweaks.core.network.mock.BasicNetwork;
 import org.squiddev.cctweaks.core.network.mock.KeyedNetworkNode;
 import org.squiddev.cctweaks.core.network.mock.NodeTile;
 
+import javax.annotation.Nonnull;
 import java.io.InputStreamReader;
 import java.util.Map;
 
@@ -70,8 +74,8 @@ public class PacketTest {
 		BasicNetwork network = new BasicNetwork(data);
 		network.reset();
 
-		INetworkNode node = ((IWorldNetworkNodeHost) network.getTileEntity(0, 0, 0)).getNode();
-		node.getAttachedNetwork().transmitPacket(node, new Packet(0, 0, null, null));
+		IWorldNetworkNode node = ((IWorldNetworkNodeHost) network.getTileEntity(0, 0, 0)).getNode();
+		node.getAttachedNetwork().transmitPacket(node, new Packet(0, 0, null, new Sender(node)));
 
 		for (Map.Entry<BlockPos, KeyedNetworkNode> location : network) {
 			Integer distance = data.distance.get(location.getValue().key);
@@ -86,5 +90,31 @@ public class PacketTest {
 		public String[] map;
 		public Map<String, Integer> counts;
 		public Map<String, Integer> distance;
+	}
+
+	public final class Sender implements IPacketSender {
+		private final IWorldNetworkNode node;
+
+		public Sender(IWorldNetworkNode node) {
+			this.node = node;
+		}
+
+		@Nonnull
+		@Override
+		public World getWorld() {
+			return (World) node.getPosition().getBlockAccess();
+		}
+
+		@Nonnull
+		@Override
+		public Vec3d getPosition() {
+			return new Vec3d(node.getPosition().getPosition());
+		}
+
+		@Nonnull
+		@Override
+		public String getSenderID() {
+			return node.toString();
+		}
 	}
 }

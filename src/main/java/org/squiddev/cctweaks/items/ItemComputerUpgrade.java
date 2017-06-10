@@ -108,7 +108,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 
 		// If we set the turtle as moved, the destroy method won't drop the items
 		try {
-			ComputerAccessor.turtleTileMoved.setBoolean(computerTile, true);
+			ComputerAccessor.tileTurtleMoveState.set(computerTile, ComputerAccessor.tileTurtleMoveStateMoved);
 		} catch (Exception e) {
 			DebugLogger.warn("Cannot set TurtleTile m_moved in ItemComputerUpgrade", e);
 			return false;
@@ -165,7 +165,7 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 			// Computer
 			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
 				ComputerItemFactory.create(-1, null, ComputerFamily.Advanced),
-				new Object[]{
+				new ItemStack[]{
 					ComputerItemFactory.create(-1, null, ComputerFamily.Normal),
 					stack
 				}
@@ -176,26 +176,17 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 			GameRegistry.addRecipe(new ImpostorRecipe(3, 3,
 				new ItemStack[]{
 					gold, gold, gold,
-					gold, TurtleItemFactory.create(-1, null, null, ComputerFamily.Normal, null, null, 0, null), gold,
+					gold, TurtleItemFactory.create(-1, null, -1, ComputerFamily.Normal, null, null, 0, null), gold,
 					gold, stack, gold,
 				},
-				TurtleItemFactory.create(-1, null, null, ComputerFamily.Advanced, null, null, 0, null)
+				TurtleItemFactory.create(-1, null, -1, ComputerFamily.Advanced, null, null, 0, null)
 			));
 
-			// Non-wireless pocket computer
+			// Pocket computer
 			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
-				PocketComputerItemFactory.create(-1, null, ComputerFamily.Advanced, false),
-				new Object[]{
-					PocketComputerItemFactory.create(-1, null, ComputerFamily.Normal, false),
-					stack
-				}
-			));
-
-			// Wireless pocket computer
-			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
-				PocketComputerItemFactory.create(-1, null, ComputerFamily.Advanced, true),
-				new Object[]{
-					PocketComputerItemFactory.create(-1, null, ComputerFamily.Normal, true),
+				PocketComputerItemFactory.create(-1, null, -1, ComputerFamily.Advanced, null),
+				new ItemStack[]{
+					PocketComputerItemFactory.create(-1, null, -1, ComputerFamily.Normal, null),
 					stack
 				}
 			));

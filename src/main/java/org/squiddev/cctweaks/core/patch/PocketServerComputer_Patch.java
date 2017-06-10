@@ -1,9 +1,10 @@
-package org.squiddev.cctweaks.core.pocket;
+package org.squiddev.cctweaks.core.patch;
 
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
-import dan200.computercraft.shared.computer.core.ServerComputer;
+import dan200.computercraft.shared.computer.core.IContainerComputer;
 import dan200.computercraft.shared.network.ComputerCraftPacket;
+import dan200.computercraft.shared.pocket.core.PocketServerComputer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -11,33 +12,16 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import org.squiddev.cctweaks.api.IContainerComputer;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.patch.ServerComputer_Patch;
 import org.squiddev.cctweaks.core.patch.iface.IExtendedServerComputer;
+import org.squiddev.patcher.visitors.MergeVisitor;
 
-import java.lang.ref.WeakReference;
+public class PocketServerComputer_Patch extends PocketServerComputer {
+	@MergeVisitor.Stub
+	private Entity m_entity;
 
-public class PocketServerComputer extends ServerComputer {
-	private final IExtendedServerComputer extended;
-	private WeakReference<Entity> owner;
-
-	public PocketServerComputer(World world, int computerID, String label, int instanceID, ComputerFamily family, int terminalWidth, int terminalHeight) {
-		super(world, computerID, label, instanceID, family, terminalWidth, terminalHeight);
-		this.extended = (IExtendedServerComputer) this;
-	}
-
-	public void setOwner(Entity entity) {
-		Entity owner = getOwner();
-		if (owner != entity) {
-			this.owner = entity == null ? null : new WeakReference<Entity>(entity);
-			if (entity instanceof EntityPlayerMP) sendState((EntityPlayerMP) entity);
-		}
-	}
-
-	public Entity getOwner() {
-		WeakReference<Entity> owner = this.owner;
-		return owner == null ? null : owner.get();
+	public PocketServerComputer_Patch(World world, int computerID, String label, int instanceID, ComputerFamily family) {
+		super(world, computerID, label, instanceID, family);
 	}
 
 	/**
@@ -46,7 +30,9 @@ public class PocketServerComputer extends ServerComputer {
 	public void broadcastState(boolean initial) {
 		World world = getWorld();
 		BlockPos position = getPosition();
-		Entity owner = getOwner();
+		Entity owner = m_entity;
+
+		IExtendedServerComputer extended = (IExtendedServerComputer) this;
 
 		// If the computer state has changed, this is the initial state then send it.
 		// If neither of these then the terminal must have changed so we want to send this
