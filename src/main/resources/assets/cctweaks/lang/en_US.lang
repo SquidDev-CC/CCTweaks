@@ -50,8 +50,6 @@ gui.config.cctweaks.turtle=Turtle
 gui.config.cctweaks.turtle.fluxRefuelAmount=RF Refuel Amount
 gui.config.cctweaks.turtle.euRefuelAmount=EU Refuel Amount
 gui.config.cctweaks.turtle.disabledActions=Disabled Actions
-gui.config.cctweaks.turtle.useBlockEvent=Use Block Events
-gui.config.cctweaks.turtle.useServerProtected=Use Server protection
 
 gui.config.cctweaks.turtle.toolhost=Tool Host
 gui.config.cctweaks.turtle.toolhost.enabled=Enabled
@@ -96,8 +94,6 @@ gui.config.cctweaks.apis=APIs
 gui.config.cctweaks.apis.socket=Socket
 gui.config.cctweaks.apis.socket.tcp=TCP enabled
 gui.config.cctweaks.apis.socket.websocket=Websocket enabled
-gui.config.cctweaks.apis.socket.blacklist=Blacklist
-gui.config.cctweaks.apis.socket.whitelist=Whitelist
 gui.config.cctweaks.apis.socket.maxConnections=Max connections
 gui.config.cctweaks.apis.socket.threads=Number of threads
 gui.config.cctweaks.apis.socket.nettyThreads=Number of Netty threads
