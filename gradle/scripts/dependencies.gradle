@@ -12,21 +12,9 @@ repositories {
 		url "http://maven.ic2.player.to"
 	}
 
-	maven {
-		name "OpenMods"
-		url "http://repo.openmods.info/artifactory/openmods"
-	}
-
-	maven { url "http://maven.amadornes.com/" }
-	maven { url "http://dvs1.progwml6.com/files/maven" }
-
+	maven { url "http://maven.covers1624.net" } // RF
+	maven { url "http://dvs1.progwml6.com/files/maven" } // JEI
 	maven { url = "https://cc.crzd.me/maven/" } // ComputerCraft
-
-	ivy {
-		name = "CoFHLib"
-		artifactPattern "http://addons-origin.cursecdn.com/files/2235/558/[module]-[revision](.[ext])"
-	}
-
 	maven { url 'http://maven.epoxide.xyz' } // Tesla
 }
 
@@ -37,14 +25,11 @@ configurations {
 
 dependencies {
 	// We modify the CC jar so we cannot include it in the normal compile configuration
-	compile "dan200.computercraft:ComputerCraft-SquidDev-CC-ComputerCraft-feature-minecraft-1.11.2:${project.cc_version}-${project.cc_minor_version}"
-	deobfProvided "MCMultiPart:MCMultiPart:1.3.0:universal"
-	deobfCompile "mezz.jei:jei_${project.mc_version}:4.2.5.233"
-
-	// For 1.7.10 but including anyway
-	provided "CoFHLib:CoFHLib:[1.7.10]1.0.1-159-dev"
+	compile "dan200.computercraft:ComputerCraft:${project.cc_version}-${project.cc_minor_version}"
+	deobfCompile "mezz.jei:jei_${project.mc_version}:4.7.0.68"
+	compile "cofh:RedstoneFlux:1.12-2.0.0.1:deobf"
 	provided "net.industrial-craft:industrialcraft-2:2.3.249-ex18:api"
-	provided "net.darkhax.tesla:Tesla:1.11-1.3.0.51:deobf"
+	compile "net.darkhax.tesla:Tesla-1.12:1.0.61:deobf"
 
 	shade("org.squiddev:cctweaks-lua:1.5.0-pr2") {
 		// Different versions
