@@ -140,7 +140,6 @@ public class ASMTransformer implements IClassTransformer {
 				"dan200.computercraft.core.terminal.Terminal",
 				"org.squiddev.cctweaks.core.patch.Terminal_Patch"
 			),
-			new TurtlePermissions(),
 
 			// Fix JEI preventing repeat events
 			new ClassMerger(TweaksLogger.instance,

@@ -20,7 +20,7 @@ repositories {
 	maven { url "http://maven.amadornes.com/" }
 	maven { url "http://dvs1.progwml6.com/files/maven" }
 
-	maven { url = "https://crzd.me/files/maven/" } // ComputerCraft
+	maven { url = "https://cc.crzd.me/maven/" } // ComputerCraft
 
 	ivy {
 		name = "CoFHLib"
@@ -46,7 +46,7 @@ dependencies {
 	provided "net.industrial-craft:industrialcraft-2:2.3.249-ex18:api"
 	provided "net.darkhax.tesla:Tesla:1.11-1.3.0.51:deobf"
 
-	shade("org.squiddev:cctweaks-lua:1.5.0-nightly-${project.cc_minor_version}") {
+	shade("org.squiddev:cctweaks-lua:1.5.0-pr1") {
 		// Different versions
 		exclude group: 'com.google.guava'
 		exclude group: 'org.ow2.asm'

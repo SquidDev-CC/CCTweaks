@@ -20,13 +20,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.squiddev.cctweaks.api.IWorldPosition;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.McEvents;
-import org.squiddev.cctweaks.core.turtle.TurtleHooks;
 import org.squiddev.cctweaks.core.utils.FakeNetHandler;
 import org.squiddev.cctweaks.core.utils.WorldPosition;
 
@@ -94,8 +95,13 @@ public class ToolHostPlayer extends TurtlePlayer {
 		if (block != digBlock || !pos.equals(digPosition)) setState(block, pos);
 
 		if (!world.isAirBlock(pos) && !state.getMaterial().isLiquid()) {
-			if (ComputerCraft.turtlesObeyBlockProtection && !TurtleHooks.isBlockBreakable(world, pos, this)) {
-				return TurtleCommandResult.failure("Cannot break protected block");
+			if (ComputerCraft.turtlesObeyBlockProtection) {
+				if (MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(world, pos, world.getBlockState(pos), this))) {
+					return TurtleCommandResult.failure("Cannot break protected block");
+				}
+				if (!ComputerCraft.isBlockEditable(world, pos, this)) {
+					return TurtleCommandResult.failure("Cannot break protected block");
+				}
 			}
 
 			if (block == Blocks.BEDROCK || state.getBlockHardness(world, pos) <= -1) {

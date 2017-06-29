@@ -4,18 +4,13 @@ import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.permissions.ITurtlePermissionProvider;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
-import org.squiddev.cctweaks.core.Config;
 
 import java.util.List;
 
@@ -71,29 +66,5 @@ public class TurtleHooks {
 		}
 
 		return permissionProviders;
-	}
-
-	public static boolean isBlockBreakable(World world, BlockPos pos, EntityPlayer player) {
-		if (Config.Turtle.useServerProtected) {
-			MinecraftServer server = player.getServer();
-			if (server != null && !world.isRemote && server.isBlockProtected(world, pos, player)) {
-				return false;
-			}
-		}
-
-		if (Config.Turtle.useBlockEvent) {
-			IBlockState state = world.getBlockState(pos);
-			if (MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(world, pos, state, player))) {
-				return false;
-			}
-		}
-
-		for (ITurtlePermissionProvider provider : getPermissionProviders()) {
-			if (!provider.isBlockEditable(world, pos)) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 }
