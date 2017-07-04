@@ -23,20 +23,19 @@ import java.util.Map;
 
 import static mezz.jei.api.ISubtypeRegistry.ISubtypeInterpreter;
 import static org.squiddev.cctweaks.integration.jei.JeiDescription.registerDescription;
-import static org.squiddev.cctweaks.integration.jei.JeiDescription.registerGenericDescription;
 
 @JEIPlugin
-public class JeiCCTweaks extends BlankModPlugin {
+public class JeiCCTweaks implements IModPlugin {
 	@Override
 	public void register(@Nonnull IModRegistry registry) {
 		IGuiHelper helper = registry.getJeiHelpers().getGuiHelper();
 
-		registerGenericDescription(registry, Registry.itemComputerUpgrade);
-		registerGenericDescription(registry, Registry.itemDebugger);
+		registerDescription(registry, Registry.itemComputerUpgrade);
+		registerDescription(registry, Registry.itemDebugger);
 		registerDescription(registry, Registry.itemToolHost);
-		registerGenericDescription(registry, Registry.itemDataCard);
+		registerDescription(registry, Registry.itemDataCard);
 
-		registerGenericDescription(registry, Registry.blockDebug);
+		registerDescription(registry, Registry.blockDebug);
 		registerDescription(registry, Registry.blockNetworked);
 
 		UpgradeCategory pocketCat = new UpgradeCategory("pocket", helper);
@@ -44,8 +43,8 @@ public class JeiCCTweaks extends BlankModPlugin {
 
 		registry.addRecipeCategories(pocketCat, turtleCat);
 		registry.addRecipeHandlers(
-			new BasicRecipeHandler<PocketUpgradeWrapper>(pocketCat, PocketUpgradeWrapper.class),
-			new BasicRecipeHandler<TurtleUpgradeWrapper>(turtleCat, TurtleUpgradeWrapper.class)
+			new BasicRecipeHandler<>(pocketCat, PocketUpgradeWrapper.class),
+			new BasicRecipeHandler<>(turtleCat, TurtleUpgradeWrapper.class)
 		);
 
 		// Register all pocket upgrades
@@ -68,7 +67,7 @@ public class JeiCCTweaks extends BlankModPlugin {
 			Map<String, ITurtleUpgrade> turtleUpgrades = ReflectionHelper.getPrivateValue(CCTurtleProxyCommon.class, (CCTurtleProxyCommon) ComputerCraft.turtleProxy, "m_turtleUpgrades");
 			List<TurtleUpgradeWrapper> turtleWrappers = Lists.newArrayListWithExpectedSize(turtleUpgrades.size() * PocketUpgradeWrapper.FAMILIES.length);
 			for (ComputerFamily family : TurtleUpgradeWrapper.FAMILIES) {
-				registry.addRecipeCategoryCraftingItem(TurtleItemFactory.create(-1, null, -1, family, null, null, 0, null), turtleCat.getUid());
+				registry.addRecipeCatalyst(TurtleItemFactory.create(-1, null, -1, family, null, null, 0, null), turtleCat.getUid());
 
 				for (ITurtleUpgrade upgrade : turtleUpgrades.values()) {
 					turtleWrappers.add(new TurtleUpgradeWrapper(upgrade, family));

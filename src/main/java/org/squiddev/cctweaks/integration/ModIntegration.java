@@ -1,12 +1,12 @@
 package org.squiddev.cctweaks.integration;
 
 import net.minecraftforge.fml.common.Loader;
-import org.squiddev.cctweaks.core.registry.Module;
+import org.squiddev.cctweaks.core.registry.IModule;
 
 /**
  * A module that is loaded when a mod is installed
  */
-public abstract class ModIntegration extends Module {
+public abstract class ModIntegration implements IModule {
 	public final String modName;
 
 	public ModIntegration(String modName) {

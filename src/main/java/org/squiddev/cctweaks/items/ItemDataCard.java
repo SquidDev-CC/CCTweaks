@@ -1,8 +1,8 @@
 package org.squiddev.cctweaks.items;
 
+import joptsimple.internal.Strings;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
@@ -11,7 +11,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.api.IDataCard;
@@ -76,8 +75,8 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean extraInfo) {
-		super.addInformation(stack, player, tooltip, extraInfo);
+	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flag) {
+		super.addInformation(stack, world, tooltip, flag);
 
 		String type = getType(stack);
 		tooltip.add(Helpers.translateAny("gui.tooltip." + type, type));
@@ -86,22 +85,9 @@ public class ItemDataCard extends ItemBase implements IDataCard {
 			NBTTagCompound data = stack.getTagCompound().getCompoundTag("data");
 			if (data != null) {
 				String msg;
-				if ((msg = data.getString("tooltip")) != null && !msg.isEmpty()) tooltip.add(msg);
-				if (extraInfo && (msg = data.getString("details")) != null && !msg.isEmpty()) tooltip.add(msg);
+				if (!Strings.isNullOrEmpty(msg = data.getString("tooltip"))) tooltip.add(msg);
+				if (flag.isAdvanced() && !Strings.isNullOrEmpty(msg = data.getString("details"))) tooltip.add(msg);
 			}
 		}
-	}
-
-	@Override
-	public void init() {
-		super.init();
-		GameRegistry.addRecipe(new ItemStack(this),
-			"SSS",
-			"GRR",
-
-			'G', Items.GOLD_INGOT,
-			'R', Items.REDSTONE,
-			'S', Blocks.STONE
-		);
 	}
 }

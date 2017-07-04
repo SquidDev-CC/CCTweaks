@@ -2,22 +2,23 @@ package org.squiddev.cctweaks.core.rom;
 
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
-import dan200.computercraft.shared.computer.items.ComputerItemFactory;
 import dan200.computercraft.shared.media.items.ItemDiskLegacy;
-import dan200.computercraft.shared.util.ImpostorShapelessRecipe;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.RecipeSorter;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.api.computer.ICustomRomItem;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.registry.Module;
+import org.squiddev.cctweaks.core.registry.IModule;
 import org.squiddev.cctweaks.items.ItemBase;
 
 import javax.annotation.Nonnull;
@@ -25,17 +26,23 @@ import javax.annotation.Nonnull;
 /**
  * Create a crafting recipe which can set the ROM of any computer item.
  */
-public class CraftingSetRom extends Module implements IRecipe {
+public class CraftingSetRom extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe, IModule {
 	private static final ComputerFamily[] FAMILIES = new ComputerFamily[]{
 		ComputerFamily.Normal,
 		ComputerFamily.Advanced,
 	};
 
 	@Override
-	public void init() {
-		RecipeSorter.register(CCTweaks.ID + ":custom_rom", CraftingSetRom.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
-		GameRegistry.addRecipe(this);
+	public void preInit() {
+		MinecraftForge.EVENT_BUS.register(this);
+	}
 
+	@SubscribeEvent
+	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+		event.getRegistry().register(this.setRegistryName(new ResourceLocation(CCTweaks.ID, "set_rom")));
+
+
+		/* TODO: Convert to JSON
 		ItemStack disk = new ItemStack(ComputerCraft.Items.diskExpanded);
 
 		// Create some custom recipes. We don't bother with turtles, pocket computers or anything else: we just
@@ -50,6 +57,7 @@ public class CraftingSetRom extends Module implements IRecipe {
 			GameRegistry.addRecipe(new ImpostorShapelessRecipe(disk, new ItemStack[]{withRom}));
 			GameRegistry.addRecipe(new ImpostorShapelessRecipe(disk, new ItemStack[]{withRom, disk}));
 		}
+		*/
 	}
 
 	@Override
@@ -106,8 +114,8 @@ public class CraftingSetRom extends Module implements IRecipe {
 	}
 
 	@Override
-	public int getRecipeSize() {
-		return 2;
+	public boolean canFit(int width, int height) {
+		return width * height >= 3;
 	}
 
 	@Nonnull
@@ -163,6 +171,11 @@ public class CraftingSetRom extends Module implements IRecipe {
 		}
 
 		return out;
+	}
+
+	@Override
+	public boolean isHidden() {
+		return true;
 	}
 
 	private static ItemStack newDisk(int id) {

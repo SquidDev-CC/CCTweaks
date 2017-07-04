@@ -4,9 +4,10 @@ import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.pocket.IPocketUpgrade;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import org.squiddev.cctweaks.api.IComputerItemFactory;
 import org.squiddev.cctweaks.api.computer.ICustomRomItem;
@@ -28,15 +29,15 @@ import java.util.Set;
  */
 public class ItemPocketComputer_Patch extends ItemPocketComputer implements IComputerItemFactory, ICustomRomItem {
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		if (advanced) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
+		if (flag.isAdvanced()) {
 			int id = getComputerID(stack);
 			if (id >= 0) tooltip.add("(Computer ID: " + id + ")");
 		}
 
 		if (hasCustomRom(stack)) {
 			int id = getCustomRom(stack);
-			if (advanced && id >= 0) {
+			if (flag.isAdvanced() && id >= 0) {
 				tooltip.add("Has custom ROM (disk ID: " + id + ")");
 			} else {
 				tooltip.add("Has custom ROM");

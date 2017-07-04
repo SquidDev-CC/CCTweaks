@@ -216,9 +216,9 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 	}
 
 	public Object[] onPlayerRightClick(@Nonnull ItemStack stack, BlockPos pos, EnumFacing side, Vec3d look) {
-		float xCoord = (float) look.xCoord - (float) pos.getX();
-		float yCoord = (float) look.yCoord - (float) pos.getY();
-		float zCoord = (float) look.zCoord - (float) pos.getZ();
+		float xCoord = (float) look.x - (float) pos.getX();
+		float yCoord = (float) look.y - (float) pos.getY();
+		float zCoord = (float) look.z - (float) pos.getZ();
 		World world = player.getEntityWorld();
 
 		if (!stack.isEmpty() && stack.getItem().onItemUseFirst(player, world, pos, side, xCoord, yCoord, zCoord, EnumHand.MAIN_HAND) == EnumActionResult.SUCCESS) {
@@ -246,7 +246,7 @@ public class ToolManipulatorPeripheral implements IPeripheral, INetworkCompatibl
 				shiftPos = pos.offset(side);
 			}
 
-			if (!world.mayPlace(itemBlock.block, shiftPos, false, shiftSide, null)) {
+			if (!world.mayPlace(itemBlock.getBlock(), shiftPos, false, shiftSide, null)) {
 				return null;
 			}
 		}

@@ -48,7 +48,6 @@ public class ASMTransformer implements IClassTransformer {
 		};
 
 		/*
-			TODO: Look into moving some rewrites into compile-time processing instead.
 			This probably includes *_Rewrite as well as many of the binary handlers as they only exist
 			because they need to stub classes that we patch anyway.
 		 */

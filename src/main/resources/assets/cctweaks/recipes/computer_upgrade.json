@@ -1,0 +1,27 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"conditions": [
+		{
+			"type": "config",
+			"prop": "Computer.computerUpgradeCrafting"
+		}
+	],
+	"group": "cctweaks:computerupgrade",
+	"pattern": [
+		"GGG",
+		"GSG",
+		"GSG"
+	],
+	"key": {
+		"G": {
+			"item": "minecraft:gold_ingot"
+		},
+		"S": {
+			"type": "forge:ore_dict",
+			"ore": "stone"
+		}
+	},
+	"result": {
+		"item": "cctweaks:computerupgrade"
+	}
+}

@@ -1,27 +1,29 @@
 package org.squiddev.cctweaks.blocks.network;
 
-import dan200.computercraft.shared.peripheral.PeripheralType;
-import dan200.computercraft.shared.peripheral.common.PeripheralItemFactory;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.blocks.TileBase;
-import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.network.modem.BasicModem;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.items.ItemMultiBlock;
@@ -93,7 +95,7 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	public void getSubBlocks(@Nonnull Item item, CreativeTabs tab, NonNullList<ItemStack> itemStacks) {
+	public void getSubBlocks(CreativeTabs itemIn, NonNullList<ItemStack> itemStacks) {
 		itemStacks.add(new ItemStack(this, 1, 0));
 		itemStacks.add(new ItemStack(this, 1, 1));
 	}
@@ -131,32 +133,9 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 
 	@Override
 	public void preInit() {
-		register(new ItemMultiBlock(this));
+		MinecraftForge.EVENT_BUS.register(this);
 		registerTileEntity(TileNetworkedWirelessBridge.class, "wirelessBridge");
 		registerTileEntity(TileNetworkedModem.class, "wiredModem");
-	}
-
-	@Override
-	public void init() {
-		super.init();
-
-		if (Config.Network.WirelessBridge.crafting) {
-			Helpers.alternateCrafting(new ItemStack(this, 1, 0), 'C', 'M',
-				"GMG",
-				"CAC",
-				"GMG",
-
-				'G', Items.GOLD_INGOT,
-				'D', Items.DIAMOND,
-				'C', PeripheralItemFactory.create(PeripheralType.Cable, null, 1),
-				'M', PeripheralItemFactory.create(PeripheralType.WiredModem, null, 1),
-				'A', PeripheralItemFactory.create(PeripheralType.AdvancedModem, null, 1)
-			);
-		}
-
-		if (Config.Network.fullBlockModemCrafting) {
-			Helpers.twoWayCrafting(new ItemStack(this, 1, 1), PeripheralItemFactory.create(PeripheralType.WiredModem, null, 1));
-		}
 	}
 
 	@Override
@@ -177,8 +156,15 @@ public class BlockNetworked extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		event.getRegistry().register(new ItemMultiBlock(this).setRegistryName(new ResourceLocation(CCTweaks.ID, name)));
+	}
+
+	@Override
 	@SideOnly(Side.CLIENT)
-	public void clientPreInit() {
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
 		for (BlockNetworkedType type : BlockNetworkedType.VALUES) {
 			Helpers.setupModel(Item.getItemFromBlock(this), type.ordinal(), type.getName());
 		}

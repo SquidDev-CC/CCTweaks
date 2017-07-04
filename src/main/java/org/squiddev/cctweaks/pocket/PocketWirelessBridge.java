@@ -21,14 +21,14 @@ import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.network.bridge.NetworkBindingWithModem;
 import org.squiddev.cctweaks.core.network.modem.BasicModemPeripheral;
 import org.squiddev.cctweaks.core.network.modem.DynamicPeripheralCollection;
-import org.squiddev.cctweaks.core.registry.Module;
+import org.squiddev.cctweaks.core.registry.IModule;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.utils.EntityPosition;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
 
-public class PocketWirelessBridge extends Module implements IPocketUpgrade {
+public class PocketWirelessBridge implements IModule, IPocketUpgrade {
 	@Nonnull
 	@Override
 	public ResourceLocation getUpgradeID() {

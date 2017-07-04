@@ -15,9 +15,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.squiddev.cctweaks.core.rom.CraftingSetRom;
 
 import javax.annotation.Nonnull;
@@ -25,7 +24,7 @@ import javax.annotation.Nonnull;
 /**
  * Handles crafting with ComputerUpgrades
  */
-public class CraftingComputerUpgrade implements IRecipe {
+public class CraftingComputerUpgrade extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
 
 	@Override
 	public boolean matches(@Nonnull InventoryCrafting inventorycrafting, @Nonnull World world) {
@@ -121,8 +120,8 @@ public class CraftingComputerUpgrade implements IRecipe {
 	}
 
 	@Override
-	public int getRecipeSize() {
-		return 2;
+	public boolean canFit(int width, int height) {
+		return width >= 3 && height >= 3;
 	}
 
 	@Nonnull
@@ -131,15 +130,8 @@ public class CraftingComputerUpgrade implements IRecipe {
 		return ComputerItemFactory.create(-1, null, ComputerFamily.Advanced);
 	}
 
-	@Nonnull
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inventory) {
-		NonNullList<ItemStack> result = NonNullList.withSize(inventory.getSizeInventory(), ItemStack.EMPTY);
-
-		for (int i = 0; i < result.size(); ++i) {
-			result.set(i, ForgeHooks.getContainerItem(inventory.getStackInSlot(i)));
-		}
-
-		return result;
+	public boolean isHidden() {
+		return true;
 	}
 }

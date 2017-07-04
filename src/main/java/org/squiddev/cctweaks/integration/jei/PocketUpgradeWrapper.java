@@ -4,13 +4,12 @@ import dan200.computercraft.api.pocket.IPocketUpgrade;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.pocket.items.PocketComputerItemFactory;
 import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.BlankRecipeWrapper;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 
-public class PocketUpgradeWrapper extends BlankRecipeWrapper implements IValidRecipeWrapper {
+public class PocketUpgradeWrapper implements IValidRecipeWrapper {
 	public static final ComputerFamily[] FAMILIES = new ComputerFamily[]{
 		ComputerFamily.Normal, ComputerFamily.Advanced,
 	};

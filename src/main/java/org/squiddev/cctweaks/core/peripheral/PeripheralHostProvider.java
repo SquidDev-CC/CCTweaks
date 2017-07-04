@@ -8,14 +8,14 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.squiddev.cctweaks.api.peripheral.IPeripheralHost;
-import org.squiddev.cctweaks.core.registry.Module;
+import org.squiddev.cctweaks.core.registry.IModule;
 
 import javax.annotation.Nonnull;
 
 /**
  * Adds support for {@link org.squiddev.cctweaks.api.peripheral.IPeripheralHost}
  */
-public class PeripheralHostProvider extends Module implements IPeripheralProvider {
+public class PeripheralHostProvider implements IModule, IPeripheralProvider {
 	@Override
 	public void init() {
 		ComputerCraftAPI.registerPeripheralProvider(this);

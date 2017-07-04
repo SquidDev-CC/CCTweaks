@@ -1,0 +1,23 @@
+{
+	"type": "computercraft:impostor_shapeless",
+	"conditions": [
+		{
+			"type": "config",
+			"prop": "Computer.computerUpgradeEnabled"
+		}
+	],
+	"group": "cctweaks:computerupgrade",
+	"ingredients": [
+		{
+			"item": "computercraft:computer",
+			"data": 0
+		},
+		{
+			"item": "cctweaks:computerupgrade"
+		}
+	],
+	"result": {
+		"item": "computercraft:computer",
+		"data": 16384
+	}
+}

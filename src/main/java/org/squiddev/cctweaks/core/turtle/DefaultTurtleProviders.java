@@ -20,14 +20,14 @@ import org.squiddev.cctweaks.api.network.IWorldNetworkNode;
 import org.squiddev.cctweaks.api.network.IWorldNetworkNodeHost;
 import org.squiddev.cctweaks.api.network.NetworkAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
-import org.squiddev.cctweaks.core.registry.Module;
+import org.squiddev.cctweaks.core.registry.IModule;
 
 import javax.annotation.Nonnull;
 
 /**
  * Registers turtle related things
  */
-public class DefaultTurtleProviders extends Module {
+public class DefaultTurtleProviders implements IModule {
 	@Override
 	public void preInit() {
 		EntityRegistry.registerModEntity(

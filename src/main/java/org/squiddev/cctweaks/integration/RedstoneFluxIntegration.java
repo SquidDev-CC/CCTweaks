@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.integration;
 
-import cofh.api.energy.IEnergyContainerItem;
+import cofh.redstoneflux.RedstoneFlux;
+import cofh.redstoneflux.api.IEnergyContainerItem;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import net.minecraft.item.ItemStack;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
@@ -14,7 +15,7 @@ import javax.annotation.Nonnull;
  */
 public class RedstoneFluxIntegration extends APIIntegration {
 	public RedstoneFluxIntegration() {
-		super("CoFHAPI|energy");
+		super(RedstoneFlux.MOD_ID);
 	}
 
 	@Override

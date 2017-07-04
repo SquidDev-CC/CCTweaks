@@ -7,14 +7,14 @@ import net.minecraftforge.energy.IEnergyStorage;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
 import org.squiddev.cctweaks.core.Config;
-import org.squiddev.cctweaks.core.registry.Module;
+import org.squiddev.cctweaks.core.registry.IModule;
 
 import javax.annotation.Nonnull;
 
 /**
  * Forge energy provider for turtles
  */
-public class ForgeIntegration extends Module {
+public class ForgeIntegration implements IModule {
 	@Override
 	public void init() {
 		CCTweaksAPI.instance().fuelRegistry().addFuelProvider(new ITurtleFuelProvider() {

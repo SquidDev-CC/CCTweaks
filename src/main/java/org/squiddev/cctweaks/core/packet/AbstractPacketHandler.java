@@ -5,9 +5,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.registry.Module;
+import org.squiddev.cctweaks.core.registry.IModule;
 
-public class AbstractPacketHandler<T extends AbstractPacketHandler.IPacket> extends Module implements IMessageHandler<T, IMessage> {
+public class AbstractPacketHandler<T extends AbstractPacketHandler.IPacket> implements IMessageHandler<T, IMessage>, IModule {
 	private final int id;
 	private final Side side;
 	private final Class<T> type;
@@ -24,7 +24,6 @@ public class AbstractPacketHandler<T extends AbstractPacketHandler.IPacket> exte
 
 	@Override
 	public void preInit() {
-		super.preInit();
 		CCTweaks.network.registerMessage(this, type, id, side);
 	}
 

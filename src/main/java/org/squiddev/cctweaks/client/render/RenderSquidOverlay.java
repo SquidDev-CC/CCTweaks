@@ -2,9 +2,9 @@ package org.squiddev.cctweaks.client.render;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -14,13 +14,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.IClientModule;
-import org.squiddev.cctweaks.core.registry.Module;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.UUID;
 
-public class RenderSquidOverlay extends Module implements IClientModule {
+public class RenderSquidOverlay implements IClientModule {
 	private static final UUID uuid = UUID.fromString("d3156e4b-c712-4fd3-87b0-b24b8ca94209");
 
 	@Override
@@ -98,7 +97,7 @@ public class RenderSquidOverlay extends Module implements IClientModule {
 				GlStateManager.translate(0.1, 0, 0);
 
 				Tessellator tessellator = Tessellator.getInstance();
-				VertexBuffer renderer = tessellator.getBuffer();
+				BufferBuilder renderer = tessellator.getBuffer();
 
 				for (int j = 0; j < SEGMENTS; j++) {
 					// Offset each tentacle by a random amount
@@ -140,7 +139,7 @@ public class RenderSquidOverlay extends Module implements IClientModule {
 			return false;
 		}
 
-		private static void tentacle(VertexBuffer renderer) {
+		private static void tentacle(BufferBuilder renderer) {
 			renderer.pos(0, 0, -WIDTH / 2).endVertex();
 			renderer.pos(0, 0, WIDTH / 2).endVertex();
 			renderer.pos(0, LENGTH, WIDTH / 2).endVertex();
@@ -171,10 +170,5 @@ public class RenderSquidOverlay extends Module implements IClientModule {
 			renderer.pos(WIDTH, LENGTH, WIDTH / 2).endVertex();
 			renderer.pos(WIDTH, 0, WIDTH / 2).endVertex();
 		}
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void clientPreInit() {
 	}
 }

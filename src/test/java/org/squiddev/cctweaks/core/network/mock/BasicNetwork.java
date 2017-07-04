@@ -141,7 +141,7 @@ public class BasicNetwork implements IBlockAccess, Iterable<Map.Entry<BlockPos, 
 	@Nonnull
 	@Override
 	public WorldType getWorldType() {
-		return WorldType.DEBUG_WORLD;
+		return WorldType.DEFAULT;
 	}
 
 	@Override

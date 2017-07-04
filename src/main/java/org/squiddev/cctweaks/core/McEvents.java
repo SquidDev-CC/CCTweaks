@@ -63,7 +63,7 @@ public class McEvents {
 
 			if (entity.capturedDrops != null && entity.capturedDrops.size() > 0) {
 				for (EntityItem item : entity.capturedDrops) {
-					consumer.consumeDrop(item.getEntityItem());
+					consumer.consumeDrop(item.getItem());
 				}
 				entity.capturedDrops.clear();
 			}
@@ -99,7 +99,7 @@ public class McEvents {
 		IDropConsumer consumer = entityConsumers.get(event.getEntity());
 		if (consumer != null) {
 			for (EntityItem item : event.getDrops()) {
-				consumer.consumeDrop(item.getEntityItem());
+				consumer.consumeDrop(item.getItem());
 			}
 			event.getDrops().clear();
 		}

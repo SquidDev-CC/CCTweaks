@@ -11,11 +11,11 @@ import org.squiddev.cctweaks.api.block.BasicRotationHandler;
 import org.squiddev.cctweaks.api.block.IRotationHandler;
 import org.squiddev.cctweaks.api.block.IRotationRegistry;
 import org.squiddev.cctweaks.api.block.PropertyRotationHandler;
-import org.squiddev.cctweaks.core.registry.Module;
+import org.squiddev.cctweaks.core.registry.IModule;
 
 import javax.annotation.Nonnull;
 
-public class VanillaRotationHandlers extends Module {
+public class VanillaRotationHandlers implements IModule {
 	private static final IRotationHandler BLOCK_DIRECTIONAL = new PropertyRotationHandler(BlockDirectional.FACING);
 
 	@Override

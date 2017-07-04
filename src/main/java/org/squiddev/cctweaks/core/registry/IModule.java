@@ -11,20 +11,25 @@ public interface IModule {
 	 *
 	 * @return If this module should be loaded
 	 */
-	boolean canLoad();
+	default boolean canLoad() {
+		return true;
+	}
 
 	/**
 	 * @see Mod.EventHandler
 	 */
-	void preInit();
+	default void preInit() {
+	}
 
 	/**
 	 * @see Mod.EventHandler
 	 */
-	void init();
+	default void init() {
+	}
 
 	/**
 	 * @see Mod.EventHandler
 	 */
-	void postInit();
+	default void postInit() {
+	}
 }

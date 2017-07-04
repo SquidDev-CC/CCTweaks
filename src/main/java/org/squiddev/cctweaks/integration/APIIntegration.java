@@ -1,12 +1,12 @@
 package org.squiddev.cctweaks.integration;
 
 import net.minecraftforge.fml.common.ModAPIManager;
-import org.squiddev.cctweaks.core.registry.Module;
+import org.squiddev.cctweaks.core.registry.IModule;
 
 /**
  * A module that is loaded when an API is on the class path
  */
-public abstract class APIIntegration extends Module {
+public abstract class APIIntegration implements IModule {
 	public final String apiName;
 
 	public APIIntegration(String modName) {

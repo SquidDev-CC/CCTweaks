@@ -58,7 +58,7 @@ public final class Registry {
 
 		// CC Providers
 		addModule(new PeripheralHostProvider());
-		addModule(new Module() {
+		addModule(new IModule() {
 			@Override
 			public void init() {
 				ApiRegister.init();

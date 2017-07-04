@@ -2,9 +2,9 @@ package org.squiddev.cctweaks.client.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
@@ -19,7 +19,6 @@ import org.lwjgl.opengl.GL11;
 import org.squiddev.cctweaks.api.UnorderedPair;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.IClientModule;
-import org.squiddev.cctweaks.core.registry.Module;
 import org.squiddev.cctweaks.core.registry.Registry;
 import org.squiddev.cctweaks.core.visualiser.NetworkChange;
 import org.squiddev.cctweaks.core.visualiser.NetworkNode;
@@ -33,7 +32,7 @@ import java.util.Set;
 /**
  * This is a helper to render a network when testing.
  */
-public final class RenderNetworkOverlay extends Module implements IClientModule {
+public final class RenderNetworkOverlay implements IClientModule {
 	private int ticksInGame;
 	private static final NetworkState data = new NetworkState();
 
@@ -137,7 +136,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 	private void renderConnections(Collection<UnorderedPair<NetworkNode>> connections, Color color, float alpha, float thickness) {
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer renderer = tessellator.getBuffer();
+		BufferBuilder renderer = tessellator.getBuffer();
 
 		GlStateManager.pushMatrix();
 		GlStateManager.scale(1, 1, 1);
@@ -176,7 +175,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 		// Render label background
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer renderer = tessellator.getBuffer();
+		BufferBuilder renderer = tessellator.getBuffer();
 
 		int width = fontrenderer.getStringWidth(label);
 		int xOffset = width / 2;
@@ -202,12 +201,7 @@ public final class RenderNetworkOverlay extends Module implements IClientModule 
 
 	@Override
 	public boolean canLoad() {
-		return super.canLoad() && Config.Computer.debugWandEnabled;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void clientPreInit() {
+		return Config.Computer.debugWandEnabled;
 	}
 
 	@Override

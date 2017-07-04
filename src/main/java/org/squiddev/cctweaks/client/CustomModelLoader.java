@@ -15,14 +15,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.registry.IClientModule;
-import org.squiddev.cctweaks.core.registry.Module;
 
 /**
  * Loader for models that aren't associated with a block
  *
  * Mostly for
  */
-public class CustomModelLoader extends Module implements IClientModule {
+public class CustomModelLoader implements IClientModule {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onModelBakeEvent(ModelBakeEvent event) {

@@ -3,7 +3,6 @@ package org.squiddev.cctweaks.integration;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import net.darkhax.tesla.api.ITeslaProducer;
 import net.darkhax.tesla.capability.TeslaCapabilities;
-import net.darkhax.tesla.lib.Constants;
 import net.minecraft.item.ItemStack;
 import org.squiddev.cctweaks.api.CCTweaksAPI;
 import org.squiddev.cctweaks.api.turtle.ITurtleFuelProvider;
@@ -16,7 +15,7 @@ import javax.annotation.Nonnull;
  */
 public class TeslaIntegration extends APIIntegration {
 	public TeslaIntegration() {
-		super(Constants.MOD_ID);
+		super("tesla");
 	}
 
 	@Override

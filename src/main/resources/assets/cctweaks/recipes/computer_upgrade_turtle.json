@@ -1,0 +1,31 @@
+{
+	"type": "computercraft:impostor_shaped",
+	"conditions": [
+		{
+			"type": "config",
+			"prop": "Computer.computerUpgradeEnabled"
+		}
+	],
+	"group": "cctweaks:computerupgrade",
+	"pattern": [
+		"GGG",
+		"GTG",
+		"GUG"
+	],
+	"key": {
+		"G": {
+			"item": "minecraft:gold_ingot"
+		},
+		"T": {
+			"item": "computercraft:turtle",
+			"data": 0
+		},
+		"U": {
+			"item": "cctweaks:computerupgrade"
+		}
+	},
+	"result": {
+		"item": "computercraft:turtle_advanced",
+		"data": 0
+	}
+}

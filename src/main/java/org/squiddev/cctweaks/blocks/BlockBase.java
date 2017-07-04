@@ -15,11 +15,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.registry.IClientModule;
+import org.squiddev.cctweaks.core.registry.IModule;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
 import javax.annotation.Nonnull;
@@ -27,7 +31,7 @@ import javax.annotation.Nonnull;
 /**
  * Base class for all blocks
  */
-public abstract class BlockBase<T extends TileBase> extends BlockContainer implements IClientModule {
+public abstract class BlockBase<T extends TileBase> extends BlockContainer implements IModule {
 	public final String name;
 	public final Class<T> klass;
 
@@ -104,13 +108,8 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 	}
 
 	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
 	public void preInit() {
-		register(new ItemBlock(this));
+		MinecraftForge.EVENT_BUS.register(this);
 		registerTileEntity(klass, name);
 	}
 
@@ -118,27 +117,19 @@ public abstract class BlockBase<T extends TileBase> extends BlockContainer imple
 		GameRegistry.registerTileEntity(klass, CCTweaks.ID + ":" + name);
 	}
 
-	protected void register(Item item) {
-		GameRegistry.register(this, new ResourceLocation(CCTweaks.ID, name));
-		GameRegistry.register(item, new ResourceLocation(CCTweaks.ID, name));
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		event.getRegistry().register(new ItemBlock(this).setRegistryName(new ResourceLocation(CCTweaks.ID, name)));
 	}
 
-	@Override
-	public void init() {
+	@SubscribeEvent
+	public void registerBlocks(RegistryEvent.Register<Block> event) {
+		event.getRegistry().register(this.setRegistryName(new ResourceLocation(CCTweaks.ID, name)));
 	}
 
-	@Override
-	public void postInit() {
-	}
-
-	@Override
 	@SideOnly(Side.CLIENT)
-	public void clientPreInit() {
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
 		Helpers.setupModel(Item.getItemFromBlock(this), 0, name);
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void clientInit() {
 	}
 }

@@ -46,10 +46,7 @@ public class Terminal_Patch extends Terminal {
 				nbttagcompound.setString("term_textColour_" + i, m_textColour[i].toString());
 				nbttagcompound.setString("term_textBgColour_" + i, m_backgroundColour[i].toString());
 			}
-		}
 
-		if (m_palette != null) {
-			// TODO: Move to if(lines) when we update to the next commit (see dan200/ComputerCraft#259)
 			m_palette.writeToNBT(nbttagcompound);
 		}
 	}

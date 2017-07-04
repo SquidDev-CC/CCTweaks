@@ -1,7 +1,7 @@
 package org.squiddev.cctweaks.integration.jei;
 
 import mezz.jei.api.IModRegistry;
-import net.minecraft.item.Item;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import org.squiddev.cctweaks.blocks.BlockBase;
@@ -13,18 +13,10 @@ public final class JeiDescription {
 	private JeiDescription() {
 	}
 
-	public static void registerDescription(IModRegistry registry, ItemStack stack) {
-		registry.addDescription(stack, stack.getUnlocalizedName() + ".information");
-	}
-
-	public static void registerDescription(IModRegistry registry, ItemBase stack, int meta) {
-		if (stack.canLoad()) registerDescription(registry, new ItemStack(stack, meta));
-	}
-
 	public static void registerDescription(IModRegistry registry, ItemBase item) {
 		if (item.canLoad()) {
 			NonNullList<ItemStack> stacks = NonNullList.create();
-			item.getSubItems(item, null, stacks);
+			item.getSubItems(CreativeTabs.SEARCH, stacks);
 
 			if (stacks.size() == 0) {
 				registerDescription(registry, new ItemStack(item));
@@ -39,7 +31,7 @@ public final class JeiDescription {
 	public static void registerDescription(IModRegistry registry, BlockBase<?> block) {
 		if (block.canLoad()) {
 			NonNullList<ItemStack> stacks = NonNullList.create();
-			block.getSubBlocks(Item.getItemFromBlock(block), null, stacks);
+			block.getSubBlocks(CreativeTabs.SEARCH, stacks);
 
 			if (stacks.size() == 0) {
 				registerDescription(registry, new ItemStack(block));
@@ -51,26 +43,7 @@ public final class JeiDescription {
 		}
 	}
 
-	public static void registerGenericDescription(IModRegistry registry, ItemBase stack) {
-		if (stack.canLoad()) registerGenericDescription(registry, new ItemStack(stack));
-	}
-
-	public static void registerGenericDescription(IModRegistry registry, BlockBase<?> block) {
-		if (block.canLoad()) {
-			NonNullList<ItemStack> stacks = NonNullList.create();
-			block.getSubBlocks(Item.getItemFromBlock(block), null, stacks);
-
-			if (stacks.size() == 0) {
-				registerGenericDescription(registry, new ItemStack(block));
-			} else {
-				for (ItemStack stack : stacks) {
-					registerGenericDescription(registry, stack);
-				}
-			}
-		}
-	}
-
-	public static void registerGenericDescription(IModRegistry registry, @Nonnull ItemStack stack) {
-		registry.addDescription(stack, stack.getItem().getUnlocalizedName() + ".information");
+	public static void registerDescription(IModRegistry registry, @Nonnull ItemStack stack) {
+		registry.addIngredientInfo(stack, ItemStack.class, stack.getUnlocalizedName() + ".information");
 	}
 }

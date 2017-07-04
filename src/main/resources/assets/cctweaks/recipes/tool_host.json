@@ -1,0 +1,29 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"conditions": [
+		{
+			"type": "config",
+			"prop": "Turtle.ToolHost.crafting"
+		}
+	],
+	"pattern": [
+		"GDG",
+		"DOD",
+		"GDG"
+	],
+	"key": {
+		"G": {
+			"item": "minecraft:gold_ingot"
+		},
+		"D": {
+			"item": "minecraft:diamond"
+		},
+		"O": {
+			"item": "minecraft:obsidian"
+		}
+	},
+	"result": {
+		"item": "cctweaks:toolhost",
+		"data": 0
+	}
+}

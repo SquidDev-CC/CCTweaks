@@ -8,6 +8,7 @@ import dan200.computercraft.shared.turtle.items.ItemTurtleBase;
 import dan200.computercraft.shared.turtle.items.TurtleItemFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -122,17 +123,16 @@ public abstract class ItemComputerBase_Patch extends ItemComputerBase implements
 
 		return true;
 	}
-
 	@Override
-	public void addInformation(@Nonnull ItemStack stack, @Nonnull EntityPlayer playerIn, @Nonnull List<String> tooltip, boolean advanced) {
-		if (advanced) {
+	public void addInformation(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<String> tooltip, @Nonnull ITooltipFlag flag) {
+		if (flag.isAdvanced()) {
 			int id = getComputerID(stack);
 			if (id >= 0) tooltip.add("(Computer ID: " + id + ")");
 		}
 
 		if (hasCustomRom(stack)) {
 			int id = getCustomRom(stack);
-			if (advanced && id >= 0) {
+			if (flag.isAdvanced() && id >= 0) {
 				tooltip.add("Has custom ROM (disk ID: " + id + ")");
 			} else {
 				tooltip.add("Has custom ROM");

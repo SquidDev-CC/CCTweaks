@@ -1,0 +1,35 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"conditions": [
+		{
+			"type": "config",
+			"prop": "Network.WirelessBridge.crafting"
+		}
+	],
+	"group": "cctweaks:wireless_bridge",
+	"pattern": [
+		"GCG",
+		"MDM",
+		"GCG"
+	],
+	"key": {
+		"G": {
+			"item": "minecraft:gold_ingot"
+		},
+		"D": {
+			"item": "minecraft:diamond"
+		},
+		"M": {
+			"item": "computercraft:cable",
+			"data": 1
+		},
+		"C": {
+			"item": "computercraft:cable",
+			"data": 0
+		}
+	},
+	"result": {
+		"item": "cctweaks:networkedblock",
+		"data": 0
+	}
+}

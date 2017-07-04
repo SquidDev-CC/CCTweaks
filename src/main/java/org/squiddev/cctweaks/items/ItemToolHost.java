@@ -2,15 +2,12 @@ package org.squiddev.cctweaks.items;
 
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeToolHost;
 import org.squiddev.cctweaks.turtle.TurtleUpgradeToolManipulator;
@@ -27,8 +24,8 @@ public class ItemToolHost extends ItemBase {
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public void getSubItems(@Nonnull Item item, CreativeTabs tab, NonNullList<ItemStack> list) {
+	public void getSubItems(@Nonnull CreativeTabs tab, @Nonnull NonNullList<ItemStack> list) {
+		if (!isInCreativeTab(tab)) return;
 		list.add(new ItemStack(this, 1, 0));
 		list.add(new ItemStack(this, 1, 1));
 	}
@@ -52,42 +49,14 @@ public class ItemToolHost extends ItemBase {
 
 	@Override
 	public void init() {
-		super.init();
-
-		if (Config.Turtle.ToolHost.enabled) {
-			if (Config.Turtle.ToolHost.crafting) {
-				GameRegistry.addRecipe(new ItemStack(this, 1, 0),
-					"GDG",
-					"DOD",
-					"GDG",
-
-					'G', Items.GOLD_INGOT,
-					'D', Items.DIAMOND,
-					'O', Blocks.OBSIDIAN
-				);
-			}
-
-			ComputerCraft.registerTurtleUpgrade(new TurtleUpgradeToolHost());
-
-			if (Config.Turtle.ToolHost.advanced) {
-				GameRegistry.addRecipe(new ItemStack(this, 1, 1),
-					"GDG",
-					"DOD",
-					"GDG",
-
-					'G', Items.GOLD_INGOT,
-					'D', Items.DIAMOND,
-					'O', new ItemStack(this, 1, 0)
-				);
-
-				ComputerCraft.registerTurtleUpgrade(new TurtleUpgradeToolManipulator());
-			}
-		}
+		ComputerCraft.registerTurtleUpgrade(new TurtleUpgradeToolHost());
+		ComputerCraft.registerTurtleUpgrade(new TurtleUpgradeToolManipulator());
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void clientPreInit() {
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
 		Helpers.setupModel(this, 0, name);
 		Helpers.setupModel(this, 1, "toolHostAdvanced");
 	}

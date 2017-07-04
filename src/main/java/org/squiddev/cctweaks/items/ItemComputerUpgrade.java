@@ -4,30 +4,27 @@ import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.computer.blocks.BlockComputer;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
-import dan200.computercraft.shared.computer.items.ComputerItemFactory;
-import dan200.computercraft.shared.pocket.items.PocketComputerItemFactory;
 import dan200.computercraft.shared.turtle.blocks.TileTurtle;
-import dan200.computercraft.shared.turtle.items.TurtleItemFactory;
-import dan200.computercraft.shared.util.ImpostorRecipe;
-import dan200.computercraft.shared.util.ImpostorShapelessRecipe;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.RecipeSorter;
 import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.utils.ComputerAccessor;
@@ -36,6 +33,7 @@ import org.squiddev.cctweaks.core.utils.Helpers;
 import org.squiddev.cctweaks.core.utils.InventoryUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class ItemComputerUpgrade extends ItemComputerAction {
@@ -142,54 +140,12 @@ public class ItemComputerUpgrade extends ItemComputerAction {
 	@Override
 	@SideOnly(Side.CLIENT)
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag flag) {
 		list.add(Helpers.translateToLocal("gui.tooltip.cctweaks.computerUpgrade.normal"));
 	}
 
-	@Override
-	public void init() {
-		super.init();
-		if (!Config.Computer.computerUpgradeEnabled) return;
-
-		ItemStack stack = new ItemStack(this);
-		if (Config.Computer.computerUpgradeCrafting) {
-			GameRegistry.addRecipe(stack, "GGG", "GSG", "GSG", 'G', Items.GOLD_INGOT, 'S', Blocks.STONE);
-		}
-
-
-		RecipeSorter.register(CCTweaks.ID + ":computer_upgrade_crafting", CraftingComputerUpgrade.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
-		GameRegistry.addRecipe(new CraftingComputerUpgrade());
-
-		// Add some impostor recipes for NEI. We just use CC's default ones
-		{
-			// Computer
-			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
-				ComputerItemFactory.create(-1, null, ComputerFamily.Advanced),
-				new ItemStack[]{
-					ComputerItemFactory.create(-1, null, ComputerFamily.Normal),
-					stack
-				}
-			));
-
-			// Turtle (Is is silly to include every possible upgrade so we just do the normal one)
-			ItemStack gold = new ItemStack(Items.GOLD_INGOT);
-			GameRegistry.addRecipe(new ImpostorRecipe(3, 3,
-				new ItemStack[]{
-					gold, gold, gold,
-					gold, TurtleItemFactory.create(-1, null, -1, ComputerFamily.Normal, null, null, 0, null), gold,
-					gold, stack, gold,
-				},
-				TurtleItemFactory.create(-1, null, -1, ComputerFamily.Advanced, null, null, 0, null)
-			));
-
-			// Pocket computer
-			GameRegistry.addRecipe(new ImpostorShapelessRecipe(
-				PocketComputerItemFactory.create(-1, null, -1, ComputerFamily.Advanced, null),
-				new ItemStack[]{
-					PocketComputerItemFactory.create(-1, null, -1, ComputerFamily.Normal, null),
-					stack
-				}
-			));
-		}
+	@SubscribeEvent
+	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+		event.getRegistry().register(new CraftingComputerUpgrade().setRegistryName(new ResourceLocation(CCTweaks.ID, "computer_upgrade_crafting")));
 	}
 }

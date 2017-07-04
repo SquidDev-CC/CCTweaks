@@ -9,9 +9,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.squiddev.cctweaks.CCTweaks;
 import org.squiddev.cctweaks.blocks.BlockBase;
 import org.squiddev.cctweaks.blocks.IMultiBlock;
 import org.squiddev.cctweaks.blocks.TileBase;
@@ -69,7 +75,7 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
-	public void getSubBlocks(@Nonnull Item item, CreativeTabs tab, NonNullList<ItemStack> itemStacks) {
+	public void getSubBlocks(CreativeTabs itemIn, NonNullList<ItemStack> itemStacks) {
 		for (BlockDebugType type : BlockDebugType.VALUES) {
 			itemStacks.add(new ItemStack(this, 1, type.ordinal()));
 		}
@@ -124,7 +130,7 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 
 	@Override
 	public void preInit() {
-		register(new ItemMultiBlock(this));
+		MinecraftForge.EVENT_BUS.register(this);
 		registerTileEntity(TileDebugPeripheral.class, "debugPeripheral");
 		registerTileEntity(TileDebugNetworkedPeripheral.class, "debugNetworkedPeripheral");
 		registerTileEntity(TileDebugNode.class, "debugNode");
@@ -136,8 +142,15 @@ public class BlockDebug extends BlockBase<TileBase> implements IMultiBlock {
 	}
 
 	@Override
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		event.getRegistry().register(new ItemMultiBlock(this).setRegistryName(new ResourceLocation(CCTweaks.ID, name)));
+	}
+
+	@Override
 	@SideOnly(Side.CLIENT)
-	public void clientPreInit() {
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
 		for (BlockDebugType type : BlockDebugType.VALUES) {
 			Helpers.setupModel(Item.getItemFromBlock(this), type.ordinal(), "debug_" + type.getName());
 		}

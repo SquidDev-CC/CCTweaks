@@ -4,14 +4,17 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.registry.IClientModule;
+import org.squiddev.cctweaks.core.registry.IModule;
 import org.squiddev.cctweaks.core.utils.Helpers;
 
-public abstract class ItemBase extends Item implements IClientModule {
+public abstract class ItemBase extends Item implements IModule {
 	protected final String name;
 
 	public ItemBase(String itemName, int stackSize) {
@@ -34,31 +37,18 @@ public abstract class ItemBase extends Item implements IClientModule {
 	}
 
 	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
 	public void preInit() {
-		GameRegistry.register(this, new ResourceLocation(CCTweaks.ID, name));
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
-	@Override
-	public void init() {
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		event.getRegistry().register(this.setRegistryName(new ResourceLocation(CCTweaks.ID, name)));
 	}
 
-	@Override
-	public void postInit() {
-	}
-
-	@Override
 	@SideOnly(Side.CLIENT)
-	public void clientPreInit() {
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
 		Helpers.setupModel(this, 0, name);
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void clientInit() {
 	}
 }

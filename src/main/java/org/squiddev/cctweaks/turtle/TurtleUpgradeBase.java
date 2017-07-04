@@ -12,12 +12,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
 import org.squiddev.cctweaks.CCTweaks;
-import org.squiddev.cctweaks.core.registry.Module;
+import org.squiddev.cctweaks.core.registry.IModule;
 
 import javax.annotation.Nonnull;
 import javax.vecmath.Matrix4f;
 
-public abstract class TurtleUpgradeBase extends Module implements ITurtleUpgrade {
+public abstract class TurtleUpgradeBase implements ITurtleUpgrade, IModule {
 	@SideOnly(Side.CLIENT)
 	private static ItemModelMesher mesher;
 

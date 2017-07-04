@@ -9,10 +9,10 @@ import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
 import dan200.computercraft.shared.util.Palette;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
@@ -39,7 +39,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.squiddev.cctweaks.core.Config;
 import org.squiddev.cctweaks.core.registry.IClientModule;
-import org.squiddev.cctweaks.core.registry.Module;
 
 import java.util.List;
 
@@ -51,12 +50,7 @@ import static dan200.computercraft.client.gui.FixedWidthFontRenderer.FONT_WIDTH;
  *
  * @see net.minecraft.client.renderer.ItemRenderer
  */
-public class ItemPocketRenderer extends Module implements IClientModule {
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void clientPreInit() {
-	}
-
+public class ItemPocketRenderer implements IClientModule {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void clientInit() {
@@ -292,7 +286,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 		GlStateManager.rotate(offset * -135f, 0f, 1f, 0f);
 		GlStateManager.translate(offset * 5.6f, 0f, 0f);
 
-		RenderPlayer renderPlayer = (RenderPlayer) manager.getEntityRenderObject(clientPlayer);
+		RenderPlayer renderPlayer = (RenderPlayer) (Render<?>) manager.getEntityRenderObject(clientPlayer);
 		GlStateManager.disableCull();
 
 		if (side == EnumHandSide.LEFT) {
@@ -310,7 +304,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 		RenderManager manager = minecraft.getRenderManager();
 
 		minecraft.getTextureManager().bindTexture(minecraft.player.getLocationSkin());
-		Render<AbstractClientPlayer> render = manager.<AbstractClientPlayer>getEntityRenderObject(minecraft.player);
+		Render<AbstractClientPlayer> render = manager.getEntityRenderObject(minecraft.player);
 		RenderPlayer renderPlayer = (RenderPlayer) render;
 
 		GlStateManager.pushMatrix();
@@ -335,7 +329,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 	private void renderModel(IBakedModel model) {
 		Minecraft mc = Minecraft.getMinecraft();
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer renderer = tessellator.getBuffer();
+		BufferBuilder renderer = tessellator.getBuffer();
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
 		renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
@@ -348,7 +342,7 @@ public class ItemPocketRenderer extends Module implements IClientModule {
 	}
 
 	@SideOnly(Side.CLIENT)
-	private void renderQuads(VertexBuffer renderer, List<BakedQuad> quads) {
+	private void renderQuads(BufferBuilder renderer, List<BakedQuad> quads) {
 		for (BakedQuad quad : quads) {
 			LightUtil.renderQuadColor(renderer, quad, -1);
 		}

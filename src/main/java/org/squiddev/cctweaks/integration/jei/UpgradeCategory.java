@@ -5,7 +5,7 @@ import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.BlankRecipeCategory;
+import mezz.jei.api.recipe.IRecipeCategory;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.util.ResourceLocation;
 import org.squiddev.cctweaks.CCTweaks;
@@ -13,7 +13,7 @@ import org.squiddev.cctweaks.core.utils.Helpers;
 
 import javax.annotation.Nonnull;
 
-public class UpgradeCategory extends BlankRecipeCategory<IRecipeWrapper> {
+public class UpgradeCategory implements IRecipeCategory<IRecipeWrapper> {
 	private final String id;
 	private final IDrawable background;
 
@@ -33,6 +33,12 @@ public class UpgradeCategory extends BlankRecipeCategory<IRecipeWrapper> {
 	@Override
 	public String getTitle() {
 		return Helpers.translateToLocal("gui.jei.cctweaks." + id);
+	}
+
+	@Nonnull
+	@Override
+	public String getModName() {
+		return CCTweaks.NAME;
 	}
 
 	@Nonnull

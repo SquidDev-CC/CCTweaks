@@ -1,0 +1,5 @@
+{
+	"conditions": {
+		"config": "org.squiddev.cctweaks.recipe.ConditionConfigFactory"
+	}
+}
