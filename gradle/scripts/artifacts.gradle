@@ -39,3 +39,20 @@ task devJar(type: Jar) {
 
 	exclude("assets/**/docs")
 }
+
+// Sign the main jar
+task signJar(type: SignJar, dependsOn: reobfJar) {
+	onlyIf {
+		project.hasProperty('keyStore')
+	}
+
+	keyStore = project.keyStore
+	alias = project.keyStoreAlias
+	storePass = project.keyStorePass
+	keyPass = project.keyStoreKeyPass
+
+	inputFile = jar.archivePath
+	outputFile = jar.archivePath
+}
+
+build.dependsOn signJar
