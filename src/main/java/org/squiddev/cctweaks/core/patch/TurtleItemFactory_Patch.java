@@ -18,11 +18,11 @@ public class TurtleItemFactory_Patch extends TurtleItemFactory {
 		ItemStack stack = native_create(turtle);
 		if (stack != null && turtle instanceof TileComputerBase_Patch) {
 			TileComputerBase_Patch compTile = (TileComputerBase_Patch) turtle;
-			if (compTile.hasDisk) {
+			if (compTile.hasDisk()) {
 				NBTTagCompound tag = stack.getTagCompound();
 				if (tag == null) stack.setTagCompound(tag = new NBTTagCompound());
 
-				tag.setInteger("rom_id", compTile.diskId);
+				tag.setInteger("rom_id", compTile.getDiskId());
 			}
 		}
 

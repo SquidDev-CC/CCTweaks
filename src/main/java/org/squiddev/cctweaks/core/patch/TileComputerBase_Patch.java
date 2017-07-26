@@ -19,8 +19,8 @@ import javax.annotation.Nonnull;
 	to = "dan200/computercraft/shared/computer/core/ServerComputer"
 )
 public abstract class TileComputerBase_Patch extends TileComputerBase implements IExtendedComputerTile {
-	public boolean hasDisk;
-	public int diskId;
+	private boolean hasDisk;
+	private int diskId;
 
 	@MergeVisitor.Stub
 	public ServerComputer createServerComputer() {
@@ -123,5 +123,21 @@ public abstract class TileComputerBase_Patch extends TileComputerBase implements
 			hasDisk = true;
 			diskId = gag.getInteger("rom_id");
 		}
+	}
+
+	public void setDiskId(int diskId) {
+		this.hasDisk = true;
+		this.diskId = diskId;
+
+		ServerComputer_Patch computer = (ServerComputer_Patch) getServerComputer();
+		if (computer != null) computer.setCustomRom(diskId);
+	}
+
+	public boolean hasDisk() {
+		return hasDisk;
+	}
+
+	public int getDiskId() {
+		return hasDisk ? diskId : -1;
 	}
 }

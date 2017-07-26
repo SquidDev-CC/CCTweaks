@@ -18,11 +18,11 @@ public class ComputerItemFactory_Patch extends ComputerItemFactory {
 		ItemStack stack = native_create(tile);
 		if (stack != null && tile instanceof TileComputerBase_Patch) {
 			TileComputerBase_Patch compTile = (TileComputerBase_Patch) tile;
-			if (compTile.hasDisk) {
+			if (compTile.hasDisk()) {
 				NBTTagCompound tag = stack.getTagCompound();
 				if (tag == null) stack.setTagCompound(tag = new NBTTagCompound());
 
-				tag.setInteger("rom_id", compTile.diskId);
+				tag.setInteger("rom_id", compTile.getDiskId());
 			}
 		}
 

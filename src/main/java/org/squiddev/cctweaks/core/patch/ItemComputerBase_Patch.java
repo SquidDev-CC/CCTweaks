@@ -116,8 +116,7 @@ public abstract class ItemComputerBase_Patch extends ItemComputerBase implements
 			TileEntity tile = world.getTileEntity(pos);
 			if (tile != null && tile instanceof TileComputerBase_Patch) {
 				TileComputerBase_Patch computer = (TileComputerBase_Patch) tile;
-				computer.hasDisk = true;
-				computer.diskId = tag.getInteger("rom_id");
+				computer.setDiskId(tag.getInteger("rom_id"));
 			}
 		}
 
