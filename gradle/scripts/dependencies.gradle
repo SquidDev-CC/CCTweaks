@@ -53,8 +53,7 @@ dependencies {
 		exclude group: 'io.netty'
 	}
 
-	shade('org.squiddev:Patcher:1.2.4') { exclude group: 'org.ow2.asm' }
-
+	shade('org.squiddev:Patcher:1.2.5') { exclude group: 'org.ow2.asm' }
 	provided('org.squiddev:ConfigGen:1.2.5') { exclude group: 'net.minecraftforge' }
 
 	testCompile group: "junit", name: "junit", version: "4.12"
