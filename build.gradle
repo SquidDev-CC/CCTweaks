@@ -39,6 +39,9 @@ minecraft {
 	replace '${cc_version}', project.cc_version
 }
 
+runClient.outputs.upToDateWhen { false }
+runServer.outputs.upToDateWhen { false }
+
 jar {
 	manifest {
 		attributes(
