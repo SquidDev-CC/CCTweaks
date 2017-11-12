@@ -103,5 +103,6 @@ public class DisableTurtleCommand implements IPatcher {
 		mv.visitInsn(ARETURN);
 
 		mv.visitLabel(continueLabel);
+		mv.visitFrame(F_SAME, 0, null, 0, null);
 	}
 }

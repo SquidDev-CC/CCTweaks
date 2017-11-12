@@ -1,6 +1,7 @@
 package org.squiddev.cctweaks.core.patch;
 
 import com.google.common.base.Objects;
+import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.computer.blocks.TileComputerBase;
 import dan200.computercraft.shared.computer.core.ClientComputer;
 import dan200.computercraft.shared.computer.core.ServerComputer;
@@ -22,9 +23,30 @@ public abstract class TileComputerBase_Patch extends TileComputerBase implements
 	private boolean hasDisk;
 	private int diskId;
 
-	@MergeVisitor.Stub
 	public ServerComputer createServerComputer() {
-		return null;
+		if (!getWorld().isRemote) {
+			boolean changed = false;
+			if (m_instanceID < 0) {
+				m_instanceID = ComputerCraft.serverComputerRegistry.getUnusedInstanceID();
+				changed = true;
+			}
+
+			if (!ComputerCraft.serverComputerRegistry.contains(m_instanceID)) {
+				ServerComputer computer = createComputer(m_instanceID, m_computerID);
+				if (hasDisk) ((ServerComputer_Patch) computer).setCustomRom(diskId);
+				ComputerCraft.serverComputerRegistry.add(m_instanceID, computer);
+				changed = true;
+			}
+
+			if (changed) {
+				this.updateBlock();
+				this.updateInput();
+			}
+
+			return ComputerCraft.serverComputerRegistry.get(m_instanceID);
+		} else {
+			return null;
+		}
 	}
 
 	/**

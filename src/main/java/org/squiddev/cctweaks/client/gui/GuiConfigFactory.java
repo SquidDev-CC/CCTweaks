@@ -1,6 +1,5 @@
 package org.squiddev.cctweaks.client.gui;
 
-import dan200.computercraft.client.gui.GuiConfigCC;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.IModGuiFactory;
@@ -19,7 +18,7 @@ public class GuiConfigFactory implements IModGuiFactory {
 
 	@Override
 	public GuiScreen createConfigGui(GuiScreen parentScreen) {
-		return new GuiConfigCC(parentScreen);
+		return new GuiConfigCCTweaks(parentScreen);
 	}
 
 	@Override
